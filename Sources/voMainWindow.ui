@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>voMainWindow</class>
+ <widget class="QMainWindow" name="voMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>27</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionFileOpen"/>
+    <addaction name="actionFileExit"/>
+   </widget>
+   <widget class="QMenu" name="menuAnalysis">
+    <property name="title">
+     <string>&amp;Analysis</string>
+    </property>
+    <addaction name="actionAnalysisRawData"/>
+    <addaction name="actionAnalysisPCA"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionHelpAbout"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuAnalysis"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>Visomics Action</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionFileOpen"/>
+   <addaction name="actionHelpAbout"/>
+  </widget>
+  <widget class="QDockWidget" name="DataBrowserDockWidget">
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="DataBrowserDockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="voDataBrowserWidget" name="DataBrowserWidget">
+       <attribute name="headerVisible">
+        <bool>false</bool>
+       </attribute>
+       <column>
+        <property name="text">
+         <string notr="true">1</string>
+        </property>
+       </column>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionFileOpen">
+   <property name="icon">
+    <iconset resource="Resources/Visomics.qrc">
+     <normaloff>:/Icons/open.png</normaloff>:/Icons/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+   <property name="statusTip">
+    <string>Open an existing csv file</string>
+   </property>
+  </action>
+  <action name="actionFileExit">
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+   <property name="statusTip">
+    <string>Exit the application</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionHelpAbout">
+   <property name="icon">
+    <iconset resource="Resources/Visomics.qrc">
+     <normaloff>:/Icons/help.png</normaloff>:/Icons/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+   <property name="statusTip">
+    <string>Show the application's About box</string>
+   </property>
+  </action>
+  <action name="actionAnalysisRawData">
+   <property name="text">
+    <string>Raw Data</string>
+   </property>
+   <property name="statusTip">
+    <string>Input data</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+R</string>
+   </property>
+  </action>
+  <action name="actionAnalysisPCA">
+   <property name="text">
+    <string>PCA</string>
+   </property>
+   <property name="statusTip">
+    <string>Run PCA</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+P</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>voDataBrowserWidget</class>
+   <extends>QTreeWidget</extends>
+   <header>voDataBrowserWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="Resources/Visomics.qrc"/>
+ </resources>
+ <connections/>
+</ui>
