@@ -77,6 +77,14 @@ IF(BUILD_TESTING)
   INCLUDE(CTest)
   MARK_AS_ADVANCED(TCL_TCLSH DART_ROOT)
   SET(CPP_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+  
+  # Setup file for setting custom ctest vars
+  CONFIGURE_FILE(
+    CMake/CTestCustom.cmake.in
+    ${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake
+    @ONLY
+    )
+    
 ENDIF()
 
 #-----------------------------------------------------------------------------
