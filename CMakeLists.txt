@@ -69,4 +69,15 @@ FIND_PACKAGE(Qt4 4.7 REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
 #-----------------------------------------------------------------------------
+# Testing
+#
+OPTION(BUILD_TESTING "Test the project" ON)
+IF(BUILD_TESTING)
+  ENABLE_TESTING()
+  INCLUDE(CTest)
+  MARK_AS_ADVANCED(TCL_TCLSH DART_ROOT)
+  SET(CPP_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+ENDIF()
+
+#-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(Sources)
