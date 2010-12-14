@@ -1,13 +1,16 @@
 
 // Qt includes
 #include <QLayout>
+#include <QDebug>
 
 // Visomics includes
 #include "voCorrelationGraphView.h"
+#include "voDataObject.h"
 
 // VTK includes
 #include <QVTKWidget.h>
 #include <vtkArcParallelEdgeStrategy.h>
+#include <vtkGraph.h>
 #include <vtkGraphLayoutView.h>
 #include <vtkLookupTable.h>
 #include <vtkRenderedGraphRepresentation.h>
@@ -16,27 +19,60 @@
 #include <vtkViewTheme.h>
 
 // --------------------------------------------------------------------------
-voCorrelationGraphView::voCorrelationGraphView()
+class voCorrelationGraphViewPrivate
 {
-  this->addInput("input");
+public:
+  voCorrelationGraphViewPrivate();
+  vtkSmartPointer<vtkGraphLayoutView> GraphView;
+  QVTKWidget*                         Widget;
+};
 
-  this->GraphView = vtkSmartPointer<vtkGraphLayoutView>::New();
-  this->Widget = new QVTKWidget();
-  this->GraphView->SetInteractor(this->Widget->GetInteractor());
-  this->Widget->SetRenderWindow(this->GraphView->GetRenderWindow());
-  this->GraphView->DisplayHoverTextOn();
-  this->GraphView->SetLayoutStrategyToCircular();
-  this->GraphView->SetVertexLabelArrayName("label");
-  this->GraphView->VertexLabelVisibilityOn();
-  this->GraphView->SetEdgeColorArrayName("Correlation");
-  this->GraphView->ColorEdgesOn();
-  this->GraphView->SetEdgeLabelArrayName("Correlation");
-  this->GraphView->EdgeLabelVisibilityOn();
+// --------------------------------------------------------------------------
+// voCorrelationGraphViewPrivate methods
+
+// --------------------------------------------------------------------------
+voCorrelationGraphViewPrivate::voCorrelationGraphViewPrivate()
+{
+  this->GraphView = 0;
+  this->Widget = 0;
+}
+
+// --------------------------------------------------------------------------
+// voCorrelationGraphView methods
+
+// --------------------------------------------------------------------------
+voCorrelationGraphView::voCorrelationGraphView(QWidget * newParent):
+    Superclass(newParent), d_ptr(new voCorrelationGraphViewPrivate)
+{
+}
+
+// --------------------------------------------------------------------------
+voCorrelationGraphView::~voCorrelationGraphView()
+{
+}
+
+// --------------------------------------------------------------------------
+void voCorrelationGraphView::setupUi(QLayout *layout)
+{
+  Q_D(voCorrelationGraphView);
+
+  d->GraphView = vtkSmartPointer<vtkGraphLayoutView>::New();
+  d->Widget = new QVTKWidget();
+  d->GraphView->SetInteractor(d->Widget->GetInteractor());
+  d->Widget->SetRenderWindow(d->GraphView->GetRenderWindow());
+  d->GraphView->DisplayHoverTextOn();
+  d->GraphView->SetLayoutStrategyToCircular();
+  d->GraphView->SetVertexLabelArrayName("label");
+  d->GraphView->VertexLabelVisibilityOn();
+  d->GraphView->SetEdgeColorArrayName("Correlation");
+  d->GraphView->ColorEdgesOn();
+  d->GraphView->SetEdgeLabelArrayName("Correlation");
+  d->GraphView->EdgeLabelVisibilityOn();
 
   vtkSmartPointer<vtkArcParallelEdgeStrategy> arc =
     vtkSmartPointer<vtkArcParallelEdgeStrategy>::New();
   arc->SetNumberOfSubdivisions(50);
-  this->GraphView->SetEdgeLayoutStrategy(arc);
+  d->GraphView->SetEdgeLayoutStrategy(arc);
 
   vtkSmartPointer<vtkViewTheme> theme =
     vtkSmartPointer<vtkViewTheme>::New();
@@ -52,24 +88,35 @@ voCorrelationGraphView::voCorrelationGraphView()
   lut->Build();
   theme->SetCellLookupTable(lut);
   theme->GetPointTextProperty()->SetColor(0.0, 0.0, 0.0);
-  this->GraphView->ApplyViewTheme(theme);
+  d->GraphView->ApplyViewTheme(theme);
 
   vtkRenderedGraphRepresentation* rep =
-    vtkRenderedGraphRepresentation::SafeDownCast(this->GraphView->GetRepresentation());
+    vtkRenderedGraphRepresentation::SafeDownCast(d->GraphView->GetRepresentation());
   rep->SetVertexHoverArrayName("name");
   rep->SetEdgeHoverArrayName("Correlation");
+
+  layout->addWidget(d->Widget);
 }
 
 // --------------------------------------------------------------------------
-void voCorrelationGraphView::updateInternal()
+void voCorrelationGraphView::setDataObject(voDataObject* dataObject)
 {
-  this->GraphView->SetRepresentationFromInput(this->Inputs["input"].data());
-  this->GraphView->Render();
-}
+  Q_D(voCorrelationGraphView);
 
-// --------------------------------------------------------------------------
-QWidget* voCorrelationGraphView::widget()
-{
-  return this->Widget;
+  if (!dataObject)
+    {
+    qCritical() << "voCorrelationGraphView - Failed to setDataObject - dataObject is NULL";
+    return;
+    }
+
+  vtkGraph * graph = vtkGraph::SafeDownCast(dataObject->data());
+  if (!graph)
+    {
+    qCritical() << "voCorrelationGraphView - Failed to setDataObject - vtkGraph data is expected !";
+    return;
+    }
+
+  d->GraphView->SetRepresentationFromInput(graph);
+  d->GraphView->Render();
 }
 

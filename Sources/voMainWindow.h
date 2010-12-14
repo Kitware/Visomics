@@ -24,30 +24,10 @@ public:
   voMainWindow(QWidget * newParent = 0);
   virtual ~voMainWindow();
   
-  typedef enum { RAW, PCA } AnalysisMode;
-  
 public slots:
-  void open();
+  void onFileOpenActionTriggered();
 
   void about();
-
-  void pca();
-
-  void selectItemTreeWidget();
-
-  void loadRawData();
-  
-private:
-
-  bool loadFile ( const QString  &filename);
-
-  void setCurrentFile ( const QString &filename );
-
-  QString strippedName( const QString &fullFileName );
-
-  void addData( const QString &filename);
-
-  AnalysisMode  mode;
 
 protected:
   QScopedPointer<voMainWindowPrivate> d_ptr;

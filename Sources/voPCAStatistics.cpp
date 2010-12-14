@@ -1,9 +1,11 @@
 
+// Qt includes
+#include <QDebug>
+
 // Visomics includes
+#include "voApplication.h"
 #include "voPCAStatistics.h"
-#include "voCorrelationGraphView.h"
-#include "voPCAProjectionPlot.h"
-#include "voTableView.h"
+#include "voTableDataObject.h"
 
 // VTK includes
 #include <vtkAdjacencyMatrixToEdgeTable.h>
@@ -15,68 +17,108 @@
 #include <vtkGraph.h>
 #include <vtkMultiBlockDataSet.h>
 #include <vtkPCAStatistics.h>
+#include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkTableToArray.h>
 #include <vtkTableToGraph.h>
 
+
 // --------------------------------------------------------------------------
-voPCAStatistics::voPCAStatistics()
+class voPCAStatisticsPrivate
 {
-  this->PCA = vtkSmartPointer<vtkPCAStatistics>::New();
-  this->PCA->SetLearnOption(true);
-  this->PCA->SetDeriveOption(true);
-  this->PCA->SetAssessOption(true);
-  this->PCA->SetBasisSchemeByName("FixedBasisEnergy");
-  this->PCA->SetFixedBasisEnergy(0.95);
+public:
 
-  this->Descriptive = vtkSmartPointer<vtkDescriptiveStatistics>::New();
+  vtkSmartPointer<vtkDescriptiveStatistics> Descriptive;
+  vtkSmartPointer<vtkPCAStatistics> PCA;
+};
 
-  voCorrelationGraphView* correl = new voCorrelationGraphView();
-  correl->setInput(voPort(this, "correlation graph"));
-  this->Views["Correlation Graph"] = correl;
+// --------------------------------------------------------------------------
+// voPCAStatisticsPrivate methods
 
-  voPCAProjectionPlot* plot = new voPCAProjectionPlot();
-  plot->setInput(voPort(this, "x"));
-  this->Views["Projection Plot"] = plot;
+// --------------------------------------------------------------------------
+// voPCAStatistics methods
 
-  this->Views["Table (Coordinates)"] = new voTableView();
-  this->Views["Table (Coordinates)"]->setInput(voPort(this, "x"));
+// --------------------------------------------------------------------------
+voPCAStatistics::voPCAStatistics():
+    Superclass(), d_ptr(new voPCAStatisticsPrivate)
+{
+  Q_D(voPCAStatistics);
 
-  this->Views["Table (Rotation)"] = new voTableView();
-  this->Views["Table (Rotation)"]->setInput(voPort(this, "rot"));
+  d->PCA = vtkSmartPointer<vtkPCAStatistics>::New();
+  d->PCA->SetLearnOption(true);
+  d->PCA->SetDeriveOption(true);
+  d->PCA->SetAssessOption(true);
+  d->PCA->SetBasisSchemeByName("FixedBasisEnergy");
+  d->PCA->SetFixedBasisEnergy(0.95);
 
-  this->Views["Table (Std. Deviation)"] = new voTableView();
-  this->Views["Table (Std. Deviation)"]->setInput(voPort(this, "sdev"));
-
-  this->Views["Table (Correlation)"] = new voTableView();
-  this->Views["Table (Correlation)"]->setInput(voPort(this, "corr"));
+  d->Descriptive = vtkSmartPointer<vtkDescriptiveStatistics>::New();
 }
 
 // --------------------------------------------------------------------------
-void voPCAStatistics::updateInternal()
+voPCAStatistics::~voPCAStatistics()
 {
-  vtkTable* table = vtkTable::SafeDownCast(this->input().data());
+}
+
+// --------------------------------------------------------------------------
+void voPCAStatistics::setInputInformation()
+{
+  this->addInputType("input", "vtkTable");
+}
+
+// --------------------------------------------------------------------------
+void voPCAStatistics::setOutputInformation()
+{
+  this->addOutputType("x", "vtkTable",
+                      "voPCAProjectionPlot", "Projection Plot",
+                      "voTableView");
+
+  this->addOutputType("x", "vtkTable",
+                      "voTableView", "Table (Coordinates)");
+
+  this->addOutputType("rot", "vtkTable",
+                      "voTableView",  "Table (Rotation)",
+                      "voTableView");
+
+  this->addOutputType("sdev", "vtkTable",
+                      "voTableView", "Table (Std. Deviation)",
+                      "voTableView");
+
+  this->addOutputType("corr", "vtkTable",
+                      "voTableView",  "Table (Correlation)",
+                      "voTableView");
+
+  this->addOutputType("correlation graph", "vtkGraph",
+                      "voCorrelationGraphView", "Correlation Graph");
+}
+
+// --------------------------------------------------------------------------
+bool voPCAStatistics::execute()
+{
+  Q_D(voPCAStatistics);
+
+  vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
   if (!table)
     {
-    return;
+    qWarning() << "Input is Null";
+    return false;
     }
 
   // Add request to process all columns
-  this->PCA->ResetRequests();
-  this->PCA->ResetAllColumnStates();
+  d->PCA->ResetRequests();
+  d->PCA->ResetAllColumnStates();
   for (int i = 1; i < table->GetNumberOfColumns(); ++i)
     {
-    this->PCA->SetColumnStatus(table->GetColumnName(i), 1);
+    d->PCA->SetColumnStatus(table->GetColumnName(i), 1);
     }
-  this->PCA->RequestSelectedColumns();
+  d->PCA->RequestSelectedColumns();
 
   // Do PCA
-  this->PCA->SetInput(table);
-  this->PCA->Update();
+  d->PCA->SetInput(table);
+  d->PCA->Update();
 
-  vtkTable* assess = vtkTable::SafeDownCast(this->PCA->GetOutputDataObject(0));
-  vtkMultiBlockDataSet* learn = vtkMultiBlockDataSet::SafeDownCast(this->PCA->GetOutputDataObject(1));
+  vtkTable* assess = vtkTable::SafeDownCast(d->PCA->GetOutputDataObject(0));
+  vtkMultiBlockDataSet* learn = vtkMultiBlockDataSet::SafeDownCast(d->PCA->GetOutputDataObject(1));
 
   /*
   assess->Dump();
@@ -87,20 +129,20 @@ void voPCAStatistics::updateInternal()
   */
 
   // Find standard deviations of each column
-  this->Descriptive->ResetRequests();
-  this->Descriptive->ResetAllColumnStates();
+  d->Descriptive->ResetRequests();
+  d->Descriptive->ResetAllColumnStates();
   for (int i = 1; i < table->GetNumberOfColumns(); ++i)
     {
-    this->Descriptive->SetColumnStatus(table->GetColumnName(i), 1);
-    this->Descriptive->RequestSelectedColumns();
-    this->Descriptive->ResetAllColumnStates();
+    d->Descriptive->SetColumnStatus(table->GetColumnName(i), 1);
+    d->Descriptive->RequestSelectedColumns();
+    d->Descriptive->ResetAllColumnStates();
     }
 
   // Do descriptive stats
-  this->Descriptive->SetInput(table);
-  this->Descriptive->Update();
+  d->Descriptive->SetInput(table);
+  d->Descriptive->Update();
 
-  vtkMultiBlockDataSet* dBlock = vtkMultiBlockDataSet::SafeDownCast(this->Descriptive->GetOutputDataObject(1));
+  vtkMultiBlockDataSet* dBlock = vtkMultiBlockDataSet::SafeDownCast(d->Descriptive->GetOutputDataObject(1));
   vtkTable* descriptive = vtkTable::SafeDownCast(dBlock->GetBlock(1));
   vtkDoubleArray* columnDev = vtkDoubleArray::SafeDownCast(descriptive->GetColumnByName("Standard Deviation"));
 
@@ -113,7 +155,7 @@ void voPCAStatistics::updateInternal()
     col->SetName(vtkVariant(c-table->GetNumberOfColumns()).ToString());
     xtab->AddColumn(col);
     }
-  this->Outputs["x"] = xtab;
+  this->setOutput("x", new voTableDataObject("x", xtab));
 
   vtkTable* compressed = vtkTable::SafeDownCast(learn->GetBlock(1));
   vtkSmartPointer<vtkTable> rot = vtkSmartPointer<vtkTable>::New();
@@ -139,7 +181,7 @@ void voPCAStatistics::updateInternal()
       }
     rot->AddColumn(arr);
     }
-  this->Outputs["rot"] = rot;
+  this->setOutput("rot", new voTableDataObject("rot", rot));
 
   // Extract standard deviations for each principal component (eigenvalues)
   vtkSmartPointer<vtkTable> sdev = vtkSmartPointer<vtkTable>::New();
@@ -152,7 +194,7 @@ void voPCAStatistics::updateInternal()
     sdevArr->SetValue(r, compressed->GetValue(r + n + 1, 1).ToDouble());
     }
   sdev->AddColumn(sdevArr);
-  this->Outputs["sdev"] = sdev;
+  this->setOutput("sdev", new voTableDataObject("sdev", sdev));
 
   // Compute correlations as corr(A,B) = cov(A,B)/(stddev(A)*stddev(B))
   vtkSmartPointer<vtkTable> corr = vtkSmartPointer<vtkTable>::New();
@@ -182,7 +224,7 @@ void voPCAStatistics::updateInternal()
       }
     corr->AddColumn(arr);
     }
-  this->Outputs["corr"] = corr;
+  this->setOutput("corr", new voTableDataObject("corr", corr));
 
   // Find high correlations to put in graph
   vtkSmartPointer<vtkTable> sparseCorr = vtkSmartPointer<vtkTable>::New();
@@ -218,5 +260,8 @@ void voPCAStatistics::updateInternal()
   correlGraphAlg->AddLinkEdge("Column 1", "Column 2");
   correlGraphAlg->Update();
 
-  this->Outputs["correlation graph"] = correlGraphAlg->GetOutput();
+  this->setOutput(
+      "correlation graph", new voDataObject("correlation graph", correlGraphAlg->GetOutput()));
+
+  return true;
 }

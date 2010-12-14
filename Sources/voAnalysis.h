@@ -2,68 +2,91 @@
 #ifndef __voAnalysis_h
 #define __voAnalysis_h
 
-#include "voPort.h"
-
-#include <vtkSmartPointer.h>
-
-#include <QString>
+// Qt includes
+#include <QSharedPointer>
+#include <QScopedPointer>
+#include <QLatin1String>
+#include <QObject>
 #include <QStringList>
-#include <QMap>
 
-class voView;
-class vtkAlgorithm;
+class voAnalysisPrivate;
+class voDataObject;
 class vtkDataObject;
 
 class voAnalysis : public QObject
 {
+  Q_OBJECT
 public:
   voAnalysis();
   virtual ~voAnalysis();
 
-  virtual voPort input(const QString& i)const;
 
-  virtual voPort input()const
-    { return this->input("input"); }
+  void addInputType(const QString& inputName, const QString& inputType);
 
-  virtual void setInput(const QString& i, voPort port);
+  QString inputType(const QString& inputName) const;
 
-  virtual void setInput(voPort port)
-    { this->setInput("input", port); }
+  int numberOfInput();
 
-  virtual void update();
+  QStringList inputNames()const;
 
-  virtual void updateViews();
+  bool hasInput(const QString& inputName) const;
 
-  virtual vtkDataObject* output(const QString& i)const;
+  void setInput(const QString& inputName, voDataObject * dataObject);
 
-  virtual vtkDataObject* output() const
-    { return this->output("output"); }
+  voDataObject * input(const QString& inputName = QLatin1String("input")) const;
 
-  virtual QStringList views() const
-    { return this->Views.keys(); }
+  void removeAllInputs();
 
-  virtual voView* view(const QString& str)
-    { return this->Views[str]; }
+
+
+  void addOutputType(const QString& outputName, const QString& outputType,
+                     const QString& viewType, const QString& viewPrettyName,
+                     const QString& rawViewType = QString());
+
+  QString outputType(const QString& outputName) const;
+
+  QString viewPrettyName(const QString& outputName, const QString& viewType);
+
+  int numberOfOutput();
+
+  QStringList outputNames() const;
+
+  bool hasOutput(const QString& outputName) const;
+
+  void setOutput(const QString& outputName, voDataObject * dataObject);
+
+  voDataObject * output(const QString& outputName) const;
+
+  bool hasOutputWithViewType(const QString& outputName, const QString& viewType) const;
+
+  QStringList viewTypesForOutput(const QString& outputName)const;
+
+//  QStringList viewTypes()const;
+
+  bool hasOutputWithRawViewType(const QString& outputName, const QString& rawViewType) const;
+
+  QString rawViewTypeForOutput(const QString& outputName)const;
+
+  void removeAllOutputs();
+
+  bool run();
+
+  void initializeInputInformation();
+  void initializeOutputInformation();
 
 protected:
-  virtual void addInput(const QString& name);
 
-  /// Call \a updateInternal on all associated inputs
-  /// \sa updateInternal
-  virtual void updateInputs();
+  virtual bool execute();
 
-  /// Set \a Algorithm inputs, update \a Algorithm and retrieve the associated outputs
-  /// The map \a Outputs will contains the output data object
-  virtual void updateInternal();
+  virtual void setInputInformation(){}
+  virtual void setOutputInformation(){}
 
-  QMap<QString, voPort> Inputs;
-  QMap<QString, vtkSmartPointer<vtkDataObject> > Outputs;
-  QMap<QString, voView*> Views;
+protected:
+  QScopedPointer<voAnalysisPrivate> d_ptr;
 
-  QMap<QString, int> InputNameToIndex;
-  QMap<QString, int> OutputNameToIndex;
-
-  vtkAlgorithm* Algorithm;
+private:
+  Q_DECLARE_PRIVATE(voAnalysis);
+  Q_DISABLE_COPY(voAnalysis);
 };
 
 #endif

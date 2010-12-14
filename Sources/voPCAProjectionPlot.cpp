@@ -1,10 +1,12 @@
 
 // QT includes
 #include <QLayout>
+#include <QDebug>
 #include <QMap>
 
 // Visomics includes
 #include "voPCAProjectionPlot.h"
+#include "voDataObject.h"
 
 // VTK includes
 #include <QVTKWidget.h>
@@ -18,21 +20,30 @@
 #include <vtkVariantArray.h>
 
 // --------------------------------------------------------------------------
-voPCAProjectionPlot::voPCAProjectionPlot()
-{  
-  this->ChartView = vtkSmartPointer<vtkContextView>::New();
-  this->Chart = vtkSmartPointer<vtkChartXY>::New();
-  this->Widget = new QVTKWidget();
-  this->ChartView->SetInteractor(this->Widget->GetInteractor());
-  this->Widget->SetRenderWindow(this->ChartView->GetRenderWindow());
-  this->ChartView->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
-  this->ChartView->GetScene()->AddItem(this->Chart);
+class voPCAProjectionPlotPrivate
+{
+public:
+  voPCAProjectionPlotPrivate();
 
-  this->addInput("input");
+  QMap<vtkVariant, vtkSmartPointer<vtkTable> > splitTable(vtkTable* t, const char* column);
+
+  vtkSmartPointer<vtkContextView> ChartView;
+  vtkSmartPointer<vtkChartXY>     Chart;
+  QVTKWidget*                     Widget;
+};
+
+// --------------------------------------------------------------------------
+// voPCAProjectionPlotPrivate methods
+
+// --------------------------------------------------------------------------
+voPCAProjectionPlotPrivate::voPCAProjectionPlotPrivate()
+{
+  this->Widget = 0;
 }
 
 // --------------------------------------------------------------------------
-QMap<vtkVariant, vtkSmartPointer<vtkTable> > voPCAProjectionPlot::splitTable(vtkTable* t, const char* column)
+QMap<vtkVariant, vtkSmartPointer<vtkTable> > voPCAProjectionPlotPrivate::splitTable(
+    vtkTable* t, const char* column)
 {
   QMap<vtkVariant, vtkSmartPointer<vtkTable> > m;
   vtkSmartPointer<vtkVariantArray> row =
@@ -58,27 +69,70 @@ QMap<vtkVariant, vtkSmartPointer<vtkTable> > voPCAProjectionPlot::splitTable(vtk
 }
 
 // --------------------------------------------------------------------------
-void voPCAProjectionPlot::updateInternal()
-{
-  vtkTable* table = vtkTable::SafeDownCast(this->input().data());
+// voPCAProjectionPlot methods
 
-  QMap<vtkVariant, vtkSmartPointer<vtkTable> > tables = this->splitTable(table, "Y Var");
+// --------------------------------------------------------------------------
+voPCAProjectionPlot::voPCAProjectionPlot(QWidget * newParent):
+    Superclass(newParent), d_ptr(new voPCAProjectionPlotPrivate)
+{
+}
+
+// --------------------------------------------------------------------------
+voPCAProjectionPlot::~voPCAProjectionPlot()
+{
+
+}
+
+// --------------------------------------------------------------------------
+void voPCAProjectionPlot::setupUi(QLayout *layout)
+{
+  Q_D(voPCAProjectionPlot);
+
+  d->ChartView = vtkSmartPointer<vtkContextView>::New();
+  d->Chart = vtkSmartPointer<vtkChartXY>::New();
+  d->Widget = new QVTKWidget();
+  d->ChartView->SetInteractor(d->Widget->GetInteractor());
+  d->Widget->SetRenderWindow(d->ChartView->GetRenderWindow());
+  d->ChartView->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
+  d->ChartView->GetScene()->AddItem(d->Chart);
+
+  layout->addWidget(d->Widget);
+}
+
+// --------------------------------------------------------------------------
+void voPCAProjectionPlot::setDataObject(voDataObject *dataObject)
+{
+  Q_D(voPCAProjectionPlot);
+
+  if (!dataObject)
+    {
+    qCritical() << "voPCAProjectionPlot - Failed to setDataObject - dataObject is NULL";
+    return;
+    }
+
+  vtkTable * table = vtkTable::SafeDownCast(dataObject->data());
+  if (!table)
+    {
+    qCritical() << "voPCAProjectionPlot - Failed to setDataObject - vtkTable data is expected !";
+    return;
+    }
+
+  QMap<vtkVariant, vtkSmartPointer<vtkTable> > tables = d->splitTable(table, "Y Var");
   QMap<vtkVariant, vtkSmartPointer<vtkTable> >::iterator it, itEnd;
   itEnd = tables.end();
-  unsigned char colors[10][3] = {{166, 206, 227}, {31, 120, 180}, {178, 223, 13}, {51, 160, 44}, {251, 154, 153}, {227, 26, 28}, {253, 191, 111}, {255, 127, 0}, {202, 178, 214}, {106, 61, 154}};
+  unsigned char colors[10][3] =
+    {
+      {166, 206, 227}, {31, 120, 180}, {178, 223, 13},
+      {51, 160, 44}, {251, 154, 153}, {227, 26, 28},
+      {253, 191, 111}, {255, 127, 0}, {202, 178, 214}, {106, 61, 154}
+    };
   int i = 0;
   for (it = tables.begin(); it != itEnd; ++it, ++i)
     {
-    vtkPlot* p = this->Chart->AddPlot(vtkChart::POINTS);
+    vtkPlot* p = d->Chart->AddPlot(vtkChart::POINTS);
     p->SetInput(it.value(), 1, 2);
     p->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
     p->SetWidth(10);
     }
-  this->ChartView->Render();
-}
-
-// --------------------------------------------------------------------------
-QWidget* voPCAProjectionPlot::widget()
-{
-  return this->Widget;
+  d->ChartView->Render();
 }

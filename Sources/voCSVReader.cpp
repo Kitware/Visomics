@@ -5,6 +5,7 @@
 
 // VTK includes
 #include <vtkDelimitedTextReader.h>
+#include <vtkStringToNumeric.h>
 #include <vtkStringArray.h>
 #include <vtkStringToNumeric.h>
 #include <vtkTable.h>
@@ -16,13 +17,11 @@ voCSVReader::voCSVReader()
   this->Reader->SetFieldDelimiterCharacters(",");
   this->Reader->SetHaveHeaders(1);
   this->Reader->DetectNumericColumnsOff();
-
-  this->Views["RawData-Table"] = new voTableView();
-  this->Views["RawData-Table"]->setInput(this);
+  this->NumericOutput = vtkSmartPointer<vtkStringToNumeric>::New();
 }
 
 // --------------------------------------------------------------------------
-void voCSVReader::updateInternal()
+void voCSVReader::update()
 {
   this->Reader->Update();
   vtkTable* table = this->Reader->GetOutput();
@@ -50,11 +49,14 @@ void voCSVReader::updateInternal()
     }
 
   // Detect numeric columns
-  vtkSmartPointer<vtkStringToNumeric> numeric = vtkSmartPointer<vtkStringToNumeric>::New();
-  numeric->SetInput(transpose);
-  numeric->Update();
+  this->NumericOutput->SetInput(transpose);
+  this->NumericOutput->Update();
+}
 
-  this->Outputs["output"] = numeric->GetOutput();
+// --------------------------------------------------------------------------
+vtkDataObject* voCSVReader::output()
+{
+  this->NumericOutput->GetOutput();
 }
 
 // --------------------------------------------------------------------------

@@ -2,25 +2,30 @@
 #ifndef __voCSVReader_h
 #define __voCSVReader_h
 
-#include "voAnalysis.h"
+// Qt includes
+#include <QString>
 
+// VTK includes
 #include <vtkSmartPointer.h>
 
+class vtkDataObject;
 class vtkDelimitedTextReader;
+class vtkStringToNumeric;
 
-class voCSVReader : public voAnalysis
+class voCSVReader
 {
 public:
   voCSVReader();
 
-  virtual void setFileName(QString fileName);
+  void setFileName(QString fileName);
+  QString fileName();
 
-  virtual QString fileName();
+  void update();
 
-protected:
-  virtual void updateInternal();
+  vtkDataObject* output();
 
   vtkSmartPointer<vtkDelimitedTextReader> Reader;
+  vtkSmartPointer<vtkStringToNumeric>     NumericOutput;
 };
 
 #endif

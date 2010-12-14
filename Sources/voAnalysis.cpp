@@ -1,103 +1,337 @@
 
-// Visomics includes
-#include "voAnalysis.h"
-#include "voView.h"
+// Qt includes
+#include <QHash>
+#include <QExplicitlySharedDataPointer>
+#include <QDebug>
 
-// VTK includes
-#include <vtkAlgorithm.h>
-#include <vtkDataObject.h>
+// Visomics include
+#include "voAnalysis.h"
+#include "voDataObject.h"
 
 // --------------------------------------------------------------------------
-voAnalysis::voAnalysis()
+class voAnalysisPrivate
 {
-  this->Algorithm = 0;
+public:
+  voAnalysisPrivate();
+  ~voAnalysisPrivate();
+
+  // TODO Use vtkInformationVector ?
+  //vtkInformationVector* InputInformation;
+  //vtkInformationVector* OutputInformation;
+
+  QHash<QString, QString> InputInformation;
+  QHash<QString, QExplicitlySharedDataPointer<voDataObject> > InputDataObjects;
+  QHash<QString, QString> OutputInformation;
+  QHash<QString, QString> OutputViewInformation;
+  QHash<QString, QString> OutputRawView;
+  QHash<QString, QString> OutputViewPrettyName;
+  QHash<QString, QExplicitlySharedDataPointer<voDataObject> > OutputDataObjects;
+
+  bool InputInformationInitialized;
+  bool OutputInformationInitialized;
+};
+
+// --------------------------------------------------------------------------
+// voAnalysisPrivate methods
+
+// --------------------------------------------------------------------------
+voAnalysisPrivate::voAnalysisPrivate()
+{
+  this->InputInformationInitialized = false;
+  this->OutputInformationInitialized = false;
+}
+
+// --------------------------------------------------------------------------
+voAnalysisPrivate::~voAnalysisPrivate()
+{
+}
+
+// --------------------------------------------------------------------------
+// voAnalysis methods
+
+// --------------------------------------------------------------------------
+voAnalysis::voAnalysis():d_ptr(new voAnalysisPrivate)
+{
 }
 
 // --------------------------------------------------------------------------
 voAnalysis::~voAnalysis()
 {
-  if (this->Algorithm)
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::addInputType(const QString& inputName, const QString& inputType)
+{
+  Q_D(voAnalysis);
+
+  if (this->hasInput(inputName))
     {
-    this->Algorithm->Delete();
+    return;
     }
-  QMap<QString, voView*>::iterator it, itEnd;
-  itEnd = this->Views.end();
-  for (it = this->Views.begin(); it != itEnd; ++it)
+  d->InputInformation.insert(inputName, inputType);
+}
+
+// --------------------------------------------------------------------------
+QString voAnalysis::inputType(const QString& inputName) const
+{
+  Q_D(const voAnalysis);
+  if (!this->hasInput(inputName))
     {
-    delete it.value();
+    return QString();
     }
+  return d->InputInformation.value(inputName);
 }
 
 // --------------------------------------------------------------------------
-voPort voAnalysis::input(const QString& str)const
+int voAnalysis::numberOfInput()
 {
-  return this->Inputs[str];
+  Q_D(const voAnalysis);
+  this->initializeInputInformation();
+  return d->InputInformation.count();
 }
 
 // --------------------------------------------------------------------------
-void voAnalysis::setInput(const QString& str, voPort p)
+QStringList voAnalysis::inputNames()const
 {
-  this->Inputs[str] = p;
+  Q_D(const voAnalysis);
+  return d->InputInformation.keys();
 }
 
 // --------------------------------------------------------------------------
-void voAnalysis::update()
+bool voAnalysis::hasInput(const QString& inputName)const
 {
-  //this->updateInputs();
-  this->updateInternal();
+  Q_D(const voAnalysis);
+  return d->InputInformation.contains(inputName);
 }
 
 // --------------------------------------------------------------------------
-void voAnalysis::updateViews()
+void voAnalysis::setInput(const QString& inputName, voDataObject * dataObject)
 {
-  foreach(voView* view, this->Views.values())
+  Q_D(voAnalysis);
+  if (!this->hasInput(inputName))
     {
-    view->update();
+    return;
     }
+  d->InputDataObjects.insert(inputName, QExplicitlySharedDataPointer<voDataObject>(dataObject));
 }
 
 // --------------------------------------------------------------------------
-void voAnalysis::updateInputs()
+voDataObject * voAnalysis::input(const QString& inputName) const
 {
-  foreach(voPort port, this->Inputs.values())
+  Q_D(const voAnalysis);
+  if (!this->hasInput(inputName))
     {
-    if (!port.analysis())
-      {
-      vtkGenericWarningMacro("Input analysis not defined.");
-      continue;
-      }
-    port.analysis()->update();
+    return 0;
     }
+  return d->InputDataObjects.value(inputName).data();
 }
 
 // --------------------------------------------------------------------------
-void voAnalysis::updateInternal()
+void voAnalysis::removeAllInputs()
 {
-  QMap<QString, int>::iterator it, itEnd;
-  itEnd = this->InputNameToIndex.end();
-  for (it = this->InputNameToIndex.begin(); it != itEnd; ++it)
+  Q_D(voAnalysis);
+  d->InputDataObjects.clear();
+  d->InputInformation.clear();
+  d->InputInformationInitialized = false;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::addOutputType(const QString& outputName, const QString& outputType,
+                               const QString& viewType, const QString& viewPrettyName,
+                               const QString& rawViewType)
+{
+  Q_D(voAnalysis);
+  if (this->hasOutput(outputName))
     {
-    Algorithm->SetInputConnection(it.value(), this->Inputs[it.key()].data()->GetProducerPort());
+    return;
     }
+  d->OutputInformation.insert(outputName, outputType);
 
-  this->Algorithm->Update();
+  d->OutputViewInformation.insertMulti(outputName, viewType);
 
-  itEnd = this->OutputNameToIndex.end();
-  for (it = this->OutputNameToIndex.begin(); it != itEnd; ++it)
+  if (!rawViewType.isEmpty())
     {
-    this->Outputs[it.key()] = Algorithm->GetOutputDataObject(it.value());
+    d->OutputRawView.insert(outputName, rawViewType);
+    }
+
+  if (!viewPrettyName.isEmpty())
+    {
+    d->OutputViewPrettyName.insert(outputName + viewType, viewPrettyName);
     }
 }
 
 // --------------------------------------------------------------------------
-void voAnalysis::addInput(const QString& str)
+QString voAnalysis::outputType(const QString& outputName) const
 {
-  this->Inputs[str] = voPort();
+  Q_D(const voAnalysis);
+  if (!this->hasOutput(outputName))
+    {
+    return QString();
+    }
+  return d->OutputInformation.value(outputName);
 }
 
 // --------------------------------------------------------------------------
-vtkDataObject* voAnalysis::output(const QString& str)const
+QString voAnalysis::viewPrettyName(const QString& outputName, const QString& viewType)
 {
-  //this->update();
-  return this->Outputs[str];
+  Q_D(const voAnalysis);
+  if (!this->hasOutput(outputName))
+    {
+    return QString();
+    }
+  return d->OutputViewPrettyName.value(outputName + viewType, /*defaultValue=*/QString());;
+}
+
+// --------------------------------------------------------------------------
+int voAnalysis::numberOfOutput()
+{
+  Q_D(const voAnalysis);
+  this->initializeOutputInformation();
+  return d->OutputInformation.count();
+}
+
+// --------------------------------------------------------------------------
+QStringList voAnalysis::outputNames()const
+{
+  Q_D(const voAnalysis);
+  return d->OutputInformation.keys();
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysis::hasOutput(const QString& outputName)const
+{
+  Q_D(const voAnalysis);
+  return d->OutputInformation.contains(outputName);
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::setOutput(const QString& outputName, voDataObject * dataObject)
+{
+  Q_D(voAnalysis);
+  if (!this->hasOutput(outputName))
+    {
+    return;
+    }
+  d->OutputDataObjects.insert(outputName, QExplicitlySharedDataPointer<voDataObject>(dataObject));
+}
+
+// --------------------------------------------------------------------------
+voDataObject * voAnalysis::output(const QString& outputName) const
+{
+  Q_D(const voAnalysis);
+  if (!this->hasOutput(outputName))
+    {
+    return 0;
+    }
+  return d->OutputDataObjects.value(outputName).data();
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysis::hasOutputWithViewType(const QString& outputName, const QString& viewType) const
+{
+  Q_D(const voAnalysis);
+  if (!this->hasOutput(outputName))
+    {
+    return false;
+    }
+  if (d->OutputViewInformation.values().contains(viewType))
+    {
+    return true;
+    }
+  return false;
+}
+
+// --------------------------------------------------------------------------
+QStringList voAnalysis::viewTypesForOutput(const QString& outputName)const
+{
+  Q_D(const voAnalysis);
+  if (!this->hasOutput(outputName))
+    {
+    return QStringList();
+    }
+  //qDebug() << "viewTypesForOutput" << outputName;
+
+  return d->OutputViewInformation.values(outputName);
+}
+
+//// --------------------------------------------------------------------------
+//QStringList voAnalysis::viewTypes()const
+//{
+//  Q_D(const voAnalysis);
+//  return d->OutputViewInformation.values();
+//}
+
+// --------------------------------------------------------------------------
+bool voAnalysis::hasOutputWithRawViewType(const QString& outputName, const QString& rawViewType) const
+{
+  Q_D(const voAnalysis);
+  if (!this->hasOutput(outputName))
+    {
+    return false;
+    }
+  if (d->OutputRawView.values().contains(rawViewType))
+    {
+    return true;
+    }
+  return false;
+}
+
+// --------------------------------------------------------------------------
+QString voAnalysis::rawViewTypeForOutput(const QString& outputName)const
+{
+  Q_D(const voAnalysis);
+  if (!this->hasOutput(outputName))
+    {
+    return QString();
+    }
+
+  return d->OutputRawView.value(outputName, /*defaultValue=*/ QString());
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::removeAllOutputs()
+{
+  Q_D(voAnalysis);
+  d->OutputDataObjects.clear();
+  d->OutputInformation.clear();
+  d->OutputViewInformation.clear();
+  d->OutputRawView.clear();
+  d->OutputViewPrettyName.clear();
+  d->OutputInformationInitialized = false;
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysis::run()
+{
+  return this->execute();
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysis::execute()
+{
+  return true;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::initializeInputInformation()
+{
+  Q_D(voAnalysis);
+  if (d->InputInformationInitialized)
+    {
+    return;
+    }
+  this->setInputInformation();
+  d->InputInformationInitialized = true;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::initializeOutputInformation()
+{
+  Q_D(voAnalysis);
+  if (d->OutputInformationInitialized)
+    {
+    return;
+    }
+  this->setOutputInformation();
+  d->OutputInformationInitialized = true;
 }

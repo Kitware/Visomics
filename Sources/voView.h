@@ -4,21 +4,26 @@
 #define __voView_h
 
 // Qt includes
+#include <QWidget>
 #include <QList>
 
-// Visomics includes
-#include "voAnalysis.h"
+class voDataObject;
 
-class QWidget;
-
-class voView : public voAnalysis
+class voView : public QWidget
 {
+  Q_OBJECT
 public:
-  voView() { }
+  typedef QWidget Superclass;
+  voView(QWidget* newParent = 0);
+  virtual ~voView();
 
-  virtual void updateInternal();
+  void initialize();
 
-  virtual QWidget* widget() = 0;
+  virtual void setDataObject(voDataObject* dataObject) = 0;
+
+protected:
+
+  virtual void setupUi(QLayout * layout) = 0;
 };
 
 #endif

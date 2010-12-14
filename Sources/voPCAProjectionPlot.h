@@ -4,36 +4,32 @@
 #define __voPCAProjectionPlot_h
 
 // Qt includes
-#include <QMap>
-#include <QString>
+#include <QScopedPointer>
 
 // Visomics includes
 #include "voView.h"
 
-// VTK includes
-#include <vtkSmartPointer.h>
-#include <vtkVariant.h>
-
-class QVTKWidget;
-class vtkChartXY;
-class vtkContextView;
-class vtkTable;
+class voPCAProjectionPlotPrivate;
 
 class voPCAProjectionPlot : public voView
 {
+  Q_OBJECT
 public:
-  voPCAProjectionPlot();
+  typedef voView Superclass;
+  voPCAProjectionPlot(QWidget * newParent = 0);
+  virtual ~voPCAProjectionPlot();
 
-  virtual QWidget* widget();
+  virtual void setDataObject(voDataObject* dataObject);
 
 protected:
-  virtual void updateInternal();
+  void setupUi(QLayout * layout);
 
-  QMap<vtkVariant, vtkSmartPointer<vtkTable> > splitTable(vtkTable* t, const char* column);
+protected:
+  QScopedPointer<voPCAProjectionPlotPrivate> d_ptr;
 
-  vtkSmartPointer<vtkContextView> ChartView;
-  vtkSmartPointer<vtkChartXY> Chart;
-  QVTKWidget* Widget;
+private:
+  Q_DECLARE_PRIVATE(voPCAProjectionPlot);
+  Q_DISABLE_COPY(voPCAProjectionPlot);
 };
 
 #endif

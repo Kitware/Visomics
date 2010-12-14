@@ -4,14 +4,14 @@
 #define __voDataBrowserWidget_h
 
 // Qt includes
-#include <QTreeWidget>
+#include <QTreeView>
 
-class voDataBrowserWidget : public QTreeWidget
+class voDataBrowserWidget : public QTreeView
 {
   Q_OBJECT
 public:
-  typedef QTreeWidget Superclass;
-  voDataBrowserWidget(QWidget* newParent);
+  typedef QTreeView Superclass;
+  voDataBrowserWidget(QWidget* newParent = 0);
   virtual ~voDataBrowserWidget();
  
 };

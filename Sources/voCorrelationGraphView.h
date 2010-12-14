@@ -3,25 +3,33 @@
 #ifndef __voCorrelationGraphView_h
 #define __voCorrelationGraphView_h
 
+// Qt includes
+#include <QScopedPointer>
+
+// Visomics includes
 #include "voView.h"
 
-#include <vtkSmartPointer.h>
-
-class QVTKWidget;
-class vtkGraphLayoutView;
+class voCorrelationGraphViewPrivate;
 
 class voCorrelationGraphView : public voView
 {
+  Q_OBJECT
 public:
-  voCorrelationGraphView();
+  typedef voView Superclass;
+  voCorrelationGraphView(QWidget * newParent = 0);
+  virtual ~voCorrelationGraphView();
 
-  virtual QWidget* widget();
+  virtual void setDataObject(voDataObject* dataObject);
 
 protected:
-  virtual void updateInternal();
+  void setupUi(QLayout * layout);
 
-  vtkSmartPointer<vtkGraphLayoutView> GraphView;
-  QVTKWidget*                         Widget;
+protected:
+  QScopedPointer<voCorrelationGraphViewPrivate> d_ptr;
+
+private:
+  Q_DECLARE_PRIVATE(voCorrelationGraphView);
+  Q_DISABLE_COPY(voCorrelationGraphView);
 };
 
 #endif

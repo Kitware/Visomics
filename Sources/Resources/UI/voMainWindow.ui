@@ -34,8 +34,6 @@
     <property name="title">
      <string>&amp;Analysis</string>
     </property>
-    <addaction name="actionAnalysisRawData"/>
-    <addaction name="actionAnalysisPCA"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -62,6 +60,9 @@
    <addaction name="actionHelpAbout"/>
   </widget>
   <widget class="QDockWidget" name="DataBrowserDockWidget">
+   <property name="windowTitle">
+    <string>Data Browser</string>
+   </property>
    <attribute name="dockWidgetArea">
     <number>1</number>
    </attribute>
@@ -74,15 +75,10 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="voDataBrowserWidget" name="DataBrowserWidget">
-       <attribute name="headerVisible">
-        <bool>false</bool>
-       </attribute>
-       <column>
-        <property name="text">
-         <string notr="true">1</string>
-        </property>
-       </column>
+      <widget class="QTreeView" name="DataBrowserWidget">
+       <property name="headerHidden">
+        <bool>true</bool>
+       </property>
       </widget>
      </item>
     </layout>
@@ -90,7 +86,7 @@
   </widget>
   <action name="actionFileOpen">
    <property name="icon">
-    <iconset resource="Resources/Visomics.qrc">
+    <iconset resource="../Visomics.qrc">
      <normaloff>:/Icons/open.png</normaloff>:/Icons/open.png</iconset>
    </property>
    <property name="text">
@@ -113,7 +109,7 @@
   </action>
   <action name="actionHelpAbout">
    <property name="icon">
-    <iconset resource="Resources/Visomics.qrc">
+    <iconset resource="../Visomics.qrc">
      <normaloff>:/Icons/help.png</normaloff>:/Icons/help.png</iconset>
    </property>
    <property name="text">
@@ -145,16 +141,14 @@
     <string>Ctrl+P</string>
    </property>
   </action>
+  <action name="actionAnalysisPCA2">
+   <property name="text">
+    <string>PCA2</string>
+   </property>
+  </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>voDataBrowserWidget</class>
-   <extends>QTreeWidget</extends>
-   <header>voDataBrowserWidget.h</header>
-  </customwidget>
- </customwidgets>
  <resources>
-  <include location="Resources/Visomics.qrc"/>
+  <include location="../Visomics.qrc"/>
  </resources>
  <connections/>
 </ui>

@@ -1,4 +1,7 @@
 
+// Qt includes
+#include <QVBoxLayout>
+
 // Visomics includes
 #include "voView.h"
 
@@ -6,16 +9,20 @@
 #include <vtkDataObject.h>
 
 // --------------------------------------------------------------------------
-void voView::updateInternal()
+voView::voView(QWidget* newParent):Superclass(newParent)
 {
-  vtkDataObject* input_data = this->input().data();
-  if (!input_data)
-    {
-    return;
-    }
+}
 
-  vtkDataObject* obj = input_data->NewInstance();
-  obj->ShallowCopy(input_data);
-  this->Outputs["output"] = obj;
-  obj->Delete();
+// --------------------------------------------------------------------------
+voView::~voView()
+{
+}
+
+// --------------------------------------------------------------------------
+void voView::initialize()
+{
+  QVBoxLayout * verticalLayout = new QVBoxLayout(this);
+  verticalLayout->setSpacing(0);
+  verticalLayout->setContentsMargins(0, 0, 0, 0);
+  this->setupUi(verticalLayout);
 }

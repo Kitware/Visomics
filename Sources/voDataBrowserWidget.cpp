@@ -6,9 +6,7 @@
 // --------------------------------------------------------------------------
 voDataBrowserWidget::voDataBrowserWidget(QWidget* newParent) : Superclass(newParent)
 {
-  QStringList fileTreeWidgetLabel;
-  fileTreeWidgetLabel << tr ("Data browser");
-  this->setHeaderLabels(fileTreeWidgetLabel);
+  this->setHeaderHidden(true);
 }
 
 // --------------------------------------------------------------------------

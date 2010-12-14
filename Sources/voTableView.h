@@ -7,30 +7,34 @@
 #include <QStandardItemModel>
 
 // Visomics includes
-#include <voView.h>
+#include "voView.h"
 
 // VTK includes
 #include <vtkSmartPointer.h>
 
+class voTableViewPrivate;
 class QTableView;
 class vtkTable;
 
 class voTableView : public voView
 {
+  Q_OBJECT;
 public:
-  voTableView();
-  ~voTableView();
+  typedef voView Superclass;
+  voTableView(QWidget* newParent = 0);
+  virtual ~voTableView();
 
-  virtual QWidget* widget();
+  virtual void setDataObject(voDataObject* dataObject);
 
 protected:
-  virtual void selectedTable(vtkTable* table);
+  void setupUi(QLayout * layout);
 
-  virtual void updateInternal();
+protected:
+  QScopedPointer<voTableViewPrivate> d_ptr;
 
-  QTableView* View;
-  QStandardItemModel Model;
-  unsigned long LastModelMTime;
+private:
+  Q_DECLARE_PRIVATE(voTableView);
+  Q_DISABLE_COPY(voTableView);
 };
 
 #endif

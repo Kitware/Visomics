@@ -1,41 +1,73 @@
 
 SET(KIT_SRCS
-  Main.cpp
   voAnalysis.cpp
   voAnalysis.h
-  voAnalysisPanel.cxx
-  voAnalysisPanel.h
+  voAnalysisDriver.cpp
+  voAnalysisDriver.h
+  voAnalysisFactory.cpp
+  voAnalysisFactory.h
+  voApplication.cpp
+  voApplication.h
   voCorrelationGraphView.cpp
   voCorrelationGraphView.h
   voCSVReader.cpp
   voCSVReader.h
   voDataBrowserWidget.cpp
   voDataBrowserWidget.h
+  voDataModel.cpp
+  voDataModel.h
+  voDataModel_p.h
+  voDataModelItem.cpp
+  voDataModelItem.h
+  voDataObject.cpp
+  voDataObject.h
+  voInputFileDataObject.cpp
+  voInputFileDataObject.h
+  voIOManager.cpp
+  voIOManager.h
   voMainWindow.cpp
   voMainWindow.h
-  voPCA.cpp
-  voPCA.h
   voPCAProjectionPlot.cpp
   voPCAProjectionPlot.h
   voPCAStatistics.cpp
   voPCAStatistics.h
-  voPort.cpp
-  voPort.h
+  voQObjectFactory.h
+  voTableDataObject.cpp
+  voTableDataObject.h
   voTableView.cpp
   voTableView.h
   voView.cpp
   voView.h
+  voViewFactory.cpp
+  voViewFactory.h
+  voViewManager.cpp
+  voViewManager.h
+  voViewTabWidget.cpp
+  voViewTabWidget.h
   )
   
 SET(KIT_MOC_SRCS
-  voAnalysisPanel.h
+  voAnalysis.h
+  voAnalysisDriver.h
+  voApplication.h
   voDataBrowserWidget.h
+  voDataModel.h
+  voDataModel_p.h
+  voDataObject.h
+  voCorrelationGraphView.h
+  voInputFileDataObject.h
   voMainWindow.h
+  voPCAProjectionPlot.h
+  voPCAStatistics.h
+  voTableDataObject.h
+  voTableView.h
+  voView.h
+  voViewManager.h
+  voViewTabWidget.h
   )
   
 SET(KIT_UI_FORMS
-  voAnalysisPanel.ui
-  voMainWindow.ui
+  Resources/UI/voMainWindow.ui
   )
   
 SET(KIT_resources
@@ -51,7 +83,8 @@ QT4_WRAP_UI(KIT_UI_CPP ${KIT_UI_FORMS})
 QT4_WRAP_CPP(KIT_MOC_CPP ${KIT_MOC_SRCS} )
 QT4_ADD_RESOURCES(KIT_QRC_SRCS ${KIT_resources})
 
-ADD_EXECUTABLE(${PROJECT_NAME}
+SET(libname ${PROJECT_NAME}Lib)
+ADD_LIBRARY(${libname} STATIC
   ${KIT_SRCS}
   ${KIT_UI_CPP}
   ${KIT_MOC_CPP}
@@ -62,9 +95,14 @@ SET(VTK_LIBRARIES QVTK vtkCharts vtkInfovis)
 
 SET(${PROJECT_NAME}_LINK_LIBRARIES ${VTK_LIBRARIES} ${QT_LIBRARIES})
 TARGET_LINK_LIBRARIES(
-  ${PROJECT_NAME}
+  ${libname}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
   )
+
+ADD_EXECUTABLE(${PROJECT_NAME}
+  Main.cpp
+  )
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${libname})
   
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)
