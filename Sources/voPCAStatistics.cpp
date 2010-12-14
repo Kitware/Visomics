@@ -71,22 +71,23 @@ void voPCAStatistics::setOutputInformation()
 {
   this->addOutputType("x", "vtkTable",
                       "voPCAProjectionPlot", "Projection Plot",
-                      "voTableView");
+                      "voTableView", "Table (Projection Plot)");
 
   this->addOutputType("x", "vtkTable",
+                      "", "",
                       "voTableView", "Table (Coordinates)");
 
   this->addOutputType("rot", "vtkTable",
-                      "voTableView",  "Table (Rotation)",
-                      "voTableView");
+                      "",  "",
+                      "voTableView",  "Table (Rotation)");
 
   this->addOutputType("sdev", "vtkTable",
-                      "voTableView", "Table (Std. Deviation)",
-                      "voTableView");
+                      "", "",
+                      "voTableView", "Table (Std. Deviation)");
 
   this->addOutputType("corr", "vtkTable",
-                      "voTableView",  "Table (Correlation)",
-                      "voTableView");
+                      "", "",
+                      "voTableView", "Table (Correlation)");
 
   this->addOutputType("correlation graph", "vtkGraph",
                       "voCorrelationGraphView", "Correlation Graph");
