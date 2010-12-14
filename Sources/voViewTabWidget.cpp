@@ -1,6 +1,8 @@
 
 // Visomics includes
 #include "voApplication.h"
+#include "voDataModelItem.h"
+#include "voDataModel.h"
 #include "voViewManager.h"
 #include "voViewTabWidget.h"
 #include "voView.h"
@@ -22,8 +24,12 @@ public:
 voViewTabWidget::voViewTabWidget(QWidget* newParent):Superclass(newParent), 
   d_ptr(new voViewTabWidgetPrivate)
 {
-  this->setTabsClosable(true);
+  Q_D(voViewTabWidget);
 
+  this->setTabsClosable(true);
+  this->setUsesScrollButtons(true);
+  this->setMovable(true);
+  this->setElideMode(Qt::ElideMiddle);
   this->connect(this, SIGNAL(tabCloseRequested(int)),
                 SLOT(onTabCloseRequested(int)));
 }
@@ -43,7 +49,10 @@ void voViewTabWidget::createView(const QString& objectUuid, voView * newView)
   int viewIndex = this->indexOf(newView);
   if (viewIndex == -1)
     {
-    viewIndex = this->addTab(newView, newView->objectName());
+    voDataModelItem* item =
+        voApplication::application()->dataModel()->findItemWithUuid(objectUuid);
+
+    viewIndex = this->addTab(newView, item->icon(), newView->objectName());
     }
   this->setCurrentIndex(viewIndex);
 }
