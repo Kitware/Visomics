@@ -203,15 +203,17 @@ void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
       continue;
       }
 
-    // Append output only if it ias associated with a non-empty rawViewType
+    // Append output only if it is associated with a non-empty rawViewType
     QString rawViewType = analysis->rawViewTypeForOutput(outputName);
     if (!rawViewType.isEmpty())
       {
-      model->addOuput(dataObject, outputsContainer, rawViewType);
+      QString rawViewPrettyName = analysis->rawViewPrettyName(outputName, rawViewType);
+      model->addOuput(dataObject, outputsContainer, rawViewType, rawViewPrettyName);
       }
 
     foreach(const QString& viewType, analysis->viewTypesForOutput(outputName))
       {
+      if (viewType.isEmpty()) { continue; }
       QString viewPrettyName = analysis->viewPrettyName(outputName, viewType);
       model->addView(viewType, viewPrettyName, dataObject, viewContainer);
       }

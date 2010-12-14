@@ -25,6 +25,7 @@ public:
   QHash<QString, QString> OutputViewInformation;
   QHash<QString, QString> OutputRawView;
   QHash<QString, QString> OutputViewPrettyName;
+  QHash<QString, QString> OutputRawViewPrettyName;
   QHash<QString, QExplicitlySharedDataPointer<voDataObject> > OutputDataObjects;
 
   bool InputInformationInitialized;
@@ -138,7 +139,7 @@ void voAnalysis::removeAllInputs()
 // --------------------------------------------------------------------------
 void voAnalysis::addOutputType(const QString& outputName, const QString& outputType,
                                const QString& viewType, const QString& viewPrettyName,
-                               const QString& rawViewType)
+                               const QString& rawViewType, const QString& rawViewPrettyName)
 {
   Q_D(voAnalysis);
   if (this->hasOutput(outputName))
@@ -152,6 +153,11 @@ void voAnalysis::addOutputType(const QString& outputName, const QString& outputT
   if (!rawViewType.isEmpty())
     {
     d->OutputRawView.insert(outputName, rawViewType);
+
+    if (!rawViewPrettyName.isEmpty())
+      {
+      d->OutputRawViewPrettyName.insert(outputName + rawViewType, rawViewPrettyName);
+      }
     }
 
   if (!viewPrettyName.isEmpty())
@@ -249,7 +255,6 @@ QStringList voAnalysis::viewTypesForOutput(const QString& outputName)const
     {
     return QStringList();
     }
-  //qDebug() << "viewTypesForOutput" << outputName;
 
   return d->OutputViewInformation.values(outputName);
 }
@@ -289,6 +294,18 @@ QString voAnalysis::rawViewTypeForOutput(const QString& outputName)const
 }
 
 // --------------------------------------------------------------------------
+QString voAnalysis::rawViewPrettyName(const QString& outputName, const QString& rawViewType)
+{
+  Q_D(const voAnalysis);
+  if (!this->hasOutput(outputName))
+    {
+    return QString();
+    }
+
+  return d->OutputRawViewPrettyName.value(outputName + rawViewType, /*defaultValue=*/QString());;
+}
+
+// --------------------------------------------------------------------------
 void voAnalysis::removeAllOutputs()
 {
   Q_D(voAnalysis);
@@ -297,6 +314,7 @@ void voAnalysis::removeAllOutputs()
   d->OutputViewInformation.clear();
   d->OutputRawView.clear();
   d->OutputViewPrettyName.clear();
+  d->OutputRawViewPrettyName.clear();
   d->OutputInformationInitialized = false;
 }
 

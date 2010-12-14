@@ -32,7 +32,8 @@ public:
   voDataModelItem* addView(const QString& viewType, const QString& viewPrettyName,
                            voDataObject * newDataObject, QStandardItem* parent = 0);
   voDataModelItem* addOuput(voDataObject * newDataObject, QStandardItem * parent,
-                            const QString& rawViewType = QString());
+                            const QString& rawViewType = QString(),
+                            const QString& rawViewPrettyName = QString());
   voDataModelItem* addDataObject(voDataObject * newDataObject);
   voDataModelItem* addDataObjectAsChild(voDataObject * newDataObject, QStandardItem * parent);
 

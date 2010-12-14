@@ -41,7 +41,8 @@ public:
 
   void addOutputType(const QString& outputName, const QString& outputType,
                      const QString& viewType, const QString& viewPrettyName,
-                     const QString& rawViewType = QString());
+                     const QString& rawViewType = QString(),
+                     const QString& rawViewPrettyName = QString());
 
   QString outputType(const QString& outputName) const;
 
@@ -66,6 +67,8 @@ public:
   bool hasOutputWithRawViewType(const QString& outputName, const QString& rawViewType) const;
 
   QString rawViewTypeForOutput(const QString& outputName)const;
+
+  QString rawViewPrettyName(const QString& outputName, const QString& rawViewType);
 
   void removeAllOutputs();
 
