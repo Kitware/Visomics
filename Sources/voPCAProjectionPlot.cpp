@@ -16,6 +16,7 @@
 #include <vtkContextView.h>
 #include <vtkPlot.h>
 #include <vtkRenderer.h>
+#include <vtkRenderWindow.h>
 #include <vtkTable.h>
 #include <vtkVariantArray.h>
 
@@ -134,5 +135,6 @@ void voPCAProjectionPlot::setDataObject(voDataObject *dataObject)
     p->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
     p->SetWidth(10);
     }
+  d->ChartView->GetRenderWindow()->SetMultiSamples(4);
   d->ChartView->Render();
 }
