@@ -15,12 +15,18 @@ public:
   voViewManager();
   virtual ~voViewManager();
 
+  void deleteView(voView * view);
+
 public slots:
+
   void createView(const QString& objectUuid);
 
+
 signals:
+
   void viewCreated(const QString& objectUuid, voView * newView);
-  
+
+
 protected:
   QScopedPointer<voViewManagerPrivate> d_ptr;
 

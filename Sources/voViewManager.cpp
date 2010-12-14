@@ -108,3 +108,31 @@ void voViewManager::createView(const QString& objectUuid)
   emit this->viewCreated(objectUuid, view);
 }
 
+// --------------------------------------------------------------------------
+void voViewManager::deleteView(voView * view)
+{
+  Q_D(voViewManager);
+  Q_ASSERT(view);
+  if (!view)
+    {
+    return;
+    }
+
+  QString uuidFound;
+
+  // Retrieve uuid associated with the view
+  foreach(const QString& uuid, d->UuidToViewMap.keys())
+    {
+    if (d->UuidToViewMap.value(uuid) == view)
+      {
+      uuidFound = uuid;
+      break;
+      }
+    }
+
+  // Delete view
+  delete view;
+
+  // Remove map entry
+  d->UuidToViewMap.remove(uuidFound);
+}

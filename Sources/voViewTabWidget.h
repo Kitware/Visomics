@@ -22,6 +22,10 @@ public:
 public slots:
   void createView(const QString& objectUuid, voView * newView);
 
+protected slots:
+
+  void onTabCloseRequested(int index);
+
 protected:
   QScopedPointer<voViewTabWidgetPrivate> d_ptr;
 

@@ -1,5 +1,7 @@
 
 // Visomics includes
+#include "voApplication.h"
+#include "voViewManager.h"
 #include "voViewTabWidget.h"
 #include "voView.h"
 
@@ -20,7 +22,10 @@ public:
 voViewTabWidget::voViewTabWidget(QWidget* newParent):Superclass(newParent), 
   d_ptr(new voViewTabWidgetPrivate)
 {
+  this->setTabsClosable(true);
 
+  this->connect(this, SIGNAL(tabCloseRequested(int)),
+                SLOT(onTabCloseRequested(int)));
 }
 
 // --------------------------------------------------------------------------
@@ -41,4 +46,14 @@ void voViewTabWidget::createView(const QString& objectUuid, voView * newView)
     viewIndex = this->addTab(newView, newView->objectName());
     }
   this->setCurrentIndex(viewIndex);
+}
+
+// --------------------------------------------------------------------------
+void voViewTabWidget::onTabCloseRequested(int index)
+{
+  voView* view = qobject_cast<voView*>(this->widget(index));
+  if (view)
+    {
+    voApplication::application()->viewManager()->deleteView(view);
+    }
 }
