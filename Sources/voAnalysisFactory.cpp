@@ -25,7 +25,7 @@ public:
 //----------------------------------------------------------------------------
 voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
 {
-  this->registerAnalysis<voPCAStatistics>("pca");
+  this->registerAnalysis<voPCAStatistics>("PCA");
 }
 
 //-----------------------------------------------------------------------------
