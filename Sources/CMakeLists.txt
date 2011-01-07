@@ -29,6 +29,8 @@ SET(KIT_SRCS
   voMainWindow.h
   voPCAProjectionPlot.cpp
   voPCAProjectionPlot.h
+  voPCABarPlot.cpp
+  voPCABarPlot.h
   voPCAStatistics.cpp
   voPCAStatistics.h
   voQObjectFactory.h
@@ -44,6 +46,8 @@ SET(KIT_SRCS
   voViewManager.h
   voViewTabWidget.cpp
   voViewTabWidget.h
+  voXCorrel.cpp
+  voXCorrel.h
   )
   
 SET(KIT_MOC_SRCS
@@ -58,12 +62,14 @@ SET(KIT_MOC_SRCS
   voInputFileDataObject.h
   voMainWindow.h
   voPCAProjectionPlot.h
+  voPCABarPlot.h
   voPCAStatistics.h
   voTableDataObject.h
   voTableView.h
   voView.h
   voViewManager.h
-  voViewTabWidget.h
+  voViewTabWidget.
+  voXCorrel.h
   )
   
 SET(KIT_UI_FORMS
