@@ -23,8 +23,7 @@ FOREACH(qtlib ${QTLIBLIST})
         FILES_MATCHING PATTERN "${QT_LIB_NAME_tmp}*"
         PATTERN "${QT_LIB_NAME_tmp}*.debug" EXCLUDE)
     ELSEIF(WIN32)
-      GET_FILENAME_COMPONENT(QT_DLL_PATH_tmp ${QT_QMAKE_EXECUTABLE} PATH)
-      INSTALL(FILES ${QT_DLL_PATH_tmp}/${qtlib}4.dll
+      INSTALL(FILES ${QT_LIBRARY_DIR}/${qtlib}4.dll
         DESTINATION ${QT_INSTALL_LIB_DIR} COMPONENT Runtime)
     ENDIF()
   ENDIF()
@@ -54,12 +53,11 @@ IF(R_LIBRARY_DIR)
       LIST(APPEND files ${R_LIBRARY_LAPACK})
     ENDIF()
     INSTALL(FILES ${files}
-      DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime)
+	    DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime)
   ELSEIF(WIN32)
     #TODO
   ENDIF()
 ENDIF()
-
 
 # -------------------------------------------------------------------------
 # Build a CPack installer 
@@ -74,7 +72,7 @@ SET(CPACK_PACKAGE_VERSION_MINOR "${Visomics_MINOR_VERSION}")
 SET(CPACK_PACKAGE_VERSION_PATCH "${Visomics_BUILD_VERSION}")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "Visomics ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "Visomics-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
-SET(CPACK_PACKAGE_EXECUTABLES "Visomics")
+SET(CPACK_PACKAGE_EXECUTABLES "Visomics;Visomics")
 
 # -------------------------------------------------------------------------
 # Install Visomics
@@ -89,5 +87,6 @@ if(EXISTS "${VTK_DIR}/CMakeCache.txt")
   set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${VTK_DIR};VTK;RuntimeLibraries;/")
 endif()
 
+INCLUDE (InstallRequiredSystemLibraries)
 INCLUDE(CPack)
 
