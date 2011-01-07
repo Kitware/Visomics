@@ -148,6 +148,7 @@ voDataModelItem* voDataModel::addOutput(voDataObject * newDataObject, QStandardI
     newItem->setText(rawViewPrettyName);
     }
   newItem->setRawViewType(rawViewType);
+  return newItem;
 }
 
 // --------------------------------------------------------------------------
