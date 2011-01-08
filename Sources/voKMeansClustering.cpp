@@ -54,8 +54,9 @@ void voKMeansClustering::setInputInformation()
 // --------------------------------------------------------------------------
 void voKMeansClustering::setOutputInformation()
 {
-  this->addOutputType("cluster tree", "vtkGraph",
-                      "voTreeGraphView", "Cluster Tree");
+  this->addOutputType("cluster", "vtkTable",
+                      "", "",
+                      "voTableView", "cluster");
 }
 
 // --------------------------------------------------------------------------
@@ -203,10 +204,7 @@ bool voKMeansClustering::execute()
   clusterTable->AddColumn(clusterNumber);
   clusterTable->Dump();
  
-  /*
-   this->setOutput(
-      "cluster tree ", new voDataObject("cluster tree", tree));
-  */
+  this->setOutput("cluster", new voTableDataObject("cluster", clusterTable));
 
   return true;
 }
