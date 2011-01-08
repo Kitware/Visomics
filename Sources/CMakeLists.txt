@@ -44,6 +44,10 @@ SET(KIT_SRCS
   voViewManager.h
   voViewTabWidget.cpp
   voViewTabWidget.h
+  voKMeansClustering.cpp
+  voKMeansClustering.h
+  voTreeGraphView.h
+  voTreeGraphView.cpp
   )
   
 SET(KIT_MOC_SRCS
@@ -64,6 +68,8 @@ SET(KIT_MOC_SRCS
   voView.h
   voViewManager.h
   voViewTabWidget.h
+  voKMeansClustering.h
+  voTreeGraphView.h
   )
   
 SET(KIT_UI_FORMS
