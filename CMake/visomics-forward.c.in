@@ -1,0 +1,26 @@
+
+#if defined(CMAKE_INTDIR)
+# define CONFIG_DIR_PRE CMAKE_INTDIR "/"
+# define CONFIG_DIR_POST "/" CMAKE_INTDIR
+#else
+# define CONFIG_DIR_PRE ""
+# define CONFIG_DIR_POST ""
+#endif
+#define vtksys_SHARED_FORWARD_DIR_BUILD "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@"
+#define vtksys_SHARED_FORWARD_PATH_BUILD "." CONFIG_DIR_POST
+#define vtksys_SHARED_FORWARD_PATH_INSTALL "../lib"
+#define vtksys_SHARED_FORWARD_EXE_BUILD CONFIG_DIR_PRE "Visomics-real"
+#define vtksys_SHARED_FORWARD_EXE_INSTALL "../lib/Visomics-real"
+#define vtksys_SHARED_FORWARD_OPTION_COMMAND "--command"
+#define vtksys_SHARED_FORWARD_OPTION_PRINT "--print"
+#define vtksys_SHARED_FORWARD_OPTION_LDD "--ldd"
+#if defined(CMAKE_INTDIR)
+# define vtksys_SHARED_FORWARD_CONFIG_NAME CMAKE_INTDIR
+#endif
+
+#include <vtksys/SharedForward.h>
+
+int main(int argc, char** argv)
+{
+  return vtksys_shared_forward_to_real(argc, argv);
+}

@@ -48,6 +48,10 @@ SET(KIT_SRCS
   voViewTabWidget.h
   voXCorrel.cpp
   voXCorrel.h
+  voKMeansClustering.cpp
+  voKMeansClustering.h
+  voTreeGraphView.h
+  voTreeGraphView.cpp
   )
   
 SET(KIT_MOC_SRCS
@@ -68,8 +72,10 @@ SET(KIT_MOC_SRCS
   voTableView.h
   voView.h
   voViewManager.h
-  voViewTabWidget.
   voXCorrel.h
+  voViewTabWidget.h
+  voKMeansClustering.h
+  voTreeGraphView.h
   )
   
 SET(KIT_UI_FORMS
@@ -105,10 +111,38 @@ TARGET_LINK_LIBRARIES(
   ${${PROJECT_NAME}_LINK_LIBRARIES}
   )
 
-ADD_EXECUTABLE(${PROJECT_NAME}
-  Main.cpp
+SET(Visomics_LIBRARY_DIRS
+  ${VTK_DIR}/bin
+  ${R_LIBRARY_DIR}
   )
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${libname})
+
+CONFIGURE_FILE(
+  ${Visomics_SOURCE_DIR}/CMake/visomics-forward.c.in
+  ${CMAKE_CURRENT_BINARY_DIR}/visomics-forward.c
+  @ONLY IMMEDIATE)
+
+# Add forward executable
+ADD_EXECUTABLE(${PROJECT_NAME}
+  ${CMAKE_CURRENT_BINARY_DIR}/visomics-forward.c)
+ADD_DEPENDENCIES(${PROJECT_NAME} ${PROJECT_NAME}-real)
+
+# Add regular application
+ADD_EXECUTABLE(${PROJECT_NAME}-real Main.cpp)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME}-real ${libname})
+
+# Install rules
+INSTALL(TARGETS ${PROJECT_NAME} DESTINATION ${Visomics_INSTALL_BIN_DIR} COMPONENT Runtime)
+INSTALL(TARGETS ${PROJECT_NAME}-real DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime)
+
+#ADD_EXECUTABLE(${PROJECT_NAME}
+#  Main.cpp
+#  )
+#TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${libname})
+
+#INSTALL(TARGETS ${PROJECT_NAME}
+#  RUNTIME DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime
+#  LIBRARY DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime
+#  ARCHIVE DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Development)
   
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)

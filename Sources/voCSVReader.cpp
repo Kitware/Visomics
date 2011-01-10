@@ -56,7 +56,7 @@ void voCSVReader::update()
 // --------------------------------------------------------------------------
 vtkDataObject* voCSVReader::output()
 {
-  this->NumericOutput->GetOutput();
+  return this->NumericOutput->GetOutput();
 }
 
 // --------------------------------------------------------------------------

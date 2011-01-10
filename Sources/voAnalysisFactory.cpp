@@ -9,6 +9,7 @@
 
 #include "voPCAStatistics.h"
 #include "voXCorrel.h"
+#include "voKMeansClustering.h"
 
 //----------------------------------------------------------------------------
 class voAnalysisFactoryPrivate
@@ -28,6 +29,7 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
 {
   this->registerAnalysis<voPCAStatistics>("PCA");
   this->registerAnalysis<voXCorrel>("Cross Correlation");
+  this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
 }
 
 //-----------------------------------------------------------------------------

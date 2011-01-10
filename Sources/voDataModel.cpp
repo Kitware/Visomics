@@ -139,7 +139,7 @@ voDataModelItem* voDataModel::addView(const QString& viewType, const QString& vi
 }
 
 // --------------------------------------------------------------------------
-voDataModelItem* voDataModel::addOuput(voDataObject * newDataObject, QStandardItem * parent,
+voDataModelItem* voDataModel::addOutput(voDataObject * newDataObject, QStandardItem * parent,
                                        const QString& rawViewType, const QString& rawViewPrettyName)
 {
   voDataModelItem * newItem = this->addDataObjectAsChild(newDataObject, parent);
@@ -148,6 +148,7 @@ voDataModelItem* voDataModel::addOuput(voDataObject * newDataObject, QStandardIt
     newItem->setText(rawViewPrettyName);
     }
   newItem->setRawViewType(rawViewType);
+  return newItem;
 }
 
 // --------------------------------------------------------------------------

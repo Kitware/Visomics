@@ -43,7 +43,7 @@ SET(Visomics_VERSION
 # Install directories, used for install rules.
 #
 SET(Visomics_INSTALL_BIN_DIR "bin")
-SET(Visomics_INSTALL_LIB_DIR "bin")
+SET(Visomics_INSTALL_LIB_DIR "lib")
 SET(Visomics_INSTALL_INCLUDE_DIR "include/visomics-${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}")
 SET(Visomics_INSTALL_DOC_DIR "doc")
 
@@ -89,3 +89,8 @@ ENDIF()
 
 #-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(Sources)
+
+#-----------------------------------------------------------------------------
+# Setup CPack
+
+INCLUDE(CMake/VisomicsCPack.cmake)

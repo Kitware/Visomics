@@ -208,7 +208,7 @@ void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
     if (!rawViewType.isEmpty())
       {
       QString rawViewPrettyName = analysis->rawViewPrettyName(outputName, rawViewType);
-      model->addOuput(dataObject, outputsContainer, rawViewType, rawViewPrettyName);
+      model->addOutput(dataObject, outputsContainer, rawViewType, rawViewPrettyName);
       }
 
     foreach(const QString& viewType, analysis->viewTypesForOutput(outputName))
