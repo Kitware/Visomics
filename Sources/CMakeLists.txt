@@ -48,6 +48,8 @@ SET(KIT_SRCS
   voKMeansClustering.h
   voTreeGraphView.h
   voTreeGraphView.cpp
+  voHierarchicalClustering.h
+  voHierarchicalClustering.cpp
   )
   
 SET(KIT_MOC_SRCS
@@ -69,6 +71,7 @@ SET(KIT_MOC_SRCS
   voViewManager.h
   voViewTabWidget.h
   voKMeansClustering.h
+  voHierarchicalClustering.h
   voTreeGraphView.h
   )
   

@@ -9,6 +9,7 @@
 
 #include "voPCAStatistics.h"
 #include "voKMeansClustering.h"
+#include "voHierarchicalClustering.h"
 
 //----------------------------------------------------------------------------
 class voAnalysisFactoryPrivate
@@ -28,6 +29,7 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
 {
   this->registerAnalysis<voPCAStatistics>("PCA");
   this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
+  this->registerAnalysis<voHierarchicalClustering>("Hierarchical Clustering");
 }
 
 //-----------------------------------------------------------------------------
