@@ -11,6 +11,7 @@
 #include "voPCAProjectionPlot.h"
 #include "voPCABarPlot.h"
 #include "voTableView.h"
+#include "voTreeGraphView.h"
 
 //----------------------------------------------------------------------------
 class voViewFactoryPrivate
@@ -33,6 +34,7 @@ voViewFactory::voViewFactory():d_ptr(new voViewFactoryPrivate)
   this->registerView<voPCAProjectionPlot>();
   this->registerView<voCorrelationGraphView>();
   this->registerView<voPCABarPlot>();
+  this->registerView<voTreeGraphView>();
 }
 
 //-----------------------------------------------------------------------------
