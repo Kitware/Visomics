@@ -58,7 +58,16 @@ ENDFOREACH()
 #-----------------------------------------------------------------------------
 # VTK
 #
-FIND_PACKAGE(VTK 5.7 REQUIRED)
+FIND_PACKAGE(VTK REQUIRED)
+SET(current_vtk_version ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION})
+SET(required_vtk_version 5.7)
+SET(preferred_vtk_version 5.8)
+IF(${current_vtk_version} VERSION_LESS ${required_vtk_version})
+  MESSAGE(FATAL_ERROR "You are trying to build Visomics using VTK ${current_vtk_version}. Please, update to VTK ${preferred_vtk_version} or higher !")
+ENDIF()
+IF(${current_vtk_version} VERSION_LESS ${preferred_vtk_version})
+  MESSAGE(WARNING "You are building Visomics using VTK ${current_vtk_version}. We recommend to use version  ${preferred_vtk_version} or higher")
+ENDIF()
 INCLUDE(${VTK_USE_FILE})
 
 #-----------------------------------------------------------------------------
