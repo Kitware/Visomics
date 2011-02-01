@@ -157,6 +157,8 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
 
   analysis->setInput(inputName, dataObject);
 
+  emit this->aboutToRunAnalysis(analysis);
+
   bool ret = analysis->run();
   if (!ret)
     {

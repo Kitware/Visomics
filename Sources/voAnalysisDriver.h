@@ -24,6 +24,9 @@ public:
 
   static void addAnalysisToObjectModel(voAnalysis * analysis, voDataModelItem* insertLocation);
 
+signals:
+  void aboutToRunAnalysis(voAnalysis*);
+
 public slots:
   void runAnalysisForAllInputs(const QString& analysisName);
 
