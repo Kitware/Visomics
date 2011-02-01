@@ -11,9 +11,16 @@
 // --------------------------------------------------------------------------
 class voAnalysisPrivate
 {
+  Q_DECLARE_PUBLIC(voAnalysis);
+
+protected:
+  voAnalysis* const q_ptr;
+
 public:
-  voAnalysisPrivate();
+  voAnalysisPrivate(voAnalysis& object);
   ~voAnalysisPrivate();
+
+  void init();
 
   // TODO Use vtkInformationVector ?
   //vtkInformationVector* InputInformation;
@@ -36,8 +43,14 @@ public:
 // voAnalysisPrivate methods
 
 // --------------------------------------------------------------------------
-voAnalysisPrivate::voAnalysisPrivate()
+voAnalysisPrivate::voAnalysisPrivate(voAnalysis& object) : q_ptr(&object)
 {
+}
+
+// --------------------------------------------------------------------------
+void voAnalysisPrivate::init()
+{
+  Q_Q(voAnalysis);
   this->InputInformationInitialized = false;
   this->OutputInformationInitialized = false;
 }
@@ -51,8 +64,10 @@ voAnalysisPrivate::~voAnalysisPrivate()
 // voAnalysis methods
 
 // --------------------------------------------------------------------------
-voAnalysis::voAnalysis():d_ptr(new voAnalysisPrivate)
+voAnalysis::voAnalysis():d_ptr(new voAnalysisPrivate(*this))
 {
+  Q_D(voAnalysis);
+  d->init();
 }
 
 // --------------------------------------------------------------------------

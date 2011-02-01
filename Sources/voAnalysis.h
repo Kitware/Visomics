@@ -3,7 +3,6 @@
 #define __voAnalysis_h
 
 // Qt includes
-#include <QSharedPointer>
 #include <QScopedPointer>
 #include <QLatin1String>
 #include <QObject>
