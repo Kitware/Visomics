@@ -37,6 +37,7 @@ public:
 
   bool InputInformationInitialized;
   bool OutputInformationInitialized;
+  bool ParameterInformationInitialized;
 };
 
 // --------------------------------------------------------------------------
@@ -53,6 +54,7 @@ void voAnalysisPrivate::init()
   Q_Q(voAnalysis);
   this->InputInformationInitialized = false;
   this->OutputInformationInitialized = false;
+  this->ParameterInformationInitialized = false;
 }
 
 // --------------------------------------------------------------------------
@@ -368,3 +370,16 @@ void voAnalysis::initializeOutputInformation()
   this->setOutputInformation();
   d->OutputInformationInitialized = true;
 }
+
+// --------------------------------------------------------------------------
+void voAnalysis::initializeParameterInformation()
+{
+  Q_D(voAnalysis);
+  if (d->ParameterInformationInitialized)
+    {
+    return;
+    }
+  this->setParameterInformation();
+  d->ParameterInformationInitialized = true;
+}
+

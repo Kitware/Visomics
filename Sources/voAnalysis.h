@@ -75,6 +75,7 @@ public:
 
   void initializeInputInformation();
   void initializeOutputInformation();
+  void initializeParameterInformation();
 
 protected:
 
@@ -82,6 +83,7 @@ protected:
 
   virtual void setInputInformation(){}
   virtual void setOutputInformation(){}
+  virtual void setParameterInformation(){}
 
 protected:
   QScopedPointer<voAnalysisPrivate> d_ptr;
