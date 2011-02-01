@@ -102,7 +102,7 @@ bool voKMeansClustering::execute()
   int start = 1;
   int end = transpose->GetNumberOfColumns();
 
-  std::cout << "Total number of columns:\t" << end << std::endl;
+  //std::cout << "Total number of columns:\t" << end << std::endl;
 
   names->SetName("Samples");
   for (int ctr=start; ctr<end; ctr++)
@@ -116,14 +116,15 @@ bool voKMeansClustering::execute()
   vtkSmartPointer< vtkArrayData > arrayData = vtkSmartPointer< vtkArrayData>::New();
   arrayData = tableToArray->GetOutput();
 
-  std::cout << "Array data sent to R \n" << std::endl;
+  //std::cout << "Array data sent to R \n" << std::endl;
 
   vtkIdType numberOfArrays = arrayData->GetNumberOfArrays();
 
+  /*
   for( vtkIdType i=0; i < numberOfArrays; i++)
     {
     vtkDenseArray<double> *array = vtkDenseArray<double>::SafeDownCast(arrayData->GetArray(i));
-    std::cout << "Dimensions:" << array->GetDimensions() << std::endl;
+    //std::cout << "Dimensions:" << array->GetDimensions() << std::endl;
     const vtkArrayExtents extents = array->GetExtents();
     for(vtkIdType i = extents[0].GetBegin(); i != extents[0].GetEnd(); ++i)
       {   
@@ -134,6 +135,7 @@ bool voKMeansClustering::execute()
         std::cout << std::endl;
       }   
     }
+  */
 
   vtkSmartPointer< vtkRCalculatorFilter > calc = vtkSmartPointer< vtkRCalculatorFilter>::New();
   calc->SetRoutput(0);
@@ -147,7 +149,7 @@ bool voKMeansClustering::execute()
 
   calc->Update();
 
-  calc->GetOutput()->Print(std::cout);
+  //calc->GetOutput()->Print(std::cout);
   vtkArrayData *temp = vtkArrayData::SafeDownCast(calc->GetOutput());
   if (!temp)
     {
@@ -202,7 +204,7 @@ bool voKMeansClustering::execute()
     }
   clusterTable->AddColumn(names);
   clusterTable->AddColumn(clusterNumber);
-  clusterTable->Dump();
+  //clusterTable->Dump();
  
   this->setOutput("cluster", new voTableDataObject("cluster", clusterTable));
 

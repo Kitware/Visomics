@@ -116,6 +116,7 @@ bool voHierarchicalClustering::execute()
 
   vtkIdType numberOfArrays = arrayData->GetNumberOfArrays();
 
+  /*
   for( vtkIdType i=0; i < numberOfArrays; i++)
     {
     vtkDenseArray<double> *array = vtkDenseArray<double>::SafeDownCast(arrayData->GetArray(i));
@@ -129,6 +130,7 @@ bool voHierarchicalClustering::execute()
         std::cout << std::endl;
       }   
     }
+    */
 
   vtkSmartPointer< vtkRCalculatorFilter > calc = vtkSmartPointer< vtkRCalculatorFilter>::New();
   calc->SetRoutput(0);

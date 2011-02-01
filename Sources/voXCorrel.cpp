@@ -98,10 +98,10 @@ bool voXCorrel::execute()
   d->XCor->RequestSelectedColumns();
   */
 
-  //table->Print(std::cout);
+ //table->Print(std::cout);
  vtkSmartPointer<vtkTableToArray> tab = vtkSmartPointer<vtkTableToArray>::New();
  tab->SetInput(table);
- table->Print(std::cout);
+ //table->Print(std::cout);
 
 
 
@@ -116,7 +116,7 @@ bool voXCorrel::execute()
   
  // tab->GetOutput()->Print(std::cout);
 
-  d->XCor->SetRoutput(1);
+  d->XCor->SetRoutput(0);
   d->XCor->SetInputConnection(tab->GetOutputPort());
   d->XCor->PutArray("0", "metabData");
   d->XCor->SetRscript("correl<-cor(metabData)");
@@ -183,15 +183,15 @@ bool voXCorrel::execute()
   vtkSmartPointer<vtkTable> corr = vtkSmartPointer<vtkTable>::New();
   corr->AddColumn(header);
 
-  assess->Print(std::cout);
+  // assess->Print(std::cout);
 
 
   for (vtkIdType c = 0;c < cols-1; ++c)  //c < assess->GetNumberOfColumns()
     {
     vtkAbstractArray* col = assess->GetColumn(c);
     col->SetName(table->GetColumnName(c + 1));
-	corr->Print(std::cout);
-	col->Print(std::cout);
+    //corr->Print(std::cout);
+    //col->Print(std::cout);
     corr->AddColumn(col);
     }
 

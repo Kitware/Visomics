@@ -76,7 +76,7 @@ QMap<vtkVariant, vtkSmartPointer<vtkTable> > voPCABarPlotPrivate::splitTable(
 voPCABarPlot::voPCABarPlot(QWidget * newParent):
     Superclass(newParent), d_ptr(new voPCABarPlotPrivate)
 {
-	std::cout<<"we are in the bar plot initialization" <<std::endl;
+	//std::cout<<"we are in the bar plot initialization" <<std::endl;
 }
 
 // --------------------------------------------------------------------------

@@ -303,7 +303,7 @@ bool voPCAStatistics::execute()
   vtkSmartPointer<vtkArrayToTable> pcastdev = vtkSmartPointer<vtkArrayToTable>::New();
   pcastdev->SetInputConnection(pcaStDevData->GetProducerPort());
   pcastdev->Update();
-  pcastdev->GetOutput()->Print(std::cout);
+  //pcastdev->GetOutput()->Print(std::cout);
 
   vtkTable* marks =vtkTable::SafeDownCast(pcastdev->GetOutput());
   vtkSmartPointer<vtkTable> sdev = vtkSmartPointer<vtkTable>::New();
