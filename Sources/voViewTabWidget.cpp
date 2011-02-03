@@ -40,7 +40,7 @@ voViewTabWidget::~voViewTabWidget()
 }
 
 // --------------------------------------------------------------------------
-void voViewTabWidget::createView(const QString& objectUuid, voView * newView)
+void voViewTabWidget::addViewTab(const QString& objectUuid, voView * newView)
 {
   if (!newView)
     {

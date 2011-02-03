@@ -61,7 +61,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(voApplication::application()->viewManager(),
           SIGNAL(viewCreated(const QString&, voView*)),
           d->ViewTabWidget,
-          SLOT(createView(const QString&, voView*)));
+          SLOT(addViewTab(const QString&, voView*)));
 
   // Setup actions
   d->actionFileOpen->setShortcut(QKeySequence::Open);
