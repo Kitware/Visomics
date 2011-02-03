@@ -2,6 +2,7 @@
 // Qt includes
 #include <QHash>
 #include <QExplicitlySharedDataPointer>
+#include <QUuid>
 #include <QDebug>
 
 // Visomics include
@@ -25,6 +26,8 @@ public:
   // TODO Use vtkInformationVector ?
   //vtkInformationVector* InputInformation;
   //vtkInformationVector* OutputInformation;
+
+  QString Uuid;
 
   QHash<QString, QString> InputInformation;
   QHash<QString, QExplicitlySharedDataPointer<voDataObject> > InputDataObjects;
@@ -52,6 +55,7 @@ voAnalysisPrivate::voAnalysisPrivate(voAnalysis& object) : q_ptr(&object)
 void voAnalysisPrivate::init()
 {
   Q_Q(voAnalysis);
+  this->Uuid = QUuid::createUuid().toString();
   this->InputInformationInitialized = false;
   this->OutputInformationInitialized = false;
   this->ParameterInformationInitialized = false;
@@ -75,6 +79,13 @@ voAnalysis::voAnalysis():d_ptr(new voAnalysisPrivate(*this))
 // --------------------------------------------------------------------------
 voAnalysis::~voAnalysis()
 {
+}
+
+// --------------------------------------------------------------------------
+QString voAnalysis::uuid()const
+{
+  Q_D(const voAnalysis);
+  return d->Uuid;
 }
 
 // --------------------------------------------------------------------------

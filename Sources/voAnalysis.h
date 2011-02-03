@@ -19,6 +19,7 @@ public:
   voAnalysis();
   virtual ~voAnalysis();
 
+  QString uuid()const;
 
   void addInputType(const QString& inputName, const QString& inputType);
 

@@ -29,6 +29,7 @@ public:
     RawViewTypeRole,
     UuidRole,
     IsAnalysisContainerRole,
+    AnalysisVoidStarRole,
     };
 
   QString viewType()const;

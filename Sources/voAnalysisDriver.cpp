@@ -18,9 +18,6 @@ class voAnalysisDriverPrivate
 public:
   voAnalysisDriverPrivate();
   virtual ~voAnalysisDriverPrivate();
-
-  QHash<QString, QSharedPointer<voAnalysis> > Analysis;
-
 };
 
 // --------------------------------------------------------------------------
@@ -88,23 +85,9 @@ void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem*
     qWarning() << "Failed to runAnalysis - InputTarget is NULL";
     return;
     }
-
   voAnalysisFactory * analysisFactory = voApplication::application()->analysisFactory();
-
-  voAnalysis * analysis = 0;
-  QStringList keys = d->Analysis.keys();
-  if (!d->Analysis.keys().contains(analysisName))
-    {
-    if (!analysisFactory->registeredAnalysisNames().contains(analysisName))
-      {
-      qWarning() << "Failed to runAnalysis - Unknown analysis [" << analysisName << "]";
-      return;
-      }
-    analysis = analysisFactory->createAnalysis(analysisName);
-    Q_ASSERT(analysis);
-    d->Analysis.insert(analysisName, QSharedPointer<voAnalysis>(analysis));
-    }
-  analysis = d->Analysis.value(analysisName).data();
+  voAnalysis * analysis = analysisFactory->createAnalysis(analysisName);
+  Q_ASSERT(analysis);
   this->runAnalysis(analysis, inputTarget);
 }
 
@@ -188,7 +171,9 @@ void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
   // Analysis container
   voDataModelItem * analysisContainer =
       model->addContainer(model->getNextName(analysis->objectName()), insertLocation);
+  analysisContainer->setData(QVariant(analysis->uuid()), voDataModelItem::UuidRole);
   analysisContainer->setData(QVariant(true), voDataModelItem::IsAnalysisContainerRole);
+  analysisContainer->setData(QVariant(QMetaType::VoidStar, &analysis), voDataModelItem::AnalysisVoidStarRole);
 
   // Outputs container
   voDataModelItem * outputsContainer =
