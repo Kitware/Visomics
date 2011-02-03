@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QScopedPointer>
 
+class QMainWindow;
 class voAnalysisDriver;
 class voAnalysisFactory;
 class voAnalysisViewFactory;
@@ -46,6 +47,8 @@ public:
   voAnalysisFactory* analysisFactory()const;
 
   voViewFactory* viewFactory()const;
+
+  QMainWindow* mainWindow()const;
   
 protected:
   QScopedPointer<voApplicationPrivate> d_ptr;
