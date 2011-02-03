@@ -68,6 +68,7 @@ voDataModelItem::voDataModelItem(voDataObject * newDataObject, int newColumn):
     }
 
   this->setData(QVariant(newDataObject->uuid()), voDataModelItem::UuidRole);
+  this->setType(voDataModelItem::typeFromDataObject(newDataObject));
 }
 
 // --------------------------------------------------------------------------

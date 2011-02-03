@@ -167,7 +167,6 @@ voDataModelItem* voDataModel::addDataObjectAsChild(
   for (int i= 0; i < this->columnCount(); ++i)
     {
     voDataModelItem* newDataModelItem = new voDataModelItem(newDataObject, i);
-    newDataModelItem->setType(voDataModelItem::typeFromDataObject(newDataObject));
     items.append(newDataModelItem);
     }
   if (parent)
