@@ -5,6 +5,7 @@
 #include <QItemSelectionModel>
 
 // Visomics includes
+#include "voAnalysis.h"
 #include "voDataModel.h"
 #include "voDataModel_p.h"
 #include "voDataModelItem.h"
@@ -223,7 +224,37 @@ const QList<voDataModelItem*>& voDataModel::selectedInputObjects() const
 }
 
 // --------------------------------------------------------------------------
-voDataModelItem* voDataModel::findItemWithUuid(const QString& uuid)
+voDataModelItem* voDataModel::inputTargetForAnalysis(voAnalysis * analysis)const
+{
+  voDataModelItem * analysisItem = this->itemForAnalysis(analysis);
+  if (!analysisItem)
+    {
+    return 0;
+    }
+  QStandardItem * item = analysisItem->parent();
+  while(item)
+    {
+    if (item->type() == voDataModelItem::InputType)
+      {
+      return dynamic_cast<voDataModelItem*>(item);
+      }
+    item = item->parent();
+    }
+  return 0;
+}
+
+// --------------------------------------------------------------------------
+voDataModelItem* voDataModel::itemForAnalysis(voAnalysis * analysis)const
+{
+  if (!analysis)
+    {
+    return 0;
+    }
+  return this->findItemWithUuid(analysis->uuid());
+}
+
+// --------------------------------------------------------------------------
+voDataModelItem* voDataModel::findItemWithUuid(const QString& uuid)const
 {
   if (QUuid(uuid).isNull())
     {
