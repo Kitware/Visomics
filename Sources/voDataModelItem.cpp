@@ -11,6 +11,7 @@
 #include "voDataObject.h"
 #include "voInputFileDataObject.h"
 #include "voTableDataObject.h"
+#include "voView.h"
 
 // --------------------------------------------------------------------------
 class voDataModelItemPrivate
@@ -186,6 +187,18 @@ void voDataModelItem::setDataObject(voDataObject* newDataObject)
 {
   Q_D(voDataModelItem);
   d->DataObject = QExplicitlySharedDataPointer<voDataObject>(newDataObject);
+
+  if (this->type() == voDataModelItem::InputType ||
+      this->type() == voDataModelItem::OutputType ||
+      this->type() == voDataModelItem::ViewType)
+    {
+    voView * view =
+        reinterpret_cast<voView*>(this->data(voDataModelItem::ViewVoidStarRole).value<void*>());
+    if (view)
+      {
+      view->setDataObject(newDataObject);
+      }
+    }
 }
 
 // --------------------------------------------------------------------------
