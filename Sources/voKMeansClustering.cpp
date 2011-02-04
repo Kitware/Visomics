@@ -6,31 +6,19 @@
 #include <QtVariantPropertyManager>
 
 // Visomics includes
-#include "voApplication.h"
 #include "voKMeansClustering.h"
 #include "voTableDataObject.h"
 
 // VTK includes
-#include <vtkAdjacencyMatrixToEdgeTable.h>
-#include <vtkAlgorithm.h>
 #include <vtkArrayToTable.h>
 #include <vtkDataSetAttributes.h>
-#include <vtkDescriptiveStatistics.h>
-#include <vtkDoubleArray.h>
-#include <vtkGraph.h>
-#include <vtkMultiBlockDataSet.h>
-#include <vtkPCAStatistics.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkTableToArray.h>
-#include <vtkTableToGraph.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkDenseArray.h>
-#include <vtkTree.h>
-#include <vtkMutableDirectedGraph.h>
 #include <vtkIntArray.h>
-
 
 // --------------------------------------------------------------------------
 // voKMeansClustering methods
@@ -140,29 +128,24 @@ bool voKMeansClustering::execute()
   tableToArray->Update();
 
   //Print ouf the array data for debugging purposes
-  vtkSmartPointer< vtkArrayData > arrayData = vtkSmartPointer< vtkArrayData>::New();
-  arrayData = tableToArray->GetOutput();
-
-  //std::cout << "Array data sent to R \n" << std::endl;
-
-  vtkIdType numberOfArrays = arrayData->GetNumberOfArrays();
-
-  /*
-  for( vtkIdType i=0; i < numberOfArrays; i++)
-    {
-    vtkDenseArray<double> *array = vtkDenseArray<double>::SafeDownCast(arrayData->GetArray(i));
-    //std::cout << "Dimensions:" << array->GetDimensions() << std::endl;
-    const vtkArrayExtents extents = array->GetExtents();
-    for(vtkIdType i = extents[0].GetBegin(); i != extents[0].GetEnd(); ++i)
-      {   
-      for(vtkIdType j = extents[1].GetBegin(); j != extents[1].GetEnd(); ++j)
-        {
-        std::cout << array->GetValue(vtkArrayCoordinates(i, j)) << "\t";
-        }
-        std::cout << std::endl;
-      }   
-    }
-  */
+//  std::cout << "Array data sent to R \n" << std::endl;
+//  vtkSmartPointer< vtkArrayData > arrayData = vtkSmartPointer< vtkArrayData>::New();
+//  arrayData = tableToArray->GetOutput();
+//  vtkIdType numberOfArrays = arrayData->GetNumberOfArrays();
+//  for( vtkIdType i=0; i < numberOfArrays; i++)
+//    {
+//    vtkDenseArray<double> *array = vtkDenseArray<double>::SafeDownCast(arrayData->GetArray(i));
+//    //std::cout << "Dimensions:" << array->GetDimensions() << std::endl;
+//    const vtkArrayExtents extents = array->GetExtents();
+//    for(vtkIdType i = extents[0].GetBegin(); i != extents[0].GetEnd(); ++i)
+//      {
+//      for(vtkIdType j = extents[1].GetBegin(); j != extents[1].GetEnd(); ++j)
+//        {
+//        std::cout << array->GetValue(vtkArrayCoordinates(i, j)) << "\t";
+//        }
+//        std::cout << std::endl;
+//      }
+//    }
 
   vtkSmartPointer< vtkRCalculatorFilter > calc = vtkSmartPointer< vtkRCalculatorFilter>::New();
   calc->SetRoutput(0);
