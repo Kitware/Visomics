@@ -75,7 +75,7 @@ void voXCorrel::setOutputInformation()
                       "", "",
                       "voTableView", "Table (Correlation)");
   
-  this->addOutputType("correlation graph", "vtkGraph",
+  this->addOutputType("correlation_graph", "vtkGraph",
                       "voCorrelationGraphView", "Correlation Graph");
 }
 
@@ -252,6 +252,6 @@ bool voXCorrel::execute()
   correlGraphAlg->Update();
 
   this->setOutput(
-      "correlation graph", new voDataObject("correlation graph", correlGraphAlg->GetOutput()));
+      "correlation_graph", new voDataObject("correlation_graph", correlGraphAlg->GetOutput()));
   return true;
 }
