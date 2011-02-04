@@ -2,6 +2,9 @@
 // Qt includes
 #include <QDebug>
 
+// QtPropertyBrowser includes
+#include <QtVariantPropertyManager>
+
 // Visomics includes
 #include "voApplication.h"
 #include "voKMeansClustering.h"
@@ -60,6 +63,25 @@ void voKMeansClustering::setOutputInformation()
 }
 
 // --------------------------------------------------------------------------
+void voKMeansClustering::setParameterInformation()
+{
+  QList<QtProperty*> kmeans_parameters;
+
+  // KMeans / Number of clusters (centers)
+  kmeans_parameters << this->addIntegerParameter("centers", tr("Number of clusters"), 2, 10, 4);
+
+  // KMeans / MaxIter
+  kmeans_parameters << this->addIntegerParameter("iter.max", tr("Max. iteration"), 5, 50, 10);
+
+  // KMeans / Algorithm
+  QStringList kmeans_algorithms;
+  kmeans_algorithms << "Hartigan-Wong" << "Lloyd" << "Forgy" << "MacQueen";
+  kmeans_parameters << this->addEnumParameter("algorithm", "Algorithm", kmeans_algorithms);
+
+  this->addParameterGroup("KMeans parameters", kmeans_parameters);
+}
+
+// --------------------------------------------------------------------------
 bool voKMeansClustering::execute()
 {
   Q_D(voKMeansClustering);
@@ -70,6 +92,11 @@ bool voKMeansClustering::execute()
     qWarning() << "Input is Null";
     return false;
     }
+
+  // Parameters
+  int kmeans_centers = this->integerParameter("centers");
+  int kmeans_iter_max = this->integerParameter("iter.max");
+  QString kmeans_algorithm = this->enumParameter("algorithm");
 
   // Transpose table
   vtkSmartPointer<vtkTable> transpose = vtkSmartPointer<vtkTable>::New();
@@ -143,7 +170,18 @@ bool voKMeansClustering::execute()
   calc->GetArray("kmCluster", "kmCluster");
   calc->GetArray("kmWithinss", "kmWithinss");
   calc->GetArray("kmSize", "kmSize");
-  calc->SetRscript("metabDatat <- t(metabData)\nkm<-kmeans(metabDatat, 4)\nkmCenters<-km$centers \nkmCluster<-km$cluster\nkmWithinss<-km$withinss\nkmSize<-km$size\nkmCenters\nkmCluster\nkmWithinss\nkmSize");
+  calc->SetRscript(QString(
+                     "metabDatat <- t(metabData)\n"
+                     "km<-kmeans(metabDatat, %1, iter.max = %2, algorithm = \"%3\")\n"
+                     "kmCenters<-km$centers \n"
+                     "kmCluster<-km$cluster\n"
+                     "kmWithinss<-km$withinss\n"
+                     "kmSize<-km$size\n"
+                     "kmCenters\n"
+                     "kmCluster\n"
+                     "kmWithinss\n"
+                     "kmSize"
+                     ).arg(kmeans_centers).arg(kmeans_iter_max).arg(kmeans_algorithm).toLatin1());
 
   calc->Update();
 
