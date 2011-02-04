@@ -246,7 +246,10 @@ void voAnalysis::setOutput(const QString& outputName, voDataObject * dataObject)
     {
     return;
     }
+  Q_ASSERT(outputName == dataObject->name());
   d->OutputDataObjects.insert(outputName, QExplicitlySharedDataPointer<voDataObject>(dataObject));
+
+  emit this->outputSet(outputName, dataObject, this);
 }
 
 // --------------------------------------------------------------------------

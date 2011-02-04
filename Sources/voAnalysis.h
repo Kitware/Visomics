@@ -77,6 +77,9 @@ public:
   void initializeInputInformation();
   void initializeOutputInformation();
   void initializeParameterInformation();
+signals:
+
+  void outputSet(const QString& outputName, voDataObject* dataObject, voAnalysis* analysis);
 
 protected:
 
