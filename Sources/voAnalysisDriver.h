@@ -4,6 +4,7 @@
 // Qt includes
 #include <QScopedPointer>
 #include <QObject>
+#include <QHash>
 
 class voAnalysis;
 class voDataModelItem;
@@ -18,20 +19,28 @@ public:
   voAnalysisDriver(QObject* newParent = 0);
   virtual ~voAnalysisDriver();
 
-  void runAnalysis(const QString& analysisName, voDataModelItem* inputTarget);
-
-  void runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget);
-
-  static void addAnalysisToObjectModel(voAnalysis * analysis, voDataModelItem* insertLocation);
+  void runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool useDefaultParameter = false);
 
 signals:
   void aboutToRunAnalysis(voAnalysis*);
 
 public slots:
-  void runAnalysisForAllInputs(const QString& analysisName);
+  void runAnalysisForAllInputs(const QString& analysisName, bool useDefaultParameter = false);
+
+  void runAnalysisForCurrentInput(
+    const QString& analysisName, const QHash<QString, QVariant>& parameters);
+
+  void updateAnalysis(
+    voAnalysis * analysis, const QHash<QString, QVariant>& parameters);
+
 protected slots:
 
   void onAnalysisOutputSet(const QString& outputName, voDataObject* dataObject, voAnalysis* analysis);
+
+protected:
+  void runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget, bool useDefaultParameter = false);
+
+  static void addAnalysisToObjectModel(voAnalysis * analysis, voDataModelItem* insertLocation);
 
 protected:
   QScopedPointer<voAnalysisDriverPrivate> d_ptr;
