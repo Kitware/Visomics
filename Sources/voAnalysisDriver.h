@@ -19,13 +19,13 @@ public:
   voAnalysisDriver(QObject* newParent = 0);
   virtual ~voAnalysisDriver();
 
-  void runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool useDefaultParameter = false);
+  void runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool acceptDefaultParameter = false);
 
 signals:
   void aboutToRunAnalysis(voAnalysis*);
 
 public slots:
-  void runAnalysisForAllInputs(const QString& analysisName, bool useDefaultParameter = false);
+  void runAnalysisForAllInputs(const QString& analysisName, bool acceptDefaultParameter = false);
 
   void runAnalysisForCurrentInput(
     const QString& analysisName, const QHash<QString, QVariant>& parameters);
@@ -38,7 +38,7 @@ protected slots:
   void onAnalysisOutputSet(const QString& outputName, voDataObject* dataObject, voAnalysis* analysis);
 
 protected:
-  void runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget, bool useDefaultParameter = false);
+  void runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget);
 
   static void addAnalysisToObjectModel(voAnalysis * analysis, voDataModelItem* insertLocation);
 

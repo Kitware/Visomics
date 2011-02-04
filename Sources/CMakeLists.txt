@@ -6,6 +6,8 @@ SET(KIT_SRCS
   voAnalysisDriver.h
   voAnalysisFactory.cpp
   voAnalysisFactory.h
+  voAnalysisParameterDialog.cpp
+  voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.cpp
   voAnalysisParameterEditorWidget.h
   voApplication.cpp
@@ -61,6 +63,7 @@ SET(KIT_SRCS
 SET(KIT_MOC_SRCS
   voAnalysis.h
   voAnalysisDriver.h
+  voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.h
   voApplication.h
   voDataBrowserWidget.h
