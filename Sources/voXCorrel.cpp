@@ -2,6 +2,9 @@
 // Qt includes
 #include <QDebug>
 
+// QtPropertyBrowser includes
+#include <QtVariantPropertyManager>
+
 // Visomics includes
 #include "voApplication.h"
 #include "voXCorrel.h"
@@ -77,6 +80,19 @@ void voXCorrel::setOutputInformation()
 }
 
 // --------------------------------------------------------------------------
+void voXCorrel::setParameterInformation()
+{
+  QList<QtProperty*> cor_parameters;
+
+  // Cor / Method
+  QStringList cor_methods;
+  cor_methods << "pearson" << "kendall" << "spearman";
+  cor_parameters << this->addEnumParameter("method", tr("Method"), cor_methods);
+
+  this->addParameterGroup("Correlation parameters", cor_parameters);
+}
+
+// --------------------------------------------------------------------------
 bool voXCorrel::execute()
 {
   Q_D(voXCorrel);
@@ -87,6 +103,9 @@ bool voXCorrel::execute()
     qWarning() << "Input is Null";
     return false;
     }
+
+  // Parameters
+  QString cor_method = this->enumParameter("method");
 
   /*// Add request to process all columns
   d->XCor->ResetRequests();
@@ -119,7 +138,8 @@ bool voXCorrel::execute()
   d->XCor->SetRoutput(1);
   d->XCor->SetInputConnection(tab->GetOutputPort());
   d->XCor->PutArray("0", "metabData");
-  d->XCor->SetRscript("correl<-cor(metabData)");
+  d->XCor->SetRscript(
+        QString("correl<-cor(metabData, method=\"%1\")").arg(cor_method).toLatin1());
   d->XCor->GetArray("correl","correl");
  
 
