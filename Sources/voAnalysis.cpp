@@ -95,10 +95,36 @@ QString voAnalysis::uuid()const
   return d->Uuid;
 }
 
+namespace
+{
+// --------------------------------------------------------------------------
+void checkForSpaces(const char* className, const char* funcName,
+                    const char* varName, const QString& value)
+{
+  // Check for spaces
+  QString msg = QObject::tr("voAnalysis::%1 [%2]- Parameter %3 shouldn't contain any spaces !");
+  if (value.contains(" ")){ qCritical() << msg.arg(funcName, className, varName); return; }
+}
+
+// --------------------------------------------------------------------------
+void checkForLeadingOrTrailingSpaces(const char* className, const char* funcName,
+                                     const char* varName, const QString& value)
+{
+  // Check for heading and trailing spaces
+  QString msg =
+      QObject::tr("voAnalysis::%1 [%2] - Parameter %2 shouldn't contain heading or trailing spaces !");
+  if (value.trimmed() != value){ qCritical() << msg.arg(funcName, className, varName); return; }
+}
+}
+
 // --------------------------------------------------------------------------
 void voAnalysis::addInputType(const QString& inputName, const QString& inputType)
 {
   Q_D(voAnalysis);
+
+  const char* className = this->metaObject()->className();
+  checkForSpaces(className, "addInputType", "inputName", inputName);
+  checkForSpaces(className, "addInputType", "inputType", inputType);
 
   if (this->hasInput(inputName))
     {
@@ -177,6 +203,17 @@ void voAnalysis::addOutputType(const QString& outputName, const QString& outputT
                                const QString& rawViewType, const QString& rawViewPrettyName)
 {
   Q_D(voAnalysis);
+
+  const char* className = this->metaObject()->className();
+
+  checkForLeadingOrTrailingSpaces(className, "addOutputType", "viewPrettyName", viewPrettyName);
+  checkForLeadingOrTrailingSpaces(className, "addOutputType", "rawViewPrettyName", rawViewPrettyName);
+
+  checkForSpaces(className, "addOutputType", "outputName", outputName);
+  checkForSpaces(className, "addOutputType", "outputType", outputType);
+  checkForSpaces(className, "addOutputType", "viewType", viewType);
+  checkForSpaces(className, "addOutputType", "rawViewType", rawViewType);
+
   if (this->hasOutput(outputName))
     {
     return;
