@@ -254,6 +254,24 @@ voDataModelItem* voDataModel::itemForAnalysis(voAnalysis * analysis)const
 }
 
 // --------------------------------------------------------------------------
+voAnalysis* voDataModel::analysisAboveItem(QStandardItem* item)const
+{
+  if (!item)
+    {
+    return 0;
+    }
+  if (item->data(voDataModelItem::IsAnalysisContainerRole).toBool())
+    {
+    return reinterpret_cast<voAnalysis*>(
+          item->data(voDataModelItem::AnalysisVoidStarRole).value<void*>());
+    }
+  else
+    {
+    return this->analysisAboveItem(item->parent());
+    }
+}
+
+// --------------------------------------------------------------------------
 voDataModelItem* voDataModel::findItemWithUuid(const QString& uuid)const
 {
   if (QUuid(uuid).isNull())

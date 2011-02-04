@@ -46,6 +46,7 @@ public:
 
   voDataModelItem* inputTargetForAnalysis(voAnalysis * analysis)const;
   voDataModelItem* itemForAnalysis(voAnalysis * analysis)const;
+  voAnalysis* analysisAboveItem(QStandardItem* item)const;
 
   voDataModelItem* findItemWithUuid(const QString& uuid)const;
 
