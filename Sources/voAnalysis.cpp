@@ -46,6 +46,8 @@ public:
   bool OutputInformationInitialized;
   bool ParameterInformationInitialized;
 
+  bool AcceptDefaultParameterValues;
+
   QtVariantPropertyManager*          VariantManager;
 };
 
@@ -65,6 +67,7 @@ void voAnalysisPrivate::init()
   this->InputInformationInitialized = false;
   this->OutputInformationInitialized = false;
   this->ParameterInformationInitialized = false;
+  this->AcceptDefaultParameterValues = false;
   this->VariantManager = new QtVariantPropertyManager(q);
 }
 
@@ -479,6 +482,20 @@ int voAnalysis::parameterCount()const
 {
   Q_D(const voAnalysis);
   return d->VariantManager->properties().count();
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::setAcceptDefaultParameterValues(bool value)
+{
+  Q_D(voAnalysis);
+  d->AcceptDefaultParameterValues = value;
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysis::acceptDefaultParameterValues()const
+{
+  Q_D(const voAnalysis);
+  return d->AcceptDefaultParameterValues;
 }
 
 // --------------------------------------------------------------------------

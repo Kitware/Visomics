@@ -11,8 +11,8 @@
 #include <QSignalMapper>
 
 // Visomics includes
-#include "voMainWindow.h"
 #include "ui_voMainWindow.h"
+#include "voAnalysisParameterDialog.h"
 #include "voApplication.h"
 #include "voAnalysis.h"
 #include "voAnalysisDriver.h"
@@ -20,6 +20,7 @@
 #include "voApplication.h"
 #include "voDataModel.h"
 #include "voIOManager.h"
+#include "voMainWindow.h"
 #include "voViewManager.h"
 #include "voViewTabWidget.h"
 
@@ -102,6 +103,10 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(dataModel, SIGNAL(activeAnalysisChanged(voAnalysis*)),
           SLOT(onActiveAnalysisChanged(voAnalysis*)));
 
+  connect(voApplication::application()->analysisDriver(),
+          SIGNAL(aboutToRunAnalysis(voAnalysis*)),
+          SLOT(onAboutToRunAnalysis(voAnalysis*)));
+
   connect(d->AnalysisParameterEditorWidget,
           SIGNAL(runAnalysisRequested(const QString&, const QHash<QString, QVariant>&)),
           voApplication::application()->analysisDriver(),
@@ -153,4 +158,18 @@ void voMainWindow::onActiveAnalysisChanged(voAnalysis* analysis)
   Q_D(voMainWindow);
   d->AnalysisParameterDockWidget->setVisible(analysis != 0 && analysis->parameterCount() > 0);
   d->AnalysisParameterEditorWidget->setAnalysis(analysis);
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::onAboutToRunAnalysis(voAnalysis* analysis)
+{
+  // Show parameter dialog if needed
+  if (!analysis->acceptDefaultParameterValues() && analysis->parameterCount())
+    {
+    voAnalysisParameterDialog analysisParameterDialog(analysis, this);
+    if (analysisParameterDialog.exec() != QDialog::Accepted)
+      {
+      return;
+      }
+    }
 }

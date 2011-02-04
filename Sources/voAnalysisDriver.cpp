@@ -12,6 +12,7 @@
 #include "voAnalysis.h"
 #include "voAnalysisDriver.h"
 #include "voAnalysisFactory.h"
+#include "voAnalysisParameterDialog.h"
 #include "voApplication.h"
 #include "voDataModelItem.h"
 #include "voDataObject.h"
@@ -54,7 +55,7 @@ voAnalysisDriver::~voAnalysisDriver()
 }
 
 // --------------------------------------------------------------------------
-void voAnalysisDriver::runAnalysisForAllInputs(const QString& analysisName, bool useDefaultParameter)
+void voAnalysisDriver::runAnalysisForAllInputs(const QString& analysisName, bool acceptDefaultParameter)
 {
   if (analysisName.isEmpty())
     {
@@ -69,14 +70,14 @@ void voAnalysisDriver::runAnalysisForAllInputs(const QString& analysisName, bool
 
   foreach(voDataModelItem* targetInput, targetInputs)
     {
-    this->runAnalysis(analysisName, targetInput, useDefaultParameter);
+    this->runAnalysis(analysisName, targetInput, acceptDefaultParameter);
     }
 
 }
 
 
 // --------------------------------------------------------------------------
-void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool useDefaultParameter)
+void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool acceptDefaultParameter)
 {
   Q_D(voAnalysisDriver);
   if (analysisName.isEmpty())
@@ -92,11 +93,12 @@ void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem*
   voAnalysisFactory * analysisFactory = voApplication::application()->analysisFactory();
   voAnalysis * analysis = analysisFactory->createAnalysis(analysisName);
   Q_ASSERT(analysis);
-  this->runAnalysis(analysis, inputTarget, useDefaultParameter);
+  analysis->setAcceptDefaultParameterValues(acceptDefaultParameter);
+  this->runAnalysis(analysis, inputTarget);
 }
 
 // --------------------------------------------------------------------------
-void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget, bool useDefaultParameter)
+void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget)
 {
   if (!analysis)
     {
@@ -178,8 +180,8 @@ void voAnalysisDriver::runAnalysisForCurrentInput(
   voAnalysis * newAnalysis = analysisFactory->createAnalysis(analysisName);
   Q_ASSERT(newAnalysis);
   newAnalysis->initializeParameterInformation(parameters);
-
-  this->runAnalysis(newAnalysis, inputTarget, /* useDefaultParameter = */ true);
+  newAnalysis->setAcceptDefaultParameterValues(true);
+  this->runAnalysis(newAnalysis, inputTarget);
 }
 
 // --------------------------------------------------------------------------
@@ -194,6 +196,7 @@ void voAnalysisDriver::updateAnalysis(
 
   // Update analysis parameter
   analysis->setParameterValues(parameters);
+  analysis->setAcceptDefaultParameterValues(true);
 
   // Clear outputs
   analysis->removeAllOutputs();
