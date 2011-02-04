@@ -7,6 +7,7 @@
 #include <QModelIndex>
 
 class QItemSelectionModel;
+class voAnalysis;
 class voDataModel;
 class voDataModelItem;
 
@@ -29,6 +30,7 @@ public:
   QItemSelectionModel*          SelectionModel;
   QList<voDataModelItem*>       SelectedInputDataObjects;
   QHash<QString, unsigned int>  NameCountMap;
+  voAnalysis*                   ActiveAnalysis;
 };
 
 #endif

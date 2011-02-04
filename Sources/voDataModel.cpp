@@ -18,6 +18,7 @@
 voDataModelPrivate::voDataModelPrivate(voDataModel& object) : q_ptr(&object)
 {
   this->SelectionModel = 0;
+  this->ActiveAnalysis = 0;
 }
 
 // --------------------------------------------------------------------------
@@ -40,6 +41,7 @@ void voDataModelPrivate::onCurrentRowChanged(const QModelIndex & current,
 
   // Clear list
   this->SelectedInputDataObjects.clear();
+  voAnalysis * selectedAnalysis = 0;
 
   if (item->type() == voDataModelItem::InputType)
     {
@@ -59,8 +61,18 @@ void voDataModelPrivate::onCurrentRowChanged(const QModelIndex & current,
     }
   else if(item->type() == voDataModelItem::ContainerType)
     {
-    qDebug() << "onCurrentRowChanged - ContainerType" << item->text();
+    selectedAnalysis =
+        reinterpret_cast<voAnalysis*>(item->data(voDataModelItem::AnalysisVoidStarRole).value<void*>());
+    qDebug() << "onCurrentRowChanged - ContainerType" << item->text() << "-" << selectedAnalysis;
     }
+
+  voAnalysis * activeAnalysis = q->analysisAboveItem(item);
+  if (activeAnalysis != this->ActiveAnalysis)
+    {
+    this->ActiveAnalysis = activeAnalysis;
+    emit q->activeAnalysisChanged(this->ActiveAnalysis);
+    }
+  emit q->analysisSelected(selectedAnalysis);
 }
 
 // --------------------------------------------------------------------------
@@ -221,6 +233,13 @@ const QList<voDataModelItem*>& voDataModel::selectedInputObjects() const
 {
   Q_D(const voDataModel);
   return d->SelectedInputDataObjects;
+}
+
+// --------------------------------------------------------------------------
+voAnalysis* voDataModel::activeAnalysis()const
+{
+   Q_D(const voDataModel);
+  return d->ActiveAnalysis;
 }
 
 // --------------------------------------------------------------------------

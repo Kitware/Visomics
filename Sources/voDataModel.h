@@ -44,6 +44,7 @@ public:
   voDataModelItem* selectedInputObject() const;
   const QList<voDataModelItem*>& selectedInputObjects() const;
 
+  voAnalysis* activeAnalysis()const;
   voDataModelItem* inputTargetForAnalysis(voAnalysis * analysis)const;
   voDataModelItem* itemForAnalysis(voAnalysis * analysis)const;
   voAnalysis* analysisAboveItem(QStandardItem* item)const;
@@ -58,6 +59,9 @@ public:
 signals:
 
   void viewSelected(const QString& objectUuid);
+
+  void activeAnalysisChanged(voAnalysis * analysis);
+  void analysisSelected(voAnalysis * analysis);
 
 protected:
   QScopedPointer<voDataModelPrivate> d_ptr;
