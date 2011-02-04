@@ -89,6 +89,10 @@ public:
 
   int parameterCount()const;
 
+  void setAcceptDefaultParameterValues(bool value);
+  bool acceptDefaultParameterValues()const;
+
+
   QtVariantPropertyManager * propertyManager()const;
 
 signals:
