@@ -119,10 +119,10 @@ IF(WITH_COVERAGE)
 ENDIF()
 
 #-----------------------------------------------------------------------------
-# CTK C/CXX Flags
+# Visomics C/CXX Flags
 #
-SET(CTK_C_FLAGS "${CMAKE_C_FLAGS_INIT} ${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
-SET(CTK_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} ${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
+SET(Visomics_C_FLAGS "${CMAKE_C_FLAGS_INIT} ${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
+SET(Visomics_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} ${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
 
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
@@ -130,8 +130,8 @@ IF(CMAKE_COMPILER_IS_GNUCXX)
   ctkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
   ctkFunctionCheckCompilerFlags("-fstack-protector-all" cflags)
 
-  SET(CTK_C_FLAGS "${cflags} ${CTK_C_FLAGS}")
-  SET(CTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${CTK_CXX_FLAGS}")
+  SET(Visomics_C_FLAGS "${cflags} ${Visomics_C_FLAGS}")
+  SET(Visomics_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${Visomics_CXX_FLAGS}")
 ENDIF()
 
 #-----------------------------------------------------------------------------
