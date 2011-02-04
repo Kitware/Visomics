@@ -154,7 +154,31 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
 
   voAnalysisDriver::addAnalysisToObjectModel(analysis, inputTarget);
 
+  connect(analysis, SIGNAL(outputSet(const QString&, voDataObject*, voAnalysis*)),
+          SLOT(onAnalysisOutputSet(const QString&,voDataObject*,voAnalysis*)));
+
   qDebug() << " => Analysis" << analysis->objectName() << " DONE";
+}
+
+// --------------------------------------------------------------------------
+void voAnalysisDriver::onAnalysisOutputSet(
+  const QString& outputName, voDataObject* dataObject, voAnalysis* analysis)
+{
+  if (outputName.isEmpty() || !dataObject || !analysis)
+    {
+    return;
+    }
+
+  voDataModel * model = voApplication::application()->dataModel();
+
+  voDataModelItem * analysisContainer = model->itemForAnalysis(analysis);
+  Q_ASSERT(analysisContainer);
+  QList<voDataModelItem*> items =
+      model->findItemsWithRole(voDataModelItem::OutputNameRole, outputName, analysisContainer);
+  foreach(voDataModelItem* item, items)
+    {
+    item->setDataObject(dataObject);
+    }
 }
 
 // --------------------------------------------------------------------------

@@ -29,6 +29,9 @@ signals:
 
 public slots:
   void runAnalysisForAllInputs(const QString& analysisName);
+protected slots:
+
+  void onAnalysisOutputSet(const QString& outputName, voDataObject* dataObject, voAnalysis* analysis);
 
 protected:
   QScopedPointer<voAnalysisDriverPrivate> d_ptr;
