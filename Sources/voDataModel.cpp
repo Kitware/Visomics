@@ -278,19 +278,32 @@ voDataModelItem* voDataModel::findItemWithUuid(const QString& uuid)const
     {
     return 0;
     }
+  QList<voDataModelItem*> items = this->findItemsWithRole(voDataModelItem::UuidRole, uuid);
+  Q_ASSERT(items.count() == 1); // Item should be uniquely identified !
+  return items.at(0);
+}
 
-  voDataModelItem* foundItem = 0;
-
-  QModelIndexList indexes = this->match(
-      this->index(0, 0, QModelIndex()),
-      voDataModelItem::UuidRole, uuid, -1, Qt::MatchExactly | Qt::MatchRecursive);
-  if (indexes.count() > 0)
+// --------------------------------------------------------------------------
+QList<voDataModelItem*> voDataModel::findItemsWithRole(int role, const QVariant& value, voDataModelItem * start)const
+{
+  QModelIndex startIndex = this->index(0, 0, QModelIndex());
+  if (start)
     {
-    Q_ASSERT(indexes.count() == 1); // Item should uniquely identified !
-    foundItem = dynamic_cast<voDataModelItem*>(this->itemFromIndex(indexes.value(0)));
-    Q_ASSERT(foundItem);
+    startIndex = this->indexFromItem(start);
+    Q_ASSERT(startIndex.isValid());
     }
-  return foundItem;
+  QModelIndexList indexes = this->match(
+      startIndex, role, value, -1, Qt::MatchExactly | Qt::MatchRecursive);
+
+  QList<voDataModelItem*> items;
+  foreach(const QModelIndex& index, indexes)
+    {
+    voDataModelItem * item
+        = dynamic_cast<voDataModelItem*>(this->itemFromIndex(index));
+    Q_ASSERT(item);
+    items << item;
+    }
+  return items;
 }
 
 // --------------------------------------------------------------------------

@@ -49,6 +49,7 @@ public:
   voAnalysis* analysisAboveItem(QStandardItem* item)const;
 
   voDataModelItem* findItemWithUuid(const QString& uuid)const;
+  QList<voDataModelItem*> findItemsWithRole(int role, const QVariant& value, voDataModelItem * start = 0)const;
 
   QString getNextName(const QString& name);
 
