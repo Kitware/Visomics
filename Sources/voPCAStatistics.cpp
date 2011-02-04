@@ -99,21 +99,19 @@ void voPCAStatistics::setOutputInformation()
 
   this->addOutputType("rot", "vtkTable",
                       "",  "",
-                      "voTableView",  "Table (Rotation)");
+                      "voTableView", "Table (Rotation)");
 
   this->addOutputType("sdev", "vtkTable",
                       "", "",
                       "voTableView", "Table (Std. Deviation)");
     
   this->addOutputType("loading", "vtkTable" ,
-						"voPCABarPlot", "Percent Loading Plot",
-						"voTableView", " Table (Percent Loading Plot)");
+                      "voPCABarPlot", "Percent Loading Plot",
+                      "voTableView", "Table (Percent Loading Plot)");
    
   this->addOutputType("sumloading", "vtkTable" ,
-						"voPCABarPlot", "Cumulative Percent Loading Plot",
-						"voTableView", " Table ( Cumulative Percent Loading Plot)");
-
-
+                      "voPCABarPlot", "Cumulative Percent Loading Plot",
+                      "voTableView", "Table ( Cumulative Percent Loading Plot)");
 }
 
 // --------------------------------------------------------------------------
