@@ -30,6 +30,7 @@ public:
     UuidRole,
     IsAnalysisContainerRole,
     AnalysisVoidStarRole,
+    OutputNameRole,
     };
 
   QString viewType()const;
