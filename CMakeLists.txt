@@ -1,34 +1,14 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.8.2)
 
 #-----------------------------------------------------------------------------
-# See http://cmake.org/cmake/help/cmake-2-8-docs.html#section_Policies for details
-#
-
-SET(project_policies
-  CMP0001 # NEW: CMAKE_BACKWARDS_COMPATIBILITY should no longer be used.
-  CMP0002 # NEW: Logical target names must be globally unique.
-  CMP0003 # NEW: Libraries linked via full path no longer produce linker search paths.
-  CMP0004 # NEW: Libraries linked may NOT have leading or trailing whitespace.
-  CMP0005 # NEW: Preprocessor definition values are now escaped automatically.
-  CMP0006 # NEW: Installing MACOSX_BUNDLE targets requires a BUNDLE DESTINATION.
-  CMP0007 # NEW: List command no longer ignores empty elements.
-  CMP0008 # NEW: Libraries linked by full-path must have a valid library file name.
-  CMP0009 # NEW: FILE GLOB_RECURSE calls should not follow symlinks by default.
-  CMP0010 # NEW: Bad variable reference syntax is an error.
-  CMP0011 # NEW: Included scripts do automatic cmake_policy PUSH and POP.
-  CMP0012 # NEW: if() recognizes numbers and boolean constants.
-  CMP0013 # NEW: Duplicate binary directories are not allowed.
-  CMP0014 # NEW: Input directories must have CMakeLists.txt
-  )
-FOREACH(policy ${project_policies})
-  IF(POLICY ${policy})
-    CMAKE_POLICY(SET ${policy} NEW)
-  ENDIF()
-ENDFOREACH()
-
-#-----------------------------------------------------------------------------
 PROJECT(Visomics)
 #-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
+# Superbuild Option - Enabled by default
+#
+OPTION(Visomics_SUPERBUILD "Build Visomics and the projects it depends on via SuperBuild.cmake." ON)
+MARK_AS_ADVANCED(Visomics_SUPERBUILD)
 
 #-----------------------------------------------------------------------------
 # Visomics version number.  An even minor number corresponds to releases.
@@ -38,7 +18,7 @@ SET(Visomics_MINOR_VERSION 2)
 SET(Visomics_BUILD_VERSION 0)
 SET(Visomics_VERSION
     "${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}.${Visomics_BUILD_VERSION}")
-    
+
 #-----------------------------------------------------------------------------
 # Install directories, used for install rules.
 #
@@ -46,6 +26,20 @@ SET(Visomics_INSTALL_BIN_DIR "bin")
 SET(Visomics_INSTALL_LIB_DIR "lib")
 SET(Visomics_INSTALL_INCLUDE_DIR "include/visomics-${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}")
 SET(Visomics_INSTALL_DOC_DIR "doc")
+
+#-----------------------------------------------------------------------------
+# Update CMake module path
+# Note: FindXXX.cmake script specific to utility should be copied into Utilities/CMake
+#
+SET(CMAKE_MODULE_PATH
+  "${CMAKE_CURRENT_SOURCE_DIR}/Utilities/CMake"
+  "${CMAKE_CURRENT_SOURCE_DIR}/CMake"
+  ${CMAKE_MODULE_PATH})
+
+#-----------------------------------------------------------------------------
+# CMake Function(s) and Macro(s)
+#
+INCLUDE(CMake/ctkFunctionCheckCompilerFlags.cmake)
 
 #-----------------------------------------------------------------------------
 # Output directories.
@@ -86,15 +80,80 @@ IF(BUILD_TESTING)
   INCLUDE(CTest)
   MARK_AS_ADVANCED(TCL_TCLSH DART_ROOT)
   SET(CPP_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
-  
+
   # Setup file for setting custom ctest vars
   CONFIGURE_FILE(
     CMake/CTestCustom.cmake.in
     ${CMAKE_CURRENT_BINARY_DIR}/CTestCustom.cmake
     @ONLY
     )
-    
+
 ENDIF()
+
+#-----------------------------------------------------------------------------
+# Coverage
+#
+OPTION(WITH_COVERAGE "Enable/Disable coverage" OFF)
+
+#-----------------------------------------------------------------------------
+# Documentation
+#
+
+#-----------------------------------------------------------------------------
+# Additional CXX/C Flags
+#
+SET(ADDITIONAL_C_FLAGS "" CACHE STRING "Additional C Flags")
+MARK_AS_ADVANCED(ADDITIONAL_C_FLAGS)
+SET(ADDITIONAL_CXX_FLAGS "" CACHE STRING "Additional CXX Flags")
+MARK_AS_ADVANCED(ADDITIONAL_CXX_FLAGS)
+
+#-----------------------------------------------------------------------------
+# Set coverage Flags
+#
+IF(WITH_COVERAGE)
+  IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    SET(coverage_flags "-g -fprofile-arcs -ftest-coverage -O0 -DNDEBUG")
+    SET(COVERAGE_CXX_FLAGS ${coverage_flags})
+    SET(COVERAGE_C_FLAGS ${coverage_flags})
+  ENDIF()
+ENDIF()
+
+#-----------------------------------------------------------------------------
+# CTK C/CXX Flags
+#
+SET(CTK_C_FLAGS "${CMAKE_C_FLAGS_INIT} ${COVERAGE_C_FLAGS} ${ADDITIONAL_C_FLAGS}")
+SET(CTK_CXX_FLAGS "${CMAKE_CXX_FLAGS_INIT} ${VISIBILITY_CXX_FLAGS} ${COVERAGE_CXX_FLAGS} ${ADDITIONAL_CXX_FLAGS}")
+
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET(cflags "-Wall -Wextra -Wpointer-arith -Winvalid-pch -Wcast-align -Wwrite-strings -D_FORTIFY_SOURCE=2")
+
+  ctkFunctionCheckCompilerFlags("-fdiagnostics-show-option" cflags)
+  ctkFunctionCheckCompilerFlags("-fstack-protector-all" cflags)
+
+  SET(CTK_C_FLAGS "${cflags} ${CTK_C_FLAGS}")
+  SET(CTK_CXX_FLAGS "${cflags} -Woverloaded-virtual -Wold-style-cast -Wstrict-null-sentinel -Wsign-promo ${CTK_CXX_FLAGS}")
+ENDIF()
+
+#-----------------------------------------------------------------------------
+# Superbuild script
+#
+IF(Visomics_SUPERBUILD)
+  INCLUDE("${CMAKE_CURRENT_SOURCE_DIR}/SuperBuild.cmake")
+  RETURN()
+ENDIF()
+
+
+#-----------------------------------------------------------------------------
+# QtPropertyBrowser
+
+FIND_PACKAGE(QtPropertyBrowser REQUIRED)
+INCLUDE(${QtPropertyBrowser_USE_FILE})
+
+#-----------------------------------------------------------------------------
+# Set C/CXX Flags
+#
+SET(CMAKE_CXX_FLAGS ${Visomics_CXX_FLAGS} CACHE STRING "CMake C Flags" FORCE)
+SET(CMAKE_C_FLAGS ${Visomics_C_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 
 #-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(Sources)

@@ -1,6 +1,7 @@
 
 //Qt includes
 #include <QDebug>
+#include <QMainWindow>
 
 // Visomics includes
 #include "voAnalysisDriver.h"
@@ -142,4 +143,19 @@ voViewFactory* voApplication::viewFactory()const
 {
   Q_D(const voApplication);
   return const_cast<voViewFactory*>(&d->ViewFactory);
+}
+
+// --------------------------------------------------------------------------
+QMainWindow* voApplication::mainWindow()const
+{
+  QMainWindow* mainwindow = 0;
+  foreach(QWidget * w, this->topLevelWidgets())
+    {
+    mainwindow = qobject_cast<QMainWindow*>(w);
+    if (mainwindow)
+      {
+      break;
+      }
+    }
+  return mainwindow;
 }

@@ -14,6 +14,7 @@
 #include "voMainWindow.h"
 #include "ui_voMainWindow.h"
 #include "voApplication.h"
+#include "voAnalysis.h"
 #include "voAnalysisDriver.h"
 #include "voAnalysisFactory.h"
 #include "voApplication.h"
@@ -61,7 +62,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(voApplication::application()->viewManager(),
           SIGNAL(viewCreated(const QString&, voView*)),
           d->ViewTabWidget,
-          SLOT(createView(const QString&, voView*)));
+          SLOT(addViewTab(const QString&, voView*)));
 
   // Setup actions
   d->actionFileOpen->setShortcut(QKeySequence::Open);
@@ -84,12 +85,32 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(&d->AnalysisActionMapper, SIGNAL(mapped(QString)),
           voApplication::application()->analysisDriver(), SLOT(runAnalysisForAllInputs(QString)));
 
+  voDataModel * dataModel = voApplication::application()->dataModel();
+
   // Set data model
-  d->DataBrowserWidget->setModel(voApplication::application()->dataModel());
+  d->DataBrowserWidget->setModel(dataModel);
 
   // Set selection model
-  d->DataBrowserWidget->setSelectionModel(
-      voApplication::application()->dataModel()->selectionModel());
+  d->DataBrowserWidget->setSelectionModel(dataModel->selectionModel());
+
+  // By default, hide the dock widget
+  d->AnalysisParameterDockWidget->setVisible(false);
+
+  connect(dataModel, SIGNAL(analysisSelected(voAnalysis*)),
+          SLOT(onAnalysisSelected(voAnalysis*)));
+
+  connect(dataModel, SIGNAL(activeAnalysisChanged(voAnalysis*)),
+          SLOT(onActiveAnalysisChanged(voAnalysis*)));
+
+  connect(d->AnalysisParameterEditorWidget,
+          SIGNAL(runAnalysisRequested(const QString&, const QHash<QString, QVariant>&)),
+          voApplication::application()->analysisDriver(),
+          SLOT(runAnalysisForCurrentInput(const QString&, const QHash<QString, QVariant>&)));
+
+  connect(d->AnalysisParameterEditorWidget,
+          SIGNAL(updateAnalysisRequested(voAnalysis*, const QHash<QString, QVariant>&)),
+          voApplication::application()->analysisDriver(),
+          SLOT(updateAnalysis(voAnalysis*, const QHash<QString, QVariant>&)));
 
   // Initialize status bar
   this->statusBar()->showMessage(tr(""), 2000);
@@ -118,4 +139,18 @@ void voMainWindow::about()
           tr("<h2>OmicsView 1.1</h2>"
              "<p>Copyright &copy; 2010 Kitware Inc."
              "<p>Omicsview is a platform for visualization and analysis of omiccs data."));
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::onAnalysisSelected(voAnalysis* analysis)
+{
+  Q_D(voMainWindow);
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::onActiveAnalysisChanged(voAnalysis* analysis)
+{
+  Q_D(voMainWindow);
+  d->AnalysisParameterDockWidget->setVisible(analysis != 0 && analysis->parameterCount() > 0);
+  d->AnalysisParameterEditorWidget->setAnalysis(analysis);
 }

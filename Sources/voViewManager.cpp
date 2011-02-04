@@ -6,6 +6,7 @@
 // Visomics includes
 #include "voApplication.h"
 #include "voDataModelItem.h"
+#include "voDataObject.h"
 #include "voView.h"
 #include "voViewFactory.h"
 #include "voViewManager.h"
@@ -80,7 +81,7 @@ void voViewManager::createView(const QString& objectUuid)
     qCritical() << "voViewManager - Failed to create view: dataObject is NULL";
     return;
     }
-  // Check if view has already been instanciated
+  // Check if view has already been instantiated
   voView * view = 0;
   if (d->UuidToViewMap.contains(objectUuid))
     {
@@ -102,6 +103,14 @@ void voViewManager::createView(const QString& objectUuid)
     }
 
   Q_ASSERT(viewType == view->metaObject()->className());
+
+  // Associate view with the dataModelItem
+  if (dataModelItem->type() == voDataModelItem::InputType ||
+      dataModelItem->type() == voDataModelItem::OutputType ||
+      dataModelItem->type() == voDataModelItem::ViewType)
+    {
+    dataModelItem->setData(QVariant(QMetaType::VoidStar, &view), voDataModelItem::ViewVoidStarRole);
+    }
 
   view->setDataObject(dataObject);
 

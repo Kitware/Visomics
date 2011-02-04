@@ -5,6 +5,7 @@
 #include <QItemSelectionModel>
 
 // Visomics includes
+#include "voAnalysis.h"
 #include "voDataModel.h"
 #include "voDataModel_p.h"
 #include "voDataModelItem.h"
@@ -17,6 +18,7 @@
 voDataModelPrivate::voDataModelPrivate(voDataModel& object) : q_ptr(&object)
 {
   this->SelectionModel = 0;
+  this->ActiveAnalysis = 0;
 }
 
 // --------------------------------------------------------------------------
@@ -39,6 +41,7 @@ void voDataModelPrivate::onCurrentRowChanged(const QModelIndex & current,
 
   // Clear list
   this->SelectedInputDataObjects.clear();
+  voAnalysis * selectedAnalysis = 0;
 
   if (item->type() == voDataModelItem::InputType)
     {
@@ -58,8 +61,18 @@ void voDataModelPrivate::onCurrentRowChanged(const QModelIndex & current,
     }
   else if(item->type() == voDataModelItem::ContainerType)
     {
-    qDebug() << "onCurrentRowChanged - ContainerType" << item->text();
+    selectedAnalysis =
+        reinterpret_cast<voAnalysis*>(item->data(voDataModelItem::AnalysisVoidStarRole).value<void*>());
+    qDebug() << "onCurrentRowChanged - ContainerType" << item->text() << "-" << selectedAnalysis;
     }
+
+  voAnalysis * activeAnalysis = q->analysisAboveItem(item);
+  if (activeAnalysis != this->ActiveAnalysis)
+    {
+    this->ActiveAnalysis = activeAnalysis;
+    emit q->activeAnalysisChanged(this->ActiveAnalysis);
+    }
+  emit q->analysisSelected(selectedAnalysis);
 }
 
 // --------------------------------------------------------------------------
@@ -167,7 +180,6 @@ voDataModelItem* voDataModel::addDataObjectAsChild(
   for (int i= 0; i < this->columnCount(); ++i)
     {
     voDataModelItem* newDataModelItem = new voDataModelItem(newDataObject, i);
-    newDataModelItem->setType(voDataModelItem::typeFromDataObject(newDataObject));
     items.append(newDataModelItem);
     }
   if (parent)
@@ -224,25 +236,93 @@ const QList<voDataModelItem*>& voDataModel::selectedInputObjects() const
 }
 
 // --------------------------------------------------------------------------
-voDataModelItem* voDataModel::findItemWithUuid(const QString& uuid)
+voAnalysis* voDataModel::activeAnalysis()const
+{
+   Q_D(const voDataModel);
+  return d->ActiveAnalysis;
+}
+
+// --------------------------------------------------------------------------
+voDataModelItem* voDataModel::inputTargetForAnalysis(voAnalysis * analysis)const
+{
+  voDataModelItem * analysisItem = this->itemForAnalysis(analysis);
+  if (!analysisItem)
+    {
+    return 0;
+    }
+  QStandardItem * item = analysisItem->parent();
+  while(item)
+    {
+    if (item->type() == voDataModelItem::InputType)
+      {
+      return dynamic_cast<voDataModelItem*>(item);
+      }
+    item = item->parent();
+    }
+  return 0;
+}
+
+// --------------------------------------------------------------------------
+voDataModelItem* voDataModel::itemForAnalysis(voAnalysis * analysis)const
+{
+  if (!analysis)
+    {
+    return 0;
+    }
+  return this->findItemWithUuid(analysis->uuid());
+}
+
+// --------------------------------------------------------------------------
+voAnalysis* voDataModel::analysisAboveItem(QStandardItem* item)const
+{
+  if (!item)
+    {
+    return 0;
+    }
+  if (item->data(voDataModelItem::IsAnalysisContainerRole).toBool())
+    {
+    return reinterpret_cast<voAnalysis*>(
+          item->data(voDataModelItem::AnalysisVoidStarRole).value<void*>());
+    }
+  else
+    {
+    return this->analysisAboveItem(item->parent());
+    }
+}
+
+// --------------------------------------------------------------------------
+voDataModelItem* voDataModel::findItemWithUuid(const QString& uuid)const
 {
   if (QUuid(uuid).isNull())
     {
     return 0;
     }
+  QList<voDataModelItem*> items = this->findItemsWithRole(voDataModelItem::UuidRole, uuid);
+  Q_ASSERT(items.count() == 1); // Item should be uniquely identified !
+  return items.at(0);
+}
 
-  voDataModelItem* foundItem = 0;
-
-  QModelIndexList indexes = this->match(
-      this->index(0, 0, QModelIndex()),
-      voDataModelItem::UuidRole, uuid, -1, Qt::MatchExactly | Qt::MatchRecursive);
-  if (indexes.count() > 0)
+// --------------------------------------------------------------------------
+QList<voDataModelItem*> voDataModel::findItemsWithRole(int role, const QVariant& value, voDataModelItem * start)const
+{
+  QModelIndex startIndex = this->index(0, 0, QModelIndex());
+  if (start)
     {
-    Q_ASSERT(indexes.count() == 1); // Item should uniquely identified !
-    foundItem = dynamic_cast<voDataModelItem*>(this->itemFromIndex(indexes.value(0)));
-    Q_ASSERT(foundItem);
+    startIndex = this->indexFromItem(start);
+    Q_ASSERT(startIndex.isValid());
     }
-  return foundItem;
+  QModelIndexList indexes = this->match(
+      startIndex, role, value, -1, Qt::MatchExactly | Qt::MatchRecursive);
+
+  QList<voDataModelItem*> items;
+  foreach(const QModelIndex& index, indexes)
+    {
+    voDataModelItem * item
+        = dynamic_cast<voDataModelItem*>(this->itemFromIndex(index));
+    Q_ASSERT(item);
+    items << item;
+    }
+  return items;
 }
 
 // --------------------------------------------------------------------------

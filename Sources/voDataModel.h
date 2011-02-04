@@ -7,6 +7,7 @@
 #include <QScopedPointer>
 
 class QItemSelectionModel;
+class voAnalysis;
 class voDataModelPrivate;
 class voDataModelItem;
 class voDataObject;
@@ -43,7 +44,13 @@ public:
   voDataModelItem* selectedInputObject() const;
   const QList<voDataModelItem*>& selectedInputObjects() const;
 
-  voDataModelItem* findItemWithUuid(const QString& uuid);
+  voAnalysis* activeAnalysis()const;
+  voDataModelItem* inputTargetForAnalysis(voAnalysis * analysis)const;
+  voDataModelItem* itemForAnalysis(voAnalysis * analysis)const;
+  voAnalysis* analysisAboveItem(QStandardItem* item)const;
+
+  voDataModelItem* findItemWithUuid(const QString& uuid)const;
+  QList<voDataModelItem*> findItemsWithRole(int role, const QVariant& value, voDataModelItem * start = 0)const;
 
   QString getNextName(const QString& name);
 
@@ -52,6 +59,9 @@ public:
 signals:
 
   void viewSelected(const QString& objectUuid);
+
+  void activeAnalysisChanged(voAnalysis * analysis);
+  void analysisSelected(voAnalysis * analysis);
 
 protected:
   QScopedPointer<voDataModelPrivate> d_ptr;

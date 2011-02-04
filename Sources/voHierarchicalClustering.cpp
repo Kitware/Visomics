@@ -2,6 +2,9 @@
 // Qt includes
 #include <QDebug>
 
+// QtPropertyBrowser includes
+#include <QtVariantPropertyManager>
+
 // Visomics includes
 #include "voApplication.h"
 #include "voHierarchicalClustering.h"
@@ -59,6 +62,19 @@ void voHierarchicalClustering::setOutputInformation()
 }
 
 // --------------------------------------------------------------------------
+void voHierarchicalClustering::setParameterInformation()
+{
+  QList<QtProperty*> hclust_parameters;
+
+  // HClust / Method
+  QStringList hclust_methods;
+  hclust_methods << "complete" << "average" << "mcquitty" << "median" << "centroid";
+  hclust_parameters << this->addEnumParameter("method", tr("Method"), hclust_methods, "average");
+
+  this->addParameterGroup("HClust parameters", hclust_parameters);
+}
+
+// --------------------------------------------------------------------------
 bool voHierarchicalClustering::execute()
 {
   Q_D(voHierarchicalClustering);
@@ -69,6 +85,9 @@ bool voHierarchicalClustering::execute()
     qWarning() << "Input is Null";
     return false;
     }
+
+  // Parameters
+  QString hclust_method = this->enumParameter("method");
 
   // Transpose table
   vtkSmartPointer<vtkTable> transpose = vtkSmartPointer<vtkTable>::New();
@@ -150,16 +169,16 @@ bool voHierarchicalClustering::execute()
    *       agglomerations of singletons, and positive entries indicate
    *       agglomerations of non-singletons. 
    *
-   * 
+   *
    * height: a set of n-1 non-decreasing real values.  The clustering
    *       _height_: that is, the value of the criterion associated with
    *       the clustering method for the particular agglomeration.
-   *  	
+   *
    * order: a vector giving the permutation of the original observations
    *       suitable for plotting, in the sense that a cluster plot using
    *       this ordering and matrix merge will not have crossings
    *       of the branches.
-   * 	
+   *
    *
    * labels : labels for each of the objects being clustered.
    *
@@ -168,11 +187,13 @@ bool voHierarchicalClustering::execute()
   calc->GetArray("height","height");
   calc->GetArray("order","order");
   calc->GetArray("merge","merge");
-  calc->SetRscript("dEuc<-dist(t(metabData))\n\
-          cluster<-hclust(dEuc,method=\"average\")\n\
-          height<-as.numeric(cluster$height)\n\
-          order<-as.numeric(cluster$order)\n\
-          merge<-as.numeric(cluster$merge)\n"); 
+  calc->SetRscript(QString(
+                     "dEuc<-dist(t(metabData))\n"
+                     "cluster<-hclust(dEuc,method=\"%1\")\n"
+                     "height<-as.numeric(cluster$height)\n"
+                     "order<-as.numeric(cluster$order)\n"
+                     "merge<-as.numeric(cluster$merge)\n"
+                     ).arg(hclust_method).toLatin1());
 
   calc->Update();
 
@@ -250,8 +271,7 @@ bool voHierarchicalClustering::execute()
       double heightParent =  heigtArray->GetValue(vtkArrayCoordinates(i));
       double heightChildrean = heightParent - 0.02; // arbitrary
       distanceArray->InsertNextValue(heightParent);
-      
-      
+
       vtkIdType child1 = builder->AddVertex();
       clusterLabel->InsertNextValue( transpose->GetColumnName( abs(firstCluster)) );
       distanceArray->InsertNextValue(heightChildrean);
@@ -317,11 +337,11 @@ bool voHierarchicalClustering::execute()
         double heightParent =  heigtArray->GetValue(vtkArrayCoordinates(i));
         double heightChildrean = heightParent-0.1; // arbitrary
         distanceArray->InsertNextValue(heightParent);
-        
-        vtkIdType child = builder->AddVertex(); 
+
+        vtkIdType child = builder->AddVertex();
         clusterLabel->InsertNextValue( transpose->GetColumnName( abs(secondCluster)) );
         distanceArray->InsertNextValue(heightChildrean);
-        
+
 
         int clusterNumber = clusterMap[firstCluster - 1]; // R cluster index start from 1
         builder->AddEdge( parent, child );
@@ -329,7 +349,7 @@ bool voHierarchicalClustering::execute()
         }
       }
     }
-  
+
   vtkSmartPointer<vtkTree> tree = vtkSmartPointer<vtkTree>::New();
   tree->ShallowCopy(builder);
 

@@ -29,6 +29,10 @@ public slots:
 
   void about();
 
+protected slots:
+  void onAnalysisSelected(voAnalysis* analysis);
+  void onActiveAnalysisChanged(voAnalysis* analysis);
+
 protected:
   QScopedPointer<voMainWindowPrivate> d_ptr;
 

@@ -3,6 +3,10 @@
 #include <QHash>
 #include <QSharedPointer>
 #include <QDebug>
+#include <QMainWindow>
+
+// QtPropertyBrowser includes
+#include <QtVariantPropertyManager>
 
 // Visomics includes
 #include "voAnalysis.h"
@@ -18,9 +22,6 @@ class voAnalysisDriverPrivate
 public:
   voAnalysisDriverPrivate();
   virtual ~voAnalysisDriverPrivate();
-
-  QHash<QString, QSharedPointer<voAnalysis> > Analysis;
-
 };
 
 // --------------------------------------------------------------------------
@@ -53,7 +54,7 @@ voAnalysisDriver::~voAnalysisDriver()
 }
 
 // --------------------------------------------------------------------------
-void voAnalysisDriver::runAnalysisForAllInputs(const QString& analysisName)
+void voAnalysisDriver::runAnalysisForAllInputs(const QString& analysisName, bool useDefaultParameter)
 {
   if (analysisName.isEmpty())
     {
@@ -68,14 +69,14 @@ void voAnalysisDriver::runAnalysisForAllInputs(const QString& analysisName)
 
   foreach(voDataModelItem* targetInput, targetInputs)
     {
-    this->runAnalysis(analysisName, targetInput);
+    this->runAnalysis(analysisName, targetInput, useDefaultParameter);
     }
 
 }
 
 
 // --------------------------------------------------------------------------
-void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem* inputTarget)
+void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool useDefaultParameter)
 {
   Q_D(voAnalysisDriver);
   if (analysisName.isEmpty())
@@ -88,28 +89,14 @@ void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem*
     qWarning() << "Failed to runAnalysis - InputTarget is NULL";
     return;
     }
-
   voAnalysisFactory * analysisFactory = voApplication::application()->analysisFactory();
-
-  voAnalysis * analysis = 0;
-  QStringList keys = d->Analysis.keys();
-  if (!d->Analysis.keys().contains(analysisName))
-    {
-    if (!analysisFactory->registeredAnalysisNames().contains(analysisName))
-      {
-      qWarning() << "Failed to runAnalysis - Unknown analysis [" << analysisName << "]";
-      return;
-      }
-    analysis = analysisFactory->createAnalysis(analysisName);
-    Q_ASSERT(analysis);
-    d->Analysis.insert(analysisName, QSharedPointer<voAnalysis>(analysis));
-    }
-  analysis = d->Analysis.value(analysisName).data();
-  this->runAnalysis(analysis, inputTarget);
+  voAnalysis * analysis = analysisFactory->createAnalysis(analysisName);
+  Q_ASSERT(analysis);
+  this->runAnalysis(analysis, inputTarget, useDefaultParameter);
 }
 
 // --------------------------------------------------------------------------
-void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget)
+void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget, bool useDefaultParameter)
 {
   if (!analysis)
     {
@@ -157,6 +144,11 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
 
   analysis->setInput(inputName, dataObject);
 
+  // Initialize parameter
+  analysis->initializeParameterInformation();
+
+  emit this->aboutToRunAnalysis(analysis);
+
   bool ret = analysis->run();
   if (!ret)
     {
@@ -166,7 +158,76 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
 
   voAnalysisDriver::addAnalysisToObjectModel(analysis, inputTarget);
 
+  connect(analysis, SIGNAL(outputSet(const QString&, voDataObject*, voAnalysis*)),
+          SLOT(onAnalysisOutputSet(const QString&,voDataObject*,voAnalysis*)));
+
   qDebug() << " => Analysis" << analysis->objectName() << " DONE";
+}
+
+// --------------------------------------------------------------------------
+void voAnalysisDriver::runAnalysisForCurrentInput(
+  const QString& analysisName, const QHash<QString, QVariant>& parameters)
+{
+  qDebug() << "runAnalysisForCurrentInput" << analysisName;
+
+  voDataModel * model = voApplication::application()->dataModel();
+  voDataModelItem * inputTarget = model->inputTargetForAnalysis(model->activeAnalysis());
+  Q_ASSERT(inputTarget);
+
+  voAnalysisFactory * analysisFactory = voApplication::application()->analysisFactory();
+  voAnalysis * newAnalysis = analysisFactory->createAnalysis(analysisName);
+  Q_ASSERT(newAnalysis);
+  newAnalysis->initializeParameterInformation(parameters);
+
+  this->runAnalysis(newAnalysis, inputTarget, /* useDefaultParameter = */ true);
+}
+
+// --------------------------------------------------------------------------
+void voAnalysisDriver::updateAnalysis(
+  voAnalysis * analysis, const QHash<QString, QVariant>& parameters)
+{
+  if (!analysis || parameters.count() == 0)
+    {
+    return;
+    }
+  // qDebug() << "voAnalysisDriver::updateAnalysis";
+
+  // Update analysis parameter
+  analysis->setParameterValues(parameters);
+
+  // Clear outputs
+  analysis->removeAllOutputs();
+  analysis->initializeOutputInformation();
+
+  emit this->aboutToRunAnalysis(analysis);
+
+  bool ret = analysis->run();
+  if (!ret)
+    {
+    qCritical() << "Analysis failed to run " << analysis->objectName();
+    return;
+    }
+}
+
+// --------------------------------------------------------------------------
+void voAnalysisDriver::onAnalysisOutputSet(
+  const QString& outputName, voDataObject* dataObject, voAnalysis* analysis)
+{
+  if (outputName.isEmpty() || !dataObject || !analysis)
+    {
+    return;
+    }
+
+  voDataModel * model = voApplication::application()->dataModel();
+
+  voDataModelItem * analysisContainer = model->itemForAnalysis(analysis);
+  Q_ASSERT(analysisContainer);
+  QList<voDataModelItem*> items =
+      model->findItemsWithRole(voDataModelItem::OutputNameRole, outputName, analysisContainer);
+  foreach(voDataModelItem* item, items)
+    {
+    item->setDataObject(dataObject);
+    }
 }
 
 // --------------------------------------------------------------------------
@@ -183,7 +244,9 @@ void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
   // Analysis container
   voDataModelItem * analysisContainer =
       model->addContainer(model->getNextName(analysis->objectName()), insertLocation);
+  analysisContainer->setData(QVariant(analysis->uuid()), voDataModelItem::UuidRole);
   analysisContainer->setData(QVariant(true), voDataModelItem::IsAnalysisContainerRole);
+  analysisContainer->setData(QVariant(QMetaType::VoidStar, &analysis), voDataModelItem::AnalysisVoidStarRole);
 
   // Outputs container
   voDataModelItem * outputsContainer =
@@ -208,14 +271,19 @@ void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
     if (!rawViewType.isEmpty())
       {
       QString rawViewPrettyName = analysis->rawViewPrettyName(outputName, rawViewType);
-      model->addOutput(dataObject, outputsContainer, rawViewType, rawViewPrettyName);
+      voDataModelItem * outputItem =
+          model->addOutput(dataObject, outputsContainer, rawViewType, rawViewPrettyName);
+      outputItem->setData(outputName, voDataModelItem::OutputNameRole);
       }
 
     foreach(const QString& viewType, analysis->viewTypesForOutput(outputName))
       {
       if (viewType.isEmpty()) { continue; }
       QString viewPrettyName = analysis->viewPrettyName(outputName, viewType);
-      model->addView(viewType, viewPrettyName, dataObject, viewContainer);
+      voDataModelItem * viewItem =
+          model->addView(viewType, viewPrettyName, dataObject, viewContainer);
+      viewItem->setData(outputName, voDataModelItem::OutputNameRole);
       }
     }
 }
+

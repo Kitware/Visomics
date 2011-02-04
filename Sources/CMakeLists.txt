@@ -6,6 +6,8 @@ SET(KIT_SRCS
   voAnalysisDriver.h
   voAnalysisFactory.cpp
   voAnalysisFactory.h
+  voAnalysisParameterEditorWidget.cpp
+  voAnalysisParameterEditorWidget.h
   voApplication.cpp
   voApplication.h
   voCorrelationGraphView.cpp
@@ -59,6 +61,7 @@ SET(KIT_SRCS
 SET(KIT_MOC_SRCS
   voAnalysis.h
   voAnalysisDriver.h
+  voAnalysisParameterEditorWidget.h
   voApplication.h
   voDataBrowserWidget.h
   voDataModel.h
@@ -108,7 +111,11 @@ ADD_LIBRARY(${libname} STATIC
 
 SET(VTK_LIBRARIES QVTK vtkCharts vtkInfovis)
 
-SET(${PROJECT_NAME}_LINK_LIBRARIES ${VTK_LIBRARIES} ${QT_LIBRARIES})
+SET(${PROJECT_NAME}_LINK_LIBRARIES
+  ${VTK_LIBRARIES}
+  ${QT_LIBRARIES}
+  QtPropertyBrowser
+  )
 TARGET_LINK_LIBRARIES(
   ${libname}
   ${${PROJECT_NAME}_LINK_LIBRARIES}

@@ -25,6 +25,7 @@ public:
 // --------------------------------------------------------------------------
 voDataObjectPrivate::voDataObjectPrivate()
 {
+  this->Uuid = QUuid::createUuid().toString();
 }
   
 // --------------------------------------------------------------------------
@@ -34,8 +35,6 @@ voDataObjectPrivate::voDataObjectPrivate()
 voDataObject::voDataObject(QObject* newParent) :
     Superclass(newParent), d_ptr(new voDataObjectPrivate)
 {
-  Q_D(voDataObject);
-  d->Uuid = QUuid::createUuid().toString();
 }
 
 // --------------------------------------------------------------------------
@@ -43,7 +42,6 @@ voDataObject::voDataObject(const QString& newName, vtkDataObject * newData, QObj
     Superclass(newParent), d_ptr(new voDataObjectPrivate)
 {
   Q_D(voDataObject);
-  d->Uuid = QUuid::createUuid().toString();
   d->Name = newName;
   d->Data = newData;
 }

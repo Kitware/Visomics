@@ -2,6 +2,9 @@
 // Qt includes
 #include <QDebug>
 
+// QtPropertyBrowser includes
+#include <QtVariantPropertyManager>
+
 // Visomics includes
 #include "voApplication.h"
 #include "voXCorrel.h"
@@ -72,8 +75,21 @@ void voXCorrel::setOutputInformation()
                       "", "",
                       "voTableView", "Table (Correlation)");
   
-  this->addOutputType("correlation graph", "vtkGraph",
+  this->addOutputType("correlation_graph", "vtkGraph",
                       "voCorrelationGraphView", "Correlation Graph");
+}
+
+// --------------------------------------------------------------------------
+void voXCorrel::setParameterInformation()
+{
+  QList<QtProperty*> cor_parameters;
+
+  // Cor / Method
+  QStringList cor_methods;
+  cor_methods << "pearson" << "kendall" << "spearman";
+  cor_parameters << this->addEnumParameter("method", tr("Method"), cor_methods);
+
+  this->addParameterGroup("Correlation parameters", cor_parameters);
 }
 
 // --------------------------------------------------------------------------
@@ -87,6 +103,9 @@ bool voXCorrel::execute()
     qWarning() << "Input is Null";
     return false;
     }
+
+  // Parameters
+  QString cor_method = this->enumParameter("method");
 
   /*// Add request to process all columns
   d->XCor->ResetRequests();
@@ -103,15 +122,11 @@ bool voXCorrel::execute()
  tab->SetInput(table);
  //table->Print(std::cout);
 
-
-
   for (int ctr=1; ctr<table->GetNumberOfColumns(); ctr++)
     {
     tab->AddColumn(table->GetColumnName(ctr));
     }
 
-  
-  
   tab->Update();
   
  // tab->GetOutput()->Print(std::cout);
@@ -119,12 +134,12 @@ bool voXCorrel::execute()
   d->XCor->SetRoutput(0);
   d->XCor->SetInputConnection(tab->GetOutputPort());
   d->XCor->PutArray("0", "metabData");
-  d->XCor->SetRscript("correl<-cor(metabData)");
+  d->XCor->SetRscript(
+        QString("correl<-cor(metabData, method=\"%1\")").arg(cor_method).toLatin1());
   d->XCor->GetArray("correl","correl");
  
-
   // Do Cross Correlation
-	d->XCor->Update();
+  d->XCor->Update();
 
 #if 0
   // Find standard deviations of each column
@@ -169,7 +184,7 @@ bool voXCorrel::execute()
     {
     // We should pop up an error message modal window here and return.  For now, cerr will do
     std::cerr << "R did not return a valid reponse probably due to memory issues.  Cannot display cross correlation result." << std::endl;
-	return false;
+    return false;
     }
 
   vtkSmartPointer<vtkArrayData> XCorProjData = vtkSmartPointer<vtkArrayData>::New();
@@ -232,6 +247,6 @@ bool voXCorrel::execute()
   correlGraphAlg->Update();
 
   this->setOutput(
-      "correlation graph", new voDataObject("correlation graph", correlGraphAlg->GetOutput()));
+      "correlation_graph", new voDataObject("correlation_graph", correlGraphAlg->GetOutput()));
   return true;
 }

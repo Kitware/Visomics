@@ -5,7 +5,6 @@
 
 // Qt includes
 #include <QWidget>
-#include <QList>
 
 class voDataObject;
 

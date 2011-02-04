@@ -3,12 +3,15 @@
 #define __voAnalysis_h
 
 // Qt includes
-#include <QSharedPointer>
 #include <QScopedPointer>
 #include <QLatin1String>
 #include <QObject>
 #include <QStringList>
+#include <QVariant>
 
+class QtProperty;
+class QtVariantPropertyManager;
+class QtVariantProperty;
 class voAnalysisPrivate;
 class voDataObject;
 class vtkDataObject;
@@ -20,6 +23,7 @@ public:
   voAnalysis();
   virtual ~voAnalysis();
 
+  QString uuid()const;
 
   void addInputType(const QString& inputName, const QString& inputType);
 
@@ -76,6 +80,20 @@ public:
 
   void initializeInputInformation();
   void initializeOutputInformation();
+  void initializeParameterInformation(
+    const QHash<QString, QVariant>& parameters = QHash<QString, QVariant>());
+
+  void setParameterValues(const QHash<QString, QVariant>& parameters);
+
+  QSet<QtVariantProperty*> topLevelParameterGroups()const;
+
+  int parameterCount()const;
+
+  QtVariantPropertyManager * propertyManager()const;
+
+signals:
+
+  void outputSet(const QString& outputName, voDataObject* dataObject, voAnalysis* analysis);
 
 protected:
 
@@ -83,6 +101,33 @@ protected:
 
   virtual void setInputInformation(){}
   virtual void setOutputInformation(){}
+  virtual void setParameterInformation(){}
+
+  void addParameterGroup(const QString& label, const QList<QtProperty*> parameters);
+
+  QtVariantProperty* parameter(const QString& id)const;
+
+  QString enumParameter(const QString& id)const;
+
+  QtVariantProperty*  addEnumParameter(const QString& id, const QString& label,
+                                             const QStringList& choices,
+                                             const QString& value = QString());
+
+  int integerParameter(const QString& id)const;
+
+  QtVariantProperty*  addIntegerParameter(const QString& id, const QString& label,
+                                          int minimum, int maximum,
+                                          int value);
+
+  double doubleParameter(const QString& id)const;
+
+  QtVariantProperty*  addDoubleParameter(const QString& id, const QString& label,
+                                         double minimum, double maximum,
+                                         double value);
+
+  bool booleanParameter(const QString& id)const;
+
+  QtVariantProperty*  addBooleanParameter(const QString& id, const QString& label, bool value);
 
 protected:
   QScopedPointer<voAnalysisPrivate> d_ptr;

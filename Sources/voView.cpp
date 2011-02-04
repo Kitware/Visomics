@@ -9,7 +9,10 @@
 #include <vtkDataObject.h>
 
 // --------------------------------------------------------------------------
-voView::voView(QWidget* newParent):Superclass(newParent)
+// voView methods
+
+// --------------------------------------------------------------------------
+voView::voView(QWidget* newParent) : Superclass(newParent)
 {
 }
 
@@ -26,3 +29,4 @@ void voView::initialize()
   verticalLayout->setContentsMargins(0, 0, 0, 0);
   this->setupUi(verticalLayout);
 }
+
