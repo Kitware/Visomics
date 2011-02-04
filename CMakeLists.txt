@@ -40,6 +40,7 @@ SET(CMAKE_MODULE_PATH
 # CMake Function(s) and Macro(s)
 #
 INCLUDE(CMake/ctkFunctionCheckCompilerFlags.cmake)
+INCLUDE(CMake/ctkFunctionGetGccVersion.cmake)
 
 #-----------------------------------------------------------------------------
 # Output directories.
@@ -98,6 +99,17 @@ OPTION(WITH_COVERAGE "Enable/Disable coverage" OFF)
 #-----------------------------------------------------------------------------
 # Documentation
 #
+
+#-----------------------------------------------------------------------------
+# Check compiler version
+# 
+IF(CMAKE_COMPILER_IS_GNUCXX)
+  SET(REQUIRED_GNUCXX_VERSION "4.4.3")
+  ctkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)
+  IF(${GCC_VERSION} VERSION_LESS ${REQUIRED_GNUCXX_VERSION})
+    MESSAGE(FATAL_ERROR "Gcc >= ${REQUIRED_GNUCXX_VERSION} is required ! Your current version is ${GCC_VERSION}.")
+  ENDIF()
+ENDIF()
 
 #-----------------------------------------------------------------------------
 # Additional CXX/C Flags
