@@ -28,7 +28,7 @@
 voHierarchicalClustering::voHierarchicalClustering():
     Superclass()
 {
-  Q_D(voHierarchicalClustering);
+  // Q_D(voHierarchicalClustering);
 
 }
 
@@ -66,7 +66,7 @@ void voHierarchicalClustering::setParameterInformation()
 // --------------------------------------------------------------------------
 bool voHierarchicalClustering::execute()
 {
-  Q_D(voHierarchicalClustering);
+  // Q_D(voHierarchicalClustering);
 
   vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
   if (!table)
@@ -277,7 +277,7 @@ bool voHierarchicalClustering::execute()
       clusterIndex++;
 
       double heightParent =  heigtArray->GetValue(vtkArrayCoordinates(i));
-      double heightChildrean = heightParent - 0.1; // arbitrary
+      // double heightChildrean = heightParent - 0.1; // arbitrary
       distanceArray->InsertNextValue(heightParent);
      
      
@@ -328,7 +328,7 @@ bool voHierarchicalClustering::execute()
         distanceArray->InsertNextValue(heightChildrean);
 
 
-        int clusterNumber = clusterMap[firstCluster - 1]; // R cluster index start from 1
+        // int clusterNumber = clusterMap[firstCluster - 1]; // R cluster index start from 1
         builder->AddEdge( parent, child );
         builder->AddEdge( parent, firstCluster );
         }

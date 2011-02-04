@@ -174,8 +174,6 @@ voDataModelItem* voDataModel::addDataObject(voDataObject * newDataObject)
 voDataModelItem* voDataModel::addDataObjectAsChild(
     voDataObject * newDataObject, QStandardItem * parent)
 {
-  Q_D(voDataModel);
-
   QList<QStandardItem*> items;
   for (int i= 0; i < this->columnCount(); ++i)
     {

@@ -24,8 +24,6 @@ public:
 voViewTabWidget::voViewTabWidget(QWidget* newParent):Superclass(newParent), 
   d_ptr(new voViewTabWidgetPrivate)
 {
-  Q_D(voViewTabWidget);
-
   this->setTabsClosable(true);
   this->setUsesScrollButtons(true);
   this->setMovable(true);

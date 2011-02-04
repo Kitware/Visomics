@@ -27,8 +27,7 @@
 voKMeansClustering::voKMeansClustering():
     Superclass()
 {
-  Q_D(voKMeansClustering);
-
+  // Q_D(voKMeansClustering);
 }
 
 // --------------------------------------------------------------------------
@@ -72,8 +71,6 @@ void voKMeansClustering::setParameterInformation()
 // --------------------------------------------------------------------------
 bool voKMeansClustering::execute()
 {
-  Q_D(voKMeansClustering);
-
   vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
   if (!table)
     {

@@ -209,15 +209,8 @@ void voAnalysisParameterEditorWidget::setAnalysis(voAnalysis* newAnalysis)
 void voAnalysisParameterEditorWidget::onLocalValueChanged(QtProperty *localProp, const QVariant &localValue)
 {
   Q_D(voAnalysisParameterEditorWidget);
-
-  // Check if new value is different from the one associated with the analysis
-  QtVariantProperty * localVariantProp = dynamic_cast<QtVariantProperty*>(localProp);
-  Q_ASSERT(localVariantProp);
-  // Retrieve associated analysis property
-  QtVariantProperty * variantProp = dynamic_cast<QtVariantProperty*>(
-        d->Analysis->propertyManager()->qtProperty(localProp->propertyId()));
-  Q_ASSERT(variantProp);
-
+  Q_UNUSED(localProp);
+  Q_UNUSED(localValue);
   bool equal = d->comparePropertySet(
         d->LocalPropertyManager.properties(), d->Analysis->propertyManager()->properties());
   d->setButtonsEnabled(!equal);

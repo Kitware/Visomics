@@ -45,13 +45,11 @@ voAnalysisDriverPrivate::~voAnalysisDriverPrivate()
 voAnalysisDriver::voAnalysisDriver(QObject* newParent):
     Superclass(newParent), d_ptr(new voAnalysisDriverPrivate)
 {
-  Q_D(voAnalysisDriver);
 }
 
 // --------------------------------------------------------------------------
 voAnalysisDriver::~voAnalysisDriver()
 {
-
 }
 
 // --------------------------------------------------------------------------
@@ -72,14 +70,11 @@ void voAnalysisDriver::runAnalysisForAllInputs(const QString& analysisName, bool
     {
     this->runAnalysis(analysisName, targetInput, acceptDefaultParameter);
     }
-
 }
-
 
 // --------------------------------------------------------------------------
 void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool acceptDefaultParameter)
 {
-  Q_D(voAnalysisDriver);
   if (analysisName.isEmpty())
     {
     qWarning() << "Failed to runAnalysis - AnalysisName is an empty string";

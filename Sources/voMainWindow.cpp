@@ -149,7 +149,8 @@ void voMainWindow::about()
 // --------------------------------------------------------------------------
 void voMainWindow::onAnalysisSelected(voAnalysis* analysis)
 {
-  Q_D(voMainWindow);
+  Q_UNUSED(analysis);
+  // Q_D(voMainWindow);
 }
 
 // --------------------------------------------------------------------------

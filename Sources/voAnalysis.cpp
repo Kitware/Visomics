@@ -529,7 +529,6 @@ QtVariantProperty* voAnalysis::parameter(const QString& id)const
 // --------------------------------------------------------------------------
 QString voAnalysis::enumParameter(const QString& id)const
 {
-  Q_D(const voAnalysis);
   QtVariantProperty * prop = this->parameter(id);
   Q_ASSERT(prop);
 
