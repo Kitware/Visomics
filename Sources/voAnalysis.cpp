@@ -5,6 +5,10 @@
 #include <QUuid>
 #include <QDebug>
 
+// QtPropertyBrowser includes
+#include <QtVariantPropertyManager>
+#include <QtVariantProperty>
+
 // Visomics include
 #include "voAnalysis.h"
 #include "voDataObject.h"
@@ -41,6 +45,8 @@ public:
   bool InputInformationInitialized;
   bool OutputInformationInitialized;
   bool ParameterInformationInitialized;
+
+  QtVariantPropertyManager*          VariantManager;
 };
 
 // --------------------------------------------------------------------------
@@ -59,6 +65,7 @@ void voAnalysisPrivate::init()
   this->InputInformationInitialized = false;
   this->OutputInformationInitialized = false;
   this->ParameterInformationInitialized = false;
+  this->VariantManager = new QtVariantPropertyManager(q);
 }
 
 // --------------------------------------------------------------------------
@@ -386,7 +393,7 @@ void voAnalysis::initializeOutputInformation()
 }
 
 // --------------------------------------------------------------------------
-void voAnalysis::initializeParameterInformation()
+void voAnalysis::initializeParameterInformation(const QHash<QString, QVariant>& parameters)
 {
   Q_D(voAnalysis);
   if (d->ParameterInformationInitialized)
@@ -394,6 +401,187 @@ void voAnalysis::initializeParameterInformation()
     return;
     }
   this->setParameterInformation();
+  this->setParameterValues(parameters);
+
   d->ParameterInformationInitialized = true;
 }
 
+// --------------------------------------------------------------------------
+void voAnalysis::setParameterValues(const QHash<QString, QVariant>& parameters)
+{
+  Q_D(voAnalysis);
+  foreach(const QString& id, parameters.keys())
+    {
+    QtVariantProperty* variantProp =
+        dynamic_cast<QtVariantProperty*>(d->VariantManager->qtProperty(id));
+    Q_ASSERT(variantProp);
+    variantProp->setValue(parameters.value(id));
+    }
+}
+
+// --------------------------------------------------------------------------
+QSet<QtVariantProperty*> voAnalysis::topLevelParameterGroups()const
+{
+  Q_D(const voAnalysis);
+  QSet<QtVariantProperty*> topLevelProperties;
+  foreach(QtProperty* prop, d->VariantManager->properties())
+    {
+    if (!prop->isSubProperty())
+      {
+      QtVariantProperty * variantProp = dynamic_cast<QtVariantProperty*>(prop);
+      Q_ASSERT(variantProp);
+      topLevelProperties << variantProp;
+      }
+    }
+
+  return topLevelProperties;
+}
+
+// --------------------------------------------------------------------------
+int voAnalysis::parameterCount()const
+{
+  Q_D(const voAnalysis);
+  return d->VariantManager->properties().count();
+}
+
+// --------------------------------------------------------------------------
+QtVariantPropertyManager * voAnalysis::propertyManager()const
+{
+  Q_D(const voAnalysis);
+  return d->VariantManager;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::addParameterGroup(const QString& label, const QList<QtProperty*> parameters)
+{
+  Q_D(voAnalysis);
+
+  QtVariantProperty * group = d->VariantManager->addProperty(
+        QtVariantPropertyManager::groupTypeId(), label);
+
+  foreach(QtProperty * param, parameters)
+    {
+    group->addSubProperty(param);
+    }
+}
+
+// --------------------------------------------------------------------------
+QtVariantProperty* voAnalysis::parameter(const QString& id)const
+{
+  Q_D(const voAnalysis);
+  return dynamic_cast<QtVariantProperty*>(d->VariantManager->qtProperty(id));
+}
+
+// --------------------------------------------------------------------------
+QString voAnalysis::enumParameter(const QString& id)const
+{
+  Q_D(const voAnalysis);
+  QtVariantProperty * prop = this->parameter(id);
+  Q_ASSERT(prop);
+
+  QStringList choices = prop->attributeValue(QLatin1String("enumNames")).toStringList();
+  Q_ASSERT(choices.count() > 0);
+
+  return choices.at(prop->value().toInt());
+}
+
+// --------------------------------------------------------------------------
+QtVariantProperty* voAnalysis::addEnumParameter(const QString& id, const QString& label,
+                                                const QStringList& choices, const QString& value)
+{
+  Q_ASSERT(!label.isEmpty());
+  Q_ASSERT(!label.isEmpty());
+  Q_ASSERT(!choices.isEmpty());
+  Q_ASSERT(value.isEmpty() || choices.contains(value));
+
+  Q_D(voAnalysis);
+
+  QtVariantProperty *param = d->VariantManager->addProperty(QtVariantPropertyManager::enumTypeId(), label);
+
+  param->setPropertyId(id);
+  param->setAttribute(QLatin1String("enumNames"), choices);
+  param->setValue(choices.indexOf(value));
+
+  return param;
+}
+
+// --------------------------------------------------------------------------
+int voAnalysis::integerParameter(const QString& id)const
+{
+  QtVariantProperty * prop = this->parameter(id);
+  Q_ASSERT(prop);
+  return prop->value().toInt();
+}
+
+// --------------------------------------------------------------------------
+QtVariantProperty*  voAnalysis::addIntegerParameter(const QString& id, const QString& label,
+                                                    int minimum, int maximum, int value)
+{
+  Q_ASSERT(!label.isEmpty());
+  Q_ASSERT(!label.isEmpty());
+
+  Q_D(voAnalysis);
+
+  QtVariantProperty * param = d->VariantManager->addProperty(QVariant::Int, label);
+
+  param->setPropertyId(id);
+  param->setValue(value);
+  param->setAttribute(QLatin1String("minimum"), minimum);
+  param->setAttribute(QLatin1String("maximum"), maximum);
+  param->setAttribute(QLatin1String("singleStep"), 1);
+
+  return param;
+}
+
+// --------------------------------------------------------------------------
+double voAnalysis::doubleParameter(const QString& id)const
+{
+  QtVariantProperty * prop = this->parameter(id);
+  Q_ASSERT(prop);
+  return prop->value().toDouble();
+}
+
+// --------------------------------------------------------------------------
+QtVariantProperty*  voAnalysis::addDoubleParameter(const QString& id, const QString& label,
+                                                   double minimum, double maximum,
+                                                   double value)
+{
+  Q_ASSERT(!id.isEmpty());
+  Q_ASSERT(!label.isEmpty());
+
+  Q_D(voAnalysis);
+
+  QtVariantProperty * param = d->VariantManager->addProperty(QVariant::Double, label);
+
+  param->setPropertyId(id);
+  param->setValue(value);
+  param->setAttribute(QLatin1String("minimum"), minimum);
+  param->setAttribute(QLatin1String("maximum"), maximum);
+  param->setAttribute(QLatin1String("singleStep"), 0.01);
+  param->setAttribute(QLatin1String("decimals"), 2);
+
+  return param;
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysis::booleanParameter(const QString& id)const
+{
+  QtVariantProperty * prop = this->parameter(id);
+  Q_ASSERT(prop);
+  return prop->value().toBool();
+}
+
+// --------------------------------------------------------------------------
+QtVariantProperty*  voAnalysis::addBooleanParameter(const QString& id, const QString& label, bool value)
+{
+  Q_ASSERT(!id.isEmpty());
+  Q_ASSERT(!label.isEmpty());
+
+  Q_D(voAnalysis);
+
+  QtVariantProperty * param = d->VariantManager->addProperty(QVariant::Bool, label);
+  param->setPropertyId(id);
+  param->setValue(value);
+
+  return param;
+}
