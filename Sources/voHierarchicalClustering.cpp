@@ -6,31 +6,20 @@
 #include <QtVariantPropertyManager>
 
 // Visomics includes
-#include "voApplication.h"
+#include "voDataObject.h"
 #include "voHierarchicalClustering.h"
-#include "voTableDataObject.h"
 
 // VTK includes
-#include <vtkAdjacencyMatrixToEdgeTable.h>
-#include <vtkAlgorithm.h>
-#include <vtkArrayToTable.h>
 #include <vtkDataSetAttributes.h>
-#include <vtkDescriptiveStatistics.h>
+#include <vtkDenseArray.h>
 #include <vtkDoubleArray.h>
-#include <vtkGraph.h>
-#include <vtkMultiBlockDataSet.h>
-#include <vtkPCAStatistics.h>
+#include <vtkMutableDirectedGraph.h>
+#include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkTableToArray.h>
-#include <vtkTableToGraph.h>
-#include <vtkRCalculatorFilter.h>
-#include <vtkDenseArray.h>
 #include <vtkTree.h>
-#include <vtkMutableDirectedGraph.h>
-#include <vtkIntArray.h>
-
 
 // --------------------------------------------------------------------------
 // voHierarchicalClustering methods
@@ -130,26 +119,22 @@ bool voHierarchicalClustering::execute()
   tableToArray->Update();
 
   //Print ouf the array data for debugging purposes
-  vtkSmartPointer< vtkArrayData > arrayData = vtkSmartPointer< vtkArrayData>::New();
-  arrayData = tableToArray->GetOutput();
-
-  vtkIdType numberOfArrays = arrayData->GetNumberOfArrays();
-
-  /*
-  for( vtkIdType i=0; i < numberOfArrays; i++)
-    {
-    vtkDenseArray<double> *array = vtkDenseArray<double>::SafeDownCast(arrayData->GetArray(i));
-    const vtkArrayExtents extents = array->GetExtents();
-    for(vtkIdType i = extents[0].GetBegin(); i != extents[0].GetEnd(); ++i)
-      {   
-      for(vtkIdType j = extents[1].GetBegin(); j != extents[1].GetEnd(); ++j)
-        {
-        std::cout << array->GetValue(vtkArrayCoordinates(i, j)) << "\t";
-        }
-        std::cout << std::endl;
-      }   
-    }
-    */
+//  vtkSmartPointer< vtkArrayData > arrayData = vtkSmartPointer< vtkArrayData>::New();
+//  arrayData = tableToArray->GetOutput();
+//  vtkIdType numberOfArrays = arrayData->GetNumberOfArrays();
+//  for( vtkIdType i=0; i < numberOfArrays; i++)
+//    {
+//    vtkDenseArray<double> *array = vtkDenseArray<double>::SafeDownCast(arrayData->GetArray(i));
+//    const vtkArrayExtents extents = array->GetExtents();
+//    for(vtkIdType i = extents[0].GetBegin(); i != extents[0].GetEnd(); ++i)
+//      {
+//      for(vtkIdType j = extents[1].GetBegin(); j != extents[1].GetEnd(); ++j)
+//        {
+//        std::cout << array->GetValue(vtkArrayCoordinates(i, j)) << "\t";
+//        }
+//        std::cout << std::endl;
+//      }
+//    }
 
   vtkSmartPointer< vtkRCalculatorFilter > calc = vtkSmartPointer< vtkRCalculatorFilter>::New();
   calc->SetRoutput(0);
@@ -221,7 +206,7 @@ bool voHierarchicalClustering::execute()
 
   vtkDenseArray<double> *mergeArray = vtkDenseArray<double>::SafeDownCast(mergeData->GetArray(0));
 
-  const vtkArrayExtents matrixExtent = mergeArray->GetExtents();
+//  const vtkArrayExtents matrixExtent = mergeArray->GetExtents();
 
   //Start constructing the graph too
   vtkSmartPointer<vtkMutableDirectedGraph> builder = vtkSmartPointer<vtkMutableDirectedGraph>::New();
