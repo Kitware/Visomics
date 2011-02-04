@@ -3,7 +3,6 @@
 #include <QDebug>
 
 // Visomics includes
-#include "voApplication.h"
 #include "voPCAStatistics.h"
 #include "voTableDataObject.h"
 

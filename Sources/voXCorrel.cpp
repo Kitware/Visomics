@@ -6,55 +6,39 @@
 #include <QtVariantPropertyManager>
 
 // Visomics includes
-#include "voApplication.h"
 #include "voXCorrel.h"
 #include "voTableDataObject.h"
 
 // VTK includes
-#include <vtkAdjacencyMatrixToEdgeTable.h>
-#include <vtkAlgorithm.h>
 #include <vtkArrayToTable.h>
-#include <vtkDataSetAttributes.h>
-#include <vtkDescriptiveStatistics.h>
 #include <vtkDoubleArray.h>
 #include <vtkGraph.h>
-#include <vtkMultiBlockDataSet.h>
+#include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkTableToArray.h>
 #include <vtkTableToGraph.h>
 
-#include <vtkRCalculatorFilter.h>
-#include <vtkDelimitedTextReader.h>
-#define VTK_CREATE(name,type) \
-  vtkSmartPointer<type> name = vtkSmartPointer<type>::New();
-
+// --------------------------------------------------------------------------
+// voXCorrelPrivate methods
 
 // --------------------------------------------------------------------------
 class voXCorrelPrivate
 {
 public:
-
-  vtkSmartPointer<vtkDescriptiveStatistics> Descriptive;
   vtkSmartPointer<vtkRCalculatorFilter> XCor;
 };
 
 // --------------------------------------------------------------------------
-// voXCorStatisticsPrivate methods
-
-// --------------------------------------------------------------------------
-// voXCorStatistics methods
+// voXCorrel methods
 
 // --------------------------------------------------------------------------
 voXCorrel::voXCorrel():
     Superclass(), d_ptr(new voXCorrelPrivate)
 {
   Q_D(voXCorrel);
-  
   d->XCor = vtkSmartPointer<vtkRCalculatorFilter>::New();
-
-  d->Descriptive = vtkSmartPointer<vtkDescriptiveStatistics>::New();
 }
 
 // --------------------------------------------------------------------------
@@ -107,26 +91,15 @@ bool voXCorrel::execute()
   // Parameters
   QString cor_method = this->enumParameter("method");
 
-  /*// Add request to process all columns
-  d->XCor->ResetRequests();
-  d->XCor->ResetAllColumnStates();
-  for (int i = 1; i < table->GetNumberOfColumns(); ++i)
-    {
-    d->XCor->SetColumnStatus(table->GetColumnName(i), 1);
-    }
-  d->XCor->RequestSelectedColumns();
-  */
-
- //table->Print(std::cout);
- vtkSmartPointer<vtkTableToArray> tab = vtkSmartPointer<vtkTableToArray>::New();
- tab->SetInput(table);
- //table->Print(std::cout);
+  //table->Print(std::cout);
+  vtkSmartPointer<vtkTableToArray> tab = vtkSmartPointer<vtkTableToArray>::New();
+  tab->SetInput(table);
+  //table->Print(std::cout);
 
   for (int ctr=1; ctr<table->GetNumberOfColumns(); ctr++)
     {
     tab->AddColumn(table->GetColumnName(ctr));
     }
-
   tab->Update();
   
  // tab->GetOutput()->Print(std::cout);
@@ -140,26 +113,6 @@ bool voXCorrel::execute()
  
   // Do Cross Correlation
   d->XCor->Update();
-
-#if 0
-  // Find standard deviations of each column
-  d->Descriptive->ResetRequests();
-  d->Descriptive->ResetAllColumnStates();
-  for (int i = 1; i < table->GetNumberOfcols(); ++i)
-    {
-    d->Descriptive->SetColumnStatus(table->GetColumnName(i), 1);
-    d->Descriptive->RequestSelectedColumns();
-    d->Descriptive->ResetAllColumnStates();
-    }
-
-  // Do descriptive stats
-  d->Descriptive->SetInput(table);
-  d->Descriptive->Update();
-
-  vtkMultiBlockDataSet* dBlock = vtkMultiBlockDataSet::SafeDownCast(d->Descriptive->GetOutputDataObject(1));
-  vtkTable* descriptive = vtkTable::SafeDownCast(dBlock->GetBlock(1));
-  vtkDoubleArray* columnDev = vtkDoubleArray::SafeDownCast(descriptive->GetColumnByName("Standard Deviation"));
-#endif
 
   vtkArrayData *XCorReturn = vtkArrayData::SafeDownCast(d->XCor->GetOutput());
   if (!XCorReturn)
@@ -199,8 +152,6 @@ bool voXCorrel::execute()
   corr->AddColumn(header);
 
   // assess->Print(std::cout);
-
-
   for (vtkIdType c = 0;c < cols-1; ++c)  //c < assess->GetNumberOfColumns()
     {
     vtkAbstractArray* col = assess->GetColumn(c);
