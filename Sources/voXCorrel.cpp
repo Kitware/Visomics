@@ -118,19 +118,15 @@ bool voXCorrel::execute()
   */
 
   //table->Print(std::cout);
- vtkSmartPointer<vtkTableToArray> tab = vtkSmartPointer<vtkTableToArray>::New();
- tab->SetInput(table);
- table->Print(std::cout);
-
-
+  vtkSmartPointer<vtkTableToArray> tab = vtkSmartPointer<vtkTableToArray>::New();
+  tab->SetInput(table);
+  table->Print(std::cout);
 
   for (int ctr=1; ctr<table->GetNumberOfColumns(); ctr++)
     {
     tab->AddColumn(table->GetColumnName(ctr));
     }
 
-  
-  
   tab->Update();
   
  // tab->GetOutput()->Print(std::cout);
@@ -142,9 +138,8 @@ bool voXCorrel::execute()
         QString("correl<-cor(metabData, method=\"%1\")").arg(cor_method).toLatin1());
   d->XCor->GetArray("correl","correl");
  
-
   // Do Cross Correlation
-	d->XCor->Update();
+  d->XCor->Update();
 
 #if 0
   // Find standard deviations of each column
@@ -189,7 +184,7 @@ bool voXCorrel::execute()
     {
     // We should pop up an error message modal window here and return.  For now, cerr will do
     std::cerr << "R did not return a valid reponse probably due to memory issues.  Cannot display cross correlation result." << std::endl;
-	return false;
+    return false;
     }
 
   vtkSmartPointer<vtkArrayData> XCorProjData = vtkSmartPointer<vtkArrayData>::New();
@@ -210,8 +205,8 @@ bool voXCorrel::execute()
     {
     vtkAbstractArray* col = assess->GetColumn(c);
     col->SetName(table->GetColumnName(c + 1));
-	corr->Print(std::cout);
-	col->Print(std::cout);
+    corr->Print(std::cout);
+    col->Print(std::cout);
     corr->AddColumn(col);
     }
 
