@@ -1,5 +1,25 @@
 
 SET(KIT_SRCS
+  Analysis/voHierarchicalClustering.h
+  Analysis/voHierarchicalClustering.cpp
+  Analysis/voKMeansClustering.cpp
+  Analysis/voKMeansClustering.h
+  Analysis/voPCAStatistics.cpp
+  Analysis/voPCAStatistics.h
+  Analysis/voXCorrel.cpp
+  Analysis/voXCorrel.h
+  
+  Views/voCorrelationGraphView.cpp
+  Views/voCorrelationGraphView.h
+  Views/voPCABarPlot.cpp
+  Views/voPCABarPlot.h
+  Views/voPCAProjectionPlot.cpp
+  Views/voPCAProjectionPlot.h
+  Views/voTableView.cpp
+  Views/voTableView.h
+  Views/voTreeGraphView.h
+  Views/voTreeGraphView.cpp
+  
   voAnalysis.cpp
   voAnalysis.h
   voAnalysisDriver.cpp
@@ -12,8 +32,6 @@ SET(KIT_SRCS
   voAnalysisParameterEditorWidget.h
   voApplication.cpp
   voApplication.h
-  voCorrelationGraphView.cpp
-  voCorrelationGraphView.h
   voCSVReader.cpp
   voCSVReader.h
   voDataBrowserWidget.cpp
@@ -31,17 +49,9 @@ SET(KIT_SRCS
   voIOManager.h
   voMainWindow.cpp
   voMainWindow.h
-  voPCAProjectionPlot.cpp
-  voPCAProjectionPlot.h
-  voPCABarPlot.cpp
-  voPCABarPlot.h
-  voPCAStatistics.cpp
-  voPCAStatistics.h
   voQObjectFactory.h
   voTableDataObject.cpp
   voTableDataObject.h
-  voTableView.cpp
-  voTableView.h
   voView.cpp
   voView.h
   voViewFactory.cpp
@@ -50,17 +60,20 @@ SET(KIT_SRCS
   voViewManager.h
   voViewTabWidget.cpp
   voViewTabWidget.h
-  voXCorrel.cpp
-  voXCorrel.h
-  voKMeansClustering.cpp
-  voKMeansClustering.h
-  voTreeGraphView.h
-  voTreeGraphView.cpp
-  voHierarchicalClustering.h
-  voHierarchicalClustering.cpp
   )
   
 SET(KIT_MOC_SRCS
+  Analysis/voHierarchicalClustering.h
+  Analysis/voKMeansClustering.h
+  Analysis/voPCAStatistics.h
+  Analysis/voXCorrel.h
+  
+  Views/voCorrelationGraphView.h
+  Views/voPCABarPlot.h
+  Views/voPCAProjectionPlot.h
+  Views/voTableView.h
+  Views/voTreeGraphView.h
+  
   voAnalysis.h
   voAnalysisDriver.h
   voAnalysisParameterDialog.h
@@ -70,21 +83,12 @@ SET(KIT_MOC_SRCS
   voDataModel.h
   voDataModel_p.h
   voDataObject.h
-  voCorrelationGraphView.h
   voInputFileDataObject.h
   voMainWindow.h
-  voPCAProjectionPlot.h
-  voPCABarPlot.h
-  voPCAStatistics.h
   voTableDataObject.h
-  voTableView.h
   voView.h
   voViewManager.h
-  voXCorrel.h
   voViewTabWidget.h
-  voKMeansClustering.h
-  voHierarchicalClustering.h
-  voTreeGraphView.h
   )
   
 SET(KIT_UI_FORMS
@@ -98,6 +102,10 @@ SET(KIT_resources
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
+  ${CMAKE_CURRENT_SOURCE_DIR}/Analysis
+  ${CMAKE_CURRENT_BINARY_DIR}/Analysis
+  ${CMAKE_CURRENT_SOURCE_DIR}/Views
+  ${CMAKE_CURRENT_BINARY_DIR}/Views
   )
   
 QT4_WRAP_UI(KIT_UI_CPP ${KIT_UI_FORMS})
