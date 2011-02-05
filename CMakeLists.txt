@@ -156,7 +156,7 @@ SET(CMAKE_CXX_FLAGS ${Visomics_CXX_FLAGS} CACHE STRING "CMake C Flags" FORCE)
 SET(CMAKE_C_FLAGS ${Visomics_C_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 
 #-----------------------------------------------------------------------------
-ADD_SUBDIRECTORY(Sources)
+ADD_SUBDIRECTORY(Base)
 
 #-----------------------------------------------------------------------------
 # Setup CPack
