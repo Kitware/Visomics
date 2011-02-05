@@ -19,7 +19,7 @@ int voDataBrowserWidgetTest(int argc, char * argv [])
 {
   QApplication app(argc, argv);
 
-  Q_INIT_RESOURCE(Visomics);
+  Q_INIT_RESOURCE(VisomicsApp);
 
   voDataBrowserWidget w;
   voDataModel model;

@@ -2,7 +2,7 @@
 SET(KIT ${PROJECT_NAME})
 
 CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
-  voCVSReaderTest.cpp
+  voDataBrowserWidgetTest.cpp
   )
   
 SET(TestsToRun ${Tests})
@@ -18,6 +18,6 @@ MACRO(SIMPLE_TEST TESTNAME)
   #SET_PROPERTY(TEST ${TESTNAME} PROPERTY LABELS ${PROJECT_NAME})
 ENDMACRO()
 
-SIMPLE_TEST(voCVSReaderTest)
+SIMPLE_TEST(voDataBrowserWidgetTest)
 
 

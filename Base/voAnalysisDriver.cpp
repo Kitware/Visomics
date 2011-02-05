@@ -12,7 +12,6 @@
 #include "voAnalysis.h"
 #include "voAnalysisDriver.h"
 #include "voAnalysisFactory.h"
-#include "voAnalysisParameterDialog.h"
 #include "voApplication.h"
 #include "voDataModelItem.h"
 #include "voDataObject.h"
