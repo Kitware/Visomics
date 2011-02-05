@@ -9,8 +9,8 @@
 #define vtksys_SHARED_FORWARD_DIR_BUILD "@CMAKE_RUNTIME_OUTPUT_DIRECTORY@"
 #define vtksys_SHARED_FORWARD_PATH_BUILD "." CONFIG_DIR_POST
 #define vtksys_SHARED_FORWARD_PATH_INSTALL "../lib"
-#define vtksys_SHARED_FORWARD_EXE_BUILD CONFIG_DIR_PRE "Visomics-real"
-#define vtksys_SHARED_FORWARD_EXE_INSTALL "../lib/Visomics-real"
+#define vtksys_SHARED_FORWARD_EXE_BUILD CONFIG_DIR_PRE "visomics-real"
+#define vtksys_SHARED_FORWARD_EXE_INSTALL "../lib/visomics-real"
 #define vtksys_SHARED_FORWARD_OPTION_COMMAND "--command"
 #define vtksys_SHARED_FORWARD_OPTION_PRINT "--print"
 #define vtksys_SHARED_FORWARD_OPTION_LDD "--ldd"
