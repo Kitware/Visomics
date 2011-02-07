@@ -8,7 +8,7 @@ int main(int argc, char* argv[])
 {
   voApplication app(argc, argv);
 
-  Q_INIT_RESOURCE(Visomics);
+  Q_INIT_RESOURCE(VisomicsApp);
 
   bool exitWhenDone = false;
   app.initialize(exitWhenDone);

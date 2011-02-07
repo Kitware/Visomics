@@ -3,14 +3,12 @@ SET(KIT ${PROJECT_NAME})
 
 CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voDataBrowserWidgetTest.cpp
-  voCVSReaderTest.cpp
   )
   
 SET(TestsToRun ${Tests})
 REMOVE(TestsToRun ${KIT}CppTests.cpp)
 
 ADD_EXECUTABLE(${KIT}CppTests ${Tests})
-#TARGET_LINK_LIBRARIES(${KIT}CppTests ${${PROJECT_NAME}_LINK_LIBRARIES})
 TARGET_LINK_LIBRARIES(${KIT}CppTests ${PROJECT_NAME}Lib)
 
 SET(KIT_TESTS ${CPP_TEST_PATH}/${KIT}CppTests)
@@ -21,6 +19,5 @@ MACRO(SIMPLE_TEST TESTNAME)
 ENDMACRO()
 
 SIMPLE_TEST(voDataBrowserWidgetTest)
-SIMPLE_TEST(voCVSReaderTest)
 
 

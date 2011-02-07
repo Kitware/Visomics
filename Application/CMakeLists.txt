@@ -1,90 +1,25 @@
 
-SET(KIT_SRCS
-  voAnalysis.cpp
-  voAnalysis.h
-  voAnalysisDriver.cpp
-  voAnalysisDriver.h
-  voAnalysisFactory.cpp
-  voAnalysisFactory.h
+PROJECT(VisomicsApp)
+
+SET(KIT_SRCS  
   voAnalysisParameterDialog.cpp
   voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.cpp
   voAnalysisParameterEditorWidget.h
-  voApplication.cpp
-  voApplication.h
-  voCorrelationGraphView.cpp
-  voCorrelationGraphView.h
-  voCSVReader.cpp
-  voCSVReader.h
   voDataBrowserWidget.cpp
   voDataBrowserWidget.h
-  voDataModel.cpp
-  voDataModel.h
-  voDataModel_p.h
-  voDataModelItem.cpp
-  voDataModelItem.h
-  voDataObject.cpp
-  voDataObject.h
-  voInputFileDataObject.cpp
-  voInputFileDataObject.h
-  voIOManager.cpp
-  voIOManager.h
   voMainWindow.cpp
   voMainWindow.h
-  voPCAProjectionPlot.cpp
-  voPCAProjectionPlot.h
-  voPCABarPlot.cpp
-  voPCABarPlot.h
-  voPCAStatistics.cpp
-  voPCAStatistics.h
-  voQObjectFactory.h
-  voTableDataObject.cpp
-  voTableDataObject.h
-  voTableView.cpp
-  voTableView.h
-  voView.cpp
-  voView.h
-  voViewFactory.cpp
-  voViewFactory.h
-  voViewManager.cpp
-  voViewManager.h
   voViewTabWidget.cpp
   voViewTabWidget.h
-  voXCorrel.cpp
-  voXCorrel.h
-  voKMeansClustering.cpp
-  voKMeansClustering.h
-  voTreeGraphView.h
-  voTreeGraphView.cpp
-  voHierarchicalClustering.h
-  voHierarchicalClustering.cpp
   )
   
 SET(KIT_MOC_SRCS
-  voAnalysis.h
-  voAnalysisDriver.h
   voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.h
-  voApplication.h
   voDataBrowserWidget.h
-  voDataModel.h
-  voDataModel_p.h
-  voDataObject.h
-  voCorrelationGraphView.h
-  voInputFileDataObject.h
   voMainWindow.h
-  voPCAProjectionPlot.h
-  voPCABarPlot.h
-  voPCAStatistics.h
-  voTableDataObject.h
-  voTableView.h
-  voView.h
-  voViewManager.h
-  voXCorrel.h
   voViewTabWidget.h
-  voKMeansClustering.h
-  voHierarchicalClustering.h
-  voTreeGraphView.h
   )
   
 SET(KIT_UI_FORMS
@@ -92,10 +27,11 @@ SET(KIT_UI_FORMS
   )
   
 SET(KIT_resources
-  Resources/Visomics.qrc
+  Resources/VisomicsApp.qrc
   )
   
 INCLUDE_DIRECTORIES(
+  ${Visomics_SOURCE_DIR}/Base
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   )
@@ -112,18 +48,16 @@ ADD_LIBRARY(${libname} STATIC
   ${KIT_QRC_SRCS}
   )
 
-SET(VTK_LIBRARIES QVTK vtkCharts vtkInfovis)
-
 SET(${PROJECT_NAME}_LINK_LIBRARIES
-  ${VTK_LIBRARIES}
-  ${QT_LIBRARIES}
-  QtPropertyBrowser
+  VisomicsBaseLib
   )
 TARGET_LINK_LIBRARIES(
   ${libname}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
   )
 
+
+# Configure forward executable
 SET(Visomics_LIBRARY_DIRS
   ${VTK_DIR}/bin
   ${R_LIBRARY_DIR}
@@ -138,10 +72,12 @@ CONFIGURE_FILE(
 ADD_EXECUTABLE(${PROJECT_NAME}
   ${CMAKE_CURRENT_BINARY_DIR}/visomics-forward.c)
 ADD_DEPENDENCIES(${PROJECT_NAME} ${PROJECT_NAME}-real)
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES OUTPUT_NAME visomics)
 
 # Add regular application
 ADD_EXECUTABLE(${PROJECT_NAME}-real Main.cpp)
 TARGET_LINK_LIBRARIES(${PROJECT_NAME}-real ${libname})
+SET_TARGET_PROPERTIES(${PROJECT_NAME}-real PROPERTIES OUTPUT_NAME visomics-real)
 
 # Install rules
 INSTALL(TARGETS ${PROJECT_NAME} DESTINATION ${Visomics_INSTALL_BIN_DIR} COMPONENT Runtime)
