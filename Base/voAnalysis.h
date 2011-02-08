@@ -80,8 +80,10 @@ public:
 
   void initializeInputInformation();
   void initializeOutputInformation();
+  
+  typedef QHash<QString, QVariant> AvoidParserBugWithGcc420; // Hack to get around a bug in Gcc 4.2.0
   void initializeParameterInformation(
-    const QHash<QString, QVariant>& parameters = QHash<QString, QVariant>());
+    const QHash<QString, QVariant>& parameters = AvoidParserBugWithGcc420());
 
   void setParameterValues(const QHash<QString, QVariant>& parameters);
 
