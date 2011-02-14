@@ -22,7 +22,7 @@
 #include "voIOManager.h"
 #include "voMainWindow.h"
 #include "voViewManager.h"
-#include "voViewTabWidget.h"
+#include "voViewStackedWidget.h"
 
 // --------------------------------------------------------------------------
 class voMainWindowPrivate: public Ui_voMainWindow
@@ -33,7 +33,7 @@ protected:
 public:
   voMainWindowPrivate(voMainWindow& object);
 
-  voViewTabWidget *  ViewTabWidget;
+  voViewStackedWidget* ViewStackedWidget;
   QSignalMapper      AnalysisActionMapper;
 };
 
@@ -57,13 +57,13 @@ voMainWindow::voMainWindow(QWidget * newParent)
 
   d->setupUi(this);
 
-  d->ViewTabWidget = new voViewTabWidget(this);
-  this->setCentralWidget(d->ViewTabWidget);
+  d->ViewStackedWidget = new voViewStackedWidget(this);
+  this->setCentralWidget(d->ViewStackedWidget);
 
   connect(voApplication::application()->viewManager(),
           SIGNAL(viewCreated(const QString&, voView*)),
-          d->ViewTabWidget,
-          SLOT(addViewTab(const QString&, voView*)));
+          d->ViewStackedWidget,
+          SLOT(addView(const QString&, voView*)));
 
   // Setup actions
   d->actionFileOpen->setShortcut(QKeySequence::Open);

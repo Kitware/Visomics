@@ -12,6 +12,8 @@ SET(KIT_SRCS
   voMainWindow.h
   voViewTabWidget.cpp
   voViewTabWidget.h
+  voViewStackedWidget.cpp
+  voViewStackedWidget.h
   )
   
 SET(KIT_MOC_SRCS
@@ -19,6 +21,7 @@ SET(KIT_MOC_SRCS
   voAnalysisParameterEditorWidget.h
   voDataBrowserWidget.h
   voMainWindow.h
+  voViewStackedWidget.h
   voViewTabWidget.h
   )
   
