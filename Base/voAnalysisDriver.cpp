@@ -246,12 +246,12 @@ void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
   analysisContainer->setData(QVariant(QMetaType::VoidStar, &analysis), voDataModelItem::AnalysisVoidStarRole);
 
   // Outputs container
-  voDataModelItem * outputsContainer =
-      model->addContainer(QObject::tr("outputs"), analysisContainer);
+  voDataModelItem * outputsContainer = analysisContainer;
+//      model->addContainer(QObject::tr("outputs"), analysisContainer);
 
   // Views container
-  voDataModelItem * viewContainer =
-      model->addContainer(QObject::tr("views"), analysisContainer);
+  voDataModelItem * viewContainer = analysisContainer;
+//      model->addContainer(QObject::tr("views"), analysisContainer);
 
   // Loop over outputs
   foreach(const QString& outputName, analysis->outputNames())
