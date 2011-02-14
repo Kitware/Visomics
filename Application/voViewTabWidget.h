@@ -20,7 +20,7 @@ public:
   virtual ~voViewTabWidget();
 
 public slots:
-  void addViewTab(const QString& objectUuid, voView * newView);
+  void addView(const QString& objectUuid, voView * newView);
 
 protected slots:
 
