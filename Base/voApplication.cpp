@@ -58,6 +58,11 @@ voApplication::voApplication(int & argc, char ** argv):
   Q_D(voApplication);
   connect(&d->DataModel, SIGNAL(viewSelected(QString)),
           &d->ViewManager, SLOT(createView(const QString&)));
+
+  connect(&d->AnalysisDriver,
+          SIGNAL(analysisAddedToObjectModel(voAnalysis*)),
+          &d->DataModel,
+          SLOT(setActiveAnalysis(voAnalysis*)));
 }
 
 // --------------------------------------------------------------------------

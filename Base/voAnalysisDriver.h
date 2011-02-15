@@ -23,6 +23,7 @@ public:
 
 signals:
   void aboutToRunAnalysis(voAnalysis*);
+  void analysisAddedToObjectModel(voAnalysis*);
 
 public slots:
   void runAnalysisForAllInputs(const QString& analysisName, bool acceptDefaultParameter = false);

@@ -56,6 +56,9 @@ public:
 
   QString analysisNameForUuid(const QString& uuid);
 
+public slots:
+  void setActiveAnalysis(voAnalysis* analysis);
+
 signals:
 
   void viewSelected(const QString& objectUuid);
