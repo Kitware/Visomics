@@ -75,7 +75,7 @@
       <number>0</number>
      </property>
      <item>
-      <widget class="QTreeView" name="DataBrowserWidget">
+      <widget class="voDataBrowserWidget" name="DataBrowserWidget">
        <property name="headerHidden">
         <bool>true</bool>
        </property>
@@ -104,7 +104,7 @@
   </widget>
   <action name="actionFileOpen">
    <property name="icon">
-    <iconset resource="../Visomics.qrc">
+    <iconset resource="../VisomicsApp.qrc">
      <normaloff>:/Icons/open.png</normaloff>:/Icons/open.png</iconset>
    </property>
    <property name="text">
@@ -127,7 +127,7 @@
   </action>
   <action name="actionHelpAbout">
    <property name="icon">
-    <iconset resource="../Visomics.qrc">
+    <iconset resource="../VisomicsApp.qrc">
      <normaloff>:/Icons/help.png</normaloff>:/Icons/help.png</iconset>
    </property>
    <property name="text">
@@ -172,9 +172,14 @@
    <header>voAnalysisParameterEditorWidget.h</header>
    <container>1</container>
   </customwidget>
+  <customwidget>
+   <class>voDataBrowserWidget</class>
+   <extends>QTreeView</extends>
+   <header>voDataBrowserWidget.h</header>
+  </customwidget>
  </customwidgets>
  <resources>
-  <include location="../Visomics.qrc"/>
+  <include location="../VisomicsApp.qrc"/>
  </resources>
  <connections/>
 </ui>
