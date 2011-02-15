@@ -241,6 +241,19 @@ voAnalysis* voDataModel::activeAnalysis()const
 }
 
 // --------------------------------------------------------------------------
+void voDataModel::setActiveAnalysis(voAnalysis* analysis)
+{
+  Q_D(voDataModel);
+  if (!analysis)
+    {
+    return;
+    }
+  QModelIndex index = this->indexFromItem(this->itemForAnalysis(analysis));
+  d->SelectionModel->setCurrentIndex(
+        index, QItemSelectionModel::ClearAndSelect | QItemSelectionModel::Rows);
+}
+
+// --------------------------------------------------------------------------
 voDataModelItem* voDataModel::inputTargetForAnalysis(voAnalysis * analysis)const
 {
   voDataModelItem * analysisItem = this->itemForAnalysis(analysis);

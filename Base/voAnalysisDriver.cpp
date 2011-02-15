@@ -157,6 +157,8 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
   connect(analysis, SIGNAL(outputSet(const QString&, voDataObject*, voAnalysis*)),
           SLOT(onAnalysisOutputSet(const QString&,voDataObject*,voAnalysis*)));
 
+  emit this->analysisAddedToObjectModel(analysis);
+
   qDebug() << " => Analysis" << analysis->objectName() << " DONE";
 }
 

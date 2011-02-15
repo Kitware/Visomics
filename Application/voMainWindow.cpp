@@ -117,6 +117,11 @@ voMainWindow::voMainWindow(QWidget * newParent)
           voApplication::application()->analysisDriver(),
           SLOT(updateAnalysis(voAnalysis*, const QHash<QString, QVariant>&)));
 
+  connect(voApplication::application()->analysisDriver(),
+          SIGNAL(analysisAddedToObjectModel(voAnalysis*)),
+          d->DataBrowserWidget,
+          SLOT(setActiveAnalysis(voAnalysis*)));
+
   // Initialize status bar
   this->statusBar()->showMessage(tr(""), 2000);
 }
