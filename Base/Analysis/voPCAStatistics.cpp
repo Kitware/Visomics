@@ -151,8 +151,11 @@ bool voPCAStatistics::execute()
   for (vtkIdType c = 0; c < assess->GetNumberOfRows(); ++c)
     {
     vtkAbstractArray* col = assess->GetColumn(c);
-    col->SetName(vtkVariant(c).ToString());
-    xtab->AddColumn(col);
+    if (col)
+      {
+      col->SetName(vtkVariant(c).ToString());
+      xtab->AddColumn(col);
+      }
     }
   this->setOutput("x", new voTableDataObject("x", xtab));
 
