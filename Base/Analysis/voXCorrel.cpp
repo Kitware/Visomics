@@ -152,7 +152,7 @@ bool voXCorrel::execute()
   corr->AddColumn(header);
 
   // assess->Print(std::cout);
-  for (vtkIdType c = 0;c < cols-1; ++c)  //c < assess->GetNumberOfColumns()
+  for (vtkIdType c = 0;c < cols; ++c)  //c < assess->GetNumberOfColumns()
     {
     vtkAbstractArray* col = assess->GetColumn(c);
     col->SetName(table->GetColumnName(c + 1));
