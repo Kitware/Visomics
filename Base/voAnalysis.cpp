@@ -307,6 +307,7 @@ voDataObject * voAnalysis::output(const QString& outputName) const
     {
     return 0;
     }
+  qDebug() << "voAnalysis::output " << outputName;
   return d->OutputDataObjects.value(outputName).data();
 }
 

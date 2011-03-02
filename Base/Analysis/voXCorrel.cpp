@@ -13,6 +13,7 @@
 #include <vtkArrayToTable.h>
 #include <vtkDoubleArray.h>
 #include <vtkGraph.h>
+#include <vtkImageData.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
@@ -61,6 +62,9 @@ void voXCorrel::setOutputInformation()
   
   this->addOutputType("correlation_graph", "vtkGraph",
                       "voCorrelationGraphView", "Correlation Graph");
+
+  this->addOutputType("correlation_heatmap", "vtkImageData",
+                      "voCorrelationHeatMapView", "Correlation Heat Map");   
 }
 
 // --------------------------------------------------------------------------
@@ -160,9 +164,29 @@ bool voXCorrel::execute()
     //col->Print(std::cout);
     corr->AddColumn(col);
     }
-
   this->setOutput("corr", new voTableDataObject("corr", corr));
 
+  // Generate image of the correlation table 
+  vtkSmartPointer<vtkImageData> imageData = vtkSmartPointer<vtkImageData>::New();
+  imageData->SetExtent(0, rows-1, 0, rows-1, 0, 0);
+  imageData->SetNumberOfScalarComponents(1);
+  imageData->SetScalarTypeToDouble();
+  imageData->AllocateScalars();
+  imageData->SetOrigin(0.0, 0.0, 0.0);
+  imageData->SetSpacing(1.0, 1.0, 1.0);
+
+  double *dPtr = static_cast<double *>(imageData->GetScalarPointer(0, 0, 0));
+  for (vtkIdType i = 0; i < rows; ++i)
+    {
+    for (vtkIdType j = 0; j < rows; ++j)
+      {
+      dPtr[i * (rows-1 ) + j] = assess->GetValue(i,j).ToDouble();
+      std::cout << assess->GetValue(i,j) << "\t";
+      }
+      std::cout << "\n \n" << std::endl;
+    }
+  this->setOutput("correlation_heatmap", new voDataObject("correlation_heatmap", imageData));
+ 
   // Find high correlations to put in graph
   vtkSmartPointer<vtkTable> sparseCorr = vtkSmartPointer<vtkTable>::New();
   vtkSmartPointer<vtkStringArray> col1 = vtkSmartPointer<vtkStringArray>::New();
