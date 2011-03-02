@@ -86,6 +86,21 @@ void voCorrelationHeatMapView::setDataObject(voDataObject* dataObject)
 
   d->Chart->SetInput( imageData );
 
+  /*
+  int* dims = imageData->GetDimensions();
+ 
+  for (int y=0; y<dims[1]; y++)
+    {
+    for (int x=0; x<dims[0]; x++)
+      {
+      double v = imageData->GetScalarComponentAsDouble(x,y,0,0);
+      std::cout << v << "  ";
+      }
+    std::cout << "\n" << std::endl;
+    }
+  */
+
+
   vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
   transferFunction->AddHSVSegment(0.0, 0.0, 1.0, 1.0,
                                   0.3333, 0.3333, 1.0, 1.0);

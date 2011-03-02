@@ -255,10 +255,6 @@ void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
   voDataModelItem * viewContainer = analysisContainer;
 //      model->addContainer(QObject::tr("views"), analysisContainer);
 
-  foreach(const QString& outputName, analysis->outputNames())
-    {
-    qDebug() << outputName;
-    }
   // Loop over outputs
   foreach(const QString& outputName, analysis->outputNames())
     {

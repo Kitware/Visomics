@@ -168,7 +168,16 @@ bool voXCorrel::execute()
 
   // Generate image of the correlation table 
   vtkSmartPointer<vtkImageData> imageData = vtkSmartPointer<vtkImageData>::New();
-  imageData->SetExtent(0, rows-1, 0, rows-1, 0, 0);
+  vtkIdType corrMatrixNumberOfCols = corr->GetNumberOfColumns();
+  vtkIdType corrMatrixNumberOfRows = corr->GetNumberOfRows();
+
+  //std::cout << "Number Of Cols =\t"  << corrMatrixNumberOfCols << std::endl;
+  //std::cout << "Number Of Rows =\t"  << corrMatrixNumberOfRows << std::endl;
+
+  imageData->SetExtent(0, corrMatrixNumberOfRows-1, 
+                       0, corrMatrixNumberOfRows-1,
+                       0,
+                       0);
   imageData->SetNumberOfScalarComponents(1);
   imageData->SetScalarTypeToDouble();
   imageData->AllocateScalars();
@@ -176,14 +185,14 @@ bool voXCorrel::execute()
   imageData->SetSpacing(1.0, 1.0, 1.0);
 
   double *dPtr = static_cast<double *>(imageData->GetScalarPointer(0, 0, 0));
-  for (vtkIdType i = 0; i < rows; ++i)
+  for (vtkIdType i = 0; i < corrMatrixNumberOfRows; ++i)
     {
-    for (vtkIdType j = 0; j < rows; ++j)
+    for (vtkIdType j = 1 ; j < corrMatrixNumberOfRows+1 ; ++j)
       {
-      dPtr[i * (rows-1 ) + j] = assess->GetValue(i,j).ToDouble();
-      std::cout << assess->GetValue(i,j) << "\t";
+      dPtr[i * (corrMatrixNumberOfRows ) + j - 1 ] = corr->GetValue(i,j).ToDouble();
+      //std::cout << corr->GetValue(i,j).ToDouble() << " ";
       }
-      std::cout << "\n \n" << std::endl;
+      //std::cout << "\n" << std::endl;
     }
   this->setOutput("correlation_heatmap", new voDataObject("correlation_heatmap", imageData));
  
