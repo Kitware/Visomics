@@ -10,7 +10,7 @@
 
 // VTK includes
 #include <QVTKWidget.h>
-#include <vtkChartXY.h>
+#include <voChartXY.h>
 #include <vtkContext2D.h>
 #include <vtkContextScene.h>
 #include <vtkContextView.h>
@@ -29,7 +29,7 @@ public:
   QMap<vtkVariant, vtkSmartPointer<vtkTable> > splitTable(vtkTable* t, const char* column);
 
   vtkSmartPointer<vtkContextView> ChartView;
-  vtkSmartPointer<vtkChartXY>     Chart;
+  vtkSmartPointer<voChartXY>     Chart;
   QVTKWidget*                     Widget;
 };
 
@@ -90,7 +90,7 @@ void voPCAProjectionPlot::setupUi(QLayout *layout)
   Q_D(voPCAProjectionPlot);
 
   d->ChartView = vtkSmartPointer<vtkContextView>::New();
-  d->Chart = vtkSmartPointer<vtkChartXY>::New();
+  d->Chart = vtkSmartPointer<voChartXY>::New();
   d->Widget = new QVTKWidget();
   d->ChartView->SetInteractor(d->Widget->GetInteractor());
   d->Widget->SetRenderWindow(d->ChartView->GetRenderWindow());
@@ -137,6 +137,17 @@ if (!p)
 		p->SetInput(it.value(), 1, 2);
 		p->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
 		p->SetWidth(10);
+
+	  unsigned int rows = table->GetNumberOfRows();
+    unsigned int cols = table->GetNumberOfColumns();
+    //std::cout << "Projection table:" << rows << "\t" << cols << std::endl;
+    std::vector<std::string> labels;
+    for( unsigned int j=0; j < rows ; j++)
+      {
+      std::string experiment = table->GetValue(j,0).ToString();
+      labels.push_back( experiment );
+      }
+    d->Chart->AddPointLabels( labels );
 		}
     }
   d->ChartView->GetRenderWindow()->SetMultiSamples(4);

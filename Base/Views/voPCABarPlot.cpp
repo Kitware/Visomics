@@ -137,6 +137,7 @@ void voPCABarPlot::setDataObject(voDataObject *dataObject)
       p = d->Chart->AddPlot(vtkChart::BAR);
       }
 	//it.value()->Print(std::cout);
+	//
     p->SetInput(table, 1,2);
     p->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
     p->SetWidth(10);
