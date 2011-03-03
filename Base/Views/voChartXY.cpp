@@ -1070,10 +1070,9 @@ void voChartXY::AddPointLabels( std::vector< std::string> labels )
   vtkTable* data = (*it)->GetInput(); 
   
   unsigned  int rows = data->GetNumberOfRows();
-  unsigned int cols = data->GetNumberOfColumns();
 
-  unsigned int numberOfLabels = labels.size();
-    
+  //unsigned int cols = data->GetNumberOfColumns();
+  //unsigned int numberOfLabels = labels.size();
   //std::cout << "Number Of Columns: " << cols << std::endl;
   //std::cout << "Number Of Rows: " << rows << std::endl;
   //std::cout << "Number Of Labels: " << numberOfLabels << std::endl;
@@ -1272,7 +1271,31 @@ void voChartXY::SetTooltipInfo(const vtkContextMouseEvent& mouse,
   std::vector<float> vector;
   vector.push_back( plotPos[0] );
   vector.push_back( plotPos[1] );
-  label = coordinateLabelMap[vector];
+
+  //Do something more robust here
+
+  std::map<std::vector<float>, std::string>::iterator lowerBoundIterator;
+  lowerBoundIterator = coordinateLabelMap.lower_bound(vector);
+  std::string lowerBoundFoundLabel = (*lowerBoundIterator).second;
+
+  std::string upperBoundFoundLabel;
+  std::map<std::vector<float>, std::string>::iterator upperBoundIterator;
+  upperBoundIterator = coordinateLabelMap.upper_bound(vector);
+  if ( upperBoundIterator != coordinateLabelMap.end() )
+    {
+    upperBoundFoundLabel = (*upperBoundIterator).second;
+    }
+
+  if ( lowerBoundFoundLabel == upperBoundFoundLabel )
+    {
+    //float key value rounding off discrepancy
+    label = "";
+    }
+  else
+    {
+    label = lowerBoundFoundLabel; 
+    }
+
   //std::cout << "PlotPosition: \t" << plotPos[0] << "\t" << plotPos[1] << "\t" << label << std::endl;
   ostr << label << ": ";
   ostr.precision(ChartPrivate->axes[vtkAxis::BOTTOM]->GetPrecision());
