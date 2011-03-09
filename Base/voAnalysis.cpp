@@ -560,6 +560,30 @@ QtVariantProperty* voAnalysis::addEnumParameter(const QString& id, const QString
 }
 
 // --------------------------------------------------------------------------
+QString voAnalysis::stringParameter(const QString& id)const
+{
+  QtVariantProperty * prop = this->parameter(id);
+  Q_ASSERT(prop);
+  return prop->value().toString();
+}
+
+// --------------------------------------------------------------------------
+QtVariantProperty*  voAnalysis::addStringParameter(const QString& id, const QString& label,
+                                                   const QString& value)
+{
+  Q_ASSERT(!label.isEmpty());
+
+  Q_D(voAnalysis);
+
+  QtVariantProperty * param = d->VariantManager->addProperty(QVariant::String, label);
+
+  param->setPropertyId(id);
+  param->setValue(value);
+
+  return param;
+}
+
+// --------------------------------------------------------------------------
 int voAnalysis::integerParameter(const QString& id)const
 {
   QtVariantProperty * prop = this->parameter(id);
