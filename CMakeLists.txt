@@ -69,7 +69,7 @@ INCLUDE(${VTK_USE_FILE})
 # Qt
 #
 SET(QT_QMAKE_EXECUTABLE ${VTK_QT_QMAKE_EXECUTABLE})
-FIND_PACKAGE(Qt4 4.7 REQUIRED)
+FIND_PACKAGE(Qt4 4.7 COMPONENTS QtCore QtGui QtNetwork QtScript REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
 #-----------------------------------------------------------------------------

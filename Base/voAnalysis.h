@@ -125,6 +125,11 @@ protected:
                                           int minimum, int maximum,
                                           int value);
 
+  QString stringParameter(const QString& id)const;
+
+  QtVariantProperty*  addStringParameter(const QString& id, const QString& label,
+                                         const QString& value);
+
   double doubleParameter(const QString& id)const;
 
   QtVariantProperty*  addDoubleParameter(const QString& id, const QString& label,

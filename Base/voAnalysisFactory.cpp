@@ -9,6 +9,7 @@
 
 #include "voPCAStatistics.h"
 #include "voXCorrel.h"
+#include "voKEGG.h"
 #include "voKMeansClustering.h"
 #include "voHierarchicalClustering.h"
 
@@ -32,6 +33,7 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voXCorrel>("Cross Correlation");
   this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
   this->registerAnalysis<voHierarchicalClustering>("Hierarchical Clustering");
+  this->registerAnalysis<voKEGG>("KEGG Pathways");
 }
 
 //-----------------------------------------------------------------------------
