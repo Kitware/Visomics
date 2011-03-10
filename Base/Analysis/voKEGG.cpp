@@ -57,7 +57,7 @@ void voKEGG::setParameterInformation()
   QList<QtProperty*> kegg_parameters;
 
   // KEGG host
-  kegg_parameters << this->addStringParameter("host", tr("Host name"), "localhost:86");
+  kegg_parameters << this->addStringParameter("host", tr("Host name"), "paraviewweb.kitware.com:88");
 
   this->addParameterGroup("KEGG parameters", kegg_parameters);
 }
@@ -86,7 +86,7 @@ bool voKEGG::execute()
     QEventLoop loop;
     QNetworkRequest request;
     QString name = table->GetColumn(i)->GetName();
-    request.setUrl(QUrl("http://localhost:86/kegg-pathway?term="+QUrl::toPercentEncoding(name)));
+    request.setUrl(QUrl("http://" + this->stringParameter("host") + "/kegg-pathway?term=" + QUrl::toPercentEncoding(name)));
     request.setRawHeader("User-Agent", "MyOwnBrowser 1.0");
     QNetworkReply *reply = manager.get(request);
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));

@@ -10,7 +10,7 @@
 #   rm *.sqlite
 #
 # Retrieve a list of KEGG compounds for a term:
-#   http://<server-name>:86/kegg-compound?term=<compound-name>
+#   http://<server-name>:88/kegg-compound?term=<compound-name>
 # Sample result:
 # [
 #   {
@@ -30,7 +30,7 @@
 # ]
 #
 # Retrieve a list of KEGG pathways for a term:
-#   http://<server-name>:86/kegg-pathway?term=<compound-name>
+#   http://<server-name>:88/kegg-pathway?term=<compound-name>
 # Sample result:
 # [
 #   {
@@ -63,7 +63,7 @@ class MyHandler(BaseHTTPRequestHandler):
 
 def main():
   try:
-    server = HTTPServer(('', 86), MyHandler)
+    server = HTTPServer(('', 88), MyHandler)
     print 'started httpserver...'
     server.serve_forever()
   except KeyboardInterrupt:
