@@ -560,7 +560,7 @@ QString voAnalysis::enumParameter(const QString& id)const
 QtVariantProperty* voAnalysis::addEnumParameter(const QString& id, const QString& label,
                                                 const QStringList& choices, const QString& value)
 {
-  Q_ASSERT(!label.isEmpty());
+  Q_ASSERT(!id.isEmpty());
   Q_ASSERT(!label.isEmpty());
   Q_ASSERT(!choices.isEmpty());
   Q_ASSERT(value.isEmpty() || choices.contains(value));
@@ -588,6 +588,7 @@ QString voAnalysis::stringParameter(const QString& id)const
 QtVariantProperty*  voAnalysis::addStringParameter(const QString& id, const QString& label,
                                                    const QString& value)
 {
+  Q_ASSERT(!id.isEmpty());
   Q_ASSERT(!label.isEmpty());
 
   Q_D(voAnalysis);
@@ -612,7 +613,7 @@ int voAnalysis::integerParameter(const QString& id)const
 QtVariantProperty*  voAnalysis::addIntegerParameter(const QString& id, const QString& label,
                                                     int minimum, int maximum, int value)
 {
-  Q_ASSERT(!label.isEmpty());
+  Q_ASSERT(!id.isEmpty());
   Q_ASSERT(!label.isEmpty());
 
   Q_D(voAnalysis);
