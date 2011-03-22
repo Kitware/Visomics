@@ -48,6 +48,8 @@ public:
 
   bool AcceptDefaultParameterValues;
 
+  bool AbortExecution;
+
   QtVariantPropertyManager*          VariantManager;
 };
 
@@ -68,6 +70,7 @@ void voAnalysisPrivate::init()
   this->OutputInformationInitialized = false;
   this->ParameterInformationInitialized = false;
   this->AcceptDefaultParameterValues = false;
+  this->AbortExecution = false;
   this->VariantManager = new QtVariantPropertyManager(q);
 }
 
@@ -395,6 +398,20 @@ void voAnalysis::removeAllOutputs()
   d->OutputViewPrettyName.clear();
   d->OutputRawViewPrettyName.clear();
   d->OutputInformationInitialized = false;
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysis::abortExecution()const
+{
+  Q_D(const voAnalysis);
+  return d->AbortExecution;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::setAbortExecution(bool abortExecutionValue)
+{
+  Q_D(voAnalysis);
+  d->AbortExecution = abortExecutionValue;
 }
 
 // --------------------------------------------------------------------------

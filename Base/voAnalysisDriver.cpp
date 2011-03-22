@@ -105,6 +105,9 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
     return;
     }
 
+  // Reset abort execution flag
+  analysis->setAbortExecution(false);
+
   // Clear inputs and outputs
   analysis->removeAllInputs();
   analysis->removeAllOutputs();
@@ -144,6 +147,10 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
   analysis->initializeParameterInformation();
 
   emit this->aboutToRunAnalysis(analysis);
+  if (analysis->abortExecution())
+    {
+    return;
+    }
 
   bool ret = analysis->run();
   if (!ret)

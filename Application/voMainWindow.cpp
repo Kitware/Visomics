@@ -175,6 +175,7 @@ void voMainWindow::onAboutToRunAnalysis(voAnalysis* analysis)
     voAnalysisParameterDialog analysisParameterDialog(analysis, this);
     if (analysisParameterDialog.exec() != QDialog::Accepted)
       {
+      analysis->setAbortExecution(true);
       return;
       }
     }

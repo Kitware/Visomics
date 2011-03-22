@@ -76,6 +76,9 @@ public:
 
   void removeAllOutputs();
 
+  bool abortExecution()const;
+  void setAbortExecution(bool abortExecutionValue);
+
   bool run();
 
   void initializeInputInformation();
