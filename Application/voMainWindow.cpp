@@ -96,6 +96,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
 
   // By default, hide the dock widget
   d->AnalysisParameterDockWidget->setVisible(false);
+  // ... and disable the associated action
+  d->actionViewAnalysisParameters->setEnabled(false);
 
   connect(dataModel, SIGNAL(analysisSelected(voAnalysis*)),
           SLOT(onAnalysisSelected(voAnalysis*)));
@@ -162,7 +164,10 @@ void voMainWindow::onAnalysisSelected(voAnalysis* analysis)
 void voMainWindow::onActiveAnalysisChanged(voAnalysis* analysis)
 {
   Q_D(voMainWindow);
-  d->AnalysisParameterDockWidget->setVisible(analysis != 0 && analysis->parameterCount() > 0);
+  bool analysisParameterDockVisible = analysis != 0 && analysis->parameterCount() > 0;
+  d->AnalysisParameterDockWidget->setVisible(
+        analysisParameterDockVisible && d->actionViewAnalysisParameters->isChecked());
+  d->actionViewAnalysisParameters->setEnabled(analysisParameterDockVisible);
   d->AnalysisParameterEditorWidget->setAnalysis(analysis);
 }
 

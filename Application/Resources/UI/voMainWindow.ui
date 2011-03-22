@@ -41,8 +41,16 @@
     </property>
     <addaction name="actionHelpAbout"/>
    </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionViewDataBrowser"/>
+    <addaction name="actionViewAnalysisParameters"/>
+   </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAnalysis"/>
+   <addaction name="menu_View"/>
    <addaction name="menuHelp"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -164,6 +172,28 @@
     <string>PCA2</string>
    </property>
   </action>
+  <action name="actionViewDataBrowser">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Data Browser</string>
+   </property>
+  </action>
+  <action name="actionViewAnalysisParameters">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Analysis Parameters</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -181,5 +211,38 @@
  <resources>
   <include location="../VisomicsApp.qrc"/>
  </resources>
- <connections/>
+ <connections>
+  <connection>
+   <sender>actionViewAnalysisParameters</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>AnalysisParameterDockWidget</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>127</x>
+     <y>536</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionViewDataBrowser</sender>
+   <signal>toggled(bool)</signal>
+   <receiver>DataBrowserDockWidget</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>127</x>
+     <y>278</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
 </ui>
