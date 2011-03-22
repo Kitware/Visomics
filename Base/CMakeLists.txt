@@ -114,10 +114,19 @@ ADD_LIBRARY(${libname} STATIC
   ${KIT_QRC_SRCS}
   )
 
+SET(EXTRA_LIBRARIES)
+IF(Q_WS_X11)
+  # If the faster 'gold' linker is used, to avoid complaints about undefined symbol
+  # 'XGetWindowAttributes', 'XCreateWindow', ..., let's link against X11 libraries.
+  FIND_PACKAGE(X11)
+  LIST(APPEND EXTRA_LIBRARIES ${X11_LIBRARIES})
+ENDIF()
+
 SET(VTK_LIBRARIES QVTK vtkCharts vtkInfovis)
 
 SET(${PROJECT_NAME}_LINK_LIBRARIES
   ${VTK_LIBRARIES}
+  ${EXTRA_LIBRARIES}
   ${QT_LIBRARIES}
   QtPropertyBrowser
   )
