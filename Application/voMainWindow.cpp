@@ -164,7 +164,7 @@ void voMainWindow::onAnalysisSelected(voAnalysis* analysis)
 void voMainWindow::onActiveAnalysisChanged(voAnalysis* analysis)
 {
   Q_D(voMainWindow);
-  bool analysisParameterDockVisible = analysis != 0 && analysis->parameterCount() > 0;
+  bool analysisParameterDockVisible = analysis != NULL && analysis->parameterCount() > 0;
   d->AnalysisParameterDockWidget->setVisible(
         analysisParameterDockVisible && d->actionViewAnalysisParameters->isChecked());
   d->actionViewAnalysisParameters->setEnabled(analysisParameterDockVisible);
