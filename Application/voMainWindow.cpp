@@ -57,6 +57,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
   Q_D(voMainWindow);
 
   d->setupUi(this);
+  this->setWindowTitle(QString("Visomics ") + QString(Visomics_VERSION_STRING));
 
   d->ViewStackedWidget = new voViewStackedWidget(this);
   this->setCentralWidget(d->ViewStackedWidget);

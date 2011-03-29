@@ -18,6 +18,7 @@ SET(Visomics_MINOR_VERSION 3)
 SET(Visomics_BUILD_VERSION 0)
 SET(Visomics_VERSION
     "${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}.${Visomics_BUILD_VERSION}")
+ADD_DEFINITIONS(-DVisomics_VERSION_STRING="${Visomics_VERSION}")
 
 #-----------------------------------------------------------------------------
 # Install directories, used for install rules.
