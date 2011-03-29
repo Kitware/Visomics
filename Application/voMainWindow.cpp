@@ -151,10 +151,10 @@ void voMainWindow::onFileOpenActionTriggered()
 // --------------------------------------------------------------------------
 void voMainWindow::about()
 {
-  QMessageBox::about(this, tr("About OmicsView"),
-          tr("<h2>OmicsView 1.1</h2>"
+  QMessageBox::about(this, tr("About Visomics"),
+          tr("<h2>Visomics %1</h2>"
              "<p>Copyright &copy; 2010 Kitware Inc."
-             "<p>Omicsview is a platform for visualization and analysis of omiccs data."));
+             "<p>Visomics is a platform for visualization and analysis of omiccs data.").arg(Visomics_VERSION_STRING));
 }
 
 // --------------------------------------------------------------------------
