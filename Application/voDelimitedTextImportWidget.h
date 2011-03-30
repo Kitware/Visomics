@@ -11,7 +11,6 @@ class voDelimitedTextImportWidget : public QWidget
 {
   Q_OBJECT
 public:
-  public:
   typedef QWidget Superclass;
   voDelimitedTextImportWidget(QWidget* newParent = 0);
   virtual ~voDelimitedTextImportWidget();
