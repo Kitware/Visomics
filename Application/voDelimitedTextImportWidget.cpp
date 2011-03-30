@@ -22,7 +22,7 @@ voDelimitedTextImportWidgetPrivate::voDelimitedTextImportWidgetPrivate()
 
 // --------------------------------------------------------------------------
 voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
-  Superclass(newParent)
+  Superclass(newParent), d_ptr(new voDelimitedTextImportWidgetPrivate())
 {
   Q_D(voDelimitedTextImportWidget);
   d->setupUi(this);
