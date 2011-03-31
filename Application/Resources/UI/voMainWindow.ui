@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>27</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -214,7 +214,7 @@
  <connections>
   <connection>
    <sender>actionViewAnalysisParameters</sender>
-   <signal>toggled(bool)</signal>
+   <signal>triggered(bool)</signal>
    <receiver>AnalysisParameterDockWidget</receiver>
    <slot>setVisible(bool)</slot>
    <hints>
@@ -230,7 +230,7 @@
   </connection>
   <connection>
    <sender>actionViewDataBrowser</sender>
-   <signal>toggled(bool)</signal>
+   <signal>triggered(bool)</signal>
    <receiver>DataBrowserDockWidget</receiver>
    <slot>setVisible(bool)</slot>
    <hints>
