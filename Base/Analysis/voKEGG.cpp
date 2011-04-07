@@ -30,7 +30,7 @@
 voKEGG::voKEGG():
     Superclass()
 {
-  Q_D(voKEGG);
+//  Q_D(voKEGG);
 }
 
 // --------------------------------------------------------------------------
@@ -65,7 +65,7 @@ void voKEGG::setParameterInformation()
 // --------------------------------------------------------------------------
 bool voKEGG::execute()
 {
-  Q_D(voKEGG);
+//  Q_D(voKEGG);
 
   vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
   if (!table)
@@ -77,15 +77,17 @@ bool voKEGG::execute()
   QNetworkAccessManager manager;
   QScriptEngine engine;
   vtkNew<vtkTable> output;
-  vtkNew<vtkStringArray> header;
-  header->SetName("header");
-  header->InsertNextValue("KEGG Pathways");
-  output->AddColumn(header.GetPointer());
-  for (vtkIdType i = 1; i < table->GetNumberOfColumns(); ++i)
+  output->AddColumn(table->GetColumn(0));
+//  vtkNew<vtkStringArray> header;
+//  header->SetName("header");
+  //header->InsertNextValue("KEGG Pathways");
+  vtkSmartPointer<vtkStringArray> path = vtkSmartPointer<vtkStringArray>::New();
+  path->SetName("KEGG Pathways");
+  for (vtkIdType i = 1; i < table->GetNumberOfRows(); ++i)
     {
     QEventLoop loop;
     QNetworkRequest request;
-    QString name = table->GetColumn(i)->GetName();
+    QString name = static_cast<const char*>(table->GetValue(i,0).ToString());
     request.setUrl(QUrl("http://" + this->stringParameter("host") + "/kegg-pathway?term=" + QUrl::toPercentEncoding(name)));
     request.setRawHeader("User-Agent", "MyOwnBrowser 1.0");
     QNetworkReply *reply = manager.get(request);
@@ -105,11 +107,11 @@ bool voKEGG::execute()
         cerr << v.property("name").toString().toStdString() << endl;
         }
       }
-    vtkNew<vtkStringArray> path;
-    path->SetName(name.toStdString().c_str());
+//    vtkNew<vtkStringArray> path;
+//    path->SetName(name.toStdString().c_str());
     path->InsertNextValue(paths.toStdString());
-    output->AddColumn(path.GetPointer());
     }
+    output->AddColumn(path);
 
   this->setOutput("pathways", new voTableDataObject("pathways", output.GetPointer()));
   return true;

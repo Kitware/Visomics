@@ -78,43 +78,20 @@ bool voHierarchicalClustering::execute()
   // Parameters
   QString hclust_method = this->enumParameter("method");
 
-  // Transpose table
-  vtkSmartPointer<vtkTable> transpose = vtkSmartPointer<vtkTable>::New();
-  vtkSmartPointer<vtkStringArray> header = vtkSmartPointer<vtkStringArray>::New();
-  header->SetName("header");
-  header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
-  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-    {
-    header->SetValue(c-1, table->GetColumnName(c));
-    }
-  transpose->AddColumn(header);
-  for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
-    {
-    vtkSmartPointer<vtkStringArray> newcol = vtkSmartPointer<vtkStringArray>::New();
-    newcol->SetName(table->GetValue(r, 0).ToString().c_str());
-    newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
-    for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-      {
-      newcol->SetValue(c-1, table->GetValue(r, c).ToString());
-      }
-    transpose->AddColumn(newcol);
-    }
-
- 
   vtkSmartPointer< vtkTableToArray > tableToArray = vtkSmartPointer< vtkTableToArray>::New();
-  tableToArray->SetInput(transpose);
+  tableToArray->SetInput(table);
 
   vtkSmartPointer< vtkStringArray > names = vtkSmartPointer< vtkStringArray >::New();
 
   int start = 1;
-  int end = transpose->GetNumberOfColumns();
+  int end = table->GetNumberOfColumns();
 
 
   names->SetName("Samples");
   for (int ctr=start; ctr<end; ctr++)
     {
-    tableToArray->AddColumn(transpose->GetColumnName(ctr));
-    names->InsertNextValue(transpose->GetColumnName(ctr));
+    tableToArray->AddColumn(table->GetColumnName(ctr));
+    names->InsertNextValue(table->GetColumnName(ctr));
     }
   tableToArray->Update();
 
@@ -258,11 +235,11 @@ bool voHierarchicalClustering::execute()
       distanceArray->InsertNextValue(heightParent);
 
       vtkIdType child1 = builder->AddVertex();
-      clusterLabel->InsertNextValue( transpose->GetColumnName( abs(firstCluster)) );
+      clusterLabel->InsertNextValue( table->GetColumnName( abs(firstCluster)) );
       distanceArray->InsertNextValue(heightChildrean);
 
       vtkIdType child2 = builder->AddVertex();
-      clusterLabel->InsertNextValue( transpose->GetColumnName( abs(secondCluster)) );
+      clusterLabel->InsertNextValue( table->GetColumnName( abs(secondCluster)) );
       distanceArray->InsertNextValue(heightChildrean);
 
       builder->AddEdge( parent, child1);
@@ -304,7 +281,7 @@ bool voHierarchicalClustering::execute()
 
         
         vtkIdType child = builder->AddVertex(); 
-        clusterLabel->InsertNextValue( transpose->GetColumnName( abs(firstCluster)) );
+        clusterLabel->InsertNextValue( table->GetColumnName( abs(firstCluster)) );
         distanceArray->InsertNextValue(heightChildrean);
 
         int clusterNumber  = clusterMap[secondCluster - 1]; // R cluster index starts from 1
@@ -324,7 +301,7 @@ bool voHierarchicalClustering::execute()
         distanceArray->InsertNextValue(heightParent);
 
         vtkIdType child = builder->AddVertex();
-        clusterLabel->InsertNextValue( transpose->GetColumnName( abs(secondCluster)) );
+        clusterLabel->InsertNextValue( table->GetColumnName( abs(secondCluster)) );
         distanceArray->InsertNextValue(heightChildrean);
 
 

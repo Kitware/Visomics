@@ -84,23 +84,22 @@ void voTableView::setDataObject(voDataObject *dataObject)
     // Note: this will clear the current selection.
     vtkIdType num_rows = table->GetNumberOfRows();
     vtkIdType num_cols = table->GetNumberOfColumns();
-    d->Model.setRowCount(static_cast<int>(num_cols - 1));
-    d->Model.setColumnCount(static_cast<int>(num_rows));
-    for (vtkIdType r = 0; r < num_rows; ++r)
+    d->Model.setRowCount(static_cast<int>(num_rows));
+    d->Model.setColumnCount(static_cast<int>(num_cols - 1));
+    for (vtkIdType c = 1; c < num_cols; ++c)
       {
-      d->Model.setHeaderData(static_cast<int>(r), Qt::Horizontal, QString(table->GetValue(r, 0).ToString()));
-      for (vtkIdType c = 1; c < num_cols; ++c)
+      d->Model.setHeaderData(static_cast<int>(c-1), Qt::Horizontal, QString(table->GetColumnName(c)));
+      for (vtkIdType r = 0; r < num_rows; ++r)
         {
         QStandardItem* item = new QStandardItem(QString(table->GetValue(r, c).ToString()));
         item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable); // Item is view-only
-        d->Model.setItem(static_cast<int>(c), static_cast<int>(r), item);
+        d->Model.setItem(static_cast<int>(r), static_cast<int>(c-1), item);
         }
       }
-    for (vtkIdType c = 1; c < num_cols; ++c)
+    for (vtkIdType r = 0; r < num_rows; ++r)
       {
-      d->Model.setHeaderData(static_cast<int>(c), Qt::Vertical, QString(table->GetColumnName(c)));
+      d->Model.setHeaderData(static_cast<int>(r), Qt::Vertical, QString(table->GetValue(r, 0).ToString()));
       }
-    d->TableView->hideRow(0);
   //  this->LastModelMTime = table->GetMTime();
   //  }
 

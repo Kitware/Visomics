@@ -17,7 +17,6 @@
 #include <vtkTable.h>
 #include <vtkTableToArray.h>
 #include <vtkRCalculatorFilter.h>
-#include <vtkDenseArray.h>
 #include <vtkIntArray.h>
 
 // --------------------------------------------------------------------------
@@ -55,10 +54,10 @@ void voKMeansClustering::setParameterInformation()
   QList<QtProperty*> kmeans_parameters;
 
   // KMeans / Number of clusters (centers)
-  kmeans_parameters << this->addIntegerParameter("centers", tr("Number of clusters"), 2, 10, 4);
+  kmeans_parameters << this->addIntegerParameter("centers", QObject::tr("Number of clusters"), 2, 10, 4);
 
   // KMeans / MaxIter
-  kmeans_parameters << this->addIntegerParameter("iter.max", tr("Max. iteration"), 5, 50, 10);
+  kmeans_parameters << this->addIntegerParameter("iter.max", QObject::tr("Max. iteration"), 5, 50, 10);
 
   // KMeans / Algorithm
   QStringList kmeans_algorithms;
@@ -83,66 +82,18 @@ bool voKMeansClustering::execute()
   int kmeans_iter_max = this->integerParameter("iter.max");
   QString kmeans_algorithm = this->enumParameter("algorithm");
 
-  // Transpose table
-  vtkSmartPointer<vtkTable> transpose = vtkSmartPointer<vtkTable>::New();
-  vtkSmartPointer<vtkStringArray> header = vtkSmartPointer<vtkStringArray>::New();
-  header->SetName("header");
-  header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
-  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-    {
-    header->SetValue(c-1, table->GetColumnName(c));
-    }
-  transpose->AddColumn(header);
-  for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
-    {
-    vtkSmartPointer<vtkStringArray> newcol = vtkSmartPointer<vtkStringArray>::New();
-    newcol->SetName(table->GetValue(r, 0).ToString().c_str());
-    newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
-    for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-      {
-      newcol->SetValue(c-1, table->GetValue(r, c).ToString());
-      }
-    transpose->AddColumn(newcol);
-    }
-
- 
   vtkSmartPointer< vtkTableToArray > tableToArray = vtkSmartPointer< vtkTableToArray>::New();
-  tableToArray->SetInput(transpose);
+  tableToArray->SetInput(table);
 
   vtkSmartPointer< vtkStringArray > names = vtkSmartPointer< vtkStringArray >::New();
 
-  int start = 1;
-  int end = transpose->GetNumberOfColumns();
-
-  //std::cout << "Total number of columns:\t" << end << std::endl;
-
   names->SetName("Samples");
-  for (int ctr=start; ctr<end; ctr++)
+  for (int ctr = 1; ctr < table->GetNumberOfColumns(); ctr++)
     {
-    tableToArray->AddColumn(transpose->GetColumnName(ctr));
-    names->InsertNextValue(transpose->GetColumnName(ctr));
+    tableToArray->AddColumn(table->GetColumnName(ctr));
+    names->InsertNextValue(table->GetColumnName(ctr));
     }
   tableToArray->Update();
-
-  //Print ouf the array data for debugging purposes
-//  std::cout << "Array data sent to R \n" << std::endl;
-//  vtkSmartPointer< vtkArrayData > arrayData = vtkSmartPointer< vtkArrayData>::New();
-//  arrayData = tableToArray->GetOutput();
-//  vtkIdType numberOfArrays = arrayData->GetNumberOfArrays();
-//  for( vtkIdType i=0; i < numberOfArrays; i++)
-//    {
-//    vtkDenseArray<double> *array = vtkDenseArray<double>::SafeDownCast(arrayData->GetArray(i));
-//    //std::cout << "Dimensions:" << array->GetDimensions() << std::endl;
-//    const vtkArrayExtents extents = array->GetExtents();
-//    for(vtkIdType i = extents[0].GetBegin(); i != extents[0].GetEnd(); ++i)
-//      {
-//      for(vtkIdType j = extents[1].GetBegin(); j != extents[1].GetEnd(); ++j)
-//        {
-//        std::cout << array->GetValue(vtkArrayCoordinates(i, j)) << "\t";
-//        }
-//        std::cout << std::endl;
-//      }
-//    }
 
   vtkSmartPointer< vtkRCalculatorFilter > calc = vtkSmartPointer< vtkRCalculatorFilter>::New();
   calc->SetRoutput(0);
@@ -167,7 +118,6 @@ bool voKMeansClustering::execute()
 
   calc->Update();
 
-  //calc->GetOutput()->Print(std::cout);
   vtkArrayData *temp = vtkArrayData::SafeDownCast(calc->GetOutput());
   if (!temp)
     {
@@ -177,21 +127,21 @@ bool voKMeansClustering::execute()
 
   vtkSmartPointer< vtkArrayData > kmReturn = vtkSmartPointer< vtkArrayData>::New();
   kmReturn->DeepCopy(temp);
-
+/*
   vtkSmartPointer< vtkArrayData > kmCentersData = vtkSmartPointer< vtkArrayData>::New();
   kmCentersData->AddArray(kmReturn->GetArrayByName("kmCenters"));
 
   vtkSmartPointer< vtkArrayToTable > kmCenters = vtkSmartPointer< vtkArrayToTable>::New();
   kmCenters->SetInputConnection(kmCentersData->GetProducerPort());
   kmCenters->Update();
-
+*/
   vtkSmartPointer< vtkArrayData > kmClusterData = vtkSmartPointer< vtkArrayData>::New();
   kmClusterData->AddArray(kmReturn->GetArrayByName("kmCluster"));
 
   vtkSmartPointer< vtkArrayToTable > kmCluster= vtkSmartPointer< vtkArrayToTable>::New();
   kmCluster->SetInputConnection(kmClusterData->GetProducerPort());
   kmCluster->Update();
-
+/*
   vtkSmartPointer< vtkArrayData > kmWithinssData= vtkSmartPointer< vtkArrayData >::New();
   kmWithinssData->AddArray(kmReturn->GetArrayByName("kmWithinss"));
 
@@ -205,25 +155,28 @@ bool voKMeansClustering::execute()
   vtkSmartPointer< vtkArrayToTable > kmSize= vtkSmartPointer< vtkArrayToTable >::New();
   kmSize->SetInputConnection(kmSizeData->GetProducerPort());
   kmSize->Update();
+*/
 
   // Create a table with sample name and cluster number
-  //
+  // NOTE: This transpose is necessary because the one-dimensional vtkArray returned by R is
+  //       oriented vertically. Attempting to transpose the array within R causes it to become
+  //       a two-dimensional vtkArray when returned.
+  //       To keep the orientation of experiments consistant between input and output, a
+  //       transpose and manually building the table is necessary. If a vertially-oriented
+  //       table is acceptable, simply output kmCluster->GetOutput()
   vtkSmartPointer< vtkTable > clusterTable = vtkSmartPointer< vtkTable >::New();
-  vtkSmartPointer< vtkIntArray > clusterNumber = vtkSmartPointer< vtkIntArray >::New();
 
-  clusterNumber->SetName("Cluster number");
-
-  const vtkArrayExtents extents = kmClusterData->GetArray(0)->GetExtents();
-  vtkDenseArray<double> * array = vtkDenseArray<double>::SafeDownCast(kmClusterData->GetArray(0));
-  for(int i = 0; i != extents[0].GetEnd(); ++i)
+  vtkSmartPointer<vtkStringArray> headerCol = vtkSmartPointer<vtkStringArray>::New();
+  headerCol->InsertNextValue(QObject::tr("Cluster number").toLatin1());
+  clusterTable->AddColumn(headerCol);
+  for(unsigned int i = 0; i < kmClusterData->GetArray(0)->GetSize(); ++i)
     {
-    //std::cout << names->GetValue(i) << "\t"  << array->GetValue(i) << std::endl;
-    clusterNumber->InsertNextValue( array->GetValue(i));
+    vtkSmartPointer<vtkIntArray> newCol = vtkSmartPointer<vtkIntArray>::New();
+    newCol->SetName(table->GetColumnName(i+1)); // "table" contains a name column that must be offset from
+    newCol->InsertNextValue(kmClusterData->GetArray(0)->GetVariantValue(i).ToInt());
+    clusterTable->AddColumn(newCol);
     }
-  clusterTable->AddColumn(names);
-  clusterTable->AddColumn(clusterNumber);
-  //clusterTable->Dump();
- 
+
   this->setOutput("cluster", new voTableDataObject("cluster", clusterTable));
 
   return true;
