@@ -92,6 +92,7 @@ void voTableView::setDataObject(voDataObject *dataObject)
       for (vtkIdType c = 1; c < num_cols; ++c)
         {
         QStandardItem* item = new QStandardItem(QString(table->GetValue(r, c).ToString()));
+        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable); // Item is view-only
         d->Model.setItem(static_cast<int>(c), static_cast<int>(r), item);
         }
       }
