@@ -30,7 +30,7 @@
 voKEGG::voKEGG():
     Superclass()
 {
-  Q_D(voKEGG);
+//  Q_D(voKEGG);
 }
 
 // --------------------------------------------------------------------------
@@ -58,14 +58,13 @@ void voKEGG::setParameterInformation()
 
   // KEGG host
   kegg_parameters << this->addStringParameter("host", tr("Host name"), "paraviewweb.kitware.com:88");
-
   this->addParameterGroup("KEGG parameters", kegg_parameters);
 }
 
 // --------------------------------------------------------------------------
 bool voKEGG::execute()
 {
-  Q_D(voKEGG);
+//  Q_D(voKEGG);
 
   vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
   if (!table)
@@ -74,42 +73,44 @@ bool voKEGG::execute()
     return false;
     }
 
+  QString keggURL("http://" + this->stringParameter("host") + "/kegg-pathway?term=");
   QNetworkAccessManager manager;
   QScriptEngine engine;
+
   vtkNew<vtkTable> output;
-  vtkNew<vtkStringArray> header;
-  header->SetName("header");
-  header->InsertNextValue("KEGG Pathways");
-  output->AddColumn(header.GetPointer());
-  for (vtkIdType i = 1; i < table->GetNumberOfColumns(); ++i)
+  output->AddColumn(table->GetColumn(0));
+
+  vtkNew<vtkStringArray> pathwaysColumn;
+  pathwaysColumn->SetName("KEGG Pathways");
+  for (vtkIdType i = 0; i < table->GetNumberOfRows(); ++i)
     {
     QEventLoop loop;
     QNetworkRequest request;
-    QString name = table->GetColumn(i)->GetName();
-    request.setUrl(QUrl("http://" + this->stringParameter("host") + "/kegg-pathway?term=" + QUrl::toPercentEncoding(name)));
+    QString name = QString::fromStdString(table->GetValue(i, 0).ToString());
+    qDebug() << "i:" << i <<  ", name:" << name;
+    request.setUrl(QUrl(keggURL + QUrl::toPercentEncoding(name)));
     request.setRawHeader("User-Agent", "MyOwnBrowser 1.0");
     QNetworkReply *reply = manager.get(request);
     QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
     loop.exec();
     QString result = QString(reply->readAll());
     QScriptValue sc = engine.evaluate(result);
-    QString paths;
+    QStringList paths;
     if (sc.isArray())
       {
       for (int i = 0; i < sc.property("length").toInteger(); ++i)
         {
         QScriptValue v = sc.property(i);
-        paths += v.property("id").toString();
-        paths += ";";
-        cerr << v.property("id").toString().toStdString() << endl;
-        cerr << v.property("name").toString().toStdString() << endl;
+        paths << v.property("id").toString();
+        qDebug() << "  id:" << v.property("id").toString()
+                 << ", name:" << v.property("name").toString();
         }
       }
-    vtkNew<vtkStringArray> path;
-    path->SetName(name.toStdString().c_str());
-    path->InsertNextValue(paths.toStdString());
-    output->AddColumn(path.GetPointer());
+    pathwaysColumn->InsertNextValue(paths.join(";").toStdString());
     }
+  output->AddColumn(pathwaysColumn.GetPointer());
+
+  // output->Dump();
 
   this->setOutput("pathways", new voTableDataObject("pathways", output.GetPointer()));
   return true;

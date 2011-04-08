@@ -9,6 +9,7 @@
 
 // VTK includes
 #include <QVTKWidget.h>
+#include <vtkAxis.h>
 #include <vtkChartXY.h>
 #include <vtkContext2D.h>
 #include <vtkContextScene.h>
@@ -17,15 +18,15 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkTable.h>
-#include <vtkVariantArray.h>
+//#include <vtkVariantArray.h> //Needed by splitTable
+#include <vtkStringArray.h>
+#include <vtkDoubleArray.h>
 
 // --------------------------------------------------------------------------
 class voPCABarPlotPrivate
 {
 public:
   voPCABarPlotPrivate();
-
-  QMap<vtkVariant, vtkSmartPointer<vtkTable> > splitTable(vtkTable* t, const char* column);
 
   vtkSmartPointer<vtkContextView> ChartView;
   vtkSmartPointer<vtkChartXY>     Chart;
@@ -39,34 +40,6 @@ public:
 voPCABarPlotPrivate::voPCABarPlotPrivate()
 {
   this->Widget = 0;
-}
-
-// --------------------------------------------------------------------------
-QMap<vtkVariant, vtkSmartPointer<vtkTable> > voPCABarPlotPrivate::splitTable(
-    vtkTable* t, const char* column)
-{
-  QMap<vtkVariant, vtkSmartPointer<vtkTable> > m;
-  vtkSmartPointer<vtkVariantArray> row =
-    vtkSmartPointer<vtkVariantArray>::New();
-  for (vtkIdType i = 0; i < t->GetNumberOfRows(); ++i)
-    {
-    t->GetRow(i, row);
-    vtkVariant val = t->GetValueByName(i, column);
-    if (m.find(val) == m.end())
-      {
-      m[val] = vtkSmartPointer<vtkTable>::New();
-      for (vtkIdType j = 0; j < t->GetNumberOfColumns(); ++j)
-        {
-        vtkAbstractArray* a = t->GetColumn(j);
-        vtkAbstractArray* b = a->NewInstance();
-        b->SetName(a->GetName());
-        m[val]->AddColumn(b);
-        }
-      }
-
-    m[val]->InsertNextRow(row);
-    }
-  return m;
 }
 
 // --------------------------------------------------------------------------
@@ -118,9 +91,31 @@ void voPCABarPlot::setDataObject(voDataObject *dataObject)
     return;
     }
 
-  QMap<vtkVariant, vtkSmartPointer<vtkTable> > tables = d->splitTable(table, "1");
-  QMap<vtkVariant, vtkSmartPointer<vtkTable> >::iterator it, itEnd;
-  itEnd = tables.end();
+  // Transpose table - this is pretty much unavoidable: vtkPlot expects each dimension
+  // to be a column, but the information should be presented to the user with each
+  // data point (principle component) in its own column
+  vtkSmartPointer<vtkTable> transpose = vtkSmartPointer<vtkTable>::New();
+  // Note: dont actually need to keep header, but will for consistancy
+  vtkSmartPointer<vtkStringArray> header = vtkSmartPointer<vtkStringArray>::New();
+  header->SetName("header");
+  header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
+  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
+    {
+    header->SetValue(c-1, table->GetColumnName(c));
+    }
+  transpose->AddColumn(header);
+  for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
+    {
+    vtkSmartPointer<vtkDoubleArray> newcol = vtkSmartPointer<vtkDoubleArray>::New();
+    newcol->SetName(table->GetValue(r, 0).ToString().c_str());
+    newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
+    for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
+      {
+      newcol->SetValue(c-1, table->GetValue(r, c).ToDouble());
+      }
+    transpose->AddColumn(newcol);
+    }
+
   unsigned char colors[10][3] =
     {
       {166, 206, 227}, {31, 120, 180}, {178, 223, 13},
@@ -129,19 +124,19 @@ void voPCABarPlot::setDataObject(voDataObject *dataObject)
     };
   int i = 0;
   
-  //for (it = tables.begin(); it != itEnd; ++it, ++i)
-    {
-    vtkPlot* p = d->Chart->GetPlot(0);
+  vtkPlot* p = d->Chart->GetPlot(0);
 	if (!p) 
-      {
-      p = d->Chart->AddPlot(vtkChart::BAR);
-      }
-	//it.value()->Print(std::cout);
-	//
-    p->SetInput(table, 1,2);
-    p->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
-    p->SetWidth(10);
+    {
+    p = d->Chart->AddPlot(vtkChart::BAR);
     }
-  d->ChartView->GetRenderWindow();
+
+  p->SetInput(transpose, 1,2);
+  p->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
+  p->SetWidth(10);
+
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(transpose->GetColumnName(2)); // y
+
+  d->ChartView->GetRenderWindow()->SetMultiSamples(4);
   d->ChartView->Render();
 }
