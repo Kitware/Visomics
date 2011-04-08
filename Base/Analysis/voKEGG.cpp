@@ -83,7 +83,7 @@ bool voKEGG::execute()
   //header->InsertNextValue("KEGG Pathways");
   vtkSmartPointer<vtkStringArray> path = vtkSmartPointer<vtkStringArray>::New();
   path->SetName("KEGG Pathways");
-  for (vtkIdType i = 1; i < table->GetNumberOfRows(); ++i)
+  for (vtkIdType i = 0; i < table->GetNumberOfRows(); ++i)
     {
     QEventLoop loop;
     QNetworkRequest request;
