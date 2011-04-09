@@ -17,7 +17,7 @@
 #include "voDelimitedTextPreviewModel.h"
 
 
-class voDelimitedTextPreviewModelPrivate //: public Ui_voDelimitedTextPreviewModel
+class voDelimitedTextPreviewModelPrivate
 {
   Q_DECLARE_PUBLIC(voDelimitedTextPreviewModel);
 
@@ -52,6 +52,7 @@ voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimit
 {
 }
 
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModelPrivate::init()
 {
   FieldDelimiter = ',';
@@ -146,6 +147,7 @@ char voDelimitedTextPreviewModel::fieldDelimiter() const
   return d->FieldDelimiter;
 }
 
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::setFieldDelimiter (char _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -158,6 +160,7 @@ void voDelimitedTextPreviewModel::setFieldDelimiter (char _arg)
       }
     }
 }
+
 // --------------------------------------------------------------------------
 char voDelimitedTextPreviewModel::stringBeginEndCharacter() const
 {
@@ -165,6 +168,7 @@ char voDelimitedTextPreviewModel::stringBeginEndCharacter() const
   return d->StringBeginEndCharacter;
 }
 
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::setStringBeginEndCharacter(char _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -177,6 +181,7 @@ void voDelimitedTextPreviewModel::setStringBeginEndCharacter(char _arg)
       }
     }
 }
+
 // --------------------------------------------------------------------------
 bool voDelimitedTextPreviewModel::useFirstLineAsAttributeNames() const
 {
@@ -184,6 +189,7 @@ bool voDelimitedTextPreviewModel::useFirstLineAsAttributeNames() const
   return d->UseFirstLineAsAttributeNames;
 }
 
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::setUseFirstLineAsAttributeNames(bool _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -196,6 +202,7 @@ void voDelimitedTextPreviewModel::setUseFirstLineAsAttributeNames(bool _arg)
       }
     }
 }
+
 // --------------------------------------------------------------------------
 bool voDelimitedTextPreviewModel::transpose() const
 {
@@ -203,6 +210,7 @@ bool voDelimitedTextPreviewModel::transpose() const
   return d->Transpose;
 }
 
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::setTranspose(bool _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -215,6 +223,7 @@ void voDelimitedTextPreviewModel::setTranspose(bool _arg)
       }
     }
 }
+
 // --------------------------------------------------------------------------
 int voDelimitedTextPreviewModel::headerColumnNumber() const
 {
@@ -222,6 +231,7 @@ int voDelimitedTextPreviewModel::headerColumnNumber() const
   return d->HeaderColumnNumber;
 }
 
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::setHeaderColumnNumber(int _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -234,6 +244,7 @@ void voDelimitedTextPreviewModel::setHeaderColumnNumber(int _arg)
       }
     }
 }
+
 // --------------------------------------------------------------------------
 int voDelimitedTextPreviewModel::headerRowNumber() const
 {
@@ -241,6 +252,7 @@ int voDelimitedTextPreviewModel::headerRowNumber() const
   return d->HeaderRowNumber;
 }
 
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::setHeaderRowNumber(int _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -253,6 +265,7 @@ void voDelimitedTextPreviewModel::setHeaderRowNumber(int _arg)
       }
     }
 }
+
 // --------------------------------------------------------------------------
 int voDelimitedTextPreviewModel::previewColumnNumber() const
 {
@@ -260,6 +273,7 @@ int voDelimitedTextPreviewModel::previewColumnNumber() const
   return d->PreviewColumnNumber;
 }
 
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::setPreviewColumnNumber(int _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -272,6 +286,7 @@ void voDelimitedTextPreviewModel::setPreviewColumnNumber(int _arg)
       }
     }
 }
+
 // --------------------------------------------------------------------------
 int voDelimitedTextPreviewModel::previewRowNumber() const
 {
@@ -279,6 +294,7 @@ int voDelimitedTextPreviewModel::previewRowNumber() const
   return d->PreviewRowNumber;
 }
 
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::setPreviewRowNumber(int _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -291,6 +307,7 @@ void voDelimitedTextPreviewModel::setPreviewRowNumber(int _arg)
       }
     }
 }
+
 // --------------------------------------------------------------------------
 bool voDelimitedTextPreviewModel::inlineUpdate() const
 {
@@ -298,6 +315,7 @@ bool voDelimitedTextPreviewModel::inlineUpdate() const
   return d->InlineUpdate;
 }
 
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::setInlineUpdate(bool _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -311,7 +329,7 @@ void voDelimitedTextPreviewModel::setInlineUpdate(bool _arg)
     }
 }
 
-
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::updatePreview()
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -342,7 +360,6 @@ void voDelimitedTextPreviewModel::updatePreview()
     {
     previewReader->SetMergeConsecutiveDelimiters(false);
     }
-
 
   if (d->StringBeginEndCharacter) // Value of 0 indicates none
     {
@@ -428,6 +445,5 @@ void voDelimitedTextPreviewModel::updatePreview()
     headerLabels.push_back(QString(table->GetColumnName(c)));
     }
   this->setHorizontalHeaderLabels(headerLabels);
-
 }
 
