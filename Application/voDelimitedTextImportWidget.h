@@ -15,6 +15,8 @@ public:
   voDelimitedTextImportWidget(QWidget* newParent = 0);
   virtual ~voDelimitedTextImportWidget();
 
+  void setFileName(const QString& fileName);
+
 protected:
   QScopedPointer<voDelimitedTextImportWidgetPrivate> d_ptr;
 
