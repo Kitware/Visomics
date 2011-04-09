@@ -337,10 +337,10 @@ void voDelimitedTextPreviewModel::updatePreview()
   Q_D(voDelimitedTextPreviewModel);
 
   if (d->SampleCacheFile.fileName()=="")
-  {
-  qWarning() << QObject::tr("ERROR: updatePreview: SampleCacheFile filename not set");
-  return;
-  }
+    {
+    qWarning() << QObject::tr("ERROR: updatePreview: SampleCacheFile filename not set");
+    return;
+    }
 
   // Set up vtkDelimitedTextReader
   vtkSmartPointer<vtkDelimitedTextReader> previewReader = vtkSmartPointer<vtkDelimitedTextReader>::New();
