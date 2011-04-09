@@ -140,7 +140,7 @@ void voDelimitedTextPreviewModel::setFileName(const QString& _arg)
 }
 
 // --------------------------------------------------------------------------
-char voDelimitedTextPreviewModel::getFieldDelimiter() const
+char voDelimitedTextPreviewModel::fieldDelimiter() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->FieldDelimiter;
@@ -159,7 +159,7 @@ void voDelimitedTextPreviewModel::setFieldDelimiter (char _arg)
     }
 }
 // --------------------------------------------------------------------------
-char voDelimitedTextPreviewModel::getStringBeginEndCharacter() const
+char voDelimitedTextPreviewModel::stringBeginEndCharacter() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->StringBeginEndCharacter;
@@ -178,7 +178,7 @@ void voDelimitedTextPreviewModel::setStringBeginEndCharacter(char _arg)
     }
 }
 // --------------------------------------------------------------------------
-bool voDelimitedTextPreviewModel::getUseFirstLineAsAttributeNames() const
+bool voDelimitedTextPreviewModel::useFirstLineAsAttributeNames() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->UseFirstLineAsAttributeNames;
@@ -197,7 +197,7 @@ void voDelimitedTextPreviewModel::setUseFirstLineAsAttributeNames(bool _arg)
     }
 }
 // --------------------------------------------------------------------------
-bool voDelimitedTextPreviewModel::getTranspose() const
+bool voDelimitedTextPreviewModel::transpose() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->Transpose;
@@ -216,7 +216,7 @@ void voDelimitedTextPreviewModel::setTranspose(bool _arg)
     }
 }
 // --------------------------------------------------------------------------
-int voDelimitedTextPreviewModel::getHeaderColumnNumber() const
+int voDelimitedTextPreviewModel::headerColumnNumber() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->HeaderColumnNumber;
@@ -235,7 +235,7 @@ void voDelimitedTextPreviewModel::setHeaderColumnNumber(int _arg)
     }
 }
 // --------------------------------------------------------------------------
-int voDelimitedTextPreviewModel::getHeaderRowNumber() const
+int voDelimitedTextPreviewModel::headerRowNumber() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->HeaderRowNumber;
@@ -254,7 +254,7 @@ void voDelimitedTextPreviewModel::setHeaderRowNumber(int _arg)
     }
 }
 // --------------------------------------------------------------------------
-int voDelimitedTextPreviewModel::getPreviewColumnNumber() const
+int voDelimitedTextPreviewModel::previewColumnNumber() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->PreviewColumnNumber;
@@ -273,7 +273,7 @@ void voDelimitedTextPreviewModel::setPreviewColumnNumber(int _arg)
     }
 }
 // --------------------------------------------------------------------------
-int voDelimitedTextPreviewModel::getPreviewRowNumber() const
+int voDelimitedTextPreviewModel::previewRowNumber() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->PreviewRowNumber;
@@ -292,7 +292,7 @@ void voDelimitedTextPreviewModel::setPreviewRowNumber(int _arg)
     }
 }
 // --------------------------------------------------------------------------
-bool voDelimitedTextPreviewModel::getInlineUpdate() const
+bool voDelimitedTextPreviewModel::inlineUpdate() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->InlineUpdate;

@@ -26,31 +26,31 @@ public:
   QString getFileName() const;
   void setFileName(const QString& _arg);
 
-  char getFieldDelimiter() const;
+  char fieldDelimiter() const;
   void setFieldDelimiter (char _arg);
 
-  char getStringBeginEndCharacter() const;
+  char stringBeginEndCharacter() const;
   void setStringBeginEndCharacter(char _arg); // Value of 0 indicates none
 
-  bool getUseFirstLineAsAttributeNames() const;
+  bool useFirstLineAsAttributeNames() const;
   void setUseFirstLineAsAttributeNames(bool _arg);
 
-  bool getTranspose() const;
+  bool transpose() const;
   void setTranspose(bool _arg);
 
-  int getHeaderColumnNumber() const;
+  int headerColumnNumber() const;
   void setHeaderColumnNumber(int _arg);
 
-  int getHeaderRowNumber() const;
+  int headerRowNumber() const;
   void setHeaderRowNumber(int _arg);
 
-  int getPreviewColumnNumber() const; // Number of columns to skip
+  int previewColumnNumber() const; // Number of columns to skip
   void setPreviewColumnNumber(int _arg);
 
-  int getPreviewRowNumber() const; // Number of rows to skip
+  int previewRowNumber() const; // Number of rows to skip
   void setPreviewRowNumber(int _arg);
 
-  bool getInlineUpdate() const;
+  bool inlineUpdate() const;
   void setInlineUpdate(bool _arg);
 
 
