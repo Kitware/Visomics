@@ -8,12 +8,12 @@ SET(KIT_SRCS
   voAnalysisParameterEditorWidget.h
   voDataBrowserWidget.cpp
   voDataBrowserWidget.h
-  voDelimitedTextPreview.cpp
-  voDelimitedTextPreview.h
   voDelimitedTextImportWidget.cpp
   voDelimitedTextImportWidget.h
-  voDelimitedTextPreview.h
   voDelimitedTextPreview.cpp
+  voDelimitedTextPreview.h
+  voDelimitedTextPreviewModel.cpp
+  voDelimitedTextPreviewModel.h
   voMainWindow.cpp
   voMainWindow.h
   voViewTabWidget.cpp
@@ -26,9 +26,9 @@ SET(KIT_MOC_SRCS
   voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.h
   voDataBrowserWidget.h
-  voDelimitedTextPreview.h
   voDelimitedTextImportWidget.h
   voDelimitedTextPreview.h
+  voDelimitedTextPreviewModel.h
   voMainWindow.h
   voViewStackedWidget.h
   voViewTabWidget.h
