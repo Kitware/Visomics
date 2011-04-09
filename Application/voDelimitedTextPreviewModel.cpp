@@ -23,7 +23,8 @@ class voDelimitedTextPreviewModelPrivate
 
 public:
   voDelimitedTextPreviewModelPrivate(voDelimitedTextPreviewModel& object);
-  void init();
+
+  void loadFile();
 
   QTemporaryFile SampleCacheFile;
 
@@ -38,7 +39,6 @@ public:
   int PreviewRowNumber; // Number of rows to skip
   bool InlineUpdate;
 
-
 private:
   voDelimitedTextPreviewModel* const q_ptr;
 };
@@ -50,38 +50,31 @@ private:
 voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimitedTextPreviewModel& object)
   : q_ptr(&object)
 {
-}
-
-// --------------------------------------------------------------------------
-void voDelimitedTextPreviewModelPrivate::init()
-{
-  FieldDelimiter = ',';
-  StringBeginEndCharacter = '\"';
-  UseFirstLineAsAttributeNames = true;
-  Transpose = false;
-  HeaderColumnNumber = 0;
-  HeaderRowNumber = 0;
-  PreviewColumnNumber = 0;
-  PreviewRowNumber = 0;
-  InlineUpdate = false;
+  this->FieldDelimiter = ',';
+  this->StringBeginEndCharacter = '\"';
+  this->UseFirstLineAsAttributeNames = true;
+  this->Transpose = false;
+  this->HeaderColumnNumber = 0;
+  this->HeaderRowNumber = 0;
+  this->PreviewColumnNumber = 0;
+  this->PreviewRowNumber = 0;
+  this->InlineUpdate = false;
 
   // If init() fails, SampleCacheFile will stay closed
   if (this->SampleCacheFile.isOpen())
     {
     this->SampleCacheFile.close();
     }
+}
 
-  // Open real file
-  if (this->FileName == QString::null)
-    {
-    qWarning("QViewsChooseFileFormatWidget: No filename.  Cannot build file preview.");
-    return;
-    }
+// --------------------------------------------------------------------------
+void voDelimitedTextPreviewModelPrivate::loadFile()
+{
   QFile infile(this->FileName);
   bool openStatus = infile.open(QIODevice::ReadOnly);
   if (!openStatus)
     {
-    qWarning() << QObject::tr("The file ") << this->FileName << QObject::tr(" could not be opened for reading.  Did something change between when you selected the file and now?");
+    qWarning() << QObject::tr("File ") << this->FileName << QObject::tr(" could not be opened for reading.  Did something change between when you selected the file and now?");
     return;
     }
 
@@ -112,12 +105,10 @@ void voDelimitedTextPreviewModelPrivate::init()
 // voDelimitedTextPreviewModel methods
 
 // --------------------------------------------------------------------------
-voDelimitedTextPreviewModel::voDelimitedTextPreviewModel(const QString& newFileName, QObject* newParent) :
+voDelimitedTextPreviewModel::voDelimitedTextPreviewModel(QObject* newParent) :
   Superclass(newParent), d_ptr(new voDelimitedTextPreviewModelPrivate(*this))
 {
-  Q_D(voDelimitedTextPreviewModel);
-  d->FileName = newFileName;
-  d->init();
+  //Q_D(voDelimitedTextPreviewModel);
 }
 
 // --------------------------------------------------------------------------
@@ -132,14 +123,25 @@ QString voDelimitedTextPreviewModel::fileName() const
   return d->FileName;
 }
 
-void voDelimitedTextPreviewModel::setFileName(const QString& _arg)
+// --------------------------------------------------------------------------
+void voDelimitedTextPreviewModel::setFileName(const QString& newFileName)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->FileName != _arg)
+  if (d->FileName == newFileName)
     {
-    d->FileName = _arg;
-    d->init(); // Different behavior from other accessors
+    return;
     }
+
+//  // Open real file
+//  if (newFileName.isEmpty())
+//    {
+//    qWarning("voDelimitedTextPreviewModel: No filename.  Cannot build file preview.");
+//    return;
+//    }
+
+  d->FileName = newFileName;
+
+  d->loadFile();
 }
 
 // --------------------------------------------------------------------------

@@ -20,11 +20,11 @@ class voDelimitedTextPreviewModel : public QStandardItemModel
 
 public:
   typedef QStandardItemModel Superclass;
-  voDelimitedTextPreviewModel(const QString& newFileName, QObject* newParent = 0);
+  voDelimitedTextPreviewModel(QObject* newParent = 0);
   virtual ~voDelimitedTextPreviewModel();
 
-  void setFileName(const QString& _arg);
   QString fileName() const;
+  void setFileName(const QString& newFileName);
 
   char fieldDelimiter() const;
   void setFieldDelimiter (char _arg);
