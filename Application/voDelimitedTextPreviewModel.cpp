@@ -126,7 +126,7 @@ voDelimitedTextPreviewModel::~voDelimitedTextPreviewModel()
 }
 
 // --------------------------------------------------------------------------
-QString voDelimitedTextPreviewModel::getFileName() const
+QString voDelimitedTextPreviewModel::fileName() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->FileName;

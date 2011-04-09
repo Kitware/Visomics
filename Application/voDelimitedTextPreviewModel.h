@@ -23,8 +23,8 @@ public:
   voDelimitedTextPreviewModel(const QString& newFileName, QObject* newParent = 0);
   virtual ~voDelimitedTextPreviewModel();
 
-  QString getFileName() const;
   void setFileName(const QString& _arg);
+  QString fileName() const;
 
   char fieldDelimiter() const;
   void setFieldDelimiter (char _arg);
