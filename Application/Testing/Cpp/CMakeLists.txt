@@ -3,6 +3,7 @@ SET(KIT ${PROJECT_NAME})
 
 CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voDataBrowserWidgetTest.cpp
+  voDelimitedTextImportWidgetTest.cpp
   )
   
 SET(TestsToRun ${Tests})
@@ -19,5 +20,6 @@ MACRO(SIMPLE_TEST TESTNAME)
 ENDMACRO()
 
 SIMPLE_TEST(voDataBrowserWidgetTest)
+SIMPLE_TEST(voDelimitedTextImportWidgetTest)
 
 
