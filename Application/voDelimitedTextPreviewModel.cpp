@@ -83,8 +83,7 @@ void voDelimitedTextPreviewModelPrivate::loadFile()
   QStringList sampleLinesList;
   for (int i = 0; i < NUM_FILE_LINES_READ && !instream.atEnd(); i++)
     {
-    QString nextLine = instream.readLine();
-    sampleLinesList.push_back(nextLine);
+    sampleLinesList << instream.readLine();
     }
 
   // Push lines to temp file
@@ -434,9 +433,9 @@ void voDelimitedTextPreviewModel::updatePreview()
         }
       else
         {
-      QStandardItem *textItem = new QStandardItem;
-      textItem->setText(row->GetValue(c).ToString().c_str());
-      itemsInRow.push_back(textItem);
+        QStandardItem *textItem = new QStandardItem;
+        textItem->setText(row->GetValue(c).ToString().c_str());
+        itemsInRow.push_back(textItem);
         }
       }
     this->appendRow(itemsInRow);
@@ -446,7 +445,7 @@ void voDelimitedTextPreviewModel::updatePreview()
   QStringList headerLabels;
   for (vtkIdType c = d->PreviewColumnNumber; c < table->GetNumberOfColumns(); ++c)
     {
-    headerLabels.push_back(QString(table->GetColumnName(c)));
+    headerLabels << QString(table->GetColumnName(c));
     }
   this->setHorizontalHeaderLabels(headerLabels);
 }
