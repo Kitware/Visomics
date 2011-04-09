@@ -8,6 +8,7 @@
 
 //VTK includes
 #include <vtkDelimitedTextReader.h>
+#include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
@@ -343,11 +344,9 @@ void voDelimitedTextPreviewModel::updatePreview()
     return;
     }
 
-  // Set up vtkDelimitedTextReader
-  vtkSmartPointer<vtkDelimitedTextReader> previewReader = vtkSmartPointer<vtkDelimitedTextReader>::New();
-
+  // Setup vtkDelimitedTextReader
+  vtkNew<vtkDelimitedTextReader> previewReader;
   previewReader->DetectNumericColumnsOff();
-
   previewReader->SetFileName(d->SampleCacheFile.fileName().toAscii().data());
 
   char delim_string[2];
@@ -382,28 +381,28 @@ void voDelimitedTextPreviewModel::updatePreview()
 
   if (d->Transpose) // Assumes there is a header column ... which we have no setting to specify for anyway
     {
-    vtkSmartPointer<vtkTable> transposeTable = vtkSmartPointer<vtkTable>::New();
+    vtkNew<vtkTable> transposeTable;
 
-    vtkSmartPointer<vtkStringArray> header = vtkSmartPointer<vtkStringArray>::New();
+    vtkNew<vtkStringArray> header;
     header->SetName("header");
     header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
     for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
       {
       header->SetValue(c-1, table->GetColumnName(c));
       }
-    transposeTable->AddColumn(header);
+    transposeTable->AddColumn(header.GetPointer());
     for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
       {
-      vtkSmartPointer<vtkStringArray> newcol = vtkSmartPointer<vtkStringArray>::New();
+      vtkNew<vtkStringArray> newcol;
       newcol->SetName(table->GetValue(r, 0).ToString().c_str());
       newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
       for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
         {
         newcol->SetValue(c-1, table->GetValue(r, c).ToString());
         }
-      transposeTable->AddColumn(newcol);
+      transposeTable->AddColumn(newcol.GetPointer());
       }
-    table = transposeTable;
+    table = transposeTable.GetPointer();
     }
 
   // Build model (self)
