@@ -104,6 +104,8 @@ void voDelimitedTextPreviewModelPrivate::init()
     return;
     }
   this->SampleCacheFile.write(sampleLines.toAscii());
+
+  this->SampleCacheFile.close();
 }
 
 // --------------------------------------------------------------------------
