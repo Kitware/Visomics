@@ -46,7 +46,7 @@ public slots:
 
 //  void setUseFirstLineAsAttributeNames(bool _arg);
 
-  void setTranspose(bool _arg);
+  void setTranspose(bool value);
 
   void setNumberOfColumnMetaDataTypes(int _arg);
 

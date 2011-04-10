@@ -159,25 +159,28 @@ void voDelimitedTextPreviewModelPrivate::transposeTable(vtkTable* table)
 
   vtkNew<vtkTable> transposeTable;
 
-  vtkNew<vtkStringArray> header;
-  header->SetName("header");
-  header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
-  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
+  for(int cid = 0; cid < table->GetNumberOfColumns(); ++cid)
     {
-    header->SetValue(c-1, table->GetColumnName(c));
-    }
-  transposeTable->AddColumn(header.GetPointer());
-  for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
-    {
-    vtkNew<vtkStringArray> newcol;
-    newcol->SetName(table->GetValue(r, 0).ToString().c_str());
-    newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
-    for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
+    vtkStringArray * column = vtkStringArray::SafeDownCast(table->GetColumn(cid));
+    Q_ASSERT(column);
+    for (int rid = 0; rid < column->GetNumberOfValues(); ++rid)
       {
-      newcol->SetValue(c-1, table->GetValue(r, c).ToString());
+      vtkStdString value = column->GetValue(rid);
+      vtkSmartPointer<vtkStringArray> transposedColumn;
+      if (cid == 0)
+        {
+        transposedColumn = vtkSmartPointer<vtkStringArray>::New();
+        transposedColumn->SetNumberOfValues(table->GetNumberOfRows());
+        transposeTable->AddColumn(transposedColumn);
+        }
+      else
+        {
+        transposedColumn = vtkStringArray::SafeDownCast(transposeTable->GetColumn(rid));
+        }
+      transposedColumn->SetValue(cid, value);
       }
-    transposeTable->AddColumn(newcol.GetPointer());
     }
+
   table->DeepCopy(transposeTable.GetPointer());
 }
 
