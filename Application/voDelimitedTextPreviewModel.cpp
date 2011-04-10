@@ -27,6 +27,8 @@ public:
 
   void loadFile();
 
+  void configureReader(vtkDelimitedTextReader * reader);
+
   QTemporaryFile SampleCacheFile;
 
   QString FileName;
@@ -99,6 +101,42 @@ void voDelimitedTextPreviewModelPrivate::loadFile()
   this->SampleCacheFile.write(sampleLines.toAscii());
 
   this->SampleCacheFile.close();
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextPreviewModelPrivate::configureReader(vtkDelimitedTextReader * reader)
+{
+  Q_ASSERT(reader);
+
+  reader->DetectNumericColumnsOff();
+  reader->SetFileName(this->SampleCacheFile.fileName().toAscii().data());
+
+  char delim_string[2];
+  delim_string[0] = this->FieldDelimiter;
+  delim_string[1] = 0;
+  vtkUnicodeString delimiters = vtkUnicodeString::from_utf8(delim_string);
+  reader->SetUnicodeFieldDelimiters(delimiters);
+
+  if (this->FieldDelimiter == ' ' || this->FieldDelimiter == '\t')
+    {
+    reader->SetMergeConsecutiveDelimiters(true);
+    }
+  else
+    {
+    reader->SetMergeConsecutiveDelimiters(false);
+    }
+
+  if (this->StringBeginEndCharacter) // Value of 0 indicates none
+    {
+    reader->SetStringDelimiter(this->StringBeginEndCharacter);
+    reader->SetUseStringDelimiter(true);
+    }
+  else
+    {
+    reader->SetUseStringDelimiter(false);
+    }
+
+  reader->SetHaveHeaders(this->UseFirstLineAsAttributeNames);
 }
 
 // --------------------------------------------------------------------------
@@ -346,34 +384,7 @@ void voDelimitedTextPreviewModel::updatePreview()
 
   // Setup vtkDelimitedTextReader
   vtkNew<vtkDelimitedTextReader> previewReader;
-  previewReader->DetectNumericColumnsOff();
-  previewReader->SetFileName(d->SampleCacheFile.fileName().toAscii().data());
-
-  char delim_string[2];
-  delim_string[0] = d->FieldDelimiter;
-  delim_string[1] = 0;
-  vtkUnicodeString delimiters = vtkUnicodeString::from_utf8(delim_string);
-  previewReader->SetUnicodeFieldDelimiters(delimiters);
-  if (d->FieldDelimiter == ' ' || d->FieldDelimiter == '\t')
-    {
-    previewReader->SetMergeConsecutiveDelimiters(true);
-    }
-  else
-    {
-    previewReader->SetMergeConsecutiveDelimiters(false);
-    }
-
-  if (d->StringBeginEndCharacter) // Value of 0 indicates none
-    {
-    previewReader->SetStringDelimiter(d->StringBeginEndCharacter);
-    previewReader->SetUseStringDelimiter(true);
-    }
-  else
-    {
-    previewReader->SetUseStringDelimiter(false);
-    }
-
-  previewReader->SetHaveHeaders(d->UseFirstLineAsAttributeNames);
+  d->configureReader(previewReader.GetPointer());
 
   // Read in file to table
   previewReader->Update();
