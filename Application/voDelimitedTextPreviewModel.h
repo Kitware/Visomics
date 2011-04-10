@@ -28,25 +28,23 @@ public:
   char stringBeginEndCharacter() const;
   void setStringBeginEndCharacter(char _arg); // Value of 0 indicates none
 
-  bool useFirstLineAsAttributeNames() const;
-  void setUseFirstLineAsAttributeNames(bool _arg);
+//  bool useFirstLineAsAttributeNames() const;
+//  void setUseFirstLineAsAttributeNames(bool _arg);
 
   bool transpose() const;
   void setTranspose(bool _arg);
 
-  int headerColumnNumber() const;
-  void setHeaderColumnNumber(int _arg);
+  int numberOfColumnMetaDataTypes() const;
+  void setNumberOfColumnMetaDataTypes(int _arg);
 
-  int headerRowNumber() const;
-  void setHeaderRowNumber(int _arg);
+  int numberOfRowMetaDataTypes() const;
+  void setNumberOfRowMetaDataTypes(int _arg);
 
   int numberOfRowsToPreview() const;
   void setNumberOfRowsToPreview(int count);
 
   bool inlineUpdate() const;
   void setInlineUpdate(bool _arg);
-
-
 
 public slots:
   void updatePreview();

@@ -2,6 +2,7 @@
 //QT includes
 #include <QDebug>
 #include <QFile>
+#include <QPalette>
 #include <QStringList>
 #include <QTemporaryFile>
 #include <QTextStream>
@@ -38,9 +39,15 @@ public:
   char StringBeginEndCharacter; // Value of 0 indicates none
   bool UseFirstLineAsAttributeNames;
   bool Transpose;
-  int HeaderColumnNumber;
-  int HeaderRowNumber;
+
+  int ColumnMetaDataTypeOfInterest; // From 0..(N-1) with N = NumberOfColumnMetaDataTypes
+  int NumberOfColumnMetaDataTypes;
+
+  int RowMetaDataTypeOfInterest; // From 0..(N-1) with N = NumberOfRowMetaDataTypes
+  int NumberOfRowMetaDataTypes;
+
   int NumberOfRowsToPreview;
+
   bool InlineUpdate;
 
 private:
@@ -56,10 +63,15 @@ voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimit
 {
   this->FieldDelimiter = ',';
   this->StringBeginEndCharacter = '\"';
-  this->UseFirstLineAsAttributeNames = true;
+  this->UseFirstLineAsAttributeNames = false;
   this->Transpose = false;
-  this->HeaderColumnNumber = 0;
-  this->HeaderRowNumber = 0;
+
+  this->ColumnMetaDataTypeOfInterest = 0;
+  this->NumberOfColumnMetaDataTypes = 1;
+
+  this->RowMetaDataTypeOfInterest = 0;
+  this->NumberOfRowMetaDataTypes = 1;
+
   this->NumberOfRowsToPreview = 100;
   this->InlineUpdate = false;
 
@@ -253,26 +265,26 @@ void voDelimitedTextPreviewModel::setStringBeginEndCharacter(char _arg)
     }
 }
 
-// --------------------------------------------------------------------------
-bool voDelimitedTextPreviewModel::useFirstLineAsAttributeNames() const
-{
-  Q_D(const voDelimitedTextPreviewModel);
-  return d->UseFirstLineAsAttributeNames;
-}
+//// --------------------------------------------------------------------------
+//bool voDelimitedTextPreviewModel::useFirstLineAsAttributeNames() const
+//{
+//  Q_D(const voDelimitedTextPreviewModel);
+//  return d->UseFirstLineAsAttributeNames;
+//}
 
-// --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setUseFirstLineAsAttributeNames(bool _arg)
-{
-  Q_D(voDelimitedTextPreviewModel);
-  if (d->UseFirstLineAsAttributeNames != _arg)
-    {
-    d->UseFirstLineAsAttributeNames = _arg;
-    if (d->InlineUpdate)
-      {
-      this->updatePreview();
-      }
-    }
-}
+//// --------------------------------------------------------------------------
+//void voDelimitedTextPreviewModel::setUseFirstLineAsAttributeNames(bool _arg)
+//{
+//  Q_D(voDelimitedTextPreviewModel);
+//  if (d->UseFirstLineAsAttributeNames != _arg)
+//    {
+//    d->UseFirstLineAsAttributeNames = _arg;
+//    if (d->InlineUpdate)
+//      {
+//      this->updatePreview();
+//      }
+//    }
+//}
 
 // --------------------------------------------------------------------------
 bool voDelimitedTextPreviewModel::transpose() const
@@ -296,19 +308,19 @@ void voDelimitedTextPreviewModel::setTranspose(bool _arg)
 }
 
 // --------------------------------------------------------------------------
-int voDelimitedTextPreviewModel::headerColumnNumber() const
+int voDelimitedTextPreviewModel::numberOfColumnMetaDataTypes() const
 {
   Q_D(const voDelimitedTextPreviewModel);
-  return d->HeaderColumnNumber;
+  return d->NumberOfColumnMetaDataTypes;
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setHeaderColumnNumber(int _arg)
+void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->HeaderColumnNumber != _arg)
+  if (d->NumberOfColumnMetaDataTypes != _arg)
     {
-    d->HeaderColumnNumber = _arg;
+    d->NumberOfColumnMetaDataTypes = _arg;
     if (d->InlineUpdate)
       {
       this->updatePreview();
@@ -317,19 +329,19 @@ void voDelimitedTextPreviewModel::setHeaderColumnNumber(int _arg)
 }
 
 // --------------------------------------------------------------------------
-int voDelimitedTextPreviewModel::headerRowNumber() const
+int voDelimitedTextPreviewModel::numberOfRowMetaDataTypes() const
 {
   Q_D(const voDelimitedTextPreviewModel);
-  return d->HeaderRowNumber;
+  return d->NumberOfRowMetaDataTypes;
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setHeaderRowNumber(int _arg)
+void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->HeaderRowNumber != _arg)
+  if (d->NumberOfRowMetaDataTypes != _arg)
     {
-    d->HeaderRowNumber = _arg;
+    d->NumberOfRowMetaDataTypes = _arg;
     if (d->InlineUpdate)
       {
       this->updatePreview();
@@ -411,45 +423,81 @@ void voDelimitedTextPreviewModel::updatePreview()
   // Build model (self)
   this->clear();
 
-  for (vtkIdType r = 0; r < table->GetNumberOfRows(); r++)
+  int modelRowCount = table->GetNumberOfRows();
+  if (d->NumberOfColumnMetaDataTypes > 0)
     {
-    if (r == d->HeaderRowNumber)
+    modelRowCount--; // Consider the header data
+    }
+  this->setRowCount(modelRowCount);
+
+  int modelColumnCount = table->GetNumberOfColumns();
+  if (d->NumberOfRowMetaDataTypes > 0)
+    {
+    modelColumnCount--; // Consider the header data
+    }
+  this->setColumnCount(modelColumnCount);
+
+  for (vtkIdType cid = 0; cid < table->GetNumberOfColumns(); ++cid)
+    {
+    vtkStringArray * column = vtkStringArray::SafeDownCast(table->GetColumn(cid));
+    Q_ASSERT(column);
+    for (int rid = 0; rid < column->GetNumberOfValues(); ++rid)
       {
-      //qDebug() << "setHeaderData" << r << QString(table->GetValue(r, 0).ToString());
-      this->setHeaderData(static_cast<int>(r), Qt::Horizontal, QString(table->GetValue(r, 0).ToString()));
-      continue;
-      }
-    QList<QStandardItem *> itemsInRow;
-    vtkVariantArray *row = table->GetRow(r);
-    for (vtkIdType c = 0; c < table->GetNumberOfColumns(); c++)
-      {
-      // Not compatible with having named headers, will fix when we add metadata tables
-/*
-      if (c == d->HeaderColumnNumber)
+      QString value = QString(column->GetValue(rid));
+      int modelRowId = rid;
+      if (d->NumberOfColumnMetaDataTypes > 0)
         {
-        this->setHeaderData(static_cast<int>(r), Qt::Horizontal, QString(table->GetValue(r, c).ToString()));
+        modelRowId--; // Consider the header data
         }
-*/
-      if (r == d->HeaderRowNumber)
+      int modelColumnId = cid;
+      if (d->NumberOfRowMetaDataTypes > 0)
         {
-        this->setHeaderData(static_cast<int>(c), Qt::Vertical, QString(table->GetValue(r, c).ToString()));
+        modelColumnId--; // Consider the header data
+        }
+      QStandardItem* currentItem = 0;
+      QColor headerBackgroundColor = QPalette().color(QPalette::Window);
+      if (cid < d->NumberOfRowMetaDataTypes)
+        {
+        if (cid == d->RowMetaDataTypeOfInterest)
+          {
+          this->setHeaderData(modelRowId, Qt::Vertical, value);
+          }
+        else
+          {
+          this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
+          currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
+
+          // Update horizontal header
+          if (rid == d->ColumnMetaDataTypeOfInterest)
+            {
+            this->setHeaderData(modelColumnId, Qt::Horizontal, value);
+            }
+          }
         }
       else
         {
-        QStandardItem *textItem = new QStandardItem;
-        textItem->setText(row->GetValue(c).ToString().c_str());
-        itemsInRow.append(textItem);
+        if (rid < d->NumberOfColumnMetaDataTypes)
+          {
+          if (rid == d->ColumnMetaDataTypeOfInterest)
+            {
+            this->setHeaderData(modelColumnId, Qt::Horizontal, value);
+            }
+          else
+            {
+            this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
+            currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
+            }
+          }
+        else
+          {
+          this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
+          }
+        }
+      if(currentItem)
+        {
+        currentItem->setFlags(Qt::NoItemFlags | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         }
       }
-    this->appendRow(itemsInRow);
     }
-
-  // Should discontinue this in favor of metadata tables
-  QStringList headerLabels;
-  for (vtkIdType c = 0; c < table->GetNumberOfColumns(); ++c)
-    {
-    headerLabels << QString(table->GetColumnName(c));
-    }
-  this->setHorizontalHeaderLabels(headerLabels);
 }
 
