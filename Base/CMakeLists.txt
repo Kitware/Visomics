@@ -61,6 +61,9 @@ SET(KIT_SRCS
   voViewFactory.h
   voViewManager.cpp
   voViewManager.h
+
+  vtkExtendedTable.cpp
+  vtkExtendedTable.h
   )
   
 SET(KIT_MOC_SRCS
