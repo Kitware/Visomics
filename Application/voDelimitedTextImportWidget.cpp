@@ -9,6 +9,8 @@ class voDelimitedTextImportWidgetPrivate : public Ui_voDelimitedTextImportWidget
 public:
   voDelimitedTextImportWidgetPrivate();
 
+  void updateWidgetFromModel();
+
   voDelimitedTextPreviewModel DelimitedTextPreviewModel;
 };
 
@@ -18,6 +20,14 @@ public:
 // --------------------------------------------------------------------------
 voDelimitedTextImportWidgetPrivate::voDelimitedTextImportWidgetPrivate()
 {
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidgetPrivate::updateWidgetFromModel()
+{
+  this->TransposeCheckBox->setChecked(this->DelimitedTextPreviewModel.transpose());
+  this->NumberHeaderColumnsSpinBox->setValue(this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes());
+  this->NumberHeaderRowsSpinBox->setValue(this->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes());
 }
 
 // --------------------------------------------------------------------------
@@ -31,6 +41,19 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
   d->setupUi(this);
 
   d->DocumentPreviewWidget->setModel(&d->DelimitedTextPreviewModel);
+
+  d->updateWidgetFromModel();
+
+  // Widget -> Model connections
+  connect(d->TransposeCheckBox, SIGNAL(toggled(bool)),
+          &d->DelimitedTextPreviewModel, SLOT(setTranspose(bool)));
+
+  connect(d->NumberHeaderColumnsSpinBox, SIGNAL(valueChanged(int)),
+          &d->DelimitedTextPreviewModel, SLOT(setNumberOfRowMetaDataTypes(int)));
+
+  connect(d->NumberHeaderRowsSpinBox, SIGNAL(valueChanged(int)),
+          &d->DelimitedTextPreviewModel, SLOT(setNumberOfColumnMetaDataTypes(int)));
+
 }
 
 // --------------------------------------------------------------------------

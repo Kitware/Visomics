@@ -29,16 +29,12 @@ public:
   void setStringBeginEndCharacter(char _arg); // Value of 0 indicates none
 
 //  bool useFirstLineAsAttributeNames() const;
-//  void setUseFirstLineAsAttributeNames(bool _arg);
 
   bool transpose() const;
-  void setTranspose(bool _arg);
 
   int numberOfColumnMetaDataTypes() const;
-  void setNumberOfColumnMetaDataTypes(int _arg);
 
   int numberOfRowMetaDataTypes() const;
-  void setNumberOfRowMetaDataTypes(int _arg);
 
   int numberOfRowsToPreview() const;
   void setNumberOfRowsToPreview(int count);
@@ -47,6 +43,15 @@ public:
   void setInlineUpdate(bool _arg);
 
 public slots:
+
+//  void setUseFirstLineAsAttributeNames(bool _arg);
+
+  void setTranspose(bool _arg);
+
+  void setNumberOfColumnMetaDataTypes(int _arg);
+
+  void setNumberOfRowMetaDataTypes(int _arg);
+
   void updatePreview();
 
 private:

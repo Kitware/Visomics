@@ -73,7 +73,7 @@ voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimit
   this->NumberOfRowMetaDataTypes = 1;
 
   this->NumberOfRowsToPreview = 100;
-  this->InlineUpdate = false;
+  this->InlineUpdate = true;
 
   // If init() fails, SampleCacheFile will stay closed
   if (this->SampleCacheFile.isOpen())
