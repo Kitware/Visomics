@@ -40,8 +40,7 @@ public:
   bool Transpose;
   int HeaderColumnNumber;
   int HeaderRowNumber;
-  int PreviewColumnNumber; // Number of columns to skip
-  int PreviewRowNumber; // Number of rows to skip
+  int NumberOfRowsToPreview;
   bool InlineUpdate;
 
 private:
@@ -61,8 +60,7 @@ voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimit
   this->Transpose = false;
   this->HeaderColumnNumber = 0;
   this->HeaderRowNumber = 0;
-  this->PreviewColumnNumber = 0;
-  this->PreviewRowNumber = 0;
+  this->NumberOfRowsToPreview = 100;
   this->InlineUpdate = false;
 
   // If init() fails, SampleCacheFile will stay closed
@@ -75,6 +73,7 @@ voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimit
 // --------------------------------------------------------------------------
 void voDelimitedTextPreviewModelPrivate::loadFile()
 {
+  Q_ASSERT(QFile::exists(this->FileName));
   QFile infile(this->FileName);
   bool openStatus = infile.open(QIODevice::ReadOnly);
   if (!openStatus)
@@ -86,7 +85,7 @@ void voDelimitedTextPreviewModelPrivate::loadFile()
   // Read file
   QTextStream instream(&infile);
   QStringList sampleLinesList;
-  for (int i = 0; i < NUM_FILE_LINES_READ && !instream.atEnd(); i++)
+  for (int i = 0; i < this->NumberOfRowsToPreview && !instream.atEnd(); i++)
     {
     sampleLinesList << instream.readLine();
     }
@@ -201,16 +200,15 @@ void voDelimitedTextPreviewModel::setFileName(const QString& newFileName)
     return;
     }
 
-//  // Open real file
-//  if (newFileName.isEmpty())
-//    {
-//    qWarning("voDelimitedTextPreviewModel: No filename.  Cannot build file preview.");
-//    return;
-//    }
+  if (!QFile::exists(newFileName))
+    {
+    return;
+    }
 
   d->FileName = newFileName;
 
   d->loadFile();
+  this->updatePreview();
 }
 
 // --------------------------------------------------------------------------
@@ -340,45 +338,28 @@ void voDelimitedTextPreviewModel::setHeaderRowNumber(int _arg)
 }
 
 // --------------------------------------------------------------------------
-int voDelimitedTextPreviewModel::previewColumnNumber() const
+int voDelimitedTextPreviewModel::numberOfRowsToPreview() const
 {
   Q_D(const voDelimitedTextPreviewModel);
-  return d->PreviewColumnNumber;
+  return d->NumberOfRowsToPreview;
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setPreviewColumnNumber(int _arg)
+void voDelimitedTextPreviewModel::setNumberOfRowsToPreview(int count)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->PreviewColumnNumber != _arg)
+  if (d->NumberOfRowsToPreview == count)
     {
-    d->PreviewColumnNumber = _arg;
-    if (d->InlineUpdate)
-      {
-      this->updatePreview();
-      }
+    return;
     }
-}
+  d->NumberOfRowsToPreview = count;
 
-// --------------------------------------------------------------------------
-int voDelimitedTextPreviewModel::previewRowNumber() const
-{
-  Q_D(const voDelimitedTextPreviewModel);
-  return d->PreviewRowNumber;
-}
-
-// --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setPreviewRowNumber(int _arg)
-{
-  Q_D(voDelimitedTextPreviewModel);
-  if (d->PreviewRowNumber != _arg)
+  if (d->FileName.isEmpty())
     {
-    d->PreviewRowNumber = _arg;
-    if (d->InlineUpdate)
-      {
-      this->updatePreview();
-      }
+    return;
     }
+  d->loadFile();
+  this->updatePreview();
 }
 
 // --------------------------------------------------------------------------
@@ -407,9 +388,9 @@ void voDelimitedTextPreviewModel::updatePreview()
 {
   Q_D(voDelimitedTextPreviewModel);
 
-  if (d->SampleCacheFile.fileName()=="")
+  if (d->SampleCacheFile.fileName().isEmpty())
     {
-    qWarning() << QObject::tr("ERROR: updatePreview: SampleCacheFile filename not set");
+    //qWarning() << QObject::tr("ERROR: updatePreview: SampleCacheFile filename not set");
     return;
     }
 
@@ -430,16 +411,17 @@ void voDelimitedTextPreviewModel::updatePreview()
   // Build model (self)
   this->clear();
 
-  for (vtkIdType r = d->PreviewRowNumber; r < table->GetNumberOfRows(); r++)
+  for (vtkIdType r = 0; r < table->GetNumberOfRows(); r++)
     {
     if (r == d->HeaderRowNumber)
       {
+      //qDebug() << "setHeaderData" << r << QString(table->GetValue(r, 0).ToString());
       this->setHeaderData(static_cast<int>(r), Qt::Horizontal, QString(table->GetValue(r, 0).ToString()));
       continue;
       }
     QList<QStandardItem *> itemsInRow;
     vtkVariantArray *row = table->GetRow(r);
-    for (vtkIdType c = d->PreviewColumnNumber; c < table->GetNumberOfColumns(); c++)
+    for (vtkIdType c = 0; c < table->GetNumberOfColumns(); c++)
       {
       // Not compatible with having named headers, will fix when we add metadata tables
 /*
@@ -456,7 +438,7 @@ void voDelimitedTextPreviewModel::updatePreview()
         {
         QStandardItem *textItem = new QStandardItem;
         textItem->setText(row->GetValue(c).ToString().c_str());
-        itemsInRow.push_back(textItem);
+        itemsInRow.append(textItem);
         }
       }
     this->appendRow(itemsInRow);
@@ -464,7 +446,7 @@ void voDelimitedTextPreviewModel::updatePreview()
 
   // Should discontinue this in favor of metadata tables
   QStringList headerLabels;
-  for (vtkIdType c = d->PreviewColumnNumber; c < table->GetNumberOfColumns(); ++c)
+  for (vtkIdType c = 0; c < table->GetNumberOfColumns(); ++c)
     {
     headerLabels << QString(table->GetColumnName(c));
     }

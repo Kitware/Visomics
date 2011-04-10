@@ -8,10 +8,6 @@
 
 // Macros - TODO: find a way to import and include ctkPimpl.h
 
-// Defines
-#define NUM_FILE_LINES_READ 100
-
-
 class voDelimitedTextPreviewModelPrivate;
 
 class voDelimitedTextPreviewModel : public QStandardItemModel
@@ -44,11 +40,8 @@ public:
   int headerRowNumber() const;
   void setHeaderRowNumber(int _arg);
 
-  int previewColumnNumber() const; // Number of columns to skip
-  void setPreviewColumnNumber(int _arg);
-
-  int previewRowNumber() const; // Number of rows to skip
-  void setPreviewRowNumber(int _arg);
+  int numberOfRowsToPreview() const;
+  void setNumberOfRowsToPreview(int count);
 
   bool inlineUpdate() const;
   void setInlineUpdate(bool _arg);

@@ -43,6 +43,5 @@ void voDelimitedTextImportWidget::setFileName(const QString& fileName)
 {
   Q_D(voDelimitedTextImportWidget);
   d->DelimitedTextPreviewModel.setFileName(fileName);
-  d->DelimitedTextPreviewModel.updatePreview();
 }
 
