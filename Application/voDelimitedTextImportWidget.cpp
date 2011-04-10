@@ -56,11 +56,10 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
 
   // Model -> Widget connections
   connect(&d->DelimitedTextPreviewModel, SIGNAL(numberOfColumnMetaDataTypesChanged(int)),
-          d->NumberHeaderRowsSpinBox, SLOT(setValue(int)));
+          this, SLOT(onNumberOfColumnMetaDataTypesChanged(int)));
 
   connect(&d->DelimitedTextPreviewModel, SIGNAL(numberOfRowMetaDataTypesChanged(int)),
-          d->NumberHeaderColumnsSpinBox, SLOT(setValue(int)));
-
+          this, SLOT(onNumberOfRowMetaDataTypesChanged(int)));
 }
 
 // --------------------------------------------------------------------------
@@ -73,5 +72,21 @@ void voDelimitedTextImportWidget::setFileName(const QString& fileName)
 {
   Q_D(voDelimitedTextImportWidget);
   d->DelimitedTextPreviewModel.setFileName(fileName);
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidget::onNumberOfColumnMetaDataTypesChanged(int value)
+{
+  Q_D(voDelimitedTextImportWidget);
+  d->NumberHeaderRowsSpinBox->setValue(value);
+  d->DocumentPreviewWidget->horizontalHeader()->setVisible(value > 0);
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidget::onNumberOfRowMetaDataTypesChanged(int value)
+{
+  Q_D(voDelimitedTextImportWidget);
+  d->NumberHeaderColumnsSpinBox->setValue(value);
+  d->DocumentPreviewWidget->verticalHeader()->setVisible(value > 0);
 }
 

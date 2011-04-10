@@ -17,6 +17,10 @@ public:
 
   void setFileName(const QString& fileName);
 
+protected slots:
+  void onNumberOfColumnMetaDataTypesChanged(int value);
+  void onNumberOfRowMetaDataTypesChanged(int value);
+
 protected:
   QScopedPointer<voDelimitedTextImportWidgetPrivate> d_ptr;
 

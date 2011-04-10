@@ -312,11 +312,13 @@ void voDelimitedTextPreviewModel::setTranspose(bool value)
   d->NumberOfColumnMetaDataTypes = d->NumberOfRowMetaDataTypes;
   d->NumberOfRowMetaDataTypes = currentNumberOfColumnMetaDataTypes;
 
+  // Do not call 'setNumberOfColumnMetaDataTypes()' to avoid extra call to 'updatePreview()'
   if (currentNumberOfColumnMetaDataTypes != d->NumberOfColumnMetaDataTypes)
     {
     emit this->numberOfColumnMetaDataTypesChanged(d->NumberOfColumnMetaDataTypes);
     }
 
+  // Do not call 'setNumberOfRowMetaDataTypes()' to avoid extra call to 'updatePreview()'
   if (currentNumberOfRowMetaDataTypes != d->NumberOfRowMetaDataTypes)
     {
     emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
@@ -339,13 +341,21 @@ int voDelimitedTextPreviewModel::numberOfColumnMetaDataTypes() const
 void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->NumberOfColumnMetaDataTypes != _arg)
+  if (d->NumberOfColumnMetaDataTypes == _arg)
     {
-    d->NumberOfColumnMetaDataTypes = _arg;
-    if (d->InlineUpdate)
-      {
-      this->updatePreview();
-      }
+    return;
+    }
+  int oldValue = d->NumberOfColumnMetaDataTypes;
+  d->NumberOfColumnMetaDataTypes = _arg;
+
+  if (d->InlineUpdate)
+    {
+    this->updatePreview();
+    }
+
+  if (oldValue != d->NumberOfColumnMetaDataTypes)
+    {
+    emit this->numberOfColumnMetaDataTypesChanged(d->NumberOfColumnMetaDataTypes);
     }
 }
 
@@ -360,13 +370,21 @@ int voDelimitedTextPreviewModel::numberOfRowMetaDataTypes() const
 void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int _arg)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->NumberOfRowMetaDataTypes != _arg)
+  if (d->NumberOfRowMetaDataTypes == _arg)
     {
-    d->NumberOfRowMetaDataTypes = _arg;
-    if (d->InlineUpdate)
-      {
-      this->updatePreview();
-      }
+    return;
+    }
+  int oldValue = d->NumberOfRowMetaDataTypes;
+  d->NumberOfRowMetaDataTypes = _arg;
+
+  if (d->InlineUpdate)
+    {
+    this->updatePreview();
+    }
+
+  if (oldValue != d->NumberOfRowMetaDataTypes)
+    {
+    emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
     }
 }
 
