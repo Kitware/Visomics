@@ -29,6 +29,8 @@ public:
 
   void configureReader(vtkDelimitedTextReader * reader);
 
+  static void transposeTable(vtkTable* table);
+
   QTemporaryFile SampleCacheFile;
 
   QString FileName;
@@ -137,6 +139,35 @@ void voDelimitedTextPreviewModelPrivate::configureReader(vtkDelimitedTextReader 
     }
 
   reader->SetHaveHeaders(this->UseFirstLineAsAttributeNames);
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextPreviewModelPrivate::transposeTable(vtkTable* table)
+{
+  Q_ASSERT(table);
+
+  vtkNew<vtkTable> transposeTable;
+
+  vtkNew<vtkStringArray> header;
+  header->SetName("header");
+  header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
+  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
+    {
+    header->SetValue(c-1, table->GetColumnName(c));
+    }
+  transposeTable->AddColumn(header.GetPointer());
+  for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
+    {
+    vtkNew<vtkStringArray> newcol;
+    newcol->SetName(table->GetValue(r, 0).ToString().c_str());
+    newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
+    for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
+      {
+      newcol->SetValue(c-1, table->GetValue(r, c).ToString());
+      }
+    transposeTable->AddColumn(newcol.GetPointer());
+    }
+  table->DeepCopy(transposeTable.GetPointer());
 }
 
 // --------------------------------------------------------------------------
@@ -390,30 +421,10 @@ void voDelimitedTextPreviewModel::updatePreview()
   previewReader->Update();
   vtkSmartPointer<vtkTable> table = previewReader->GetOutput();
 
-  if (d->Transpose) // Assumes there is a header column ... which we have no setting to specify for anyway
+  if (d->Transpose)
     {
-    vtkNew<vtkTable> transposeTable;
-
-    vtkNew<vtkStringArray> header;
-    header->SetName("header");
-    header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
-    for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-      {
-      header->SetValue(c-1, table->GetColumnName(c));
-      }
-    transposeTable->AddColumn(header.GetPointer());
-    for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
-      {
-      vtkNew<vtkStringArray> newcol;
-      newcol->SetName(table->GetValue(r, 0).ToString().c_str());
-      newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
-      for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-        {
-        newcol->SetValue(c-1, table->GetValue(r, c).ToString());
-        }
-      transposeTable->AddColumn(newcol.GetPointer());
-      }
-    table = transposeTable.GetPointer();
+    // Assumes there is a header column ... which we have no setting to specify for anyway
+    voDelimitedTextPreviewModelPrivate::transposeTable(table);
     }
 
   // Build model (self)
