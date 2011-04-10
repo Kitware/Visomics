@@ -54,6 +54,13 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
   connect(d->NumberHeaderRowsSpinBox, SIGNAL(valueChanged(int)),
           &d->DelimitedTextPreviewModel, SLOT(setNumberOfColumnMetaDataTypes(int)));
 
+  // Model -> Widget connections
+  connect(&d->DelimitedTextPreviewModel, SIGNAL(numberOfColumnMetaDataTypesChanged(int)),
+          d->NumberHeaderRowsSpinBox, SLOT(setValue(int)));
+
+  connect(&d->DelimitedTextPreviewModel, SIGNAL(numberOfRowMetaDataTypesChanged(int)),
+          d->NumberHeaderColumnsSpinBox, SLOT(setValue(int)));
+
 }
 
 // --------------------------------------------------------------------------

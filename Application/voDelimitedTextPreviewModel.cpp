@@ -297,16 +297,34 @@ bool voDelimitedTextPreviewModel::transpose() const
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setTranspose(bool _arg)
+void voDelimitedTextPreviewModel::setTranspose(bool value)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->Transpose != _arg)
+  if (d->Transpose == value)
     {
-    d->Transpose = _arg;
-    if (d->InlineUpdate)
-      {
-      this->updatePreview();
-      }
+    return;
+    }
+  d->Transpose = value;
+
+  // Switch row and column metdata type numbers
+  int currentNumberOfColumnMetaDataTypes = d->NumberOfColumnMetaDataTypes;
+  int currentNumberOfRowMetaDataTypes = d->NumberOfRowMetaDataTypes;
+  d->NumberOfColumnMetaDataTypes = d->NumberOfRowMetaDataTypes;
+  d->NumberOfRowMetaDataTypes = currentNumberOfColumnMetaDataTypes;
+
+  if (currentNumberOfColumnMetaDataTypes != d->NumberOfColumnMetaDataTypes)
+    {
+    emit this->numberOfColumnMetaDataTypesChanged(d->NumberOfColumnMetaDataTypes);
+    }
+
+  if (currentNumberOfRowMetaDataTypes != d->NumberOfRowMetaDataTypes)
+    {
+    emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
+    }
+
+  if (d->InlineUpdate)
+    {
+    this->updatePreview();
     }
 }
 

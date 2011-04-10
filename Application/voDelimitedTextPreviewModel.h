@@ -54,6 +54,10 @@ public slots:
 
   void updatePreview();
 
+signals:
+  void numberOfColumnMetaDataTypesChanged(int value);
+  void numberOfRowMetaDataTypesChanged(int value);
+
 private:
   QScopedPointer<voDelimitedTextPreviewModelPrivate> d_ptr;
 
