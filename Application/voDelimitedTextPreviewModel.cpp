@@ -225,6 +225,8 @@ void voDelimitedTextPreviewModel::setFileName(const QString& newFileName)
 
   d->loadFile();
   this->updatePreview();
+
+  emit this->fileNameChanged(newFileName);
 }
 
 // --------------------------------------------------------------------------
@@ -248,6 +250,8 @@ void voDelimitedTextPreviewModel::setFieldDelimiter(char delimiter)
     {
     this->updatePreview();
     }
+
+  emit this->fieldDelimiterChanged(delimiter);
 }
 
 // --------------------------------------------------------------------------
@@ -270,6 +274,7 @@ void voDelimitedTextPreviewModel::setStringDelimiter(char character)
     {
     this->updatePreview();
     }
+  emit this->stringDelimiterChanged(character);
 }
 
 //// --------------------------------------------------------------------------
@@ -332,6 +337,8 @@ void voDelimitedTextPreviewModel::setTranspose(bool value)
     {
     this->updatePreview();
     }
+
+  emit this->transposeChanged(value);
 }
 
 // --------------------------------------------------------------------------
@@ -349,7 +356,6 @@ void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int _arg)
     {
     return;
     }
-  int oldValue = d->NumberOfColumnMetaDataTypes;
   d->NumberOfColumnMetaDataTypes = _arg;
 
   if (d->InlineUpdate)
@@ -357,10 +363,7 @@ void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int _arg)
     this->updatePreview();
     }
 
-  if (oldValue != d->NumberOfColumnMetaDataTypes)
-    {
-    emit this->numberOfColumnMetaDataTypesChanged(d->NumberOfColumnMetaDataTypes);
-    }
+  emit this->numberOfColumnMetaDataTypesChanged(d->NumberOfColumnMetaDataTypes);
 }
 
 // --------------------------------------------------------------------------
@@ -378,7 +381,6 @@ void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int _arg)
     {
     return;
     }
-  int oldValue = d->NumberOfRowMetaDataTypes;
   d->NumberOfRowMetaDataTypes = _arg;
 
   if (d->InlineUpdate)
@@ -386,10 +388,7 @@ void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int _arg)
     this->updatePreview();
     }
 
-  if (oldValue != d->NumberOfRowMetaDataTypes)
-    {
-    emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
-    }
+  emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
 }
 
 // --------------------------------------------------------------------------
@@ -415,6 +414,8 @@ void voDelimitedTextPreviewModel::setNumberOfRowsToPreview(int count)
     }
   d->loadFile();
   this->updatePreview();
+
+  emit this->numberOfRowsToPreviewChanged(count);
 }
 
 // --------------------------------------------------------------------------
@@ -425,17 +426,20 @@ bool voDelimitedTextPreviewModel::inlineUpdate() const
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setInlineUpdate(bool _arg)
+void voDelimitedTextPreviewModel::setInlineUpdate(bool value)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->InlineUpdate != _arg)
+  if (d->InlineUpdate != value)
     {
-    d->InlineUpdate = _arg;
-    if (d->InlineUpdate)
-      {
-      this->updatePreview();
-      }
+    return;
     }
+  d->InlineUpdate = value;
+  if (d->InlineUpdate)
+    {
+    this->updatePreview();
+    }
+
+  emit this->inlineUpdateChanged(value);
 }
 
 // --------------------------------------------------------------------------

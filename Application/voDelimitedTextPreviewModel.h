@@ -40,7 +40,7 @@ public:
   void setNumberOfRowsToPreview(int count);
 
   bool inlineUpdate() const;
-  void setInlineUpdate(bool _arg);
+  void setInlineUpdate(bool value);
 
 public slots:
 
@@ -55,8 +55,21 @@ public slots:
   void updatePreview();
 
 signals:
+  void fileNameChanged(const QString& filename);
+
+  void fieldDelimiterChanged(char delimiter);
+
+  void inlineUpdateChanged(bool value);
+
   void numberOfColumnMetaDataTypesChanged(int value);
+
   void numberOfRowMetaDataTypesChanged(int value);
+
+  void numberOfRowsToPreviewChanged(int count);
+
+  void stringDelimiterChanged(char character);
+
+  void transposeChanged(bool transpose);
 
 private:
   QScopedPointer<voDelimitedTextPreviewModelPrivate> d_ptr;
