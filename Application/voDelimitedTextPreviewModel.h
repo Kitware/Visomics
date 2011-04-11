@@ -23,7 +23,7 @@ public:
   void setFileName(const QString& newFileName);
 
   char fieldDelimiter() const;
-  void setFieldDelimiter (char _arg);
+  void setFieldDelimiter(char delimiter);
 
   char stringBeginEndCharacter() const;
   void setStringBeginEndCharacter(char _arg); // Value of 0 indicates none

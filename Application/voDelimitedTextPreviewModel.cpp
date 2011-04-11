@@ -126,9 +126,10 @@ void voDelimitedTextPreviewModelPrivate::configureReader(vtkDelimitedTextReader 
 
   char delim_string[2];
   delim_string[0] = this->FieldDelimiter;
-  delim_string[1] = 0;
-  vtkUnicodeString delimiters = vtkUnicodeString::from_utf8(delim_string);
-  reader->SetUnicodeFieldDelimiters(delimiters);
+  delim_string[1] = '\0';
+  //vtkUnicodeString delimiters = vtkUnicodeString::from_utf8(delim_string);
+  //reader->SetUnicodeFieldDelimiters(delimiters);
+  reader->SetFieldDelimiterCharacters(delim_string);
 
   if (this->FieldDelimiter == ' ' || this->FieldDelimiter == '\t')
     {
@@ -234,16 +235,18 @@ char voDelimitedTextPreviewModel::fieldDelimiter() const
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setFieldDelimiter (char _arg)
+void voDelimitedTextPreviewModel::setFieldDelimiter(char delimiter)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->FieldDelimiter != _arg)
+  if (d->FieldDelimiter == delimiter)
     {
-    d->FieldDelimiter = _arg;
-    if (d->InlineUpdate)
-      {
-      this->updatePreview();
-      }
+    return;
+    }
+  d->FieldDelimiter = delimiter;
+
+  if (d->InlineUpdate)
+    {
+    this->updatePreview();
     }
 }
 
