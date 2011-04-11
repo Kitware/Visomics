@@ -15,6 +15,8 @@ public:
   voDelimitedTextImportWidget(QWidget* newParent = 0);
   virtual ~voDelimitedTextImportWidget();
 
+public slots:
+
   void setFileName(const QString& fileName);
 
 protected slots:
