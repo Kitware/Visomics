@@ -5,7 +5,7 @@
 #include <QHash>
 #include <QString>
 
-class voDelimitedTextImportSettings : QHash<int, QVariant>
+class voDelimitedTextImportSettings : public QHash<int, QVariant>
 {
 public:
   typedef voDelimitedTextImportSettings Self;
