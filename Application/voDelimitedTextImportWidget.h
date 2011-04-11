@@ -21,6 +21,9 @@ protected slots:
   void onNumberOfColumnMetaDataTypesChanged(int value);
   void onNumberOfRowMetaDataTypesChanged(int value);
 
+  void onDelimiterChanged(int delimiter);
+  void onOtherDelimiterLineEditChanged(const QString& text);
+
 protected:
   QScopedPointer<voDelimitedTextImportWidgetPrivate> d_ptr;
 

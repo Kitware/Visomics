@@ -11,6 +11,7 @@ public:
 
   void updateWidgetFromModel();
 
+  QButtonGroup DelimiterButtonGroup;
   voDelimitedTextPreviewModel DelimitedTextPreviewModel;
 };
 
@@ -43,6 +44,16 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
   d->DocumentPreviewWidget->setModel(&d->DelimitedTextPreviewModel);
 
   d->updateWidgetFromModel();
+
+  d->DelimiterButtonGroup.addButton(d->CommaRadioButton, ',');
+  d->DelimiterButtonGroup.addButton(d->SemicolonRadioButton, ';');
+  d->DelimiterButtonGroup.addButton(d->TabRadioButton, '\t');
+  d->DelimiterButtonGroup.addButton(d->SpaceRadioButton, ' ');
+  d->DelimiterButtonGroup.addButton(d->OtherRadioButton, 'x');
+
+  // Delimiter connections
+  connect(&d->DelimiterButtonGroup, SIGNAL(buttonClicked(int)),
+          this, SLOT(onDelimiterChanged(int)));
 
   // Widget -> Model connections
   connect(d->TransposeCheckBox, SIGNAL(toggled(bool)),
@@ -88,5 +99,42 @@ void voDelimitedTextImportWidget::onNumberOfRowMetaDataTypesChanged(int value)
   Q_D(voDelimitedTextImportWidget);
   d->NumberHeaderColumnsSpinBox->setValue(value);
   d->DocumentPreviewWidget->verticalHeader()->setVisible(value > 0);
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidget::onDelimiterChanged(int delimiter)
+{
+  Q_D(voDelimitedTextImportWidget);
+  if (delimiter == 'x')
+    { // Special case triggered by OtherRadioButton
+    QString text = d->OtherLineEdit->text();
+
+    connect(d->OtherLineEdit, SIGNAL(textChanged(const QString&)),
+            this, SLOT(onOtherDelimiterLineEditChanged(const QString&)));
+
+    if (text.isEmpty())
+      {
+      return;
+      }
+    delimiter = text.at(0).toLatin1();
+    }
+  else
+    {
+    disconnect(d->OtherLineEdit, SIGNAL(textChanged(const QString&)),
+               this, SLOT(onOtherDelimiterLineEditChanged(const QString&)));
+    }
+  d->DelimitedTextPreviewModel.setFieldDelimiter(delimiter);
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidget::onOtherDelimiterLineEditChanged(const QString& text)
+{
+  Q_D(voDelimitedTextImportWidget);
+  if (text.isEmpty())
+    {
+    return;
+    }
+  char delimiter = d->OtherLineEdit->text().at(0).toLatin1();
+  d->DelimitedTextPreviewModel.setFieldDelimiter(delimiter);
 }
 
