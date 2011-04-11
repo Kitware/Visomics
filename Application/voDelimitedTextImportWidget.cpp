@@ -16,7 +16,7 @@ public:
 };
 
 // --------------------------------------------------------------------------
-// voDelimitedTextImportWidgetPrivatePrivate methods
+// voDelimitedTextImportWidgetPrivate methods
 
 // --------------------------------------------------------------------------
 voDelimitedTextImportWidgetPrivate::voDelimitedTextImportWidgetPrivate()
@@ -80,6 +80,38 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
 // --------------------------------------------------------------------------
 voDelimitedTextImportWidget::~voDelimitedTextImportWidget()
 {
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidget::insertWidget(QWidget * widget, InsertWidgetLocation location)
+{
+  Q_D(voDelimitedTextImportWidget);
+  if (!widget)
+    {
+    return;
+    }
+  int index = -1;
+  if (location == Self::DelimiterGroupBox)
+    {
+    index = d->MainVerticalLayout->indexOf(d->DelimiterGroupBox);
+    }
+  else if (location == Self::RowsAndColumnsGroupBox)
+    {
+    index = d->MainVerticalLayout->indexOf(d->RowsColumnsGroupBox);
+    }
+  else if (location == Self::DocumentPreviewGroupBox)
+    {
+    index = d->MainVerticalLayout->indexOf(d->DocumentPreviewGroupBox);
+    }
+  Q_ASSERT(index != -1);
+  d->MainVerticalLayout->insertWidget(index, widget);
+}
+
+// --------------------------------------------------------------------------
+voDelimitedTextPreviewModel* voDelimitedTextImportWidget::delimitedTextPreviewModel()
+{
+  Q_D(voDelimitedTextImportWidget);
+  return &d->DelimitedTextPreviewModel;
 }
 
 // --------------------------------------------------------------------------

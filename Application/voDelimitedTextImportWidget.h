@@ -5,15 +5,29 @@
 // Qt includes
 #include <QWidget>
 
+class voDelimitedTextPreviewModel;
 class voDelimitedTextImportWidgetPrivate;
 
 class voDelimitedTextImportWidget : public QWidget
 {
   Q_OBJECT
 public:
+  typedef voDelimitedTextImportWidget Self;
   typedef QWidget Superclass;
+
   voDelimitedTextImportWidget(QWidget* newParent = 0);
   virtual ~voDelimitedTextImportWidget();
+
+  enum InsertWidgetLocation
+    {
+    DelimiterGroupBox = 0,
+    RowsAndColumnsGroupBox,
+    DocumentPreviewGroupBox,
+    };
+
+  void insertWidget(QWidget * widget, InsertWidgetLocation location);
+
+  voDelimitedTextPreviewModel* delimitedTextPreviewModel();
 
 public slots:
 
