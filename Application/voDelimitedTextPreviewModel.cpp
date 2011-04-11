@@ -37,6 +37,7 @@ public:
   QString FileName;
   char FieldDelimiter;
   char StringDelimiter; // Value of 0 indicates none
+  bool MergeConsecutiveDelimiters;
   bool UseFirstLineAsAttributeNames;
   bool Transpose;
 
@@ -63,6 +64,7 @@ voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimit
 {
   this->FieldDelimiter = ',';
   this->StringDelimiter = '\"';
+  this->MergeConsecutiveDelimiters = false;
   this->UseFirstLineAsAttributeNames = false;
   this->Transpose = false;
 
@@ -131,14 +133,8 @@ void voDelimitedTextPreviewModelPrivate::configureReader(vtkDelimitedTextReader 
   //reader->SetUnicodeFieldDelimiters(delimiters);
   reader->SetFieldDelimiterCharacters(delim_string);
 
-  if (this->FieldDelimiter == ' ' || this->FieldDelimiter == '\t')
-    {
-    reader->SetMergeConsecutiveDelimiters(true);
-    }
-  else
-    {
-    reader->SetMergeConsecutiveDelimiters(false);
-    }
+  this->MergeConsecutiveDelimiters = (this->FieldDelimiter == ' ' || this->FieldDelimiter == '\t');
+  reader->SetMergeConsecutiveDelimiters(this->MergeConsecutiveDelimiters);
 
   if (this->StringDelimiter) // Value of 0 indicates none
     {
@@ -423,6 +419,27 @@ bool voDelimitedTextPreviewModel::inlineUpdate() const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->InlineUpdate;
+}
+
+// --------------------------------------------------------------------------
+bool voDelimitedTextPreviewModel::mergeConsecutiveDelimiters()const
+{
+  Q_D(const voDelimitedTextPreviewModel);
+  return d->MergeConsecutiveDelimiters;
+}
+
+// --------------------------------------------------------------------------
+bool voDelimitedTextPreviewModel::useStringDelimiter()const
+{
+  Q_D(const voDelimitedTextPreviewModel);
+  return d->StringDelimiter; // Value of 0 indicates None
+}
+
+// --------------------------------------------------------------------------
+bool voDelimitedTextPreviewModel::haveHeaders()const
+{
+  Q_D(const voDelimitedTextPreviewModel);
+  return d->UseFirstLineAsAttributeNames;
 }
 
 // --------------------------------------------------------------------------

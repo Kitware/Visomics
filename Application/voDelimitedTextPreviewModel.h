@@ -39,6 +39,12 @@ public:
 
   bool inlineUpdate() const;
 
+  bool mergeConsecutiveDelimiters()const;
+
+  bool useStringDelimiter()const;
+
+  bool haveHeaders()const;
+
 public slots:
 
   void setFileName(const QString& newFileName);
