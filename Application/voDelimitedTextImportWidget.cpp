@@ -55,6 +55,10 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
   connect(&d->DelimiterButtonGroup, SIGNAL(buttonClicked(int)),
           this, SLOT(onDelimiterChanged(int)));
 
+  // StringBeginEndCharacter connection
+  connect(d->StringBeginEndCharCheckBox, SIGNAL(toggled(bool)),
+          this, SLOT(onStringBeginEndCharacterEnabled(bool)));
+
   // Widget -> Model connections
   connect(d->TransposeCheckBox, SIGNAL(toggled(bool)),
           &d->DelimitedTextPreviewModel, SLOT(setTranspose(bool)));
@@ -138,3 +142,40 @@ void voDelimitedTextImportWidget::onOtherDelimiterLineEditChanged(const QString&
   d->DelimitedTextPreviewModel.setFieldDelimiter(delimiter);
 }
 
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidget::onStringBeginEndCharacterEnabled(bool value)
+{
+  Q_D(voDelimitedTextImportWidget);
+  char character = 0;
+  if (value)
+    {
+    QString text = d->StringBeginEndCharLineEdit->text();
+
+    connect(d->StringBeginEndCharLineEdit, SIGNAL(textChanged(const QString&)),
+            this, SLOT(onStringBeginEndCharacterLineEditChanged(const QString&)));
+
+    if (text.isEmpty())
+      {
+      return;
+      }
+    character = text.at(0).toLatin1();
+    }
+  else
+    {
+    disconnect(d->StringBeginEndCharLineEdit, SIGNAL(textChanged(const QString&)),
+               this, SLOT(onStringBeginEndCharacterLineEditChanged(const QString&)));
+    }
+  d->DelimitedTextPreviewModel.setStringBeginEndCharacter(character);
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidget::onStringBeginEndCharacterLineEditChanged(const QString& text)
+{
+  Q_D(voDelimitedTextImportWidget);
+  if (text.isEmpty())
+    {
+    return;
+    }
+  char character = d->StringBeginEndCharLineEdit->text().at(0).toLatin1();
+  d->DelimitedTextPreviewModel.setStringBeginEndCharacter(character);
+}

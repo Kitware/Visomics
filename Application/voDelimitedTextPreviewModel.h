@@ -26,7 +26,7 @@ public:
   void setFieldDelimiter(char delimiter);
 
   char stringBeginEndCharacter() const;
-  void setStringBeginEndCharacter(char _arg); // Value of 0 indicates none
+  void setStringBeginEndCharacter(char character); // Value of 0 indicates none
 
 //  bool useFirstLineAsAttributeNames() const;
 

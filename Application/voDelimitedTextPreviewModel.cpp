@@ -258,16 +258,17 @@ char voDelimitedTextPreviewModel::stringBeginEndCharacter() const
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setStringBeginEndCharacter(char _arg)
+void voDelimitedTextPreviewModel::setStringBeginEndCharacter(char character)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->StringBeginEndCharacter != _arg)
+  if (d->StringBeginEndCharacter == character)
     {
-    d->StringBeginEndCharacter = _arg;
-    if (d->InlineUpdate)
-      {
-      this->updatePreview();
-      }
+    return;
+    }
+  d->StringBeginEndCharacter = character;
+  if (d->InlineUpdate)
+    {
+    this->updatePreview();
     }
 }
 
