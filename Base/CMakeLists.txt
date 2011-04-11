@@ -46,6 +46,8 @@ SET(KIT_SRCS
   voDataModelItem.h
   voDataObject.cpp
   voDataObject.h
+  voDelimitedTextImportSettings.cpp
+  voDelimitedTextImportSettings.h
   voInputFileDataObject.cpp
   voInputFileDataObject.h
   voIOManager.cpp
