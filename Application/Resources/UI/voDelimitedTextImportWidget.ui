@@ -45,6 +45,9 @@
             <property name="text">
              <string>&amp;Comma</string>
             </property>
+            <property name="checked">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item row="0" column="3">
@@ -74,7 +77,7 @@
              <string>&amp;Other</string>
             </property>
             <property name="checked">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
