@@ -36,7 +36,7 @@ public:
 
   QString FileName;
   char FieldDelimiter;
-  char StringBeginEndCharacter; // Value of 0 indicates none
+  char StringDelimiter; // Value of 0 indicates none
   bool UseFirstLineAsAttributeNames;
   bool Transpose;
 
@@ -62,7 +62,7 @@ voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimit
   : q_ptr(&object)
 {
   this->FieldDelimiter = ',';
-  this->StringBeginEndCharacter = '\"';
+  this->StringDelimiter = '\"';
   this->UseFirstLineAsAttributeNames = false;
   this->Transpose = false;
 
@@ -140,9 +140,9 @@ void voDelimitedTextPreviewModelPrivate::configureReader(vtkDelimitedTextReader 
     reader->SetMergeConsecutiveDelimiters(false);
     }
 
-  if (this->StringBeginEndCharacter) // Value of 0 indicates none
+  if (this->StringDelimiter) // Value of 0 indicates none
     {
-    reader->SetStringDelimiter(this->StringBeginEndCharacter);
+    reader->SetStringDelimiter(this->StringDelimiter);
     reader->SetUseStringDelimiter(true);
     }
   else
@@ -251,21 +251,21 @@ void voDelimitedTextPreviewModel::setFieldDelimiter(char delimiter)
 }
 
 // --------------------------------------------------------------------------
-char voDelimitedTextPreviewModel::stringBeginEndCharacter() const
+char voDelimitedTextPreviewModel::stringDelimiter() const
 {
   Q_D(const voDelimitedTextPreviewModel);
-  return d->StringBeginEndCharacter;
+  return d->StringDelimiter;
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setStringBeginEndCharacter(char character)
+void voDelimitedTextPreviewModel::setStringDelimiter(char character)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->StringBeginEndCharacter == character)
+  if (d->StringDelimiter == character)
     {
     return;
     }
-  d->StringBeginEndCharacter = character;
+  d->StringDelimiter = character;
   if (d->InlineUpdate)
     {
     this->updatePreview();

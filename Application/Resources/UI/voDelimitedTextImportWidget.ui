@@ -92,7 +92,7 @@
            </widget>
           </item>
           <item row="3" column="0" colspan="2">
-           <widget class="QCheckBox" name="StringBeginEndCharCheckBox">
+           <widget class="QCheckBox" name="StringDelimiterCheckBox">
             <property name="text">
              <string>&amp;String begin/end character</string>
             </property>
@@ -102,7 +102,7 @@
            </widget>
           </item>
           <item row="3" column="2">
-           <widget class="QLineEdit" name="StringBeginEndCharLineEdit">
+           <widget class="QLineEdit" name="StringDelimiterLineEdit">
             <property name="text">
              <string>&quot;</string>
             </property>
@@ -265,9 +265,9 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>StringBeginEndCharCheckBox</sender>
+   <sender>StringDelimiterCheckBox</sender>
    <signal>clicked()</signal>
-   <receiver>StringBeginEndCharLineEdit</receiver>
+   <receiver>StringDelimiterLineEdit</receiver>
    <slot>setFocus()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -281,9 +281,9 @@ p, li { white-space: pre-wrap; }
    </hints>
   </connection>
   <connection>
-   <sender>StringBeginEndCharCheckBox</sender>
+   <sender>StringDelimiterCheckBox</sender>
    <signal>clicked()</signal>
-   <receiver>StringBeginEndCharLineEdit</receiver>
+   <receiver>StringDelimiterLineEdit</receiver>
    <slot>selectAll()</slot>
    <hints>
     <hint type="sourcelabel">

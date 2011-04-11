@@ -24,8 +24,8 @@ protected slots:
   void onDelimiterChanged(int delimiter);
   void onOtherDelimiterLineEditChanged(const QString& text);
 
-  void onStringBeginEndCharacterEnabled(bool value);
-  void onStringBeginEndCharacterLineEditChanged(const QString& text);
+  void onStringDelimiterEnabled(bool value);
+  void onStringDelimiterLineEditChanged(const QString& text);
 
 protected:
   QScopedPointer<voDelimitedTextImportWidgetPrivate> d_ptr;

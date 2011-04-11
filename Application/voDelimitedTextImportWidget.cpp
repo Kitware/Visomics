@@ -56,8 +56,8 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
           this, SLOT(onDelimiterChanged(int)));
 
   // StringBeginEndCharacter connection
-  connect(d->StringBeginEndCharCheckBox, SIGNAL(toggled(bool)),
-          this, SLOT(onStringBeginEndCharacterEnabled(bool)));
+  connect(d->StringDelimiterCheckBox, SIGNAL(toggled(bool)),
+          this, SLOT(onStringDelimiterEnabled(bool)));
 
   // Widget -> Model connections
   connect(d->TransposeCheckBox, SIGNAL(toggled(bool)),
@@ -143,16 +143,16 @@ void voDelimitedTextImportWidget::onOtherDelimiterLineEditChanged(const QString&
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextImportWidget::onStringBeginEndCharacterEnabled(bool value)
+void voDelimitedTextImportWidget::onStringDelimiterEnabled(bool value)
 {
   Q_D(voDelimitedTextImportWidget);
   char character = 0;
   if (value)
     {
-    QString text = d->StringBeginEndCharLineEdit->text();
+    QString text = d->StringDelimiterLineEdit->text();
 
-    connect(d->StringBeginEndCharLineEdit, SIGNAL(textChanged(const QString&)),
-            this, SLOT(onStringBeginEndCharacterLineEditChanged(const QString&)));
+    connect(d->StringDelimiterLineEdit, SIGNAL(textChanged(const QString&)),
+            this, SLOT(onStringDelimiterLineEditChanged(const QString&)));
 
     if (text.isEmpty())
       {
@@ -162,20 +162,20 @@ void voDelimitedTextImportWidget::onStringBeginEndCharacterEnabled(bool value)
     }
   else
     {
-    disconnect(d->StringBeginEndCharLineEdit, SIGNAL(textChanged(const QString&)),
-               this, SLOT(onStringBeginEndCharacterLineEditChanged(const QString&)));
+    disconnect(d->StringDelimiterLineEdit, SIGNAL(textChanged(const QString&)),
+               this, SLOT(onStringDelimiterLineEditChanged(const QString&)));
     }
-  d->DelimitedTextPreviewModel.setStringBeginEndCharacter(character);
+  d->DelimitedTextPreviewModel.setStringDelimiter(character);
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextImportWidget::onStringBeginEndCharacterLineEditChanged(const QString& text)
+void voDelimitedTextImportWidget::onStringDelimiterLineEditChanged(const QString& text)
 {
   Q_D(voDelimitedTextImportWidget);
   if (text.isEmpty())
     {
     return;
     }
-  char character = d->StringBeginEndCharLineEdit->text().at(0).toLatin1();
-  d->DelimitedTextPreviewModel.setStringBeginEndCharacter(character);
+  char character = d->StringDelimiterLineEdit->text().at(0).toLatin1();
+  d->DelimitedTextPreviewModel.setStringDelimiter(character);
 }
