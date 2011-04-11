@@ -8,6 +8,8 @@ SET(KIT_SRCS
   voAnalysisParameterEditorWidget.h
   voDataBrowserWidget.cpp
   voDataBrowserWidget.h
+  voDelimitedTextImportDialog.cpp
+  voDelimitedTextImportDialog.h
   voDelimitedTextImportWidget.cpp
   voDelimitedTextImportWidget.h
   voDelimitedTextPreview.cpp
@@ -26,6 +28,7 @@ SET(KIT_MOC_SRCS
   voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.h
   voDataBrowserWidget.h
+  voDelimitedTextImportDialog.h
   voDelimitedTextImportWidget.h
   voDelimitedTextPreview.h
   voDelimitedTextPreviewModel.h
@@ -36,6 +39,7 @@ SET(KIT_MOC_SRCS
   
 SET(KIT_UI_FORMS
   Resources/UI/voMainWindow.ui
+  Resources/UI/voDelimitedTextImportDialog.ui
   Resources/UI/voDelimitedTextImportWidget.ui
   )
   
