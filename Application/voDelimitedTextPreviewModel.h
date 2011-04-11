@@ -20,7 +20,6 @@ public:
   virtual ~voDelimitedTextPreviewModel();
 
   QString fileName() const;
-  void setFileName(const QString& newFileName);
 
   char fieldDelimiter() const;
   void setFieldDelimiter(char delimiter);
@@ -37,12 +36,12 @@ public:
   int numberOfRowMetaDataTypes() const;
 
   int numberOfRowsToPreview() const;
-  void setNumberOfRowsToPreview(int count);
 
   bool inlineUpdate() const;
-  void setInlineUpdate(bool value);
 
 public slots:
+
+  void setFileName(const QString& newFileName);
 
 //  void setUseFirstLineAsAttributeNames(bool _arg);
 
@@ -51,6 +50,10 @@ public slots:
   void setNumberOfColumnMetaDataTypes(int _arg);
 
   void setNumberOfRowMetaDataTypes(int _arg);
+
+  void setNumberOfRowsToPreview(int count);
+
+  void setInlineUpdate(bool value);
 
   void updatePreview();
 
