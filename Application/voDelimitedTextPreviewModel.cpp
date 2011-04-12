@@ -17,6 +17,7 @@
 
 // Visomics includes
 #include "voDelimitedTextPreviewModel.h"
+#include "voUtils.h"
 
 
 class voDelimitedTextPreviewModelPrivate
@@ -29,8 +30,6 @@ public:
   void loadFile();
 
   void configureReader(vtkDelimitedTextReader * reader);
-
-  static void transposeTable(vtkTable* table);
 
   QTemporaryFile SampleCacheFile;
 
@@ -147,38 +146,6 @@ void voDelimitedTextPreviewModelPrivate::configureReader(vtkDelimitedTextReader 
     }
 
   reader->SetHaveHeaders(this->UseFirstLineAsAttributeNames);
-}
-
-// --------------------------------------------------------------------------
-void voDelimitedTextPreviewModelPrivate::transposeTable(vtkTable* table)
-{
-  Q_ASSERT(table);
-
-  vtkNew<vtkTable> transposeTable;
-
-  for(int cid = 0; cid < table->GetNumberOfColumns(); ++cid)
-    {
-    vtkStringArray * column = vtkStringArray::SafeDownCast(table->GetColumn(cid));
-    Q_ASSERT(column);
-    for (int rid = 0; rid < column->GetNumberOfValues(); ++rid)
-      {
-      vtkStdString value = column->GetValue(rid);
-      vtkSmartPointer<vtkStringArray> transposedColumn;
-      if (cid == 0)
-        {
-        transposedColumn = vtkSmartPointer<vtkStringArray>::New();
-        transposedColumn->SetNumberOfValues(table->GetNumberOfRows());
-        transposeTable->AddColumn(transposedColumn);
-        }
-      else
-        {
-        transposedColumn = vtkStringArray::SafeDownCast(transposeTable->GetColumn(rid));
-        }
-      transposedColumn->SetValue(cid, value);
-      }
-    }
-
-  table->DeepCopy(transposeTable.GetPointer());
 }
 
 // --------------------------------------------------------------------------
@@ -481,7 +448,7 @@ void voDelimitedTextPreviewModel::updatePreview()
   if (d->Transpose)
     {
     // Assumes there is a header column ... which we have no setting to specify for anyway
-    voDelimitedTextPreviewModelPrivate::transposeTable(table);
+    voUtils::transposeTable(table);
     }
 
   // Build model (self)

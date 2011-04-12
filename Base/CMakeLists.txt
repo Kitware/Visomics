@@ -55,6 +55,8 @@ SET(KIT_SRCS
   voQObjectFactory.h
   voTableDataObject.cpp
   voTableDataObject.h
+  voUtils.cpp
+  voUtils.h
   voView.cpp
   voView.h
   voViewFactory.cpp
