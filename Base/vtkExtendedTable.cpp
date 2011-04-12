@@ -132,12 +132,6 @@ vtkTable* vtkExtendedTable::GetData()
 }
 
 //----------------------------------------------------------------------------
-//vtkTable* vtkExtendedTable::GetColumnMetaDataTable()
-//{
-//  return this->Internal->ColumnMetaData;
-//}
-
-//----------------------------------------------------------------------------
 vtkIdType vtkExtendedTable::GetNumberOfColumnMetaDataTypes() const
 {
   return this->Internal->ColumnMetaData->GetNumberOfColumns();
@@ -148,12 +142,6 @@ vtkAbstractArray* vtkExtendedTable::GetColumnMetaData(vtkIdType id) const
 {
   return this->Internal->ColumnMetaData->GetColumn(id);
 }
-
-//----------------------------------------------------------------------------
-//vtkAbstractArray* vtkExtendedTable::GetColumnMetaDataByName(const char* name) const
-//{
-//  return 0;
-//}
 
 //----------------------------------------------------------------------------
 vtkIdType vtkExtendedTable::GetColumnMetaDataTypeOfInterest() const
@@ -202,12 +190,6 @@ void vtkExtendedTable::SetColumnMetaDataTable(vtkTable* columnMetaData)
   this->Modified();
 }
 
-////----------------------------------------------------------------------------
-//vtkTable* vtkExtendedTable::GetRowMetaDataTable()
-//{
-//  return this->Internal->RowMetaData;
-//}
-
 //----------------------------------------------------------------------------
 vtkIdType vtkExtendedTable::GetNumberOfRowMetaDataTypes() const
 {
@@ -240,12 +222,6 @@ vtkAbstractArray* vtkExtendedTable::GetRowMetaData(vtkIdType id) const
 {
   return this->Internal->RowMetaData->GetColumn(id);
 }
-
-//----------------------------------------------------------------------------
-//vtkVariantArray* vtkExtendedTable::GetRowMetaDataByName(const char* name) const
-//{
-//  return 0;
-//}
 
 //----------------------------------------------------------------------------
 vtkIdType vtkExtendedTable::GetRowMetaDataTypeOfInterest() const

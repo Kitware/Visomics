@@ -67,13 +67,9 @@ public:
 
   void SetColumnMetaDataTable(vtkTable* columnMetaData);
   
-  // vtkTable* GetColumnMetaDataTable();
-  
   vtkIdType GetNumberOfColumnMetaDataTypes() const;
   
   vtkAbstractArray* GetColumnMetaData(vtkIdType id) const;
-  
-  //vtkAbstractArray* GetColumnMetaDataByName(const char* name) const;
   
   vtkIdType GetColumnMetaDataTypeOfInterest() const;
   
@@ -87,13 +83,9 @@ public:
 
   void SetRowMetaDataTable(vtkTable* rowMetaData);
   
-  // vtkTable* GetRowMetaDataTable();
-  
   vtkIdType GetNumberOfRowMetaDataTypes()const;
   
   vtkAbstractArray* GetRowMetaData(vtkIdType id) const;
-  
-  //vtkVariantArray* GetRowMetaDataByName(const char* name);
   
   vtkIdType GetRowMetaDataTypeOfInterest() const;
   
