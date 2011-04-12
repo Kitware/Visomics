@@ -18,7 +18,8 @@ public:
     StringDelimiter,
     UseStringDelimiter,
     HaveHeaders,
-    Transpose, 
+    // vtkExtendedTable settings
+    Transpose,
     NumberOfColumnMetaDataTypes, 
     ColumnMetaDataTypeOfInterest,
     NumberOfRowMetaDataTypes,
@@ -26,6 +27,8 @@ public:
     };
 
   voDelimitedTextImportSettings();
+
+  virtual void printAdditionalInfo()const;
     
   void setDefaultSettings();
 };
