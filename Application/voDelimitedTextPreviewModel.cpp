@@ -193,10 +193,10 @@ void voDelimitedTextPreviewModel::setFileName(const QString& newFileName)
 }
 
 // --------------------------------------------------------------------------
-char voDelimitedTextPreviewModel::fieldDelimiter() const
+QString voDelimitedTextPreviewModel::fieldDelimiterCharacters() const
 {
   Q_D(const voDelimitedTextPreviewModel);
-  return d->FieldDelimiter;
+  return QString(d->FieldDelimiter);
 }
 
 // --------------------------------------------------------------------------

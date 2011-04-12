@@ -14,7 +14,7 @@ voDelimitedTextImportSettings::voDelimitedTextImportSettings()
 // --------------------------------------------------------------------------
 void voDelimitedTextImportSettings::setDefaultSettings()
 {
-  this->insert(Self::FieldDelimiter, ",");
+  this->insert(Self::FieldDelimiterCharacters, ",");
   this->insert(Self::MergeConsecutiveDelimiters, false);
   this->insert(Self::StringDelimiter, "\"");
   this->insert(Self::UseStringDelimiter, true);

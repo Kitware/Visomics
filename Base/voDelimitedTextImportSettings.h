@@ -13,7 +13,7 @@ public:
   enum DelimitedTextReaderSettings
     {
     // vtkDelimitedTextReader settings
-    FieldDelimiter = 0,
+    FieldDelimiterCharacters = 0,
     MergeConsecutiveDelimiters,
     StringDelimiter,
     UseStringDelimiter,

@@ -74,8 +74,8 @@ voDelimitedTextImportSettings voDelimitedTextImportDialog::importSettings()const
   voDelimitedTextPreviewModel * model = d->DelimitedTextImportWidget->delimitedTextPreviewModel();
 
   // vtkDelimitedTextReader settings
-  settings.insert(voDelimitedTextImportSettings::FieldDelimiter,
-                  model->fieldDelimiter());
+  settings.insert(voDelimitedTextImportSettings::FieldDelimiterCharacters,
+                  model->fieldDelimiterCharacters());
   settings.insert(voDelimitedTextImportSettings::MergeConsecutiveDelimiters,
                   model->mergeConsecutiveDelimiters());
   settings.insert(voDelimitedTextImportSettings::StringDelimiter,
@@ -84,6 +84,7 @@ voDelimitedTextImportSettings voDelimitedTextImportDialog::importSettings()const
                   model->useStringDelimiter());
   settings.insert(voDelimitedTextImportSettings::HaveHeaders,
                   model->haveHeaders());
+  // vtkExtendedTable settings
   settings.insert(voDelimitedTextImportSettings::Transpose,
                   model->transpose());
   settings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes,

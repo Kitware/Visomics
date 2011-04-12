@@ -21,7 +21,7 @@ public:
 
   QString fileName() const;
 
-  char fieldDelimiter() const;
+  QString fieldDelimiterCharacters() const;
   void setFieldDelimiter(char delimiter);
 
   char stringDelimiter() const;
