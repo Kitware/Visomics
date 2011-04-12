@@ -2,7 +2,7 @@
 #define __vtkExtendedTable_h
 
 // VTK includes
-#include <vtkObject.h>
+#include <vtkTable.h>
 
 ///
 /// This class allows to store numerical tabular data and their associated metadata.
@@ -38,30 +38,42 @@ class vtkAbstractArray;
 class vtkTable;
 class vtkVariantArray;
 
-class vtkExtendedTable : public vtkObject
+class vtkExtendedTable : public vtkTable
 {
 public:
   static vtkExtendedTable* New();
-  vtkTypeMacro(vtkExtendedTable, vtkObject);
+  vtkTypeMacro(vtkExtendedTable, vtkTable);
   void PrintSelf(ostream &os, vtkIndent indent);
+
+  void Dump() const;
+
+  vtkIdType GetTotalNumberOfRows();
+
+  vtkIdType GetTotalNumberOfColumns();
   
   //
   // Data
   //
+
+  void SetData(vtkTable* data);
   
   vtkTable* GetData();
   
   //
   // Column MetaData
   //
+
+  bool HasColumnMetaData() const;
+
+  void SetColumnMetaDataTable(vtkTable* columnMetaData);
   
-  vtkTable* GetColumnMetaData();
+  // vtkTable* GetColumnMetaDataTable();
   
-  vtkIdType GetNumberOfColumnMetaDataTypes()const;
+  vtkIdType GetNumberOfColumnMetaDataTypes() const;
   
-  vtkAbstractArray* GetColumnMetaData(vtkIdType id);
+  vtkAbstractArray* GetColumnMetaData(vtkIdType id) const;
   
-  //vtkAbstractArray* GetColumnMetaDataByName(const char* name);
+  //vtkAbstractArray* GetColumnMetaDataByName(const char* name) const;
   
   vtkIdType GetColumnMetaDataTypeOfInterest() const;
   
@@ -70,12 +82,16 @@ public:
   //
   // Row MetaData
   //
+
+  bool HasRowMetaData() const;
+
+  void SetRowMetaDataTable(vtkTable* rowMetaData);
   
-  vtkTable* GetRowMetaData();
+  // vtkTable* GetRowMetaDataTable();
   
   vtkIdType GetNumberOfRowMetaDataTypes()const;
   
-  vtkVariantArray* GetRowMetaData(vtkIdType id);
+  vtkAbstractArray* GetRowMetaData(vtkIdType id) const;
   
   //vtkVariantArray* GetRowMetaDataByName(const char* name);
   
