@@ -180,3 +180,23 @@ bool voUtils::insertColumnIntoTable(vtkTable * table, int position, vtkAbstractA
   table->ShallowCopy(updatedTable.GetPointer());
   return true;
 }
+
+//----------------------------------------------------------------------------
+void voUtils::setTableColumnNames(vtkTable * table, vtkStringArray * columnNames)
+{
+  if (!table)
+    {
+    return;
+    }
+  if (!columnNames)
+    {
+    return;
+    }
+
+  for (int cid = 0; cid < table->GetNumberOfColumns() && cid < columnNames->GetNumberOfValues(); ++cid)
+    {
+    vtkAbstractArray * column = table->GetColumn(cid);
+    Q_ASSERT(column);
+    column->SetName(columnNames->GetValue(cid));
+    }
+}

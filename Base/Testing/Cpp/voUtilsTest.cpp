@@ -136,6 +136,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
   inputTable->AddColumn(doubleArray.GetPointer());
 
+  // Variant column
   vtkNew<vtkVariantArray> variantArray;
   variantArray->SetNumberOfValues(5);
   variantArray->InsertValue(0, vtkVariant(0));
@@ -489,7 +490,61 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
       }
     }
 
+  //-----------------------------------------------------------------------------
+  // Test setTableColumnNames(vtkTable * table, vtkStringArray * columnNames)
+  //-----------------------------------------------------------------------------
 
+  voUtils::setTableColumnNames(0, 0);
+
+  vtkNew<vtkTable> setTableColumnNamesTest;
+  setTableColumnNamesTest->DeepCopy(originalTable.GetPointer());
+
+  vtkNew<vtkStringArray> columnNames;
+  columnNames->SetNumberOfValues(4);
+  columnNames->SetValue(0, "String");
+  columnNames->SetValue(1, "Integer");
+  columnNames->SetValue(2, "Double");
+  columnNames->SetValue(3, "Variant");
+
+  voUtils::setTableColumnNames(setTableColumnNamesTest.GetPointer(), columnNames.GetPointer());
+
+  vtkNew<vtkStringArray> setColumnNames;
+  setColumnNames->SetNumberOfValues(4);
+  for (int cid = 0; cid < setTableColumnNamesTest->GetNumberOfColumns(); ++cid)
+    {
+    vtkAbstractArray * column = setTableColumnNamesTest->GetColumn(cid);
+    setColumnNames->SetValue(cid, column->GetName());
+    }
+
+  success = compareArray(columnNames.GetPointer(), setColumnNames.GetPointer());
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with insertColumnIntoTable() - "
+              << "'columnNames' is different from 'setColumnNames'" << std::endl;
+
+    std::cerr << "columnNames:" << std::endl;
+    for(int j = 0; j < columnNames->GetNumberOfValues(); ++j)
+      {
+      if (j != 0)
+        {
+        std::cerr << ", ";
+        }
+      std::cerr << columnNames->GetValue(j);
+      }
+    std::cerr << std::endl;
+
+    std::cerr << "setColumnNames:" << std::endl;
+    for(int j = 0; j < setColumnNames->GetNumberOfValues(); ++j)
+      {
+      if (j != 0)
+        {
+        std::cerr << ", ";
+        }
+      std::cerr << setColumnNames->GetValue(j);
+      }
+    std::cerr << std::endl;
+    }
 
 
   return EXIT_SUCCESS;
