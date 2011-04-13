@@ -1,4 +1,8 @@
 
+// Qt includes
+#include <QList>
+
+// Visomics includes
 #include "voUtils.h"
 
 // VTK includes
@@ -147,7 +151,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
 
   if (!compareTable(originalTable.GetPointer(), inputTable.GetPointer()))
     {
-    // Table are expected to be equals
+    // Tables are expected to be equals
     std::cerr << "Line " << __LINE__ << " - "
               << "Problem with compareTable()" << std::endl;
     return EXIT_FAILURE;
@@ -216,7 +220,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   // Compare table
   if (!compareTable(originalTable.GetPointer(), transposeTranspose.GetPointer()))
     {
-    // Table are expected to be equals
+    // Tables are expected to be equals
     std::cerr << "Line " << __LINE__ << " - "
               << "Problem with transposeTable()" << std::endl;
 
@@ -247,7 +251,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   // Compare table
   if (!compareTable(testTranspose.GetPointer(), transpose.GetPointer()))
     {
-    // Table are expected to be equals
+    // Tables are expected to be equals
     std::cerr << "Line " << __LINE__ << " - "
               << "Problem with transposeTable()" << std::endl;
 
@@ -271,7 +275,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   // Compare table
   if (!compareTable(originalTable.GetPointer(), testTranspose.GetPointer()))
     {
-    // Table are expected to be equals
+    // Tables are expected to be equals
     std::cerr << "Line " << __LINE__ << " - "
               << "Problem with transposeTable()" << std::endl;
 
@@ -282,6 +286,207 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     testTranspose->Dump();
 
     return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
+  // Test insertColumnIntoTable(vtkTable * table, int position, vtkAbstractArray * column)
+  //-----------------------------------------------------------------------------
+
+  vtkNew<vtkStringArray> stringArraytoInsert;
+  stringArraytoInsert->SetNumberOfValues(4);
+  stringArraytoInsert->SetValue(0, "zero");
+  stringArraytoInsert->SetValue(1, "one");
+  stringArraytoInsert->SetValue(2, "two");
+  stringArraytoInsert->SetValue(3, "three");
+
+  vtkNew<vtkStringArray> stringArraytoInsertInvalid;
+  stringArraytoInsertInvalid->SetNumberOfValues(5);
+  stringArraytoInsertInvalid->SetValue(0, "zero");
+  stringArraytoInsertInvalid->SetValue(1, "one");
+  stringArraytoInsertInvalid->SetValue(2, "two");
+  stringArraytoInsertInvalid->SetValue(3, "three");
+  stringArraytoInsertInvalid->SetValue(4, "four");
+
+  vtkNew<vtkTable> insertTableTest;
+  vtkNew<vtkIntArray> intArray1;
+  intArray1->SetNumberOfValues(4);
+  intArray1->SetValue(0, 0);
+  intArray1->SetValue(0, 1);
+  intArray1->SetValue(0, 2);
+  intArray1->SetValue(0, 3);
+  insertTableTest->AddColumn(intArray1.GetPointer());
+
+  vtkNew<vtkIntArray> intArray2;
+  intArray2->SetNumberOfValues(4);
+  intArray2->SetValue(0, 10);
+  intArray2->SetValue(0, 11);
+  intArray2->SetValue(0, 12);
+  intArray2->SetValue(0, 13);
+  insertTableTest->AddColumn(intArray2.GetPointer());
+
+  vtkNew<vtkIntArray> intArray3;
+  intArray3->SetNumberOfValues(4);
+  intArray3->SetValue(0, 20);
+  intArray3->SetValue(0, 21);
+  intArray3->SetValue(0, 22);
+  intArray3->SetValue(0, 23);
+  insertTableTest->AddColumn(intArray3.GetPointer());
+
+
+  vtkNew<vtkTable> insertTableTest1;
+  insertTableTest1->DeepCopy(insertTableTest.GetPointer());
+
+  success = voUtils::insertColumnIntoTable(insertTableTest1.GetPointer(), 0, stringArraytoInsertInvalid.GetPointer());
+  if (success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with insertColumnIntoTable()" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // Compare table
+  if (!compareTable(insertTableTest.GetPointer(), insertTableTest1.GetPointer()))
+    {
+    // Tables are expected to be equals
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with transposeTable()" << std::endl;
+
+    std::cerr << "insertTableTest:" << std::endl;
+    insertTableTest->Dump();
+
+    std::cerr << "insertTableTest1:" << std::endl;
+    insertTableTest1->Dump();
+
+    return EXIT_FAILURE;
+    }
+
+  success = voUtils::insertColumnIntoTable(insertTableTest1.GetPointer(), 0, stringArraytoInsert.GetPointer());
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with insertColumnIntoTable()" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (insertTableTest1->GetNumberOfColumns() != 4)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with insertColumnIntoTable()\n"
+              << "\tExpected NumberOfColumns: " << 4 << "\n"
+              << "\tCurrent NumberOfColumns:" << insertTableTest1->GetNumberOfColumns() << std::endl;
+
+    std::cerr << "insertTableTest1:" << std::endl;
+    insertTableTest1->Dump();;
+
+    return EXIT_FAILURE;
+    }
+
+  success = voUtils::insertColumnIntoTable(insertTableTest1.GetPointer(), -10, stringArraytoInsert.GetPointer());
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with insertColumnIntoTable()" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (insertTableTest1->GetNumberOfColumns() != 5)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with insertColumnIntoTable()\n"
+              << "\tExpected NumberOfColumns: " << 5 << "\n"
+              << "\tCurrent NumberOfColumns:" << insertTableTest1->GetNumberOfColumns() << std::endl;
+
+    std::cerr << "insertTableTest1:" << std::endl;
+    insertTableTest1->Dump();;
+
+    return EXIT_FAILURE;
+    }
+
+  success = voUtils::insertColumnIntoTable(insertTableTest1.GetPointer(), 3, stringArraytoInsert.GetPointer());
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with insertColumnIntoTable()" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (insertTableTest1->GetNumberOfColumns() != 6)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with insertColumnIntoTable()\n"
+              << "\tExpected NumberOfColumns: " << 6 << "\n"
+              << "\tCurrent NumberOfColumns:" << insertTableTest1->GetNumberOfColumns() << std::endl;
+
+    std::cerr << "insertTableTest1:" << std::endl;
+    insertTableTest1->Dump();;
+
+    return EXIT_FAILURE;
+    }
+
+  success = voUtils::insertColumnIntoTable(insertTableTest1.GetPointer(), 6, stringArraytoInsert.GetPointer());
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with insertColumnIntoTable()" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (insertTableTest1->GetNumberOfColumns() != 7)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with insertColumnIntoTable()\n"
+              << "\tExpected NumberOfColumns: " << 7 << "\n"
+              << "\tCurrent NumberOfColumns:" << insertTableTest1->GetNumberOfColumns() << std::endl;
+
+    std::cerr << "insertTableTest1:" << std::endl;
+    insertTableTest1->Dump();
+
+    return EXIT_FAILURE;
+    }
+
+  QList<vtkStringArray*> stringArrayColumns;
+  stringArrayColumns << vtkStringArray::SafeDownCast(insertTableTest1->GetColumn(0));
+  stringArrayColumns << vtkStringArray::SafeDownCast(insertTableTest1->GetColumn(1));
+  stringArrayColumns << vtkStringArray::SafeDownCast(insertTableTest1->GetColumn(3));
+  stringArrayColumns << vtkStringArray::SafeDownCast(insertTableTest1->GetColumn(6));
+
+  for (int i = 0; i < stringArrayColumns.size(); ++i)
+    {
+    vtkStringArray* column = stringArrayColumns.at(i);
+    if (!column)
+      {
+      std::cerr << "Line " << __LINE__ << " - "
+                << "Problem with insertColumnIntoTable() - "
+                << "Column: " << i << " is expected to be a vtkStringArray" << std::endl;
+
+      std::cerr << "insertTableTest1:" << std::endl;
+      insertTableTest1->Dump();
+
+      return EXIT_FAILURE;
+      }
+    success = compareArray(column, stringArraytoInsert.GetPointer());
+    if (!success)
+      {
+      std::cerr << "Line " << __LINE__ << " - "
+                << "Problem with insertColumnIntoTable() - "
+                << "Column: " << i << " is different from 'stringArraytoInsert'" << std::endl;
+
+      std::cerr << "insertTableTest1:" << std::endl;
+      insertTableTest1->Dump();
+
+      std::cerr << "stringArraytoInsert:" << std::endl;
+      for(int j = 0; j < stringArraytoInsert->GetNumberOfValues(); ++j)
+        {
+        if (j != 0)
+          {
+          std::cerr << ", ";
+          }
+        std::cerr << stringArraytoInsert->GetValue(j);
+        }
+      std::cerr << std::endl;
+
+      return EXIT_FAILURE;
+      }
     }
 
 

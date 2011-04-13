@@ -137,3 +137,46 @@ bool voUtils::transposeTable(vtkTable* table)
   table->ShallowCopy(transposedTable.GetPointer());
   return true;
 }
+
+//----------------------------------------------------------------------------
+bool voUtils::insertColumnIntoTable(vtkTable * table, int position, vtkAbstractArray * columnToInsert)
+{
+  if (!table)
+    {
+    return false;
+    }
+  if (!columnToInsert)
+    {
+    return false;
+    }
+  if (table->GetNumberOfRows() != columnToInsert->GetNumberOfComponents() * columnToInsert->GetNumberOfTuples())
+    {
+    return false;
+    }
+  if (position < 0)
+    {
+    position = 0;
+    }
+  if (position > table->GetNumberOfColumns())
+    {
+    position = table->GetNumberOfColumns();
+    }
+
+  vtkNew<vtkTable> updatedTable;
+  for (int cid = 0; cid < table->GetNumberOfColumns(); ++cid)
+    {
+    vtkAbstractArray * column = table->GetColumn(cid);
+    Q_ASSERT(column);
+    if (cid == position)
+      {
+      updatedTable->AddColumn(columnToInsert);
+      }
+    updatedTable->AddColumn(column);
+    }
+  if (position == table->GetNumberOfColumns())
+    {
+    updatedTable->AddColumn(columnToInsert);
+    }
+  table->ShallowCopy(updatedTable.GetPointer());
+  return true;
+}
