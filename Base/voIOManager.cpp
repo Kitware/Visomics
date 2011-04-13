@@ -203,6 +203,9 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
   extendedTable->SetColumnMetaDataTypeOfInterest(columnMetaDataTypeOfInterest);
   extendedTable->SetRowMetaDataTypeOfInterest(rowMetaDataTypeOfInterest);
 
+  // Set column names
+  voUtils::setTableColumnNames(extendedTable->GetData(), extendedTable->GetColumnMetaDataOfInterestAsString());
+
   voInputFileDataObject * dataObject = new voInputFileDataObject();
   dataObject->setData(extendedTable.GetPointer());
   dataObject->setName(QFileInfo(fileName).baseName());
