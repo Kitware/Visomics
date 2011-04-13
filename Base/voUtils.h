@@ -6,7 +6,9 @@ class vtkTable;
 namespace voUtils 
 {
 
-void transposeTable(vtkTable* table);
+bool transposeTable(vtkTable* srcTable, vtkTable* destTable);
+
+bool transposeTable(vtkTable* table);
 
 }
 
