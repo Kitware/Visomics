@@ -97,8 +97,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
   if(extendedTable->HasColumnMetaData())
     {
       {
-      // TODO Consider ColumnMetaDataTypeOfInterest instead of defaulting to '0'
-      vtkStringArray * metadata = vtkStringArray::SafeDownCast(extendedTable->GetColumnMetaData(0));
+      vtkStringArray * metadata = vtkStringArray::SafeDownCast(extendedTable->GetColumnMetaDataOfInterest());
       Q_ASSERT(metadata);
       for(int i = 0; i < metadata->GetNumberOfValues(); ++i)
         {
@@ -111,6 +110,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
         d->Model.setHeaderData(headerId, Qt::Horizontal, value);
         }
       }
+    // TODO Consider ColumnMetaDataTypeOfInterest
     for (int metadataType = 1; metadataType < extendedTable->GetNumberOfColumnMetaDataTypes(); ++metadataType)
       {
       vtkStringArray * metadata = vtkStringArray::SafeDownCast(extendedTable->GetColumnMetaData(metadataType));
@@ -140,8 +140,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
   if(extendedTable->HasRowMetaData())
     {
       {
-      // TODO Consider RowMetaDataTypeOfInterest instead of defaulting to '0'
-      vtkStringArray * metadata = vtkStringArray::SafeDownCast(extendedTable->GetRowMetaData(0));
+      vtkStringArray * metadata = vtkStringArray::SafeDownCast(extendedTable->GetRowMetaDataOfInterest());
       Q_ASSERT(metadata);
       for(int i = 0; i < metadata->GetNumberOfValues(); ++i)
         {
@@ -154,6 +153,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
         d->Model.setHeaderData(headerId, Qt::Vertical, value);
         }
       }
+    // TODO Consider RowMetaDataTypeOfInterest
     for (int metadataType = 1; metadataType < extendedTable->GetNumberOfRowMetaDataTypes(); ++metadataType)
       {
       vtkStringArray * metadata = vtkStringArray::SafeDownCast(extendedTable->GetRowMetaData(metadataType));

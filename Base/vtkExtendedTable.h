@@ -74,6 +74,8 @@ public:
   vtkIdType GetColumnMetaDataTypeOfInterest() const;
   
   void SetColumnMetaDataTypeOfInterest(vtkIdType id);
+
+  vtkAbstractArray* GetColumnMetaDataOfInterest() const;
   
   //
   // Row MetaData
@@ -90,6 +92,8 @@ public:
   vtkIdType GetRowMetaDataTypeOfInterest() const;
   
   void SetRowMetaDataTypeOfInterest(vtkIdType id);
+
+  vtkAbstractArray* GetRowMetaDataOfInterest() const;
   
   
 protected:

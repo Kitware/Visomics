@@ -248,3 +248,33 @@ void vtkExtendedTable::SetRowMetaDataTypeOfInterest(vtkIdType id)
   
   this->Modified();
 }
+
+//----------------------------------------------------------------------------
+vtkAbstractArray* vtkExtendedTable::GetColumnMetaDataOfInterest() const
+{
+  if (!this->Internal->ColumnMetaData)
+    {
+    return 0;
+    }
+  if (this->Internal->ColumnMetaDataTypeOfInterest < 0 ||
+      this->Internal->ColumnMetaDataTypeOfInterest >= this->Internal->ColumnMetaData->GetNumberOfColumns())
+    {
+    return 0;
+    }
+  return this->Internal->ColumnMetaData->GetColumn(this->Internal->ColumnMetaDataTypeOfInterest);
+}
+
+//----------------------------------------------------------------------------
+vtkAbstractArray* vtkExtendedTable::GetRowMetaDataOfInterest() const
+{
+  if (!this->Internal->RowMetaData)
+    {
+    return 0;
+    }
+  if (this->Internal->RowMetaDataTypeOfInterest < 0 ||
+      this->Internal->RowMetaDataTypeOfInterest >= this->Internal->RowMetaData->GetNumberOfColumns())
+    {
+    return 0;
+    }
+  return this->Internal->RowMetaData->GetColumn(this->Internal->RowMetaDataTypeOfInterest);
+}
