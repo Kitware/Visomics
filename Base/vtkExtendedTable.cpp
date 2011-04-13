@@ -5,6 +5,7 @@
 // VTK includes
 #include <vtkObjectFactory.h>
 #include <vtkSmartPointer.h>
+#include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkVariantArray.h>
 
@@ -140,7 +141,22 @@ vtkIdType vtkExtendedTable::GetNumberOfColumnMetaDataTypes() const
 //---------------------------------------------------------------------------- 
 vtkAbstractArray* vtkExtendedTable::GetColumnMetaData(vtkIdType id) const
 {
+  if (!this->Internal->ColumnMetaData)
+    {
+    return 0;
+    }
+  if (id < 0 ||
+      id >= this->Internal->ColumnMetaData->GetNumberOfColumns())
+    {
+    return 0;
+    }
   return this->Internal->ColumnMetaData->GetColumn(id);
+}
+
+//----------------------------------------------------------------------------
+vtkStringArray* vtkExtendedTable::GetColumnMetaDataAsString(vtkIdType id) const
+{
+  return vtkStringArray::SafeDownCast(this->GetColumnMetaData(id));
 }
 
 //----------------------------------------------------------------------------
@@ -167,6 +183,27 @@ void vtkExtendedTable::SetColumnMetaDataTypeOfInterest(vtkIdType id)
   this->Internal->ColumnMetaDataTypeOfInterest = id;
   
   this->Modified();
+}
+
+//----------------------------------------------------------------------------
+vtkAbstractArray* vtkExtendedTable::GetColumnMetaDataOfInterest() const
+{
+  if (!this->Internal->ColumnMetaData)
+    {
+    return 0;
+    }
+  if (this->Internal->ColumnMetaDataTypeOfInterest < 0 ||
+      this->Internal->ColumnMetaDataTypeOfInterest >= this->Internal->ColumnMetaData->GetNumberOfColumns())
+    {
+    return 0;
+    }
+  return this->Internal->ColumnMetaData->GetColumn(this->Internal->ColumnMetaDataTypeOfInterest);
+}
+
+//----------------------------------------------------------------------------
+vtkStringArray* vtkExtendedTable::GetColumnMetaDataOfInterestAsString() const
+{
+  return vtkStringArray::SafeDownCast(this->GetColumnMetaDataOfInterest());
 }
 
 //----------------------------------------------------------------------------
@@ -220,7 +257,22 @@ void vtkExtendedTable::SetRowMetaDataTable(vtkTable* rowMetaData)
 //----------------------------------------------------------------------------
 vtkAbstractArray* vtkExtendedTable::GetRowMetaData(vtkIdType id) const
 {
+  if (!this->Internal->RowMetaData)
+    {
+    return 0;
+    }
+  if (id < 0 ||
+      id >= this->Internal->RowMetaData->GetNumberOfColumns())
+    {
+    return 0;
+    }
   return this->Internal->RowMetaData->GetColumn(id);
+}
+
+//----------------------------------------------------------------------------
+vtkStringArray* vtkExtendedTable::GetRowMetaDataAsString(vtkIdType id) const
+{
+  return vtkStringArray::SafeDownCast(this->GetRowMetaData(id));
 }
 
 //----------------------------------------------------------------------------
@@ -250,21 +302,6 @@ void vtkExtendedTable::SetRowMetaDataTypeOfInterest(vtkIdType id)
 }
 
 //----------------------------------------------------------------------------
-vtkAbstractArray* vtkExtendedTable::GetColumnMetaDataOfInterest() const
-{
-  if (!this->Internal->ColumnMetaData)
-    {
-    return 0;
-    }
-  if (this->Internal->ColumnMetaDataTypeOfInterest < 0 ||
-      this->Internal->ColumnMetaDataTypeOfInterest >= this->Internal->ColumnMetaData->GetNumberOfColumns())
-    {
-    return 0;
-    }
-  return this->Internal->ColumnMetaData->GetColumn(this->Internal->ColumnMetaDataTypeOfInterest);
-}
-
-//----------------------------------------------------------------------------
 vtkAbstractArray* vtkExtendedTable::GetRowMetaDataOfInterest() const
 {
   if (!this->Internal->RowMetaData)
@@ -277,4 +314,10 @@ vtkAbstractArray* vtkExtendedTable::GetRowMetaDataOfInterest() const
     return 0;
     }
   return this->Internal->RowMetaData->GetColumn(this->Internal->RowMetaDataTypeOfInterest);
+}
+
+//----------------------------------------------------------------------------
+vtkStringArray* vtkExtendedTable::GetRowMetaDataOfInterestAsString() const
+{
+  return vtkStringArray::SafeDownCast(this->GetRowMetaDataOfInterest());
 }

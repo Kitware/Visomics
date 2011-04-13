@@ -35,6 +35,7 @@
 ///
 
 class vtkAbstractArray;
+class vtkStringArray;
 class vtkTable;
 class vtkVariantArray;
 
@@ -70,12 +71,16 @@ public:
   vtkIdType GetNumberOfColumnMetaDataTypes() const;
   
   vtkAbstractArray* GetColumnMetaData(vtkIdType id) const;
+
+  vtkStringArray* GetColumnMetaDataAsString(vtkIdType id) const;
   
   vtkIdType GetColumnMetaDataTypeOfInterest() const;
   
   void SetColumnMetaDataTypeOfInterest(vtkIdType id);
 
   vtkAbstractArray* GetColumnMetaDataOfInterest() const;
+
+  vtkStringArray* GetColumnMetaDataOfInterestAsString() const;
   
   //
   // Row MetaData
@@ -88,12 +93,16 @@ public:
   vtkIdType GetNumberOfRowMetaDataTypes()const;
   
   vtkAbstractArray* GetRowMetaData(vtkIdType id) const;
+
+  vtkStringArray* GetRowMetaDataAsString(vtkIdType id) const;
   
   vtkIdType GetRowMetaDataTypeOfInterest() const;
   
   void SetRowMetaDataTypeOfInterest(vtkIdType id);
 
   vtkAbstractArray* GetRowMetaDataOfInterest() const;
+
+  vtkStringArray* GetRowMetaDataOfInterestAsString() const;
   
   
 protected:

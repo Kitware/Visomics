@@ -97,7 +97,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
   if(extendedTable->HasColumnMetaData())
     {
       {
-      vtkStringArray * metadata = vtkStringArray::SafeDownCast(extendedTable->GetColumnMetaDataOfInterest());
+      vtkStringArray * metadata = extendedTable->GetColumnMetaDataOfInterestAsString();
       Q_ASSERT(metadata);
       for(int i = 0; i < metadata->GetNumberOfValues(); ++i)
         {
@@ -113,7 +113,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
     // TODO Consider ColumnMetaDataTypeOfInterest
     for (int metadataType = 1; metadataType < extendedTable->GetNumberOfColumnMetaDataTypes(); ++metadataType)
       {
-      vtkStringArray * metadata = vtkStringArray::SafeDownCast(extendedTable->GetColumnMetaData(metadataType));
+      vtkStringArray * metadata = extendedTable->GetColumnMetaDataAsString(metadataType);
       Q_ASSERT(metadata);
       for(int i = 0; i < metadata->GetNumberOfValues(); ++i)
         {
@@ -140,7 +140,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
   if(extendedTable->HasRowMetaData())
     {
       {
-      vtkStringArray * metadata = vtkStringArray::SafeDownCast(extendedTable->GetRowMetaDataOfInterest());
+      vtkStringArray * metadata = extendedTable->GetRowMetaDataOfInterestAsString();
       Q_ASSERT(metadata);
       for(int i = 0; i < metadata->GetNumberOfValues(); ++i)
         {
@@ -156,7 +156,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
     // TODO Consider RowMetaDataTypeOfInterest
     for (int metadataType = 1; metadataType < extendedTable->GetNumberOfRowMetaDataTypes(); ++metadataType)
       {
-      vtkStringArray * metadata = vtkStringArray::SafeDownCast(extendedTable->GetRowMetaData(metadataType));
+      vtkStringArray * metadata = extendedTable->GetRowMetaDataAsString(metadataType);
       Q_ASSERT(metadata);
       for(int i = 0; i < metadata->GetNumberOfValues(); ++i)
         {
