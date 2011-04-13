@@ -87,6 +87,7 @@ void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem*
   voAnalysisFactory * analysisFactory = voApplication::application()->analysisFactory();
   voAnalysis * analysis = analysisFactory->createAnalysis(analysisName);
   Q_ASSERT(analysis);
+  analysis->setParent(qApp);
   analysis->setAcceptDefaultParameterValues(acceptDefaultParameter);
   this->runAnalysis(analysis, inputTarget);
 }
