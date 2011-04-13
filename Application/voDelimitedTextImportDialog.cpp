@@ -39,6 +39,10 @@ void voDelimitedTextImportDialogPrivate::setupUi(QDialog *widget)
                                "Click on <i>Normalization</i> tab for more options.</li></ul>"));
   this->DelimitedTextImportWidget->insertWidget(
         preProcessingAndFilteringGroupBox, voDelimitedTextImportWidget::RowsAndColumnsGroupBox);
+
+  preProcessingAndFilteringGroupBox->setDisabled(true);
+  this->ImportStepTabWidget->setTabEnabled(1, false);
+  this->ImportStepTabWidget->setTabEnabled(2, false);
 }
 
 // --------------------------------------------------------------------------
