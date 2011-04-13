@@ -146,7 +146,7 @@ void voMainWindow::onFileOpenActionTriggered()
 
   files.sort();
 
-  voDelimitedTextImportDialog dialog;
+  voDelimitedTextImportDialog dialog(this);
 
   foreach(const QString& file, files)
     {
