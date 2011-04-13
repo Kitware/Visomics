@@ -24,32 +24,8 @@ voCSVReader::voCSVReader()
 void voCSVReader::update()
 {
   this->Reader->Update();
-  vtkTable* table = this->Reader->GetOutput();
-
-  // Transpose table
-  vtkSmartPointer<vtkTable> transpose = vtkSmartPointer<vtkTable>::New();
-  vtkSmartPointer<vtkStringArray> header = vtkSmartPointer<vtkStringArray>::New();
-  header->SetName("header");
-  header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
-  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-    {
-    header->SetValue(c-1, table->GetColumnName(c));
-    }
-  transpose->AddColumn(header);
-  for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
-    {
-    vtkSmartPointer<vtkStringArray> newcol = vtkSmartPointer<vtkStringArray>::New();
-    newcol->SetName(table->GetValue(r, 0).ToString().c_str());
-    newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
-    for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-      {
-      newcol->SetValue(c-1, table->GetValue(r, c).ToString());
-      }
-    transpose->AddColumn(newcol);
-    }
-
   // Detect numeric columns
-  this->NumericOutput->SetInput(transpose);
+  this->NumericOutput->SetInputConnection(this->Reader->GetOutputPort());
   this->NumericOutput->Update();
 }
 

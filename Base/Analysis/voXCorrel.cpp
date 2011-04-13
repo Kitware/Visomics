@@ -112,7 +112,7 @@ bool voXCorrel::execute()
   d->XCor->SetInputConnection(tab->GetOutputPort());
   d->XCor->PutArray("0", "metabData");
   d->XCor->SetRscript(
-        QString("correl<-cor(metabData, method=\"%1\")").arg(cor_method).toLatin1());
+        QString("correl<-cor(t(metabData), method=\"%1\")").arg(cor_method).toLatin1());
   d->XCor->GetArray("correl","correl");
  
   // Do Cross Correlation
@@ -126,14 +126,11 @@ bool voXCorrel::execute()
     }
 
   // Set up headers for the rows.
-  vtkIdType cols = table->GetNumberOfColumns() - 1;
-  vtkIdType rows = table->GetNumberOfRows();
-  vtkSmartPointer<vtkStringArray> header = vtkSmartPointer<vtkStringArray>::New();
-  header->SetName("header");
-  header->SetNumberOfTuples(cols);
-  for (vtkIdType i = 0; i < cols; ++i)
+  vtkSmartPointer<vtkStringArray> header = vtkStringArray::SafeDownCast(table->GetColumn(0));
+  if (!header)
     {
-    header->SetValue(i, table->GetColumnName(i + 1));
+    std::cout << "Downcast DID NOT work." << std::endl;
+    return 1;
     }
 
   // Extract rotated coordinates
@@ -151,28 +148,22 @@ bool voXCorrel::execute()
   XCorProj->SetInputConnection(XCorProjData->GetProducerPort());
   XCorProj->Update();  
   
-  vtkTable* assess = vtkTable::SafeDownCast(XCorProj->GetOutput());
+  vtkTable* assess = XCorProj->GetOutput();
   vtkSmartPointer<vtkTable> corr = vtkSmartPointer<vtkTable>::New();
   corr->AddColumn(header);
 
-  // assess->Print(std::cout);
-  for (vtkIdType c = 0;c < cols; ++c)  //c < assess->GetNumberOfColumns()
+  for (vtkIdType c = 0;c < assess->GetNumberOfColumns(); ++c)
     {
     vtkAbstractArray* col = assess->GetColumn(c);
-    col->SetName(table->GetColumnName(c + 1));
-    //corr->Print(std::cout);
-    //col->Print(std::cout);
+    col->SetName(header->GetValue(c));
     corr->AddColumn(col);
     }
   this->setOutput("corr", new voTableDataObject("corr", corr));
 
   // Generate image of the correlation table 
   vtkSmartPointer<vtkImageData> imageData = vtkSmartPointer<vtkImageData>::New();
-  vtkIdType corrMatrixNumberOfCols = corr->GetNumberOfColumns();
+//  vtkIdType corrMatrixNumberOfCols = corr->GetNumberOfColumns();
   vtkIdType corrMatrixNumberOfRows = corr->GetNumberOfRows();
-
-  //std::cout << "Number Of Cols =\t"  << corrMatrixNumberOfCols << std::endl;
-  //std::cout << "Number Of Rows =\t"  << corrMatrixNumberOfRows << std::endl;
 
   imageData->SetExtent(0, corrMatrixNumberOfRows-1, 
                        0, corrMatrixNumberOfRows-1,
@@ -204,15 +195,15 @@ bool voXCorrel::execute()
   col2->SetName("Column 2");
   vtkSmartPointer<vtkDoubleArray> valueArr = vtkSmartPointer<vtkDoubleArray>::New();
   valueArr->SetName("Correlation");
-  for (vtkIdType r = 0; r < rows; ++r)
+  for (vtkIdType r = 0; r < corrMatrixNumberOfRows; ++r)
     {
-    for (vtkIdType c = r+1; c < rows; ++c)
+    for (vtkIdType c = r+1; c < corrMatrixNumberOfRows; ++c)
       {
       double val = corr->GetValue(r, c + 1).ToDouble();
       if (val > 0.1)
         {
-        col1->InsertNextValue(table->GetColumnName(r + 1));
-        col2->InsertNextValue(table->GetColumnName(c + 1));
+        col1->InsertNextValue(header->GetValue(r));
+        col2->InsertNextValue(header->GetValue(c));
         valueArr->InsertNextValue(val);
         }
       }

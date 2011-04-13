@@ -10,6 +10,7 @@
 
 // VTK includes
 #include <QVTKWidget.h>
+#include <vtkAxis.h>
 #include <voChartXY.h>
 #include <vtkContext2D.h>
 #include <vtkContextScene.h>
@@ -18,15 +19,14 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkTable.h>
-#include <vtkVariantArray.h>
+#include <vtkStringArray.h>
+#include <vtkDoubleArray.h>
 
 // --------------------------------------------------------------------------
 class voPCAProjectionPlotPrivate
 {
 public:
   voPCAProjectionPlotPrivate();
-
-  QMap<vtkVariant, vtkSmartPointer<vtkTable> > splitTable(vtkTable* t, const char* column);
 
   vtkSmartPointer<vtkContextView> ChartView;
   vtkSmartPointer<voChartXY>     Chart;
@@ -40,33 +40,6 @@ public:
 voPCAProjectionPlotPrivate::voPCAProjectionPlotPrivate()
 {
   this->Widget = 0;
-}
-
-// --------------------------------------------------------------------------
-QMap<vtkVariant, vtkSmartPointer<vtkTable> > voPCAProjectionPlotPrivate::splitTable(
-    vtkTable* t, const char* column)
-{
-  QMap<vtkVariant, vtkSmartPointer<vtkTable> > m;
-  vtkSmartPointer<vtkVariantArray> row =
-    vtkSmartPointer<vtkVariantArray>::New();
-  for (vtkIdType i = 0; i < t->GetNumberOfRows(); ++i)
-    {
-    t->GetRow(i, row);
-    vtkVariant val = t->GetValueByName(i, column);
-    if (m.find(val) == m.end())
-      {
-      m[val] = vtkSmartPointer<vtkTable>::New();
-      for (vtkIdType j = 0; j < t->GetNumberOfColumns(); ++j)
-        {
-        vtkAbstractArray* a = t->GetColumn(j);
-        vtkAbstractArray* b = a->NewInstance();
-        b->SetName(a->GetName());
-        m[val]->AddColumn(b);
-        }
-      }
-    m[val]->InsertNextRow(row);
-    }
-  return m;
 }
 
 // --------------------------------------------------------------------------
@@ -118,9 +91,30 @@ void voPCAProjectionPlot::setDataObject(voDataObject *dataObject)
     return;
     }
 
-  QMap<vtkVariant, vtkSmartPointer<vtkTable> > tables = d->splitTable(table, "Y Var");
-  QMap<vtkVariant, vtkSmartPointer<vtkTable> >::iterator it, itEnd;
-  itEnd = tables.end();
+  // Transpose table - this is pretty much unavoidable: vtkPlot expects each dimension
+  // to be a column, but the information should be presented to the user with each
+  // data point (principle component) in its own column
+  vtkSmartPointer<vtkTable> transpose = vtkSmartPointer<vtkTable>::New();
+  vtkSmartPointer<vtkStringArray> header = vtkSmartPointer<vtkStringArray>::New();
+  header->SetName("header");
+  header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
+  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
+    {
+    header->SetValue(c-1, table->GetColumnName(c));
+    }
+  transpose->AddColumn(header);
+  for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
+    {
+    vtkSmartPointer<vtkDoubleArray> newcol = vtkSmartPointer<vtkDoubleArray>::New();
+    newcol->SetName(table->GetValue(r, 0).ToString().c_str());
+    newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
+    for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
+      {
+      newcol->SetValue(c-1, table->GetValue(r, c).ToDouble());
+      }
+    transpose->AddColumn(newcol);
+    }
+
   unsigned char colors[10][3] =
     {
       {166, 206, 227}, {31, 120, 180}, {178, 223, 13},
@@ -128,28 +122,31 @@ void voPCAProjectionPlot::setDataObject(voDataObject *dataObject)
       {253, 191, 111}, {255, 127, 0}, {202, 178, 214}, {106, 61, 154}
     };
   int i = 0;
-  vtkPlot* p = d->Chart->GetPlot(0);
-if (!p) 
-    {
-	  for (it = tables.begin(); it != itEnd; ++it, ++i)
-		{
-		vtkPlot* p = d->Chart->AddPlot(vtkChart::POINTS);
-		p->SetInput(it.value(), 1, 2);
-		p->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
-		p->SetWidth(10);
 
-	  unsigned int rows = table->GetNumberOfRows();
-    unsigned int cols = table->GetNumberOfColumns();
-    //std::cout << "Projection table:" << rows << "\t" << cols << std::endl;
-    std::vector<std::string> labels;
-    for( unsigned int j=0; j < rows ; j++)
-      {
-      std::string experiment = table->GetValue(j,0).ToString();
-      labels.push_back( experiment );
-      }
-    d->Chart->AddPointLabels( labels );
-		}
+  vtkPlot* p = d->Chart->GetPlot(0);
+	if (!p) 
+    {
+    p = d->Chart->AddPlot(vtkChart::POINTS);
     }
+
+  p->SetInput(transpose, 1,2);
+  p->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
+  p->SetWidth(10);
+
+  // TODO: have voChartXY take a vtkStringArray, rather than std::vector<std::string>
+  std::vector<std::string> labels;
+  for(int j = 0; j < transpose->GetNumberOfColumns(); j++)
+    {
+    labels.push_back(transpose->GetValue(j,0).ToString());
+    }
+  d->Chart->AddPointLabels( labels );
+
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(transpose->GetColumnName(2)); // y
+
+  d->ChartView->GetRenderWindow();
+  d->ChartView->Render();
+
   d->ChartView->GetRenderWindow()->SetMultiSamples(4);
   d->ChartView->Render();
 }

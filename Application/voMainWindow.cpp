@@ -35,7 +35,7 @@ public:
 
   voViewStackedWidget* ViewStackedWidget;
   QSignalMapper      AnalysisActionMapper;
-  bool analysisParametersPrevShown; //remembers previous user-selected state of widget
+  bool AnalysisParametersPrevShown; // Remembers previous user-selected state of widget
 };
 
 // --------------------------------------------------------------------------
@@ -100,8 +100,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
   d->AnalysisParameterDockWidget->setVisible(false);
   // ... and disable the associated action
   d->actionViewAnalysisParameters->setEnabled(false);
-  // but ensure it is shown when it becomes available
-  d->analysisParametersPrevShown = true;
+  // ... but ensure it is shown when it first becomes available
+  d->AnalysisParametersPrevShown = true;
 
   connect(dataModel, SIGNAL(analysisSelected(voAnalysis*)),
           SLOT(onAnalysisSelected(voAnalysis*)));
@@ -168,21 +168,19 @@ void voMainWindow::onAnalysisSelected(voAnalysis* analysis)
 void voMainWindow::onActiveAnalysisChanged(voAnalysis* analysis)
 {
   Q_D(voMainWindow);
-  bool showAnalysisParameterDock = analysis != NULL && analysis->parameterCount() > 0;
+  bool showAnalysisParameterDock = analysis != 0 && analysis->parameterCount() > 0;
 
   if(!showAnalysisParameterDock && d->actionViewAnalysisParameters->isEnabled())
     {
-    //if widget is going to disable and is currently enabled, remember previous visible state
-    d->analysisParametersPrevShown = d->AnalysisParameterDockWidget->isVisible(); //4, 6
+    // If widget is going to disable and is currently enabled, remember previous visible state
+    d->AnalysisParametersPrevShown = d->AnalysisParameterDockWidget->isVisible();
     d->AnalysisParameterDockWidget->setVisible(false);
     }
   else if(showAnalysisParameterDock && !d->actionViewAnalysisParameters->isEnabled())
     {
-    //if widget is going to enable and is currently disabled, recall previous visible state
-    d->AnalysisParameterDockWidget->setVisible(d->analysisParametersPrevShown); //3, 5
+    // If widget is going to enable and is currently disabled, recall previous visible state
+    d->AnalysisParameterDockWidget->setVisible(d->AnalysisParametersPrevShown);
     }
-/*  d->AnalysisParameterDockWidget->setVisible(
-        showAnalysisParameterDock && d->analysisParametersPrevShown);*/
   d->actionViewAnalysisParameters->setEnabled(showAnalysisParameterDock);
   d->AnalysisParameterEditorWidget->setAnalysis(analysis);
 }
