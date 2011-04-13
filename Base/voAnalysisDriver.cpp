@@ -105,6 +105,8 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
     return;
     }
 
+  QScopedPointer<voAnalysis> analysisScopedPtr(analysis);
+
   // Reset abort execution flag
   analysis->setAbortExecution(false);
 
@@ -159,7 +161,7 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
     return;
     }
 
-  voAnalysisDriver::addAnalysisToObjectModel(analysis, inputTarget);
+  voAnalysisDriver::addAnalysisToObjectModel(analysisScopedPtr.take(), inputTarget);
 
   connect(analysis, SIGNAL(outputSet(const QString&, voDataObject*, voAnalysis*)),
           SLOT(onAnalysisOutputSet(const QString&,voDataObject*,voAnalysis*)));
