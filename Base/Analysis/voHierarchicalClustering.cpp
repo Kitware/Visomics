@@ -8,6 +8,7 @@
 // Visomics includes
 #include "voDataObject.h"
 #include "voHierarchicalClustering.h"
+#include "vtkExtendedTable.h"
 
 // VTK includes
 #include <vtkDataSetAttributes.h>
@@ -40,7 +41,7 @@ voHierarchicalClustering::~voHierarchicalClustering()
 // --------------------------------------------------------------------------
 void voHierarchicalClustering::setInputInformation()
 {
-  this->addInputType("input", "vtkTable");
+  this->addInputType("input", "vtkExtendedTable");
 }
 
 // --------------------------------------------------------------------------
@@ -68,12 +69,14 @@ bool voHierarchicalClustering::execute()
 {
   // Q_D(voHierarchicalClustering);
 
-  vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
-  if (!table)
+  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->data());
+  if (!extendedTable)
     {
     qWarning() << "Input is Null";
     return false;
     }
+
+  vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
 
   // Parameters
   QString hclust_method = this->enumParameter("method");
@@ -81,17 +84,12 @@ bool voHierarchicalClustering::execute()
   vtkSmartPointer< vtkTableToArray > tableToArray = vtkSmartPointer< vtkTableToArray>::New();
   tableToArray->SetInput(table);
 
-  vtkSmartPointer< vtkStringArray > names = vtkSmartPointer< vtkStringArray >::New();
-
   int start = 1;
   int end = table->GetNumberOfColumns();
 
-
-  names->SetName("Samples");
   for (int ctr=start; ctr<end; ctr++)
     {
     tableToArray->AddColumn(table->GetColumnName(ctr));
-    names->InsertNextValue(table->GetColumnName(ctr));
     }
   tableToArray->Update();
 
@@ -117,8 +115,8 @@ bool voHierarchicalClustering::execute()
   calc->SetRoutput(0);
   calc->SetInput(tableToArray->GetOutput());
 
-  /* 
-   * hclust class in R has the following attributes 
+  /*
+   * hclust class in R has the following attributes
    *
    * labels: labels for each of the objects being clustered.
    *
@@ -129,7 +127,7 @@ bool voHierarchicalClustering::execute()
    *      with the cluster formed at the (earlier) stage j of the
    *      algorithm.  Thus negative entries in merge indicate
    *       agglomerations of singletons, and positive entries indicate
-   *       agglomerations of non-singletons. 
+   *       agglomerations of non-singletons.
    *
    *
    * height: a set of n-1 non-decreasing real values.  The clustering
@@ -196,9 +194,9 @@ bool voHierarchicalClustering::execute()
   vtkSmartPointer<vtkDoubleArray> distanceArray = vtkSmartPointer<vtkDoubleArray>::New();
   distanceArray->SetName("Height");
 
- 
+
   /* Each time we create a parent "id", store the corresponding vertex id */
-     
+
   vtkstd::map<int,int> clusterMap;
 
   int clusterIndex=0;
@@ -208,14 +206,14 @@ bool voHierarchicalClustering::execute()
     {
     int firstClusterIndex;
     int secondClusterIndex;
-  
-    /* The following is needed to find the corresponding indices in the matrix */ 
+
+    /* The following is needed to find the corresponding indices in the matrix */
     firstClusterIndex = i;
     secondClusterIndex = firstClusterIndex + heightExtent[0].GetEnd();
-   
+
     int firstCluster  =  mergeArray->GetValue(vtkArrayCoordinates(firstClusterIndex));
     int secondCluster =  mergeArray->GetValue(vtkArrayCoordinates(secondClusterIndex));
- 
+
 
     /** Three scenario:
     *  if both  values are negative, create two new childs and a new vertex in the tree
@@ -256,11 +254,11 @@ bool voHierarchicalClustering::execute()
       double heightParent =  heigtArray->GetValue(vtkArrayCoordinates(i));
       // double heightChildrean = heightParent - 0.1; // arbitrary
       distanceArray->InsertNextValue(heightParent);
-     
-     
+
+
       int clusterNumber1 = clusterMap[firstCluster - 1];
-      int clusterNumber2 = clusterMap[secondCluster - 1]; 
-  
+      int clusterNumber2 = clusterMap[secondCluster - 1];
+
       builder->AddEdge( parent, clusterNumber1 );
       builder->AddEdge( parent, clusterNumber2 );
       }
@@ -273,14 +271,14 @@ bool voHierarchicalClustering::execute()
         clusterLabel->InsertNextValue ( "");
         clusterMap[clusterIndex] = parent;
         clusterIndex++;
- 
+
 
         double heightParent =  heigtArray->GetValue(vtkArrayCoordinates(i));
         double heightChildrean = heightParent - 0.1;// arbitrary
         distanceArray->InsertNextValue(heightParent);
 
-        
-        vtkIdType child = builder->AddVertex(); 
+
+        vtkIdType child = builder->AddVertex();
         clusterLabel->InsertNextValue( table->GetColumnName( abs(firstCluster)) );
         distanceArray->InsertNextValue(heightChildrean);
 

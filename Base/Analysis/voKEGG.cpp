@@ -14,6 +14,7 @@
 // Visomics includes
 #include "voKEGG.h"
 #include "voTableDataObject.h"
+#include "vtkExtendedTable.h"
 
 // VTK includes
 #include <vtkArrayToTable.h>
@@ -41,7 +42,7 @@ voKEGG::~voKEGG()
 // --------------------------------------------------------------------------
 void voKEGG::setInputInformation()
 {
-  this->addInputType("input", "vtkTable");
+  this->addInputType("input", "vtkExtendedTable");
 }
 
 // --------------------------------------------------------------------------
@@ -66,12 +67,14 @@ bool voKEGG::execute()
 {
 //  Q_D(voKEGG);
 
-  vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
-  if (!table)
+  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->data());
+  if (!extendedTable)
     {
     qWarning() << "Input is Null";
     return false;
     }
+
+  vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
 
   QString keggURL("http://" + this->stringParameter("host") + "/kegg-pathway?term=");
   QNetworkAccessManager manager;

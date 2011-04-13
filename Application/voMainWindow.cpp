@@ -19,6 +19,7 @@
 #include "voAnalysisFactory.h"
 #include "voApplication.h"
 #include "voDataModel.h"
+#include "voDelimitedTextImportDialog.h"
 #include "voIOManager.h"
 #include "voMainWindow.h"
 #include "voViewManager.h"
@@ -145,7 +146,17 @@ void voMainWindow::onFileOpenActionTriggered()
 
   files.sort();
 
-  voApplication::application()->ioManager()->openCSVFiles(files);
+  voDelimitedTextImportDialog dialog;
+
+  foreach(const QString& file, files)
+    {
+    dialog.setFileName(file);
+    int status = dialog.exec();
+    if (status == voDelimitedTextImportDialog::Accepted)
+      {
+      voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
+      }
+    }
 }
 
 // --------------------------------------------------------------------------

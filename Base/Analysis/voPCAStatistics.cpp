@@ -5,6 +5,7 @@
 // Visomics includes
 #include "voPCAStatistics.h"
 #include "voTableDataObject.h"
+#include "vtkExtendedTable.h"
 
 // VTK includes
 #include <vtkArrayToTable.h>
@@ -45,7 +46,7 @@ voPCAStatistics::~voPCAStatistics()
 // --------------------------------------------------------------------------
 void voPCAStatistics::setInputInformation()
 {
-  this->addInputType("input", "vtkTable");
+  this->addInputType("input", "vtkExtendedTable");
 }
 
 // --------------------------------------------------------------------------
@@ -77,12 +78,14 @@ bool voPCAStatistics::execute()
 {
   Q_D(voPCAStatistics);
 
-  vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
-  if (!table)
+  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->data());
+  if (!extendedTable)
     {
     qWarning() << "Input is Null";
     return false;
     }
+
+  vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
 
   vtkSmartPointer<vtkTableToArray> tab = vtkSmartPointer<vtkTableToArray>::New();
   tab->SetInput(table);

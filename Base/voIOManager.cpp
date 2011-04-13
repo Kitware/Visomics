@@ -58,7 +58,7 @@ void voIOManager::openCSVFiles(const QStringList& fileNames)
 // --------------------------------------------------------------------------
 void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImportSettings& settings)
 {
-  settings.printAdditionalInfo();
+  // settings.printAdditionalInfo();
 
   vtkNew<vtkDelimitedTextReader> reader;
   reader->SetFileName(fileName.toLatin1());
