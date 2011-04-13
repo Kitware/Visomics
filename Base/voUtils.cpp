@@ -134,6 +134,6 @@ bool voUtils::transposeTable(vtkTable* table)
     {
     return false;
     }
-  table->DeepCopy(transposedTable.GetPointer());
+  table->ShallowCopy(transposedTable.GetPointer());
   return true;
 }
