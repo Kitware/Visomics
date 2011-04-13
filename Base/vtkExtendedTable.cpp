@@ -1,6 +1,7 @@
 
 // Visomics includes
 #include "vtkExtendedTable.h"
+#include "voUtils.h"
 
 // VTK includes
 #include <vtkObjectFactory.h>
@@ -130,6 +131,15 @@ void vtkExtendedTable::SetData(vtkTable* data)
 vtkTable* vtkExtendedTable::GetData()
 {
   return this;
+}
+
+//----------------------------------------------------------------------------
+vtkTable* vtkExtendedTable::GetDataWithRowHeader()
+{
+  vtkTable * dataWithRowHeader = vtkTable::New();
+  dataWithRowHeader->ShallowCopy(this);
+  voUtils::insertColumnIntoTable(dataWithRowHeader, 0, this->GetRowMetaDataOfInterestAsString());
+  return dataWithRowHeader;
 }
 
 //----------------------------------------------------------------------------

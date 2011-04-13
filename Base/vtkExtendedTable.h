@@ -59,6 +59,8 @@ public:
   void SetData(vtkTable* data);
   
   vtkTable* GetData();
+
+  vtkTable* GetDataWithRowHeader();
   
   //
   // Column MetaData
