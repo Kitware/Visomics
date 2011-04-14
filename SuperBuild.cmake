@@ -1,5 +1,13 @@
 
 #-----------------------------------------------------------------------------
+# GNU R
+#-----------------------------------------------------------------------------
+# Note :GNU R is should be provided at configuration time. For example:
+#       cmake <OTHER_OPTIONS> -DR_COMMAND:FILEPATH=/path/to/R-2.11.1/bin/R ../Visomics
+
+find_package(R REQUIRED)
+
+#-----------------------------------------------------------------------------
 # Git protocole option
 #-----------------------------------------------------------------------------
 
@@ -9,19 +17,6 @@ set(git_protocol "git")
 if(NOT Visomics_USE_GIT_PROTOCOL)
   set(git_protocol "http")
 endif()
-
-#-----------------------------------------------------------------------------
-# Qt - Let's check if a valid version of Qt is available
-#-----------------------------------------------------------------------------
-
-#FIND_PACKAGE(Qt4)
-#IF(QT_FOUND)
-#  IF("${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}" VERSION_LESS "${minimum_required_qt_version}")
-#    MESSAGE(FATAL_ERROR "error: Slicer requires Qt >= ${minimum_required_qt_version} -- you cannot use Qt ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR}.${QT_VERSION_PATCH}.")
-#  ENDIF()
-#ELSE()
-#  MESSAGE(FATAL_ERROR "error: Qt4 was not found on your system. You probably need to set the QT_QMAKE_EXECUTABLE variable")
-#ENDIF()
 
 #-----------------------------------------------------------------------------
 # Enable and setup External project global properties
@@ -54,7 +49,7 @@ endif()
 # Include ExternalProject Target
 #------------------------------------------------------------------------------
 
-#include(CMakeExternals/VTK.cmake)
+include(CMakeExternals/VTK.cmake)
 include(CMakeExternals/QtPropertyBrowser.cmake)
 #include(CMakeExternals/CTK.cmake)
 
@@ -79,7 +74,7 @@ ENDFOREACH()
 # FOREACH(arg ${project_superbuild_boolean_args})
 #   MESSAGE("  ${arg}")
 # ENDFOREACH()
-  
+
 #-----------------------------------------------------------------------------
 # Configure and build the project
 #------------------------------------------------------------------------------
@@ -116,5 +111,5 @@ ExternalProject_Add(${proj}
     # Mandatory dependencies
     ${QtPropertyBrowser_DEPENDS}
     #${CTK_DEPENDS}
-    #${VTK_DEPENDS}
+    ${VTK_DEPENDS}
   )
