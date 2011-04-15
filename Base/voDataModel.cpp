@@ -94,6 +94,7 @@ voDataModel::voDataModel():Superclass(), d_ptr(new voDataModelPrivate(*this))
 voDataModel::~voDataModel()
 {
   Q_D(voDataModel);
+  this->clear();
   delete d->SelectionModel;
 }
 

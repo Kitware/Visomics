@@ -87,6 +87,7 @@ void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem*
   voAnalysisFactory * analysisFactory = voApplication::application()->analysisFactory();
   voAnalysis * analysis = analysisFactory->createAnalysis(analysisName);
   Q_ASSERT(analysis);
+  analysis->setParent(qApp);
   analysis->setAcceptDefaultParameterValues(acceptDefaultParameter);
   this->runAnalysis(analysis, inputTarget);
 }
@@ -104,6 +105,8 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
     qWarning() << "Failed to runAnalysis - InputTarget is NULL";
     return;
     }
+
+  QScopedPointer<voAnalysis> analysisScopedPtr(analysis);
 
   // Reset abort execution flag
   analysis->setAbortExecution(false);
@@ -159,7 +162,7 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
     return;
     }
 
-  voAnalysisDriver::addAnalysisToObjectModel(analysis, inputTarget);
+  voAnalysisDriver::addAnalysisToObjectModel(analysisScopedPtr.take(), inputTarget);
 
   connect(analysis, SIGNAL(outputSet(const QString&, voDataObject*, voAnalysis*)),
           SLOT(onAnalysisOutputSet(const QString&,voDataObject*,voAnalysis*)));
