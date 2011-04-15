@@ -32,6 +32,12 @@ int voDelimitedTextImportDialogTest(int argc, char * argv [])
     autoExit.start(1000);
     }
 
-  return dialog.exec();
+  int status = dialog.exec();
+  if (status != QDialog::Accepted)
+    {
+    return EXIT_FAILURE;
+    }
+
+  return EXIT_SUCCESS;
 }
 
