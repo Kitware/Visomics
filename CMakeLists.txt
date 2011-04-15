@@ -52,24 +52,8 @@ FOREACH(type LIBRARY RUNTIME ARCHIVE)
 ENDFOREACH()
 
 #-----------------------------------------------------------------------------
-# VTK
-#
-FIND_PACKAGE(VTK REQUIRED)
-SET(current_vtk_version ${VTK_MAJOR_VERSION}.${VTK_MINOR_VERSION}.${VTK_BUILD_VERSION})
-SET(required_vtk_version 5.7)
-SET(preferred_vtk_version 5.8)
-IF(${current_vtk_version} VERSION_LESS ${required_vtk_version})
-  MESSAGE(FATAL_ERROR "You are trying to build Visomics using VTK ${current_vtk_version}. Please, update to VTK ${preferred_vtk_version} or higher !")
-ENDIF()
-IF(${current_vtk_version} VERSION_LESS ${preferred_vtk_version})
-  MESSAGE(WARNING "You are building Visomics using VTK ${current_vtk_version}. We recommend to use version  ${preferred_vtk_version} or higher")
-ENDIF()
-INCLUDE(${VTK_USE_FILE})
-
-#-----------------------------------------------------------------------------
 # Qt
 #
-SET(QT_QMAKE_EXECUTABLE ${VTK_QT_QMAKE_EXECUTABLE})
 FIND_PACKAGE(Qt4 4.7 COMPONENTS QtCore QtGui QtNetwork QtScript REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
@@ -155,6 +139,20 @@ IF(Visomics_SUPERBUILD)
   RETURN()
 ENDIF()
 
+#-----------------------------------------------------------------------------
+# VTK
+#
+FIND_PACKAGE(VTK REQUIRED)
+INCLUDE(${VTK_USE_FILE})
+GET_FILENAME_COMPONENT(VTK_QT_QMAKE_EXECUTABLE_REALPATH ${VTK_QT_QMAKE_EXECUTABLE} REALPATH)
+GET_FILENAME_COMPONENT(QT_QMAKE_EXECUTABLE_REALPATH ${QT_QMAKE_EXECUTABLE} REALPATH)
+IF(NOT ${VTK_QT_QMAKE_EXECUTABLE_REALPATH} STREQUAL ${QT_QMAKE_EXECUTABLE_REALPATH})
+  MESSAGE(FATAL_ERROR "Qt version mismatch problem:
+(1) QT_QMAKE_EXECUTABLE:${QT_QMAKE_EXECUTABLE_REALPATH}
+(2) VTK_QT_QMAKE_EXECUTABLE:${VTK_QT_QMAKE_EXECUTABLE_REALPATH}
+Try to rebuild VTK using (1)
+")
+ENDIF()
 
 #-----------------------------------------------------------------------------
 # QtPropertyBrowser
