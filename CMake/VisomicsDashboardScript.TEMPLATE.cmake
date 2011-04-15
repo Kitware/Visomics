@@ -160,10 +160,17 @@ set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-QT${MY_QT_VERSION}-$
 #
 # Display build info
 #
-message("site name: ${CTEST_SITE}")
-message("build name: ${CTEST_BUILD_NAME}")
-message("script mode: ${SCRIPT_MODE}")
-message("coverage: ${WITH_COVERAGE}, memcheck: ${WITH_MEMCHECK}")
+message("CTEST_SITE ................: ${CTEST_SITE}")
+message("CTEST_BUILD_NAME ..........: ${CTEST_BUILD_NAME}")
+message("SCRIPT_MODE ...............: ${SCRIPT_MODE}")
+message("GIT_TAG ...................: ${GIT_TAG}")
+message("CTEST_BUILD_CONFIGURATION .: ${CTEST_BUILD_CONFIGURATION}")
+message("WITH_KWSTYLE ..............: ${WITH_KWSTYLE}")
+message("WITH_COVERAGE: ............: ${WITH_COVERAGE}")
+message("WITH_MEMCHECK .............: ${WITH_MEMCHECK}")
+message("WITH_PACKAGES .............: ${WITH_PACKAGES}")
+message("WITH_DOCUMENTATION ........: ${WITH_DOCUMENTATION}")
+message("DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY: ${DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY}")
 
 #
 # Convenient macro allowing to download a file
