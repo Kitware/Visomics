@@ -72,6 +72,8 @@ void voChartXY::SetTooltipInfo(const vtkContextMouseEvent& mouse,
                                 const vtkVector2f &plotPos,
                                 int seriesIndex, vtkPlot* plot)
 {
+  Q_UNUSED(seriesIndex);
+  Q_UNUSED(plot);
   vtkStdString label;
   // Check for group names if we are plotting stacked bars
   //
