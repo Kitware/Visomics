@@ -198,7 +198,7 @@ get_filename_component(src_name ${src_dir} NAME)
 
 if(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}")
   _write_gitclone_script(
-    ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}-gitclone.cmake # script_filename
+    ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}-${GIT_TAG}-${SCRIPT_MODE}-gitclone.cmake # script_filename
     ${CTEST_SOURCE_DIRECTORY} # source_dir
     ${CTEST_GIT_COMMAND} # git_EXECUTABLE
     ${GIT_REPOSITORY} # git_repository
@@ -207,11 +207,11 @@ if(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}")
     ${work_dir} # work_dir
   )
   # Note: The following command should be specified as a string.
-  set(CTEST_CHECKOUT_COMMAND "${CMAKE_COMMAND} -P ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}-gitclone.cmake")
+  set(CTEST_CHECKOUT_COMMAND "${CMAKE_COMMAND} -P ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}-${GIT_TAG}-${SCRIPT_MODE}-gitclone.cmake")
 endif()
 
 _update_gitclone_script(
-  ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}-gitupdate.cmake # script_filename
+  ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}-${GIT_TAG}-${SCRIPT_MODE}-gitupdate.cmake # script_filename
   ${CTEST_SOURCE_DIRECTORY} # source_dir
   ${CTEST_GIT_COMMAND} # git_EXECUTABLE
   ${GIT_REPOSITORY} # git_repository
@@ -223,7 +223,7 @@ _update_gitclone_script(
 #set(CTEST_UPDATE_COMMAND "${CTEST_GIT_COMMAND}")
 
 # Note: The following command should be specified as a list.
-set(CTEST_GIT_UPDATE_CUSTOM ${CMAKE_COMMAND} -P ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}-gitupdate.cmake)
+set(CTEST_GIT_UPDATE_CUSTOM ${CMAKE_COMMAND} -P ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}-${GIT_TAG}-${SCRIPT_MODE}-gitupdate.cmake)
 
 #
 # run_ctest macro
