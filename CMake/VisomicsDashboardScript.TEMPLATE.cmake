@@ -20,19 +20,6 @@ cmake_minimum_required(VERSION 2.8.2)
 #
 
 #-----------------------------------------------------------------------------
-# Attempt to extract configuration passed from command line
-#-----------------------------------------------------------------------------
-# Note: The syntax to pass option from the command line while invoking ctest is 
-#       the following: ctest -S /path/to/script.cmake,<SCRIPT_MODE>\;<GIT_TAG>
-#       where <SCRIPT_MODE> is either "experimental", "continuous" or "nightly"
-#       and <GIT_TAG> is either 'master' or 'next'
-if(NOT CTEST_SCRIPT_ARG STREQUAL "")
-  set(CTEST_SCRIPT_ARG_AS_LIST ${CTEST_SCRIPT_ARG})
-  list(GET CTEST_SCRIPT_ARG_AS_LIST 0 SCRIPT_MODE)
-  list(GET CTEST_SCRIPT_ARG_AS_LIST 1 GIT_TAG)
-endif()
-
-#-----------------------------------------------------------------------------
 # Dashboard properties
 #-----------------------------------------------------------------------------
 set(MY_OPERATING_SYSTEM   "Linux") # Windows, Linux, Darwin... 
@@ -47,17 +34,45 @@ set(CTEST_CMAKE_COMMAND   "$ENV{HOME}/Dashboards/Support/cmake-2.8.4-Linux-i386/
 set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 
 #-----------------------------------------------------------------------------
+# Attempt to extract dashboard option passed from command line
+#-----------------------------------------------------------------------------
+# Note: The syntax to pass option from the command line while invoking ctest is 
+#       the following: ctest -S /path/to/script.cmake,OPTNAME1##OPTVALUE1^^OPTNAME2##OPTVALUE2
+#
+# Example:
+#       ctest -S /path/to/script.cmake,SCRIPT_MODE##continuous^^GIT_TAG##next
+#
+if(NOT CTEST_SCRIPT_ARG STREQUAL "")
+  string(REPLACE "^^" "\\;" CTEST_SCRIPT_ARG_AS_LIST ${CTEST_SCRIPT_ARG})
+  set(CTEST_SCRIPT_ARG_AS_LIST ${CTEST_SCRIPT_ARG_AS_LIST})
+  foreach(argn_argv ${CTEST_SCRIPT_ARG_AS_LIST})
+    string(REPLACE "##" "\\;" argn_argv_list ${argn_argv})
+    set(argn_argv_list ${argn_argv_list})
+    list(GET argn_argv_list 0 argn)
+    list(GET argn_argv_list 1 argv)
+    set(${argn} ${argv})
+  endforeach()
+endif()
+
+# Macro allowing to set a variable to its default value only if not already defined
+macro(setIfNotDefined var defaultvalue)
+  if(NOT DEFINED ${var})
+    set(${var} "${defaultvalue}")
+  endif()
+endmacro()
+
+#-----------------------------------------------------------------------------
 # Dashboard options
 #-----------------------------------------------------------------------------
-set(WITH_KWSTYLE FALSE)
-set(WITH_MEMCHECK FALSE)
-set(WITH_COVERAGE FALSE)
-set(WITH_DOCUMENTATION FALSE)
-#set(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY ) # for example: $ENV{HOME}/Projects/Doxygen
-set(WITH_PACKAGES FALSE)
-set(CTEST_BUILD_CONFIGURATION "Release") # Release or Debug
-set(CTEST_TEST_TIMEOUT 100)
-set(CTEST_BUILD_FLAGS "") # Use multiple CPU cores to build. For example "-j4" on unix
+setIfNotDefined(WITH_KWSTYLE FALSE)
+setIfNotDefined(WITH_MEMCHECK FALSE)
+setIfNotDefined(WITH_COVERAGE FALSE)
+setIfNotDefined(WITH_DOCUMENTATION FALSE)
+set(DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY ) # for example: $ENV{HOME}/Projects/Doxygen
+setIfNotDefined(WITH_PACKAGES FALSE)
+setIfNotDefined(CTEST_BUILD_CONFIGURATION "Release") # Release or Debug
+setIfNotDefined(CTEST_TEST_TIMEOUT 100)
+setIfNotDefined(CTEST_BUILD_FLAGS "") # Use multiple CPU cores to build. For example "-j4" on unix
 
 # experimental: 
 #     - run_ctest() macro will be called *ONE* time
@@ -69,9 +84,7 @@ set(CTEST_BUILD_FLAGS "") # Use multiple CPU cores to build. For example "-j4" o
 # nightly: 
 #     - run_ctest() macro will be called *ONE* time
 #     - binary directory *WILL BE* cleaned
-if(NOT DEFINED SCRIPT_MODE)
-  set(SCRIPT_MODE "nightly") # "experimental", "continuous", "nightly"
-endif()
+setIfNotDefined(SCRIPT_MODE "nightly") # "experimental", "continuous", "nightly"
 
 # You could invoke the script with the following syntax:
 #  ctest -S karakoram_Visomics_nightly.cmake -C <CTEST_BUILD_CONFIGURATION> -V
@@ -112,14 +125,12 @@ find_program(CTEST_MEMORYCHECK_COMMAND NAMES valgrind)
 #-----------------------------------------------------------------------------
 # Git tag - Should be pecified without the prefix 'origin/'
 #-----------------------------------------------------------------------------
-if(NOT DEFINED GIT_TAG)
-  set(GIT_TAG "master") # master, next, ...
-endif()
+setIfNotDefined(GIT_TAG "master") # master, next, ...
 
 #-----------------------------------------------------------------------------
 # Git repository
 #-----------------------------------------------------------------------------
-set(GIT_REPOSITORY git://kwsource.kitwarein.com/bioinformatics/visomics.git)
+setIfNotDefined(GIT_REPOSITORY git://kwsource.kitwarein.com/bioinformatics/visomics.git)
 # OR
 #set(GIT_REPOSITORY git://kwsource.kitwarein.com/~<YOURUSERNAME>/bioinformatics/<YOURUSERNAME>s-visomics.git)
 
@@ -128,7 +139,7 @@ set(GIT_REPOSITORY git://kwsource.kitwarein.com/bioinformatics/visomics.git)
 #-----------------------------------------------------------------------------
 # Note: If you have multiple dashboard scripts checking out different GIT TAG and/or REPOSITORY
 #       Make sure you append a suffix to the source directory to differentate them.
-set(BUILD_OPTIONS_STRING "Qt4.7-R-2.11.1-${GIT_TAG}")
+setIfNotDefined(BUILD_OPTIONS_STRING "Qt4.7-R-2.11.1-${GIT_TAG}")
 
 #-----------------------------------------------------------------------------
 # Build directory
