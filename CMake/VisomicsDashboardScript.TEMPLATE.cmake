@@ -43,7 +43,7 @@ set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 #       ctest -S /path/to/script.cmake,SCRIPT_MODE##continuous^^GIT_TAG##next
 #
 if(NOT CTEST_SCRIPT_ARG STREQUAL "")
-  string(REPLACE "^^" "\\;" CTEST_SCRIPT_ARG_AS_LIST ${CTEST_SCRIPT_ARG})
+  string(REPLACE "^^" "\\;" CTEST_SCRIPT_ARG_AS_LIST "${CTEST_SCRIPT_ARG}")
   set(CTEST_SCRIPT_ARG_AS_LIST ${CTEST_SCRIPT_ARG_AS_LIST})
   foreach(argn_argv ${CTEST_SCRIPT_ARG_AS_LIST})
     string(REPLACE "##" "\\;" argn_argv_list ${argn_argv})
