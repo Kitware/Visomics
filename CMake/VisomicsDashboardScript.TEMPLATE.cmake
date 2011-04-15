@@ -25,6 +25,7 @@ cmake_minimum_required(VERSION 2.8.2)
 set(MY_OPERATING_SYSTEM   "Linux") # Windows, Linux, Darwin... 
 set(MY_COMPILER           "g++4.4.3")
 set(MY_QT_VERSION         "4.7")
+set(MY_R_VERSION          "2.11.1")
 set(QT_QMAKE_EXECUTABLE   "$ENV{HOME}/Dashboards/Support/qtsdk-2010.05/qt/bin/qmake")
 set(R_COMMAND             "$ENV{HOME}/Dashboards/Support/R-2.11.1/bin/R")
 set(CTEST_SITE            "karakoram.kitware") # for example: mymachine.kitware, mymachine.bwh.harvard.edu, ...
@@ -139,7 +140,7 @@ setIfNotDefined(GIT_REPOSITORY git://kwsource.kitwarein.com/bioinformatics/visom
 #-----------------------------------------------------------------------------
 # Note: If you have multiple dashboard scripts checking out different GIT TAG and/or REPOSITORY
 #       Make sure you append a suffix to the source directory to differentate them.
-setIfNotDefined(BUILD_OPTIONS_STRING "Qt4.7-R-2.11.1-${GIT_TAG}")
+setIfNotDefined(BUILD_OPTIONS_STRING "-${GIT_TAG}")
 
 #-----------------------------------------------------------------------------
 # Build directory
@@ -166,7 +167,7 @@ set(CTEST_NOTES_FILES "${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}")
 # Project specific properties
 #
 set(CTEST_PROJECT_NAME "Visomics")
-set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-QT${MY_QT_VERSION}-${BUILD_OPTIONS_STRING}-${CTEST_BUILD_CONFIGURATION}")
+set(CTEST_BUILD_NAME "${MY_OPERATING_SYSTEM}-${MY_COMPILER}-Qt${MY_QT_VERSION}-R${MY_R_VERSION}-${BUILD_OPTIONS_STRING}-${CTEST_BUILD_CONFIGURATION}")
 
 #
 # Display build info
