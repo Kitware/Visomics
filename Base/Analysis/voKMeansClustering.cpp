@@ -8,6 +8,7 @@
 // Visomics includes
 #include "voKMeansClustering.h"
 #include "voTableDataObject.h"
+#include "vtkExtendedTable.h"
 
 // VTK includes
 #include <vtkArrayToTable.h>
@@ -37,7 +38,7 @@ voKMeansClustering::~voKMeansClustering()
 // --------------------------------------------------------------------------
 void voKMeansClustering::setInputInformation()
 {
-  this->addInputType("input", "vtkTable");
+  this->addInputType("input", "vtkExtendedTable");
 }
 
 // --------------------------------------------------------------------------
@@ -70,12 +71,14 @@ void voKMeansClustering::setParameterInformation()
 // --------------------------------------------------------------------------
 bool voKMeansClustering::execute()
 {
-  vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
-  if (!table)
+  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->data());
+  if (!extendedTable)
     {
     qWarning() << "Input is Null";
     return false;
     }
+
+  vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
 
   // Parameters
   int kmeans_centers = this->integerParameter("centers");

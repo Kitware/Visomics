@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>voDelimitedTextImportWidget</class>
+ <widget class="QWidget" name="voDelimitedTextImportWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>791</width>
+    <height>521</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <layout class="QVBoxLayout" name="MainVerticalLayout">
+   <property name="margin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QLabel" name="label">
+     <property name="text">
+      <string>Please choose the character that separates fileds in your data. At the bottom you will see a preview of documents extracted using your selections.</string>
+     </property>
+     <property name="wordWrap">
+      <bool>true</bool>
+     </property>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="DelimiterGroupBox">
+     <property name="title">
+      <string>Delimiter</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout" columnstretch="0,0,0,1">
+      <item row="0" column="0" colspan="2">
+       <widget class="QRadioButton" name="CommaRadioButton">
+        <property name="text">
+         <string>&amp;Comma</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <widget class="QRadioButton" name="SemicolonRadioButton">
+        <property name="text">
+         <string>Se&amp;micolon</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="QRadioButton" name="TabRadioButton">
+        <property name="text">
+         <string>&amp;Tab</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="3">
+       <widget class="QRadioButton" name="SpaceRadioButton">
+        <property name="text">
+         <string>&amp;Space</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QRadioButton" name="OtherRadioButton">
+        <property name="text">
+         <string>&amp;Other</string>
+        </property>
+        <property name="checked">
+         <bool>false</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLineEdit" name="OtherLineEdit">
+        <property name="text">
+         <string>:</string>
+        </property>
+        <property name="maxLength">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0" colspan="2">
+       <widget class="QCheckBox" name="StringDelimiterCheckBox">
+        <property name="text">
+         <string>&amp;String begin/end character</string>
+        </property>
+        <property name="checked">
+         <bool>true</bool>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="2">
+       <widget class="QLineEdit" name="StringDelimiterLineEdit">
+        <property name="text">
+         <string>&quot;</string>
+        </property>
+        <property name="maxLength">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="RowsColumnsGroupBox">
+     <property name="title">
+      <string>Rows &amp;&amp; Columns</string>
+     </property>
+     <layout class="QFormLayout" name="formLayout">
+      <property name="fieldGrowthPolicy">
+       <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
+      </property>
+      <item row="0" column="0" colspan="2">
+       <widget class="QCheckBox" name="TransposeCheckBox">
+        <property name="text">
+         <string>Transpose</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QSpinBox" name="NumberHeaderColumnsSpinBox">
+        <property name="value">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLabel" name="NumberHeaderColumnsLabel">
+        <property name="text">
+         <string>header columns</string>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="0">
+       <widget class="QSpinBox" name="NumberHeaderRowsSpinBox">
+        <property name="value">
+         <number>1</number>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="1">
+       <widget class="QLabel" name="NumberHeaderRowsLabel">
+        <property name="text">
+         <string>header rows</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="DocumentPreviewGroupBox">
+     <property name="title">
+      <string>Document Preview</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="voDelimitedTextPreview" name="DocumentPreviewWidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>voDelimitedTextPreview</class>
+   <extends>QWidget</extends>
+   <header>voDelimitedTextPreview.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>

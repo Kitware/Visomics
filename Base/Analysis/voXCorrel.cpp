@@ -8,6 +8,7 @@
 // Visomics includes
 #include "voXCorrel.h"
 #include "voTableDataObject.h"
+#include "vtkExtendedTable.h"
 
 // VTK includes
 #include <vtkArrayToTable.h>
@@ -50,7 +51,7 @@ voXCorrel::~voXCorrel()
 // --------------------------------------------------------------------------
 void voXCorrel::setInputInformation()
 {
-  this->addInputType("input", "vtkTable");
+  this->addInputType("input", "vtkExtendedTable");
 }
 
 // --------------------------------------------------------------------------
@@ -85,12 +86,14 @@ bool voXCorrel::execute()
 {
   Q_D(voXCorrel);
 
-  vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
-  if (!table)
+  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->data());
+  if (!extendedTable)
     {
     qWarning() << "Input is Null";
     return false;
     }
+
+  vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
 
   // Parameters
   QString cor_method = this->enumParameter("method");

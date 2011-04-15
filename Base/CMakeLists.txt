@@ -15,6 +15,8 @@ SET(KIT_SRCS
   
   Views/voCorrelationGraphView.cpp
   Views/voCorrelationGraphView.h
+  Views/voExtendedTableView.cpp
+  Views/voExtendedTableView.h
   Views/voPCABarPlot.cpp
   Views/voPCABarPlot.h
   Views/voPCAProjectionPlot.cpp
@@ -46,6 +48,8 @@ SET(KIT_SRCS
   voDataModelItem.h
   voDataObject.cpp
   voDataObject.h
+  voDelimitedTextImportSettings.cpp
+  voDelimitedTextImportSettings.h
   voInputFileDataObject.cpp
   voInputFileDataObject.h
   voIOManager.cpp
@@ -53,12 +57,17 @@ SET(KIT_SRCS
   voQObjectFactory.h
   voTableDataObject.cpp
   voTableDataObject.h
+  voUtils.cpp
+  voUtils.h
   voView.cpp
   voView.h
   voViewFactory.cpp
   voViewFactory.h
   voViewManager.cpp
   voViewManager.h
+
+  vtkExtendedTable.cpp
+  vtkExtendedTable.h
   )
   
 SET(KIT_MOC_SRCS
@@ -69,6 +78,7 @@ SET(KIT_MOC_SRCS
   Analysis/voXCorrel.h
   
   Views/voCorrelationGraphView.h
+  Views/voExtendedTableView.h
   Views/voPCABarPlot.h
   Views/voPCAProjectionPlot.h
   Views/voTableView.h
