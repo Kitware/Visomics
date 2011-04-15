@@ -20,6 +20,19 @@ cmake_minimum_required(VERSION 2.8.2)
 #
 
 #-----------------------------------------------------------------------------
+# Attempt to extract configuration passed from command line
+#-----------------------------------------------------------------------------
+# Note: The syntax to pass option from the command line while invoking ctest is 
+#       the following: ctest -S /path/to/script.cmake,<SCRIPT_MODE>\;<GIT_TAG>
+#       where <SCRIPT_MODE> is either "experimental", "continuous" or "nightly"
+#       and <GIT_TAG> is either 'master' or 'next'
+if(NOT CTEST_SCRIPT_ARG STREQUAL "")
+  set(CTEST_SCRIPT_ARG_AS_LIST ${CTEST_SCRIPT_ARG})
+  list(GET CTEST_SCRIPT_ARG_AS_LIST 0 SCRIPT_MODE)
+  list(GET CTEST_SCRIPT_ARG_AS_LIST 1 GIT_TAG)
+endif()
+
+#-----------------------------------------------------------------------------
 # Dashboard properties
 #-----------------------------------------------------------------------------
 set(MY_OPERATING_SYSTEM   "Linux") # Windows, Linux, Darwin... 
