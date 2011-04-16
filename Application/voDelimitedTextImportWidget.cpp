@@ -9,7 +9,7 @@ class voDelimitedTextImportWidgetPrivate : public Ui_voDelimitedTextImportWidget
 public:
   voDelimitedTextImportWidgetPrivate();
 
-  void updateWidgetFromModel();
+  void initWidgetFromModel();
 
   QButtonGroup DelimiterButtonGroup;
   voDelimitedTextPreviewModel DelimitedTextPreviewModel;
@@ -24,8 +24,32 @@ voDelimitedTextImportWidgetPrivate::voDelimitedTextImportWidgetPrivate()
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextImportWidgetPrivate::updateWidgetFromModel()
+void voDelimitedTextImportWidgetPrivate::initWidgetFromModel()
 {
+  this->OtherLineEdit->setText(QString(":"));
+  switch (this->DelimitedTextPreviewModel.fieldDelimiterCharacters().at(0).toLatin1())
+    {
+    case ',':
+      this->CommaRadioButton->setChecked(true);
+      break;
+    case ';':
+      this->SemicolonRadioButton->setChecked(true);
+      break;
+    case '\t':
+      this->TabRadioButton->setChecked(true);
+      break;
+    case ' ':
+      this->SpaceRadioButton->setChecked(true);
+      break;
+    default:
+      this->OtherRadioButton->setChecked(true);
+      this->OtherLineEdit->setText(this->DelimitedTextPreviewModel.fieldDelimiterCharacters());
+      break;
+    }
+
+  this->StringDelimiterCheckBox->setChecked(this->DelimitedTextPreviewModel.useStringDelimiter());
+  this->StringDelimiterLineEdit->setText(QString(QChar(this->DelimitedTextPreviewModel.stringDelimiter())));
+
   this->TransposeCheckBox->setChecked(this->DelimitedTextPreviewModel.transpose());
 
   this->NumberHeaderColumnsSpinBox->setValue(this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes());
@@ -53,7 +77,7 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
   d->DocumentPreviewWidget->horizontalHeader()->setVisible(false);
   d->DocumentPreviewWidget->verticalHeader()->setVisible(false);
 
-  d->updateWidgetFromModel();
+  d->initWidgetFromModel();
 
   d->DelimiterButtonGroup.addButton(d->CommaRadioButton, ',');
   d->DelimiterButtonGroup.addButton(d->SemicolonRadioButton, ';');
