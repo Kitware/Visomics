@@ -26,7 +26,11 @@ IF(NOT DEFINED VTK_DIR)
       ${ep_common_args}
       -DVTK_USE_GNU_R:BOOL=ON
       -DR_COMMAND:PATH=${R_COMMAND}
-      -DR_INCLUDE_DIR:PATH=${R_INCLUDE_DIR} # Note: VTK/FindR should be fixed upstream to auto discover this value based on R_COMMAND
+      -DR_INCLUDE_DIR:PATH=${R_INCLUDE_DIR}
+      -DR_LIBRARY_BASE:FILEPATH=${R_LIBRARY_BASE}
+      -DR_LIBRARY_BLAS:FILEPATH=${R_LIBRARY_BLAS}
+      -DR_LIBRARY_LAPACK:FILEPATH=${R_LIBRARY_LAPACK}
+      -DR_LIBRARY_READLINE:FILEPATH=${R_LIBRARY_READLINE}
       -DVTK_USE_N_WAY_ARRAYS:BOOL=ON # Required for using R interface
       -DVTK_USE_INFOVIS:BOOL=ON # Required for using R interface
       -DBUILD_EXAMPLES:BOOL=OFF
