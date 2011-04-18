@@ -561,7 +561,7 @@ void voDelimitedTextPreviewModel::updatePreview()
       else // Not row or column of interest, is a main table cell
         {
         this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
-        currentItem->setFlags(Qt::NoItemFlags | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         if (rid < d->NumberOfColumnMetaDataTypes || cid < d->NumberOfRowMetaDataTypes)
           {
           currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
