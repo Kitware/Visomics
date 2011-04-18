@@ -32,8 +32,10 @@ public:
   bool transpose() const;
 
   int numberOfColumnMetaDataTypes() const;
+  int columnMetaDataTypeOfInterest() const;
 
   int numberOfRowMetaDataTypes() const;
+  int rowMetaDataTypeOfInterest() const;
 
   int numberOfRowsToPreview() const;
 
@@ -54,8 +56,10 @@ public slots:
   void setTranspose(bool value);
 
   void setNumberOfColumnMetaDataTypes(int _arg);
+  void setColumnMetaDataTypeOfInterest(int _arg);
 
   void setNumberOfRowMetaDataTypes(int _arg);
+  void setRowMetaDataTypeOfInterest(int _arg);
 
   void setNumberOfRowsToPreview(int count);
 
@@ -71,8 +75,10 @@ signals:
   void inlineUpdateChanged(bool value);
 
   void numberOfColumnMetaDataTypesChanged(int value);
+  void columnMetaDataTypeOfInterestChanged(int value);
 
   void numberOfRowMetaDataTypesChanged(int value);
+  void rowMetaDataTypeOfInterestChanged(int value);
 
   void numberOfRowsToPreviewChanged(int count);
 

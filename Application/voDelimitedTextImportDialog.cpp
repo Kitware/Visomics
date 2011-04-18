@@ -93,12 +93,12 @@ voDelimitedTextImportSettings voDelimitedTextImportDialog::importSettings()const
                   model->transpose());
   settings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes,
                   model->numberOfColumnMetaDataTypes());
-//  settings.insert(voDelimitedTextImportSettings::ColumnMetaDataTypeOfInterest,
-//                  model->columnMetaDataTypeOfInterest());
+  settings.insert(voDelimitedTextImportSettings::ColumnMetaDataTypeOfInterest,
+                  model->columnMetaDataTypeOfInterest());
   settings.insert(voDelimitedTextImportSettings::NumberOfRowMetaDataTypes,
                   model->numberOfRowMetaDataTypes());
-//  settings.insert(voDelimitedTextImportSettings::RowMetaDataTypeOfInterest,
-//                  model->rowMetaDataTypeOfInterest());
+  settings.insert(voDelimitedTextImportSettings::RowMetaDataTypeOfInterest,
+                  model->rowMetaDataTypeOfInterest());
 
   return settings;
 }

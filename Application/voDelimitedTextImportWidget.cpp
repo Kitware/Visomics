@@ -27,8 +27,16 @@ voDelimitedTextImportWidgetPrivate::voDelimitedTextImportWidgetPrivate()
 void voDelimitedTextImportWidgetPrivate::updateWidgetFromModel()
 {
   this->TransposeCheckBox->setChecked(this->DelimitedTextPreviewModel.transpose());
+
   this->NumberHeaderColumnsSpinBox->setValue(this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes());
+
+  this->HeaderColumnOfInterestSpinBox->setValue(this->DelimitedTextPreviewModel.rowMetaDataTypeOfInterest());
+  this->HeaderColumnOfInterestSpinBox->setMaximum(this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes()-1);
+
   this->NumberHeaderRowsSpinBox->setValue(this->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes());
+
+  this->HeaderRowOfInterestSpinBox->setValue(this->DelimitedTextPreviewModel.columnMetaDataTypeOfInterest());
+  this->HeaderRowOfInterestSpinBox->setMaximum(this->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes()-1);
 }
 
 // --------------------------------------------------------------------------
@@ -66,15 +74,25 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
   connect(d->NumberHeaderColumnsSpinBox, SIGNAL(valueChanged(int)),
           &d->DelimitedTextPreviewModel, SLOT(setNumberOfRowMetaDataTypes(int)));
 
+  connect(d->HeaderColumnOfInterestSpinBox, SIGNAL(valueChanged(int)),
+          &d->DelimitedTextPreviewModel, SLOT(setRowMetaDataTypeOfInterest(int)));
+
   connect(d->NumberHeaderRowsSpinBox, SIGNAL(valueChanged(int)),
           &d->DelimitedTextPreviewModel, SLOT(setNumberOfColumnMetaDataTypes(int)));
+
+  connect(d->HeaderRowOfInterestSpinBox, SIGNAL(valueChanged(int)),
+          &d->DelimitedTextPreviewModel, SLOT(setColumnMetaDataTypeOfInterest(int)));
 
   // Model -> Widget connections
   connect(&d->DelimitedTextPreviewModel, SIGNAL(numberOfColumnMetaDataTypesChanged(int)),
           this, SLOT(onNumberOfColumnMetaDataTypesChanged(int)));
+  connect(&d->DelimitedTextPreviewModel, SIGNAL(columnMetaDataTypeOfInterestChanged(int)),
+          this, SLOT(onColumnMetaDataTypeOfInterestChanged(int)));
 
   connect(&d->DelimitedTextPreviewModel, SIGNAL(numberOfRowMetaDataTypesChanged(int)),
           this, SLOT(onNumberOfRowMetaDataTypesChanged(int)));
+  connect(&d->DelimitedTextPreviewModel, SIGNAL(rowMetaDataTypeOfInterestChanged(int)),
+          this, SLOT(onRowMetaDataTypeOfInterestChanged(int)));
 }
 
 // --------------------------------------------------------------------------
@@ -126,7 +144,27 @@ void voDelimitedTextImportWidget::onNumberOfColumnMetaDataTypesChanged(int value
 {
   Q_D(voDelimitedTextImportWidget);
   d->NumberHeaderRowsSpinBox->setValue(value);
+
+  // Modify HeaderRowOfInterestSpinBox to conform
+  d->HeaderRowOfInterestSpinBox->setEnabled(value != 0);
+  if(value > 0)
+    {
+    d->HeaderRowOfInterestSpinBox->setMaximum(value-1);
+    }
+  if(value < d->HeaderRowOfInterestSpinBox->value())
+    {
+    d->HeaderRowOfInterestSpinBox->setValue(value);
+    }
+
   d->DocumentPreviewWidget->horizontalHeader()->setVisible(value > 0);
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidget::onColumnMetaDataTypeOfInterestChanged(int value)
+{
+  Q_D(voDelimitedTextImportWidget);
+  d->HeaderRowOfInterestSpinBox->setValue(value);
+  //set header here?
 }
 
 // --------------------------------------------------------------------------
@@ -134,7 +172,27 @@ void voDelimitedTextImportWidget::onNumberOfRowMetaDataTypesChanged(int value)
 {
   Q_D(voDelimitedTextImportWidget);
   d->NumberHeaderColumnsSpinBox->setValue(value);
+
+  // Modify HeaderColumnOfInterestSpinBox to conform
+  d->HeaderColumnOfInterestSpinBox->setEnabled(value != 0);
+  if(value > 0)
+    {
+    d->HeaderColumnOfInterestSpinBox->setMaximum(value-1);
+    }
+  if(value < d->HeaderColumnOfInterestSpinBox->value())
+    {
+    d->HeaderColumnOfInterestSpinBox->setValue(value);
+    }
+
   d->DocumentPreviewWidget->verticalHeader()->setVisible(value > 0);
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidget::onRowMetaDataTypeOfInterestChanged(int value)
+{
+  Q_D(voDelimitedTextImportWidget);
+  d->HeaderColumnOfInterestSpinBox->setValue(value);
+  //set header here?
 }
 
 // --------------------------------------------------------------------------

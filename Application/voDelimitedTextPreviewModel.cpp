@@ -284,16 +284,25 @@ void voDelimitedTextPreviewModel::setTranspose(bool value)
   d->NumberOfColumnMetaDataTypes = d->NumberOfRowMetaDataTypes;
   d->NumberOfRowMetaDataTypes = currentNumberOfColumnMetaDataTypes;
 
+  // Switch row and column metdata types of interest
+  int currentColumnMetaDataTypeOfInterest = d->ColumnMetaDataTypeOfInterest;
+  int currentRowMetaDataTypeOfInterest = d->RowMetaDataTypeOfInterest;
+  d->ColumnMetaDataTypeOfInterest = d->RowMetaDataTypeOfInterest;
+  d->RowMetaDataTypeOfInterest = currentColumnMetaDataTypeOfInterest;
+
   // Do not call 'setNumberOfColumnMetaDataTypes()' to avoid extra call to 'updatePreview()'
   if (currentNumberOfColumnMetaDataTypes != d->NumberOfColumnMetaDataTypes)
     {
+    // If column is changed, row is changed too (since they were swapped)
     emit this->numberOfColumnMetaDataTypesChanged(d->NumberOfColumnMetaDataTypes);
+    emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
     }
 
-  // Do not call 'setNumberOfRowMetaDataTypes()' to avoid extra call to 'updatePreview()'
-  if (currentNumberOfRowMetaDataTypes != d->NumberOfRowMetaDataTypes)
+  // Do not call 'setColumnMetaDataTypeOfInterest()' to avoid extra call to 'updatePreview()'
+  if (currentColumnMetaDataTypeOfInterest != d->ColumnMetaDataTypeOfInterest)
     {
-    emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
+    emit this->columnMetaDataTypeOfInterestChanged(d->ColumnMetaDataTypeOfInterest);
+    emit this->rowMetaDataTypeOfInterestChanged(d->RowMetaDataTypeOfInterest);
     }
 
   if (d->InlineUpdate)
@@ -330,6 +339,31 @@ void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int _arg)
 }
 
 // --------------------------------------------------------------------------
+int voDelimitedTextPreviewModel::columnMetaDataTypeOfInterest() const
+{
+  Q_D(const voDelimitedTextPreviewModel);
+  return d->ColumnMetaDataTypeOfInterest;
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextPreviewModel::setColumnMetaDataTypeOfInterest(int _arg)
+{
+  Q_D(voDelimitedTextPreviewModel);
+  if (d->ColumnMetaDataTypeOfInterest == _arg)
+    {
+    return;
+    }
+  d->ColumnMetaDataTypeOfInterest = _arg;
+
+  if (d->InlineUpdate)
+    {
+    this->updatePreview();
+    }
+
+  emit this->columnMetaDataTypeOfInterestChanged(d->ColumnMetaDataTypeOfInterest);
+}
+
+// --------------------------------------------------------------------------
 int voDelimitedTextPreviewModel::numberOfRowMetaDataTypes() const
 {
   Q_D(const voDelimitedTextPreviewModel);
@@ -352,6 +386,31 @@ void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int _arg)
     }
 
   emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
+}
+
+// --------------------------------------------------------------------------
+int voDelimitedTextPreviewModel::rowMetaDataTypeOfInterest() const
+{
+  Q_D(const voDelimitedTextPreviewModel);
+  return d->RowMetaDataTypeOfInterest;
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextPreviewModel::setRowMetaDataTypeOfInterest(int _arg)
+{
+  Q_D(voDelimitedTextPreviewModel);
+  if (d->RowMetaDataTypeOfInterest == _arg)
+    {
+    return;
+    }
+  d->RowMetaDataTypeOfInterest = _arg;
+
+  if (d->InlineUpdate)
+    {
+    this->updatePreview();
+    }
+
+  emit this->rowMetaDataTypeOfInterestChanged(d->RowMetaDataTypeOfInterest);
 }
 
 // --------------------------------------------------------------------------
@@ -468,6 +527,7 @@ void voDelimitedTextPreviewModel::updatePreview()
     }
   this->setColumnCount(modelColumnCount);
 
+  QColor headerBackgroundColor = QPalette().color(QPalette::Window);
   for (vtkIdType cid = 0; cid < table->GetNumberOfColumns(); ++cid)
     {
     vtkStringArray * column = vtkStringArray::SafeDownCast(table->GetColumn(cid));
@@ -476,57 +536,38 @@ void voDelimitedTextPreviewModel::updatePreview()
       {
       QString value = QString(column->GetValue(rid));
       int modelRowId = rid;
-      if (d->NumberOfColumnMetaDataTypes > 0)
+      if (d->NumberOfColumnMetaDataTypes > 0 && rid > d->ColumnMetaDataTypeOfInterest)
         {
         modelRowId--; // Consider the header data
         }
       int modelColumnId = cid;
-      if (d->NumberOfRowMetaDataTypes > 0)
+      if (d->NumberOfRowMetaDataTypes > 0 && cid > d->RowMetaDataTypeOfInterest)
         {
         modelColumnId--; // Consider the header data
         }
       QStandardItem* currentItem = 0;
-      QColor headerBackgroundColor = QPalette().color(QPalette::Window);
-      if (cid < d->NumberOfRowMetaDataTypes)
+
+      if ((rid == d->ColumnMetaDataTypeOfInterest && d->NumberOfColumnMetaDataTypes > 0)||
+          (cid == d->RowMetaDataTypeOfInterest && d->NumberOfRowMetaDataTypes > 0))
         {
-        if (cid == d->RowMetaDataTypeOfInterest)
+        // One cell will be both a row and column header
+        if (rid == d->ColumnMetaDataTypeOfInterest && d->NumberOfColumnMetaDataTypes > 0)
+          {
+          this->setHeaderData(modelColumnId, Qt::Horizontal, value);
+          }
+        if (cid == d->RowMetaDataTypeOfInterest && d->NumberOfRowMetaDataTypes > 0)
           {
           this->setHeaderData(modelRowId, Qt::Vertical, value);
           }
-        else
-          {
-          this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
-          currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
-
-          // Update horizontal header
-          if (rid == d->ColumnMetaDataTypeOfInterest)
-            {
-            this->setHeaderData(modelColumnId, Qt::Horizontal, value);
-            }
-          }
         }
-      else
+      else // Not row or column of interest, is a main table cell
         {
-        if (rid < d->NumberOfColumnMetaDataTypes)
-          {
-          if (rid == d->ColumnMetaDataTypeOfInterest)
-            {
-            this->setHeaderData(modelColumnId, Qt::Horizontal, value);
-            }
-          else
-            {
-            this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
-            currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
-            }
-          }
-        else
-          {
-          this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
-          }
-        }
-      if(currentItem)
-        {
+        this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
         currentItem->setFlags(Qt::NoItemFlags | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        if (rid < d->NumberOfColumnMetaDataTypes || cid < d->NumberOfRowMetaDataTypes)
+          {
+          currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
+          }
         }
       }
     }
