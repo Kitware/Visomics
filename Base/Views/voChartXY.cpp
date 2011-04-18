@@ -70,10 +70,8 @@ void voChartXY::AddPointLabels( std::vector< std::string> labels )
 
 void voChartXY::SetTooltipInfo(const vtkContextMouseEvent& mouse,
                                 const vtkVector2f &plotPos,
-                                int seriesIndex, vtkPlot* plot)
+                                int vtkNotUsed(seriesIndex), vtkPlot* vtkNotUsed(plot))
 {
-  Q_UNUSED(seriesIndex);
-  Q_UNUSED(plot);
   vtkStdString label;
   // Check for group names if we are plotting stacked bars
   //
