@@ -72,8 +72,7 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
         settings.value(voDelimitedTextImportSettings::StringDelimiter).toChar().toLatin1());
   reader->SetUseStringDelimiter(
         settings.value(voDelimitedTextImportSettings::UseStringDelimiter).toBool());
-  reader->SetHaveHeaders(
-        settings.value(voDelimitedTextImportSettings::HaveHeaders).toBool());
+  reader->SetHaveHeaders(false);
 
   // Read data
   reader->Update();

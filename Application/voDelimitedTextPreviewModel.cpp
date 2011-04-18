@@ -37,7 +37,6 @@ public:
   char FieldDelimiter;
   char StringDelimiter; // Value of 0 indicates none
   bool MergeConsecutiveDelimiters;
-  bool UseFirstLineAsAttributeNames;
   bool Transpose;
 
   int ColumnMetaDataTypeOfInterest; // From 0..(N-1) with N = NumberOfColumnMetaDataTypes
@@ -64,7 +63,6 @@ voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimit
   this->FieldDelimiter = ',';
   this->StringDelimiter = '\"';
   this->MergeConsecutiveDelimiters = false;
-  this->UseFirstLineAsAttributeNames = false;
   this->Transpose = false;
 
   this->ColumnMetaDataTypeOfInterest = 0;
@@ -145,7 +143,7 @@ void voDelimitedTextPreviewModelPrivate::configureReader(vtkDelimitedTextReader 
     reader->SetUseStringDelimiter(false);
     }
 
-  reader->SetHaveHeaders(this->UseFirstLineAsAttributeNames);
+  reader->SetHaveHeaders(false);
 }
 
 // --------------------------------------------------------------------------
@@ -239,27 +237,6 @@ void voDelimitedTextPreviewModel::setStringDelimiter(char character)
     }
   emit this->stringDelimiterChanged(character);
 }
-
-//// --------------------------------------------------------------------------
-//bool voDelimitedTextPreviewModel::useFirstLineAsAttributeNames() const
-//{
-//  Q_D(const voDelimitedTextPreviewModel);
-//  return d->UseFirstLineAsAttributeNames;
-//}
-
-//// --------------------------------------------------------------------------
-//void voDelimitedTextPreviewModel::setUseFirstLineAsAttributeNames(bool _arg)
-//{
-//  Q_D(voDelimitedTextPreviewModel);
-//  if (d->UseFirstLineAsAttributeNames != _arg)
-//    {
-//    d->UseFirstLineAsAttributeNames = _arg;
-//    if (d->InlineUpdate)
-//      {
-//      this->updatePreview();
-//      }
-//    }
-//}
 
 // --------------------------------------------------------------------------
 bool voDelimitedTextPreviewModel::transpose() const
@@ -457,13 +434,6 @@ bool voDelimitedTextPreviewModel::useStringDelimiter()const
 {
   Q_D(const voDelimitedTextPreviewModel);
   return d->StringDelimiter; // Value of 0 indicates None
-}
-
-// --------------------------------------------------------------------------
-bool voDelimitedTextPreviewModel::haveHeaders()const
-{
-  Q_D(const voDelimitedTextPreviewModel);
-  return d->UseFirstLineAsAttributeNames;
 }
 
 // --------------------------------------------------------------------------

@@ -20,7 +20,6 @@ void voDelimitedTextImportSettings::printAdditionalInfo()const
            << " MergeConsecutiveDelimiters:" << this->value(Self::MergeConsecutiveDelimiters).toBool() << endl
            << " StringDelimiter:" << this->value(Self::StringDelimiter).toChar() << endl
            << " UseStringDelimiter:" << this->value(Self::UseStringDelimiter).toBool() << endl
-           << " HaveHeaders:" << this->value(Self::HaveHeaders).toBool() << endl
            << " Transpose:" << this->value(Self::Transpose).toBool() << endl
            << " NumberOfColumnMetaDataTypes:" << this->value(Self::NumberOfColumnMetaDataTypes).toInt() << endl
            << " ColumnMetaDataTypeOfInterest:" << this->value(Self::ColumnMetaDataTypeOfInterest).toInt() << endl
@@ -35,7 +34,6 @@ void voDelimitedTextImportSettings::setDefaultSettings()
   this->insert(Self::MergeConsecutiveDelimiters, false);
   this->insert(Self::StringDelimiter, '\"');
   this->insert(Self::UseStringDelimiter, true);
-  this->insert(Self::HaveHeaders, false);
   this->insert(Self::Transpose, false);
   this->insert(Self::NumberOfColumnMetaDataTypes, 1);
   this->insert(Self::ColumnMetaDataTypeOfInterest, 0);

@@ -87,8 +87,6 @@ voDelimitedTextImportSettings voDelimitedTextImportDialog::importSettings()const
                   model->stringDelimiter());
   settings.insert(voDelimitedTextImportSettings::UseStringDelimiter,
                   model->useStringDelimiter());
-  settings.insert(voDelimitedTextImportSettings::HaveHeaders,
-                  model->haveHeaders());
   // vtkExtendedTable settings
   settings.insert(voDelimitedTextImportSettings::Transpose,
                   model->transpose());

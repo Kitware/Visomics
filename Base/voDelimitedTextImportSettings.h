@@ -17,7 +17,6 @@ public:
     MergeConsecutiveDelimiters,
     StringDelimiter,
     UseStringDelimiter,
-    HaveHeaders,
     // vtkExtendedTable settings
     Transpose,
     NumberOfColumnMetaDataTypes, 

@@ -27,8 +27,6 @@ public:
   char stringDelimiter() const;
   void setStringDelimiter(char character); // Value of 0 indicates none
 
-//  bool useFirstLineAsAttributeNames() const;
-
   bool transpose() const;
 
   int numberOfColumnMetaDataTypes() const;
@@ -45,13 +43,9 @@ public:
 
   bool useStringDelimiter()const;
 
-  bool haveHeaders()const;
-
 public slots:
 
   void setFileName(const QString& newFileName);
-
-//  void setUseFirstLineAsAttributeNames(bool _arg);
 
   void setTranspose(bool value);
 
