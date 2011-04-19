@@ -186,11 +186,11 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
     }
 
   // Set upper-left "empty quadrant" headers to blank
-  for (int cid = 0; cid < extendedTable->GetNumberOfColumnMetaDataTypes() - 1; ++cid)
+  for (int cid = 0; cid < extendedTable->GetNumberOfRowMetaDataTypes() - 1; ++cid)
     {
     d->Model.setHeaderData(cid, Qt::Horizontal, QString(""));
     }
-  for (int rid = 0; rid < extendedTable->GetNumberOfRowMetaDataTypes() - 1; ++rid)
+  for (int rid = 0; rid < extendedTable->GetNumberOfColumnMetaDataTypes() - 1; ++rid)
     {
     d->Model.setHeaderData(rid, Qt::Vertical, QString(""));
     }
