@@ -199,7 +199,7 @@ get_filename_component(src_dir ${CTEST_SOURCE_DIRECTORY} REALPATH)
 get_filename_component(work_dir ${src_dir} PATH)
 get_filename_component(src_name ${src_dir} NAME)
 
-if(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}")
+if(NOT EXISTS "${CTEST_SOURCE_DIRECTORY}/.git")
   _write_gitclone_script(
     ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}-${GIT_TAG}-${SCRIPT_MODE}-gitclone.cmake # script_filename
     ${CTEST_SOURCE_DIRECTORY} # source_dir
