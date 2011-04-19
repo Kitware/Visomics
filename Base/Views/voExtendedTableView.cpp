@@ -119,7 +119,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
         {
         QStandardItem * currentItem = new QStandardItem(value);
         d->Model.setItem(modelRowItr, modelColItr, currentItem);
-        currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
+        currentItem->setData(headerBackgroundColor, Qt::BackgroundRole);
         currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         }
       }
@@ -151,7 +151,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
         {
         QStandardItem * currentItem = new QStandardItem(value);
         d->Model.setItem(modelRowItr, modelColItr, currentItem);
-        currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
+        currentItem->setData(headerBackgroundColor, Qt::BackgroundRole);
         currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         }
       }

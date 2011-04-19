@@ -564,7 +564,7 @@ void voDelimitedTextPreviewModel::updatePreview()
         currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         if (rid < d->NumberOfColumnMetaDataTypes || cid < d->NumberOfRowMetaDataTypes)
           {
-          currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
+          currentItem->setData(headerBackgroundColor, Qt::BackgroundRole);
           }
         }
       }
