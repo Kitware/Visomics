@@ -50,6 +50,8 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
   d->setupUi(this);
 
   d->DocumentPreviewWidget->setModel(&d->DelimitedTextPreviewModel);
+  d->DocumentPreviewWidget->horizontalHeader()->setVisible(false);
+  d->DocumentPreviewWidget->verticalHeader()->setVisible(false);
 
   d->updateWidgetFromModel();
 
@@ -155,8 +157,6 @@ void voDelimitedTextImportWidget::onNumberOfColumnMetaDataTypesChanged(int value
     {
     d->HeaderRowOfInterestSpinBox->setValue(value);
     }
-
-  d->DocumentPreviewWidget->horizontalHeader()->setVisible(value > 0);
 }
 
 // --------------------------------------------------------------------------
@@ -183,8 +183,6 @@ void voDelimitedTextImportWidget::onNumberOfRowMetaDataTypesChanged(int value)
     {
     d->HeaderColumnOfInterestSpinBox->setValue(value);
     }
-
-  d->DocumentPreviewWidget->verticalHeader()->setVisible(value > 0);
 }
 
 // --------------------------------------------------------------------------
