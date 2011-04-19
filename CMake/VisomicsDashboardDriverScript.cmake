@@ -228,12 +228,23 @@ _update_gitclone_script(
 # Note: The following command should be specified as a list.
 set(CTEST_GIT_UPDATE_CUSTOM ${CMAKE_COMMAND} -P ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}-${GIT_TAG}-${SCRIPT_MODE}-gitupdate.cmake)
 
+#-----------------------------------------------------------------------------
+# The following variable can be used while testing the driver scripts
+#-----------------------------------------------------------------------------
+set(run_ctest_with_update TRUE)
+set(run_ctest_with_configure TRUE)
+set(run_ctest_with_build TRUE)
+set(run_ctest_with_test TRUE)
+set(run_ctest_with_coverage TRUE)
+set(run_ctest_with_memcheck TRUE)
+set(run_ctest_with_packages TRUE)
+set(run_ctest_with_notes TRUE)
+    
 #
 # run_ctest macro
 #
 MACRO(run_ctest)
   ctest_start(${model} TRACK ${track})
-  ctest_update(SOURCE "${CTEST_SOURCE_DIRECTORY}" RETURN_VALUE FILES_UPDATED)
 
   # force a build if this is the first run and the build dir is empty
   if(NOT EXISTS "${CTEST_BINARY_DIRECTORY}/CMakeCache.txt")
@@ -254,24 +265,20 @@ ${ADDITIONAL_CMAKECACHE_OPTION}
 ")
   endif()
   
+  #-----------------------------------------------------------------------------
+  # Update
+  #-----------------------------------------------------------------------------
+  set(FILES_UPDATED 0)
+  if (run_ctest_with_update)
+    ctest_update(SOURCE "${CTEST_SOURCE_DIRECTORY}" RETURN_VALUE FILES_UPDATED)
+  endif()
+  
   if (FILES_UPDATED GREATER 0 OR force_build)
 
     set(force_build 0)
     
     #-----------------------------------------------------------------------------
-    # The following variable can be used while testing the driver scripts
-    #-----------------------------------------------------------------------------
-    set(run_ctest_with_update TRUE)
-    set(run_ctest_with_configure TRUE)
-    set(run_ctest_with_build TRUE)
-    set(run_ctest_with_test TRUE)
-    set(run_ctest_with_coverage TRUE)
-    set(run_ctest_with_memcheck TRUE)
-    set(run_ctest_with_packages TRUE)
-    set(run_ctest_with_notes TRUE)
-    
-    #-----------------------------------------------------------------------------
-    # Update
+    # Submit Update
     #-----------------------------------------------------------------------------
     if(run_ctest_with_update)
       ctest_submit(PARTS Update)
