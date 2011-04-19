@@ -86,7 +86,7 @@ void vtkExtendedTable::Dump() const
     }
 
   std::cout << "Data:"<< std::endl;
-  this->Dump();
+  Superclass::Dump();
 }
 
 //----------------------------------------------------------------------------
