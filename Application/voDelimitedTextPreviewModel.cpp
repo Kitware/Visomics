@@ -280,13 +280,11 @@ void voDelimitedTextPreviewModel::setTranspose(bool value)
 
   // Switch row and column metdata type numbers
   int currentNumberOfColumnMetaDataTypes = d->NumberOfColumnMetaDataTypes;
-  int currentNumberOfRowMetaDataTypes = d->NumberOfRowMetaDataTypes;
   d->NumberOfColumnMetaDataTypes = d->NumberOfRowMetaDataTypes;
   d->NumberOfRowMetaDataTypes = currentNumberOfColumnMetaDataTypes;
 
   // Switch row and column metdata types of interest
   int currentColumnMetaDataTypeOfInterest = d->ColumnMetaDataTypeOfInterest;
-  int currentRowMetaDataTypeOfInterest = d->RowMetaDataTypeOfInterest;
   d->ColumnMetaDataTypeOfInterest = d->RowMetaDataTypeOfInterest;
   d->RowMetaDataTypeOfInterest = currentColumnMetaDataTypeOfInterest;
 
