@@ -288,7 +288,7 @@ vtkStringArray* vtkExtendedTable::GetRowMetaDataAsString(vtkIdType id) const
 //----------------------------------------------------------------------------
 vtkIdType vtkExtendedTable::GetRowMetaDataTypeOfInterest() const
 {
-  return this->Internal->ColumnMetaDataTypeOfInterest;
+  return this->Internal->RowMetaDataTypeOfInterest;
 }
 
 //----------------------------------------------------------------------------
