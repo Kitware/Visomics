@@ -61,7 +61,7 @@ void vtkExtendedTable::PrintSelf(ostream &os, vtkIndent indent)
 }
 
 //----------------------------------------------------------------------------
-void vtkExtendedTable::Dump() const
+void vtkExtendedTable::Dump()
 {
   std::cout << "ColumnMetaData:";
   if (this->Internal->ColumnMetaData)

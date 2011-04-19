@@ -46,7 +46,7 @@ public:
   vtkTypeMacro(vtkExtendedTable, vtkTable);
   void PrintSelf(ostream &os, vtkIndent indent);
 
-  void Dump() const;
+  void Dump();
 
   vtkIdType GetTotalNumberOfRows();
 
