@@ -7,7 +7,6 @@
 #include "voAnalysisDriver.h"
 #include "voApplication.h"
 #include "voDataModel.h"
-#include "voDataObject.h"
 #include "voIOManager.h"
 #include "voViewManager.h"
 #include "voAnalysisFactory.h"
@@ -15,7 +14,6 @@
 
 // VTK includes
 #include <vtkSmartPointer.h>
-#include <vtkDelimitedTextReader.h>
 #include <vtkTable.h>
 
 // Convenient macro
@@ -87,25 +85,6 @@ void voApplication::initialize(bool& exitWhenDone)
 
   d->Initialized = true;
   exitWhenDone = d->ExitWhenDone;
-}
-
-// --------------------------------------------------------------------------
-void voApplication::loadCSVData(const QString& fileName)
-{
-  qDebug() << "loadCSVData" << fileName;
-
-  VTK_CREATE(vtkDelimitedTextReader, reader);
-  reader->SetFieldDelimiterCharacters(",");
-  reader->SetHaveHeaders(1);
-  reader->DetectNumericColumnsOff();
-  reader->SetFileName(fileName.toLatin1());
-  reader->Update();
-
-  voDataObject * dataObject = new voDataObject;
-  dataObject->setData(reader->GetOutput());
-  dataObject->setName(fileName);
-
-  voApplication::application()->dataModel()->addDataObject(dataObject);
 }
 
 // --------------------------------------------------------------------------
