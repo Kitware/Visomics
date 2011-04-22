@@ -14,6 +14,7 @@
 #include "voPCAStatistics.h"
 #include "voTTest.h"
 #include "voXCorrel.h"
+#include "voPLSStatistics.h"
 
 //----------------------------------------------------------------------------
 class voAnalysisFactoryPrivate
@@ -40,7 +41,9 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voPCAStatistics>("PCA");
   this->registerAnalysis<voTTest>("T-Test");
   this->registerAnalysis<voXCorrel>("Cross Correlation");
+  this->registerAnalysis<voPLSStatistics>("PLS");
 }
+
 
 //-----------------------------------------------------------------------------
 voAnalysisFactory::~voAnalysisFactory()
