@@ -33,6 +33,8 @@ SET(KIT_SRCS
   Views/voCorrelationHeatMapView.h
   Views/voChartXY.h
   Views/voChartXY.cpp
+  Views/voVolcanoView.cpp
+  Views/voVolcanoView.h
 
   
   voAnalysis.cpp
@@ -88,6 +90,7 @@ SET(KIT_MOC_SRCS
   Views/voTableView.h
   Views/voTreeGraphView.h
   Views/voCorrelationHeatMapView.h
+  Views/voVolcanoView.h
   
   voAnalysis.h
   voAnalysisDriver.h
