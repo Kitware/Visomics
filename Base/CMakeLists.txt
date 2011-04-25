@@ -2,6 +2,8 @@
 PROJECT(VisomicsBase)
 
 SET(KIT_SRCS
+  Analysis/voFoldChange.cpp
+  Analysis/voFoldChange.h
   Analysis/voHierarchicalClustering.h
   Analysis/voHierarchicalClustering.cpp
   Analysis/voKEGG.h
@@ -69,6 +71,7 @@ SET(KIT_SRCS
   )
   
 SET(KIT_MOC_SRCS
+  Analysis/voFoldChange.h
   Analysis/voHierarchicalClustering.h
   Analysis/voKEGG.h
   Analysis/voKMeansClustering.h
