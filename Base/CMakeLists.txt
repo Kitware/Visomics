@@ -10,6 +10,8 @@ SET(KIT_SRCS
   Analysis/voKMeansClustering.h
   Analysis/voPCAStatistics.cpp
   Analysis/voPCAStatistics.h
+  Analysis/voTTest.cpp
+  Analysis/voTTest.h
   Analysis/voXCorrel.cpp
   Analysis/voXCorrel.h
   
@@ -73,6 +75,7 @@ SET(KIT_MOC_SRCS
   Analysis/voKEGG.h
   Analysis/voKMeansClustering.h
   Analysis/voPCAStatistics.h
+  Analysis/voTTest.h
   Analysis/voXCorrel.h
   
   Views/voCorrelationGraphView.h
