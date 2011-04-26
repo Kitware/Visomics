@@ -63,8 +63,8 @@ void voTTest::setParameterInformation()
 {
   QList<QtProperty*> TTest_parameters;
 
-  TTest_parameters << this->addStringParameter("sample1_range", QObject::tr("Sample Group 1"), "");
-  TTest_parameters << this->addStringParameter("sample2_range", QObject::tr("Sample Group 2"), "");
+  TTest_parameters << this->addStringParameter("sample1_range", QObject::tr("Sample Group 1"), "A-C,F");
+  TTest_parameters << this->addStringParameter("sample2_range", QObject::tr("Sample Group 2"), "D,E,G-J");
 
   this->addParameterGroup("T-Test parameters", TTest_parameters);
 
