@@ -49,11 +49,11 @@ public slots:
 
   void setTranspose(bool value);
 
-  void setNumberOfColumnMetaDataTypes(int _arg);
-  void setColumnMetaDataTypeOfInterest(int _arg);
+  void setNumberOfColumnMetaDataTypes(int count);
+  void setColumnMetaDataTypeOfInterest(int count);
 
-  void setNumberOfRowMetaDataTypes(int _arg);
-  void setRowMetaDataTypeOfInterest(int _arg);
+  void setNumberOfRowMetaDataTypes(int count);
+  void setRowMetaDataTypeOfInterest(int count);
 
   void setNumberOfRowsToPreview(int count);
 

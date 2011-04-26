@@ -296,14 +296,14 @@ int voDelimitedTextPreviewModel::numberOfColumnMetaDataTypes() const
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int _arg)
+void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int count)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->NumberOfColumnMetaDataTypes == _arg)
+  if (d->NumberOfColumnMetaDataTypes == count)
     {
     return;
     }
-  d->NumberOfColumnMetaDataTypes = _arg;
+  d->NumberOfColumnMetaDataTypes = count;
 
   if (d->InlineUpdate)
     {
@@ -321,14 +321,14 @@ int voDelimitedTextPreviewModel::columnMetaDataTypeOfInterest() const
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setColumnMetaDataTypeOfInterest(int _arg)
+void voDelimitedTextPreviewModel::setColumnMetaDataTypeOfInterest(int count)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->ColumnMetaDataTypeOfInterest == _arg)
+  if (d->ColumnMetaDataTypeOfInterest == count)
     {
     return;
     }
-  d->ColumnMetaDataTypeOfInterest = _arg;
+  d->ColumnMetaDataTypeOfInterest = count;
 
   if (d->InlineUpdate)
     {
@@ -346,14 +346,14 @@ int voDelimitedTextPreviewModel::numberOfRowMetaDataTypes() const
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int _arg)
+void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int count)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->NumberOfRowMetaDataTypes == _arg)
+  if (d->NumberOfRowMetaDataTypes == count)
     {
     return;
     }
-  d->NumberOfRowMetaDataTypes = _arg;
+  d->NumberOfRowMetaDataTypes = count;
 
   if (d->InlineUpdate)
     {
@@ -371,14 +371,14 @@ int voDelimitedTextPreviewModel::rowMetaDataTypeOfInterest() const
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setRowMetaDataTypeOfInterest(int _arg)
+void voDelimitedTextPreviewModel::setRowMetaDataTypeOfInterest(int count)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->RowMetaDataTypeOfInterest == _arg)
+  if (d->RowMetaDataTypeOfInterest == count)
     {
     return;
     }
-  d->RowMetaDataTypeOfInterest = _arg;
+  d->RowMetaDataTypeOfInterest = count;
 
   if (d->InlineUpdate)
     {
