@@ -8,12 +8,15 @@
 #include "voUtils.h"
 
 // VTK includes
+#include <vtkArray.h>
+#include <vtkArrayToTable.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
+#include <vtkTableToArray.h>
 #include <vtkVariantArray.h>
 
 #include <QDebug>
@@ -322,5 +325,40 @@ int voUtils::counterAlphaToInt(const QString& alphaVal)
     return (voUtils::counterAlphaToInt(alphaVal.mid(0, alphaVal.length()-1)) + 1) * 26
            + voUtils::counterAlphaToInt(alphaVal.mid(alphaVal.length()-1));
     }
+}
+
+//----------------------------------------------------------------------------
+bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray, QList<int>& columnList)
+{
+  vtkNew<vtkTableToArray> tabToArr;
+  tabToArr->SetInputConnection(srcTable->GetProducerPort());
+
+  foreach (int ctr, columnList)
+    {
+    if(ctr < 0 || ctr >= srcTable->GetNumberOfColumns())
+      {
+      return false;
+      }
+    tabToArr->AddColumn(ctr);
+    }
+  tabToArr->Update();
+
+  // Reference count will be incremented
+  destArray = tabToArr->GetOutput()->GetArray(0);
+  return true;
+}
+
+//----------------------------------------------------------------------------
+void voUtils::arrayToTable(vtkArray* srcArray, vtkSmartPointer<vtkTable>& destTable)
+{
+  vtkNew<vtkArrayData> arrData;
+  arrData->AddArray(srcArray);
+
+  vtkNew<vtkArrayToTable> arrToTab;
+  arrToTab->SetInputConnection(arrData->GetProducerPort());
+  arrToTab->Update();
+
+  // Reference count will be incremented
+  destTable = arrToTab->GetOutput();
 }
 

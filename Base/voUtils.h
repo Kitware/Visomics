@@ -6,6 +6,8 @@ class vtkStringArray;
 class vtkTable;
 template <class T> class QList;
 class QString;
+class vtkArray;
+template <class T> class vtkSmartPointer;
 
 namespace voUtils 
 {
@@ -23,6 +25,10 @@ bool parseRangeString(const QString& rangeString, QList<int>& rangeList, bool al
 QString counterIntToAlpha(int intVal);
 
 int counterAlphaToInt(const QString& alphaVal);
+
+bool tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray, QList<int>& columnList);
+
+void arrayToTable(vtkArray* srcArray, vtkSmartPointer<vtkTable>& destTable);
 }
 
 #endif
