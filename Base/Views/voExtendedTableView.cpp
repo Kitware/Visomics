@@ -113,6 +113,10 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
       QString value = QString(metadata->GetValue(tableColItr));
       if(tableRowItr == extendedTable->GetColumnMetaDataTypeOfInterest())
         {
+        if(tableColItr < 26)
+          {
+          value.prepend(QString("%1: ").arg(QChar('A' + tableColItr)));
+          }
         d->Model.setHeaderData(modelColItr, Qt::Horizontal, value);
         }
       else
@@ -145,6 +149,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
       QString value = QString(metadata->GetValue(tableRowItr));
       if(tableColItr == extendedTable->GetRowMetaDataTypeOfInterest())
         {
+        value.prepend(QString("%1: ").arg(1 + tableRowItr));
         d->Model.setHeaderData(modelRowItr, Qt::Vertical, value);
         }
       else
