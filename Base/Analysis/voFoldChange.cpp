@@ -65,8 +65,8 @@ void voFoldChange::setParameterInformation()
 
   fold_change_parameters << this->addEnumParameter("mean_method", tr("Mean Method"), 
                                     (QStringList() << "Geometric" << "Arithmetic"), "Arithmetic");
-  fold_change_parameters << this->addStringParameter("sample1_range", QObject::tr("Initial Sample(s)"), "");
-  fold_change_parameters << this->addStringParameter("sample2_range", QObject::tr("Final Sample(s)"), "");
+  fold_change_parameters << this->addStringParameter("sample1_range", QObject::tr("Initial Sample(s)"), "A-C,F");
+  fold_change_parameters << this->addStringParameter("sample2_range", QObject::tr("Final Sample(s)"), "D,E,G-J");
 
   this->addParameterGroup("Fold Change parameters", fold_change_parameters);
 
