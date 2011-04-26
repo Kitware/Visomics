@@ -151,7 +151,8 @@ bool voUtils::insertColumnIntoTable(vtkTable * table, int position, vtkAbstractA
     {
     return false;
     }
-  if (table->GetNumberOfRows() != columnToInsert->GetNumberOfComponents() * columnToInsert->GetNumberOfTuples())
+  if ((table->GetNumberOfRows() != columnToInsert->GetNumberOfComponents() * columnToInsert->GetNumberOfTuples()) &&
+      (table->GetNumberOfRows() != 0))
     {
     return false;
     }
