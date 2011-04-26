@@ -1,6 +1,8 @@
 
 // Qt includes
 #include <QtGlobal>
+#include <QStringList>
+#include <QRegExp>
 
 // Visomics includes
 #include "voUtils.h"
@@ -200,3 +202,81 @@ void voUtils::setTableColumnNames(vtkTable * table, vtkStringArray * columnNames
     column->SetName(columnNames->GetValue(cid));
     }
 }
+
+//----------------------------------------------------------------------------
+bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList, bool alpha)
+{
+  if(!rangeList.empty())
+    {
+    return false;
+    }
+
+  //Validate - checks for form, not semantics
+  QRegExp validRegEx;
+  if (!alpha) // Numbers
+    {
+    validRegEx.setPattern("^\\s*(\\d+\\s*[-,]\\s*)*\\d+\\s*$");
+    }
+  else // Letters
+    {
+    validRegEx.setPattern("^\\s*([A-Z]\\s*[-,]\\s*)*[A-Z]\\s*$");
+    validRegEx.setCaseSensitivity(Qt::CaseInsensitive);
+    }
+  if(!validRegEx.exactMatch(rangeString))
+    {
+    return false;
+    }
+
+  //Parse
+  QString scratchString(rangeString);
+  scratchString.replace(" ", "");
+  QStringList rangeStringList = scratchString.split(",");
+  rangeStringList.removeDuplicates();
+
+  QRegExp rangeRegEx;
+  if (!alpha)
+    {
+    rangeRegEx.setPattern("^(\\d+)-(\\d+)$");
+    }
+  else
+    {
+    rangeRegEx.setPattern("^([A-Z])-([A-Z])$");
+    rangeRegEx.setCaseSensitivity(Qt::CaseInsensitive);
+    }
+  foreach(QString subStr, rangeStringList)
+    {
+    if(rangeRegEx.indexIn(subStr) != -1)
+      {
+      int subBegin;
+      int subEnd;
+      if (!alpha)
+        {
+        subBegin = rangeRegEx.cap(1).toInt() - 1;
+        subEnd = rangeRegEx.cap(2).toInt() - 1;
+        }
+      else
+        {
+        subBegin = rangeRegEx.cap(1).toUpper().at(0).toLatin1() - 'A';
+        subEnd = rangeRegEx.cap(2).toUpper().at(0).toLatin1() - 'A';
+        }
+      for(int subCtr = subBegin; subCtr <= subEnd; subCtr++)
+        {
+        rangeList.push_back(subCtr);
+        }
+      }
+    else
+      {
+      if (!alpha)
+        {
+        rangeList.push_back(subStr.toInt() - 1);
+        }
+      else
+        {
+        rangeList.push_back(subStr.toUpper().at(0).toLatin1() - 'A');
+        }
+      }
+    }
+
+  return true;
+}
+
