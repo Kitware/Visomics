@@ -66,6 +66,7 @@ voDelimitedTextImportDialog::~voDelimitedTextImportDialog()
 void voDelimitedTextImportDialog::setFileName(const QString& fileName)
 {
   Q_D(voDelimitedTextImportDialog);
+  this->setWindowTitle(QString("Import Data - ") + fileName);
   d->DelimitedTextImportWidget->setFileName(fileName);
 }
 
@@ -86,19 +87,17 @@ voDelimitedTextImportSettings voDelimitedTextImportDialog::importSettings()const
                   model->stringDelimiter());
   settings.insert(voDelimitedTextImportSettings::UseStringDelimiter,
                   model->useStringDelimiter());
-  settings.insert(voDelimitedTextImportSettings::HaveHeaders,
-                  model->haveHeaders());
   // vtkExtendedTable settings
   settings.insert(voDelimitedTextImportSettings::Transpose,
                   model->transpose());
   settings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes,
                   model->numberOfColumnMetaDataTypes());
-//  settings.insert(voDelimitedTextImportSettings::ColumnMetaDataTypeOfInterest,
-//                  model->columnMetaDataTypeOfInterest());
+  settings.insert(voDelimitedTextImportSettings::ColumnMetaDataTypeOfInterest,
+                  model->columnMetaDataTypeOfInterest());
   settings.insert(voDelimitedTextImportSettings::NumberOfRowMetaDataTypes,
                   model->numberOfRowMetaDataTypes());
-//  settings.insert(voDelimitedTextImportSettings::RowMetaDataTypeOfInterest,
-//                  model->rowMetaDataTypeOfInterest());
+  settings.insert(voDelimitedTextImportSettings::RowMetaDataTypeOfInterest,
+                  model->rowMetaDataTypeOfInterest());
 
   return settings;
 }

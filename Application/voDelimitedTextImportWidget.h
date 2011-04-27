@@ -35,7 +35,9 @@ public slots:
 
 protected slots:
   void onNumberOfColumnMetaDataTypesChanged(int value);
+  void onColumnMetaDataTypeOfInterestChanged(int value);
   void onNumberOfRowMetaDataTypesChanged(int value);
+  void onRowMetaDataTypeOfInterestChanged(int value);
 
   void onDelimiterChanged(int delimiter);
   void onOtherDelimiterLineEditChanged(const QString& text);

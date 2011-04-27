@@ -34,8 +34,6 @@ public:
   /// \note initialize() should be called only one time.
   bool initialized() const;
 
-  void loadCSVData(const QString& fileName);
-  
   voDataModel* dataModel()const;
 
   voAnalysisDriver* analysisDriver()const;

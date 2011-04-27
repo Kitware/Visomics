@@ -94,86 +94,64 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
   QColor headerBackgroundColor = QPalette().color(QPalette::Window);
 
   // Set column meta data
-  if(extendedTable->HasColumnMetaData())
+  for (vtkIdType tableRowItr = 0; tableRowItr < extendedTable->GetNumberOfColumnMetaDataTypes(); ++tableRowItr)
     {
+    vtkStringArray * metadata = extendedTable->GetColumnMetaDataAsString(tableRowItr);
+    Q_ASSERT(metadata);
+    for(vtkIdType tableColItr = 0; tableColItr < metadata->GetNumberOfValues(); ++tableColItr)
       {
-      vtkStringArray * metadata = extendedTable->GetColumnMetaDataOfInterestAsString();
-      Q_ASSERT(metadata);
-      for(int i = 0; i < metadata->GetNumberOfValues(); ++i)
+      int modelRowItr = tableRowItr;
+      if (tableRowItr > extendedTable->GetColumnMetaDataTypeOfInterest())
         {
-        int headerId = i;
-        if (extendedTable->HasRowMetaData())
-          {
-          headerId += extendedTable->GetNumberOfRowMetaDataTypes() - 1;
-          }
-        QString value = QString(metadata->GetValue(i));
-        d->Model.setHeaderData(headerId, Qt::Horizontal, value);
+        modelRowItr--;
         }
-      }
-    // TODO Consider ColumnMetaDataTypeOfInterest
-    for (int metadataType = 1; metadataType < extendedTable->GetNumberOfColumnMetaDataTypes(); ++metadataType)
-      {
-      vtkStringArray * metadata = extendedTable->GetColumnMetaDataAsString(metadataType);
-      Q_ASSERT(metadata);
-      for(int i = 0; i < metadata->GetNumberOfValues(); ++i)
+      int modelColItr = tableColItr;
+      if (extendedTable->HasRowMetaData())
         {
-        int modelColumnId = i;
-        if (extendedTable->HasRowMetaData())
-          {
-          modelColumnId += extendedTable->GetNumberOfRowMetaDataTypes() - 1;
-          }
-        int modelRowId = metadataType;
-        if (extendedTable->HasColumnMetaData())
-          {
-          modelRowId--;
-          }
-        QString value = QString(metadata->GetValue(i));
+        modelColItr += extendedTable->GetNumberOfRowMetaDataTypes() - 1;
+        }
+      QString value = QString(metadata->GetValue(tableColItr));
+      if(tableRowItr == extendedTable->GetColumnMetaDataTypeOfInterest())
+        {
+        d->Model.setHeaderData(modelColItr, Qt::Horizontal, value);
+        }
+      else
+        {
         QStandardItem * currentItem = new QStandardItem(value);
-        d->Model.setItem(modelRowId, modelColumnId, currentItem);
-        currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
+        d->Model.setItem(modelRowItr, modelColItr, currentItem);
+        currentItem->setData(headerBackgroundColor, Qt::BackgroundRole);
         currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         }
       }
     }
 
   // Set row meta data
-  if(extendedTable->HasRowMetaData())
+  for(vtkIdType tableColItr = 0; tableColItr < extendedTable->GetNumberOfRowMetaDataTypes(); ++tableColItr)
     {
+    vtkStringArray * metadata = extendedTable->GetRowMetaDataAsString(tableColItr);
+    Q_ASSERT(metadata);
+    for (vtkIdType tableRowItr = 0; tableRowItr <  metadata->GetNumberOfValues(); ++tableRowItr)
       {
-      vtkStringArray * metadata = extendedTable->GetRowMetaDataOfInterestAsString();
-      Q_ASSERT(metadata);
-      for(int i = 0; i < metadata->GetNumberOfValues(); ++i)
+      int modelColItr = tableColItr;
+      if (tableColItr > extendedTable->GetRowMetaDataTypeOfInterest())
         {
-        int headerId = i;
-        if (extendedTable->HasColumnMetaData())
-          {
-          headerId += extendedTable->GetNumberOfColumnMetaDataTypes() - 1;
-          }
-        QString value = QString(metadata->GetValue(i));
-        d->Model.setHeaderData(headerId, Qt::Vertical, value);
+        modelColItr--;
         }
-      }
-    // TODO Consider RowMetaDataTypeOfInterest
-    for (int metadataType = 1; metadataType < extendedTable->GetNumberOfRowMetaDataTypes(); ++metadataType)
-      {
-      vtkStringArray * metadata = extendedTable->GetRowMetaDataAsString(metadataType);
-      Q_ASSERT(metadata);
-      for(int i = 0; i < metadata->GetNumberOfValues(); ++i)
+      int modelRowItr = tableRowItr;
+      if (extendedTable->HasColumnMetaData())
         {
-        int modelColumnId = metadataType;
-        if (extendedTable->HasRowMetaData())
-          {
-          modelColumnId--;
-          }
-        int modelRowId = i;
-        if (extendedTable->HasColumnMetaData())
-          {
-          modelRowId += extendedTable->GetNumberOfColumnMetaDataTypes() - 1;
-          }
-        QString value = QString(metadata->GetValue(i));
+        modelRowItr += extendedTable->GetNumberOfColumnMetaDataTypes() - 1;
+        }
+      QString value = QString(metadata->GetValue(tableRowItr));
+      if(tableColItr == extendedTable->GetRowMetaDataTypeOfInterest())
+        {
+        d->Model.setHeaderData(modelRowItr, Qt::Vertical, value);
+        }
+      else
+        {
         QStandardItem * currentItem = new QStandardItem(value);
-        d->Model.setItem(modelRowId, modelColumnId, currentItem);
-        currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
+        d->Model.setItem(modelRowItr, modelColItr, currentItem);
+        currentItem->setData(headerBackgroundColor, Qt::BackgroundRole);
         currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         }
       }
@@ -207,5 +185,13 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
       }
     }
 
+  // Set upper-left "empty quadrant" headers to blank
+  for (int cid = 0; cid < extendedTable->GetNumberOfRowMetaDataTypes() - 1; ++cid)
+    {
+    d->Model.setHeaderData(cid, Qt::Horizontal, QString(""));
+    }
+  for (int rid = 0; rid < extendedTable->GetNumberOfColumnMetaDataTypes() - 1; ++rid)
+    {
+    d->Model.setHeaderData(rid, Qt::Vertical, QString(""));
+    }
 }
-

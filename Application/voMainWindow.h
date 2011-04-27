@@ -11,7 +11,6 @@ class QTreeWidget;
 class QTableWidget;
 
 class voAnalysisPanel;
-class voCSVReader;
 class voAnalysis;
 
 class voMainWindowPrivate;

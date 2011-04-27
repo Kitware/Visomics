@@ -5,10 +5,8 @@
 
 // Visomics includes
 #include "voApplication.h"
-#include "voCSVReader.h"
 #include "voDataModel.h"
 #include "voDataModelItem.h"
-#include "voDataObject.h"
 #include "voInputFileDataObject.h"
 #include "voIOManager.h"
 #include "voUtils.h"
@@ -18,42 +16,9 @@
 #include <vtkDelimitedTextReader.h>
 #include <vtkDoubleArray.h>
 #include <vtkNew.h>
+#include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
-
-// --------------------------------------------------------------------------
-void voIOManager::openCSVFiles(const QStringList& fileNames)
-{
-  QList<voDataObject*> loadedDataObjects;
-
-  foreach(const QString& file, fileNames)
-    {
-    voCSVReader reader;
-    reader.setFileName(file);
-    reader.update();
-    voInputFileDataObject * dataObject = new voInputFileDataObject();
-    dataObject->setData(reader.output());
-    dataObject->setName(QFileInfo(file).baseName());
-    dataObject->setFileName(file);
-    loadedDataObjects << dataObject;
-    }
-
-  voDataModel * model = voApplication::application()->dataModel();
-
-  QList<voDataModelItem*> itemsAdded;
-  foreach(voDataObject* dataObject, loadedDataObjects)
-    {
-    voDataModelItem * newItem = model->addDataObject(dataObject);
-    newItem->setRawViewType("voTableView");
-    itemsAdded << newItem;
-    }
-
-  // Select the first item added
-  if (itemsAdded.count())
-    {
-    model->setSelected(itemsAdded.value(0));
-    }
-}
 
 // --------------------------------------------------------------------------
 void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImportSettings& settings)
@@ -72,8 +37,7 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
         settings.value(voDelimitedTextImportSettings::StringDelimiter).toChar().toLatin1());
   reader->SetUseStringDelimiter(
         settings.value(voDelimitedTextImportSettings::UseStringDelimiter).toBool());
-  reader->SetHaveHeaders(
-        settings.value(voDelimitedTextImportSettings::HaveHeaders).toBool());
+  reader->SetHaveHeaders(false);
 
   // Read data
   reader->Update();

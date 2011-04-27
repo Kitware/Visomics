@@ -123,31 +123,71 @@
         </property>
        </widget>
       </item>
-      <item row="1" column="0">
+      <item row="3" column="0">
        <widget class="QSpinBox" name="NumberHeaderColumnsSpinBox">
         <property name="value">
          <number>1</number>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="3" column="1">
        <widget class="QLabel" name="NumberHeaderColumnsLabel">
         <property name="text">
          <string>header columns</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="6" column="0">
        <widget class="QSpinBox" name="NumberHeaderRowsSpinBox">
         <property name="value">
          <number>1</number>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
+      <item row="6" column="1">
        <widget class="QLabel" name="NumberHeaderRowsLabel">
         <property name="text">
          <string>header rows</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0">
+       <widget class="QSpinBox" name="HeaderColumnOfInterestSpinBox">
+        <property name="minimum">
+         <number>-1</number>
+        </property>
+        <property name="maximum">
+         <number>0</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
+       <widget class="QSpinBox" name="HeaderRowOfInterestSpinBox">
+        <property name="minimum">
+         <number>-1</number>
+        </property>
+        <property name="maximum">
+         <number>0</number>
+        </property>
+        <property name="value">
+         <number>0</number>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <widget class="QLabel" name="HeaderColumnOfInterestLabel">
+        <property name="text">
+         <string>header column of interest</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QLabel" name="HeaderRowOfInterestLabel">
+        <property name="text">
+         <string>header row of interest</string>
         </property>
        </widget>
       </item>

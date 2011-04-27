@@ -27,13 +27,13 @@ public:
   char stringDelimiter() const;
   void setStringDelimiter(char character); // Value of 0 indicates none
 
-//  bool useFirstLineAsAttributeNames() const;
-
   bool transpose() const;
 
   int numberOfColumnMetaDataTypes() const;
+  int columnMetaDataTypeOfInterest() const;
 
   int numberOfRowMetaDataTypes() const;
+  int rowMetaDataTypeOfInterest() const;
 
   int numberOfRowsToPreview() const;
 
@@ -43,19 +43,17 @@ public:
 
   bool useStringDelimiter()const;
 
-  bool haveHeaders()const;
-
 public slots:
 
   void setFileName(const QString& newFileName);
 
-//  void setUseFirstLineAsAttributeNames(bool _arg);
-
   void setTranspose(bool value);
 
-  void setNumberOfColumnMetaDataTypes(int _arg);
+  void setNumberOfColumnMetaDataTypes(int count);
+  void setColumnMetaDataTypeOfInterest(int count);
 
-  void setNumberOfRowMetaDataTypes(int _arg);
+  void setNumberOfRowMetaDataTypes(int count);
+  void setRowMetaDataTypeOfInterest(int count);
 
   void setNumberOfRowsToPreview(int count);
 
@@ -71,8 +69,10 @@ signals:
   void inlineUpdateChanged(bool value);
 
   void numberOfColumnMetaDataTypesChanged(int value);
+  void columnMetaDataTypeOfInterestChanged(int value);
 
   void numberOfRowMetaDataTypesChanged(int value);
+  void rowMetaDataTypeOfInterestChanged(int value);
 
   void numberOfRowsToPreviewChanged(int count);
 

@@ -37,7 +37,6 @@ public:
   char FieldDelimiter;
   char StringDelimiter; // Value of 0 indicates none
   bool MergeConsecutiveDelimiters;
-  bool UseFirstLineAsAttributeNames;
   bool Transpose;
 
   int ColumnMetaDataTypeOfInterest; // From 0..(N-1) with N = NumberOfColumnMetaDataTypes
@@ -64,7 +63,6 @@ voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimit
   this->FieldDelimiter = ',';
   this->StringDelimiter = '\"';
   this->MergeConsecutiveDelimiters = false;
-  this->UseFirstLineAsAttributeNames = false;
   this->Transpose = false;
 
   this->ColumnMetaDataTypeOfInterest = 0;
@@ -145,7 +143,7 @@ void voDelimitedTextPreviewModelPrivate::configureReader(vtkDelimitedTextReader 
     reader->SetUseStringDelimiter(false);
     }
 
-  reader->SetHaveHeaders(this->UseFirstLineAsAttributeNames);
+  reader->SetHaveHeaders(false);
 }
 
 // --------------------------------------------------------------------------
@@ -240,27 +238,6 @@ void voDelimitedTextPreviewModel::setStringDelimiter(char character)
   emit this->stringDelimiterChanged(character);
 }
 
-//// --------------------------------------------------------------------------
-//bool voDelimitedTextPreviewModel::useFirstLineAsAttributeNames() const
-//{
-//  Q_D(const voDelimitedTextPreviewModel);
-//  return d->UseFirstLineAsAttributeNames;
-//}
-
-//// --------------------------------------------------------------------------
-//void voDelimitedTextPreviewModel::setUseFirstLineAsAttributeNames(bool _arg)
-//{
-//  Q_D(voDelimitedTextPreviewModel);
-//  if (d->UseFirstLineAsAttributeNames != _arg)
-//    {
-//    d->UseFirstLineAsAttributeNames = _arg;
-//    if (d->InlineUpdate)
-//      {
-//      this->updatePreview();
-//      }
-//    }
-//}
-
 // --------------------------------------------------------------------------
 bool voDelimitedTextPreviewModel::transpose() const
 {
@@ -280,20 +257,27 @@ void voDelimitedTextPreviewModel::setTranspose(bool value)
 
   // Switch row and column metdata type numbers
   int currentNumberOfColumnMetaDataTypes = d->NumberOfColumnMetaDataTypes;
-  int currentNumberOfRowMetaDataTypes = d->NumberOfRowMetaDataTypes;
   d->NumberOfColumnMetaDataTypes = d->NumberOfRowMetaDataTypes;
   d->NumberOfRowMetaDataTypes = currentNumberOfColumnMetaDataTypes;
+
+  // Switch row and column metdata types of interest
+  int currentColumnMetaDataTypeOfInterest = d->ColumnMetaDataTypeOfInterest;
+  d->ColumnMetaDataTypeOfInterest = d->RowMetaDataTypeOfInterest;
+  d->RowMetaDataTypeOfInterest = currentColumnMetaDataTypeOfInterest;
 
   // Do not call 'setNumberOfColumnMetaDataTypes()' to avoid extra call to 'updatePreview()'
   if (currentNumberOfColumnMetaDataTypes != d->NumberOfColumnMetaDataTypes)
     {
+    // If column is changed, row is changed too (since they were swapped)
     emit this->numberOfColumnMetaDataTypesChanged(d->NumberOfColumnMetaDataTypes);
+    emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
     }
 
-  // Do not call 'setNumberOfRowMetaDataTypes()' to avoid extra call to 'updatePreview()'
-  if (currentNumberOfRowMetaDataTypes != d->NumberOfRowMetaDataTypes)
+  // Do not call 'setColumnMetaDataTypeOfInterest()' to avoid extra call to 'updatePreview()'
+  if (currentColumnMetaDataTypeOfInterest != d->ColumnMetaDataTypeOfInterest)
     {
-    emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
+    emit this->columnMetaDataTypeOfInterestChanged(d->ColumnMetaDataTypeOfInterest);
+    emit this->rowMetaDataTypeOfInterestChanged(d->RowMetaDataTypeOfInterest);
     }
 
   if (d->InlineUpdate)
@@ -312,14 +296,14 @@ int voDelimitedTextPreviewModel::numberOfColumnMetaDataTypes() const
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int _arg)
+void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int count)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->NumberOfColumnMetaDataTypes == _arg)
+  if (d->NumberOfColumnMetaDataTypes == count)
     {
     return;
     }
-  d->NumberOfColumnMetaDataTypes = _arg;
+  d->NumberOfColumnMetaDataTypes = count;
 
   if (d->InlineUpdate)
     {
@@ -327,6 +311,45 @@ void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int _arg)
     }
 
   emit this->numberOfColumnMetaDataTypesChanged(d->NumberOfColumnMetaDataTypes);
+
+  // Constrain ColumnMetaDataTypeOfInterest
+  if (count < this->columnMetaDataTypeOfInterest())
+    {
+    this->setColumnMetaDataTypeOfInterest(count);
+    }
+  if (count == 0)
+    {
+    this->setColumnMetaDataTypeOfInterest(-1);
+    }
+  else if (count > 0 && this->columnMetaDataTypeOfInterest() == -1)
+    {
+    this->setColumnMetaDataTypeOfInterest(0);
+    }
+}
+
+// --------------------------------------------------------------------------
+int voDelimitedTextPreviewModel::columnMetaDataTypeOfInterest() const
+{
+  Q_D(const voDelimitedTextPreviewModel);
+  return d->ColumnMetaDataTypeOfInterest;
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextPreviewModel::setColumnMetaDataTypeOfInterest(int count)
+{
+  Q_D(voDelimitedTextPreviewModel);
+  if (d->ColumnMetaDataTypeOfInterest == count)
+    {
+    return;
+    }
+  d->ColumnMetaDataTypeOfInterest = count;
+
+  if (d->InlineUpdate)
+    {
+    this->updatePreview();
+    }
+
+  emit this->columnMetaDataTypeOfInterestChanged(d->ColumnMetaDataTypeOfInterest);
 }
 
 // --------------------------------------------------------------------------
@@ -337,14 +360,14 @@ int voDelimitedTextPreviewModel::numberOfRowMetaDataTypes() const
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int _arg)
+void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int count)
 {
   Q_D(voDelimitedTextPreviewModel);
-  if (d->NumberOfRowMetaDataTypes == _arg)
+  if (d->NumberOfRowMetaDataTypes == count)
     {
     return;
     }
-  d->NumberOfRowMetaDataTypes = _arg;
+  d->NumberOfRowMetaDataTypes = count;
 
   if (d->InlineUpdate)
     {
@@ -352,6 +375,45 @@ void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int _arg)
     }
 
   emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
+
+  // Constrain RowMetaDataTypeOfInterest
+  if(count < this->rowMetaDataTypeOfInterest())
+    {
+    this->setRowMetaDataTypeOfInterest(count);
+    }
+  if (count == 0)
+    {
+    this->setRowMetaDataTypeOfInterest(-1);
+    }
+  else if (count > 0 && this->rowMetaDataTypeOfInterest() == -1)
+    {
+    this->setRowMetaDataTypeOfInterest(0);
+    }
+}
+
+// --------------------------------------------------------------------------
+int voDelimitedTextPreviewModel::rowMetaDataTypeOfInterest() const
+{
+  Q_D(const voDelimitedTextPreviewModel);
+  return d->RowMetaDataTypeOfInterest;
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextPreviewModel::setRowMetaDataTypeOfInterest(int count)
+{
+  Q_D(voDelimitedTextPreviewModel);
+  if (d->RowMetaDataTypeOfInterest == count)
+    {
+    return;
+    }
+  d->RowMetaDataTypeOfInterest = count;
+
+  if (d->InlineUpdate)
+    {
+    this->updatePreview();
+    }
+
+  emit this->rowMetaDataTypeOfInterestChanged(d->RowMetaDataTypeOfInterest);
 }
 
 // --------------------------------------------------------------------------
@@ -403,13 +465,6 @@ bool voDelimitedTextPreviewModel::useStringDelimiter()const
 }
 
 // --------------------------------------------------------------------------
-bool voDelimitedTextPreviewModel::haveHeaders()const
-{
-  Q_D(const voDelimitedTextPreviewModel);
-  return d->UseFirstLineAsAttributeNames;
-}
-
-// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::setInlineUpdate(bool value)
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -454,19 +509,8 @@ void voDelimitedTextPreviewModel::updatePreview()
   // Build model (self)
   this->clear();
 
-  int modelRowCount = table->GetNumberOfRows();
-  if (d->NumberOfColumnMetaDataTypes > 0)
-    {
-    modelRowCount--; // Consider the header data
-    }
-  this->setRowCount(modelRowCount);
-
-  int modelColumnCount = table->GetNumberOfColumns();
-  if (d->NumberOfRowMetaDataTypes > 0)
-    {
-    modelColumnCount--; // Consider the header data
-    }
-  this->setColumnCount(modelColumnCount);
+  QColor headerBackgroundColor = QPalette().color(QPalette::Window);
+  QColor ofInterestBackgroundColor = QPalette().color(QPalette::Mid);
 
   for (vtkIdType cid = 0; cid < table->GetNumberOfColumns(); ++cid)
     {
@@ -475,58 +519,19 @@ void voDelimitedTextPreviewModel::updatePreview()
     for (int rid = 0; rid < column->GetNumberOfValues(); ++rid)
       {
       QString value = QString(column->GetValue(rid));
-      int modelRowId = rid;
-      if (d->NumberOfColumnMetaDataTypes > 0)
-        {
-        modelRowId--; // Consider the header data
-        }
-      int modelColumnId = cid;
-      if (d->NumberOfRowMetaDataTypes > 0)
-        {
-        modelColumnId--; // Consider the header data
-        }
-      QStandardItem* currentItem = 0;
-      QColor headerBackgroundColor = QPalette().color(QPalette::Window);
-      if (cid < d->NumberOfRowMetaDataTypes)
-        {
-        if (cid == d->RowMetaDataTypeOfInterest)
-          {
-          this->setHeaderData(modelRowId, Qt::Vertical, value);
-          }
-        else
-          {
-          this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
-          currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
 
-          // Update horizontal header
-          if (rid == d->ColumnMetaDataTypeOfInterest)
-            {
-            this->setHeaderData(modelColumnId, Qt::Horizontal, value);
-            }
-          }
-        }
-      else
+      QStandardItem* currentItem = 0;
+
+      this->setItem(rid, cid, (currentItem = new QStandardItem(value)));
+      currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+
+      if (rid == d->ColumnMetaDataTypeOfInterest || cid == d->RowMetaDataTypeOfInterest)
         {
-        if (rid < d->NumberOfColumnMetaDataTypes)
-          {
-          if (rid == d->ColumnMetaDataTypeOfInterest)
-            {
-            this->setHeaderData(modelColumnId, Qt::Horizontal, value);
-            }
-          else
-            {
-            this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
-            currentItem->setData(headerBackgroundColor, Qt::BackgroundColorRole);
-            }
-          }
-        else
-          {
-          this->setItem(modelRowId, modelColumnId, (currentItem = new QStandardItem(value)));
-          }
+        currentItem->setData(ofInterestBackgroundColor, Qt::BackgroundRole);
         }
-      if(currentItem)
+      else if (rid < d->NumberOfColumnMetaDataTypes || cid < d->NumberOfRowMetaDataTypes)
         {
-        currentItem->setFlags(Qt::NoItemFlags | Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+        currentItem->setData(headerBackgroundColor, Qt::BackgroundRole);
         }
       }
     }

@@ -4,11 +4,15 @@
 #include <QTimer>
 #include <QDebug>
 
+// VTK includes
+#include <vtkSmartPointer.h>
+#include <vtkDelimitedTextReader.h>
+#include <vtkStringToNumeric.h>
+
 // Visomics includes
 #include <voDataBrowserWidget.h>
 #include <voDataModel.h>
 #include <voDataModelItem.h>
-#include <voCSVReader.h>
 #include <voInputFileDataObject.h>
 
 // STD includes
@@ -30,15 +34,23 @@ int voDataBrowserWidgetTest(int argc, char * argv [])
 
   // Read file
   QString filename("/home/jchris/Projects/Bioinformatics/Data/UNC/All_conc_kitware_transposed.csv");
-  voCSVReader reader;
-  reader.setFileName(filename);
-  reader.update();
+  vtkSmartPointer<vtkDelimitedTextReader> reader = vtkSmartPointer<vtkDelimitedTextReader>::New();
+  reader->SetFieldDelimiterCharacters(",");
+  reader->SetHaveHeaders(1);
+  reader->DetectNumericColumnsOff();
+  reader->SetFileName(filename.toAscii().data());
+  reader->Update();
+
+  // Detect numeric columns
+  vtkSmartPointer<vtkStringToNumeric> NumericOutput = vtkSmartPointer<vtkStringToNumeric>::New();
+  NumericOutput->SetInputConnection(reader->GetOutputPort());
+  NumericOutput->Update();
 
   // Add corresponding dataObject to model
   voInputFileDataObject * dataObject = new voInputFileDataObject();
   dataObject->setName("test");
   dataObject->setFileName(filename);
-  dataObject->setData(reader.output());
+  dataObject->setData(NumericOutput->GetOutput());
   model.addDataObject(dataObject);
 
   QStandardItem * container1 = model.addContainer("PCA");

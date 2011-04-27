@@ -4,7 +4,7 @@
 #define __voIOManager_h
 
 // Qt includes
-#include <QStringList>
+#include <QString>
 
 // Visomics includes
 #include "voDelimitedTextImportSettings.h"
@@ -12,8 +12,6 @@
 class voIOManager
 {
 public:
-
-  void openCSVFiles(const QStringList& fileNames);
 
   void openCSVFile(const QString& fileName, const voDelimitedTextImportSettings& settings);
   

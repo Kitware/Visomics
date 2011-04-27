@@ -39,8 +39,6 @@ SET(KIT_SRCS
   voAnalysisFactory.h
   voApplication.cpp
   voApplication.h
-  voCSVReader.cpp
-  voCSVReader.h
   voDataModel.cpp
   voDataModel.h
   voDataModel_p.h
