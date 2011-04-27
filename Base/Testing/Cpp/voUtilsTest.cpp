@@ -1,6 +1,7 @@
 
 // Qt includes
 #include <QList>
+#include <QString>
 
 // Visomics includes
 #include "voUtils.h"
@@ -545,6 +546,38 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
       }
     std::cerr << std::endl;
     }
+
+  //-----------------------------------------------------------------------------
+  // Test counterIntToAlpha(int intVal), counterAlphaToInt(QString alphaVal)
+  //-----------------------------------------------------------------------------
+
+  success = true;
+  for(int i = 680; i < 1000 && success;i++)
+    {
+    QString alpha = voUtils::counterIntToAlpha(i);
+    if (i != voUtils::counterAlphaToInt(alpha))
+      {
+      std::cerr << "Line " << __LINE__ << " - "
+                << "Problem with counterIntToAlpha(), counterAlphaToInt() - "
+                << "Functions are not mutually consistent" << std::endl;
+      std::cerr << "counterIntToAlpha(" << i << ") : " << voUtils::counterIntToAlpha(i).toLatin1().data() << std::endl;
+      std::cerr << "counterAlphaToInt(" << alpha.toLatin1().data() << ") : " << voUtils::counterAlphaToInt(alpha) << std::endl;
+      return EXIT_FAILURE;
+      }
+    }
+
+  if(voUtils::counterAlphaToInt(QString("ABA")) != 728)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with counterAlphaToInt() - "
+              << "counterAlphaToInt(\"ABA\") returned "
+              << voUtils::counterAlphaToInt(QString("ABA"))
+              << ", should be 728" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // Don't need to also spot test counterIntToAlpha, since we've spot tested
+  // counterAlphaToInt and know its consistant with counterIntToAlpha
 
 
   return EXIT_SUCCESS;
