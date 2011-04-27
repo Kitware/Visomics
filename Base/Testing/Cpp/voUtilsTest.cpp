@@ -126,6 +126,27 @@ bool counterAlphaToIntTestCase(int line, const QString& inputString, int expecte
   return true;
 }
 
+//-----------------------------------------------------------------------------
+bool parseRangeStringAlphaTestCase(int line, const QString& inputRangeString, QList<int>& expectedRange)
+{
+  QList<int> computedRange;
+  bool success = voUtils::parseRangeString(inputRangeString, computedRange, /* alpha= */ true);
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with parseRangeString()" << std::endl;
+    return false;
+    }
+  if (expectedRange != computedRange)
+    {
+    std::cerr << "Line " << line << " - Problem with parseRangeString()\n"
+              << "\tinputRangeString:" << qPrintable(inputRangeString) << "\n"
+              << "\tCurrent:" << qPrintable(intListToStringList(computedRange).join(",")) << "\n"
+              << "\tExpected:" << qPrintable(intListToStringList(expectedRange).join(",")) << std::endl;
+    return false;
+    }
+  return true;
+}
+
 }
 
 //-----------------------------------------------------------------------------
@@ -627,21 +648,79 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   // Test parseRangeString(const QString& rangeString, QList<int>& rangeList, bool alpha)
   //-----------------------------------------------------------------------------
 
-  QString rangeString; // empty range
   QList<int> expectedRange;
-
-  QList<int> computedRange;
-  success = voUtils::parseRangeString(rangeString, computedRange, /* alpha= */ true);
-  if (!success)
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String(""), expectedRange))
     {
-    std::cerr << "Line " << __LINE__ << " - Problem with parseRangeString()" << std::endl;
     return EXIT_FAILURE;
     }
-  if (expectedRange != computedRange)
+
+  expectedRange.clear();
+  expectedRange << 0;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A"), expectedRange))
     {
-    std::cerr << "Line " << __LINE__ << " - Problem with parseRangeString()\n"
-              << "\tCurrent:" << qPrintable(intListToStringList(computedRange).join(",")) << "\n"
-              << "\tExpected:" << qPrintable(intListToStringList(expectedRange).join(",")) << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 25;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("Z"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 26;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("AA"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 51;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("AZ"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 1 << 2 << 3 << 4;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A,B,C,D,E"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 1 << 2 << 3 << 4;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A, B, C ,D ,E "), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 1 << 2 << 3 << 4;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A-E"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 1 << 2 << 3 << 4;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A  - E   "), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 26 << 2 << 3 << 4 << 0;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("AA,C-E,A"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 1 << 2 << 3;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A-C,B-D"), expectedRange))
+    {
     return EXIT_FAILURE;
     }
 
