@@ -117,7 +117,7 @@ bool counterAlphaToIntTestCase(int line, const QString& inputString, int expecte
   if(currentValue != expectedValue)
     {
     std::cerr << "Line " << line << " - "
-              << "Problem with counterAlphaToInt() - "
+              << "Problem with counterAlphaToInt()\n"
               << "\tinputString:" << qPrintable(inputString) << "\n"
               << "\tcurrentValue:" << currentValue << "\n"
               << "\texpectedValue:" << expectedValue << std::endl;
@@ -579,6 +579,26 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   //-----------------------------------------------------------------------------
   // Test counterIntToAlpha(int intVal), counterAlphaToInt(QString alphaVal)
   //-----------------------------------------------------------------------------
+
+  if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("A"), 0))
+    {
+    return EXIT_FAILURE;
+    }
+
+  if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("Z"), 25))
+    {
+    return EXIT_FAILURE;
+    }
+
+  if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("AA"), 26))
+    {
+    return EXIT_FAILURE;
+    }
+
+  if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("AZ"), 51))
+    {
+    return EXIT_FAILURE;
+    }
 
   if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("ABA"), 728))
     {
