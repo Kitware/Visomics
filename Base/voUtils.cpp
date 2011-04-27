@@ -211,7 +211,7 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
     return false;
     }
 
-  //Validate - checks for form, not semantics
+  // Validate - checks for form, not semantics
   QRegExp validRegEx;
   if (!alpha) // Numbers
     {
@@ -227,7 +227,7 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
     return false;
     }
 
-  //Parse
+  // Parse
   QString scratchString(rangeString);
   scratchString.replace(" ", "");
   QStringList rangeStringList = scratchString.split(",");
