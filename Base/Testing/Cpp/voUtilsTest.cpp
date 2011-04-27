@@ -109,6 +109,23 @@ QStringList intListToStringList(const QList<int>& intList)
     }
   return strList;
 }
+
+//-----------------------------------------------------------------------------
+bool counterAlphaToIntTestCase(int line, const QString& inputString, int expectedValue)
+{
+  int currentValue = voUtils::counterAlphaToInt(inputString);
+  if(currentValue != expectedValue)
+    {
+    std::cerr << "Line " << line << " - "
+              << "Problem with counterAlphaToInt() - "
+              << "\tinputString:" << qPrintable(inputString) << "\n"
+              << "\tcurrentValue:" << currentValue << "\n"
+              << "\texpectedValue:" << expectedValue << std::endl;
+    return false;
+    }
+  return true;
+}
+
 }
 
 //-----------------------------------------------------------------------------
@@ -563,6 +580,11 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   // Test counterIntToAlpha(int intVal), counterAlphaToInt(QString alphaVal)
   //-----------------------------------------------------------------------------
 
+  if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("ABA"), 728))
+    {
+    return EXIT_FAILURE;
+    }
+
   success = true;
   for(int i = 680; i < 1000 && success;i++)
     {
@@ -576,16 +598,6 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
       std::cerr << "counterAlphaToInt(" << alpha.toLatin1().data() << ") : " << voUtils::counterAlphaToInt(alpha) << std::endl;
       return EXIT_FAILURE;
       }
-    }
-
-  if(voUtils::counterAlphaToInt(QString("ABA")) != 728)
-    {
-    std::cerr << "Line " << __LINE__ << " - "
-              << "Problem with counterAlphaToInt() - "
-              << "counterAlphaToInt(\"ABA\") returned "
-              << voUtils::counterAlphaToInt(QString("ABA"))
-              << ", should be 728" << std::endl;
-    return EXIT_FAILURE;
     }
 
   // Don't need to also spot test counterIntToAlpha, since we've spot tested
