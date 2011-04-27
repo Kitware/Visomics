@@ -311,6 +311,20 @@ void voDelimitedTextPreviewModel::setNumberOfColumnMetaDataTypes(int count)
     }
 
   emit this->numberOfColumnMetaDataTypesChanged(d->NumberOfColumnMetaDataTypes);
+
+  // Constrain ColumnMetaDataTypeOfInterest
+  if (count < this->columnMetaDataTypeOfInterest())
+    {
+    this->setColumnMetaDataTypeOfInterest(count);
+    }
+  if (count == 0)
+    {
+    this->setColumnMetaDataTypeOfInterest(-1);
+    }
+  else if (count > 0 && this->columnMetaDataTypeOfInterest() == -1)
+    {
+    this->setColumnMetaDataTypeOfInterest(0);
+    }
 }
 
 // --------------------------------------------------------------------------
@@ -361,6 +375,20 @@ void voDelimitedTextPreviewModel::setNumberOfRowMetaDataTypes(int count)
     }
 
   emit this->numberOfRowMetaDataTypesChanged(d->NumberOfRowMetaDataTypes);
+
+  // Constrain RowMetaDataTypeOfInterest
+  if(count < this->rowMetaDataTypeOfInterest())
+    {
+    this->setRowMetaDataTypeOfInterest(count);
+    }
+  if (count == 0)
+    {
+    this->setRowMetaDataTypeOfInterest(-1);
+    }
+  else if (count > 0 && this->rowMetaDataTypeOfInterest() == -1)
+    {
+    this->setRowMetaDataTypeOfInterest(0);
+    }
 }
 
 // --------------------------------------------------------------------------

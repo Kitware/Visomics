@@ -171,16 +171,15 @@ void voDelimitedTextImportWidget::onNumberOfColumnMetaDataTypesChanged(int value
   Q_D(voDelimitedTextImportWidget);
   d->NumberHeaderRowsSpinBox->setValue(value);
 
-  // Modify HeaderRowOfInterestSpinBox to conform
-  d->HeaderRowOfInterestSpinBox->setEnabled(value != 0);
   if(value > 0)
     {
-    d->HeaderRowOfInterestSpinBox->setMaximum(value-1);
+    d->HeaderRowOfInterestSpinBox->setRange(0, value-1);
     }
-  if(value < d->HeaderRowOfInterestSpinBox->value())
+  else
     {
-    d->HeaderRowOfInterestSpinBox->setValue(value);
+    d->HeaderRowOfInterestSpinBox->setMinimum(-1);
     }
+  d->HeaderRowOfInterestSpinBox->setEnabled(value > 0);
 }
 
 // --------------------------------------------------------------------------
@@ -188,7 +187,6 @@ void voDelimitedTextImportWidget::onColumnMetaDataTypeOfInterestChanged(int valu
 {
   Q_D(voDelimitedTextImportWidget);
   d->HeaderRowOfInterestSpinBox->setValue(value);
-  //set header here?
 }
 
 // --------------------------------------------------------------------------
@@ -197,16 +195,15 @@ void voDelimitedTextImportWidget::onNumberOfRowMetaDataTypesChanged(int value)
   Q_D(voDelimitedTextImportWidget);
   d->NumberHeaderColumnsSpinBox->setValue(value);
 
-  // Modify HeaderColumnOfInterestSpinBox to conform
-  d->HeaderColumnOfInterestSpinBox->setEnabled(value != 0);
   if(value > 0)
     {
-    d->HeaderColumnOfInterestSpinBox->setMaximum(value-1);
+    d->HeaderColumnOfInterestSpinBox->setRange(0, value-1);
     }
-  if(value < d->HeaderColumnOfInterestSpinBox->value())
+  else
     {
-    d->HeaderColumnOfInterestSpinBox->setValue(value);
+    d->HeaderColumnOfInterestSpinBox->setMinimum(-1);
     }
+  d->HeaderColumnOfInterestSpinBox->setEnabled(value > 0);
 }
 
 // --------------------------------------------------------------------------
@@ -214,7 +211,6 @@ void voDelimitedTextImportWidget::onRowMetaDataTypeOfInterestChanged(int value)
 {
   Q_D(voDelimitedTextImportWidget);
   d->HeaderColumnOfInterestSpinBox->setValue(value);
-  //set header here?
 }
 
 // --------------------------------------------------------------------------

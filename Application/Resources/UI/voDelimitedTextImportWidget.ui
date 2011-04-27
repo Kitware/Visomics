@@ -153,6 +153,9 @@
       </item>
       <item row="4" column="0">
        <widget class="QSpinBox" name="HeaderColumnOfInterestSpinBox">
+        <property name="minimum">
+         <number>-1</number>
+        </property>
         <property name="maximum">
          <number>0</number>
         </property>
@@ -163,6 +166,9 @@
       </item>
       <item row="7" column="0">
        <widget class="QSpinBox" name="HeaderRowOfInterestSpinBox">
+        <property name="minimum">
+         <number>-1</number>
+        </property>
         <property name="maximum">
          <number>0</number>
         </property>
