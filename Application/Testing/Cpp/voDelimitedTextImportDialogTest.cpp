@@ -9,6 +9,7 @@
 
 // STD includes
 #include <cstdlib>
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 int voDelimitedTextImportDialogTest(int argc, char * argv [])
@@ -16,9 +17,18 @@ int voDelimitedTextImportDialogTest(int argc, char * argv [])
   QApplication app(argc, argv);
 
   Q_INIT_RESOURCE(VisomicsApp);
+  
+  if (argc < 2)
+    {
+    // TODO Add a better to handle arguments. May be by using ctkCommandLineParser
+    std::cerr << "Missing an argument !\n"
+              << "Usage: \n"
+              << "  " << argv[0] << " </path/to/data.csv>" << std::endl;
+    return EXIT_FAILURE;
+    }
 
   // Read file
-  QString filename("/home/jchris/Projects/Bioinformatics/Data/UNC/All_conc_kitware_transposed.csv");
+  QString filename(argv[1]);
 
   voDelimitedTextImportDialog dialog;
   dialog.setFileName(filename);

@@ -17,6 +17,7 @@
 
 // STD includes
 #include <cstdlib>
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 int voDataBrowserWidgetTest(int argc, char * argv [])
@@ -42,7 +43,7 @@ int voDataBrowserWidgetTest(int argc, char * argv [])
   w.show();
 
   // Read file
-  QString filename(argv[1]));
+  QString filename(argv[1]);
   vtkSmartPointer<vtkDelimitedTextReader> reader = vtkSmartPointer<vtkDelimitedTextReader>::New();
   reader->SetFieldDelimiterCharacters(",");
   reader->SetHaveHeaders(1);

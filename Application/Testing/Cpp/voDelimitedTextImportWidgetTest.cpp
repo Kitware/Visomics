@@ -9,6 +9,7 @@
 
 // STD includes
 #include <cstdlib>
+#include <iostream>
 
 //-----------------------------------------------------------------------------
 int voDelimitedTextImportWidgetTest(int argc, char * argv [])
@@ -16,9 +17,18 @@ int voDelimitedTextImportWidgetTest(int argc, char * argv [])
   QApplication app(argc, argv);
 
   Q_INIT_RESOURCE(VisomicsApp);
+  
+  if (argc < 2)
+    {
+    // TODO Add a better to handle arguments. May be by using ctkCommandLineParser
+    std::cerr << "Missing an argument !\n"
+              << "Usage: \n"
+              << "  " << argv[0] << " </path/to/data.csv>" << std::endl;
+    return EXIT_FAILURE;
+    }
 
   // Read file
-  QString filename("/home/jchris/Projects/Bioinformatics/Data/UNC/All_conc_kitware_transposed.csv");
+  QString filename(argv[1]);
 
   voDelimitedTextImportWidget w;
   w.show();
@@ -26,11 +36,11 @@ int voDelimitedTextImportWidgetTest(int argc, char * argv [])
   w.setFileName(filename);
 
   QTimer autoExit;
-  if (argc < 2 || QString(argv[1]) != "-I")
-    {
+  //if (argc < 2 || QString(argv[1]) != "-I")
+  //  {
     QObject::connect(&autoExit, SIGNAL(timeout()), &app, SLOT(quit()));
     autoExit.start(1000);
-    }
+  //  }
   return app.exec();
 }
 
