@@ -2,6 +2,7 @@
 // Qt includes
 #include <QList>
 #include <QString>
+#include <QStringList>
 
 // Visomics includes
 #include "voUtils.h"
@@ -96,6 +97,17 @@ bool compareTable(vtkTable * table1, vtkTable * table2)
     }
 
 return true;
+}
+
+//-----------------------------------------------------------------------------
+QStringList intListToStringList(const QList<int>& intList)
+{
+  QStringList strList;
+  foreach(int i, intList)
+    {
+    strList << QString::number(i);
+    }
+  return strList;
 }
 }
 
@@ -579,6 +591,27 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   // Don't need to also spot test counterIntToAlpha, since we've spot tested
   // counterAlphaToInt and know its consistant with counterIntToAlpha
 
+  //-----------------------------------------------------------------------------
+  // Test parseRangeString(const QString& rangeString, QList<int>& rangeList, bool alpha)
+  //-----------------------------------------------------------------------------
+
+  QString rangeString; // empty range
+  QList<int> expectedRange;
+
+  QList<int> computedRange;
+  success = voUtils::parseRangeString(rangeString, computedRange, /* alpha= */ true);
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with parseRangeString()" << std::endl;
+    return EXIT_FAILURE;
+    }
+  if (expectedRange != computedRange)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with parseRangeString()\n"
+              << "\tCurrent:" << qPrintable(intListToStringList(computedRange).join(",")) << "\n"
+              << "\tExpected:" << qPrintable(intListToStringList(expectedRange).join(",")) << std::endl;
+    return EXIT_FAILURE;
+    }
 
   return EXIT_SUCCESS;
 }

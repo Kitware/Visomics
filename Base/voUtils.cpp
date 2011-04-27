@@ -211,6 +211,11 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
     return false;
     }
 
+  if(rangeString.isEmpty())
+    {
+    return true;
+    }
+
   // Validate - checks for form, not semantics
   QRegExp validRegEx;
   if (!alpha) // Numbers
