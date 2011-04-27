@@ -16,12 +16,12 @@ TARGET_LINK_LIBRARIES(${KIT}CppTests ${PROJECT_NAME}Lib)
 SET(KIT_TESTS ${CPP_TEST_PATH}/${KIT}CppTests)
 
 MACRO(SIMPLE_TEST TESTNAME)
-  ADD_TEST(${TESTNAME} ${KIT_TESTS} ${TESTNAME})
+  ADD_TEST(${TESTNAME} ${KIT_TESTS} ${TESTNAME} ${ARGV})
   #SET_PROPERTY(TEST ${TESTNAME} PROPERTY LABELS ${PROJECT_NAME})
 ENDMACRO()
 
 SIMPLE_TEST(voDataBrowserWidgetTest)
-SIMPLE_TEST(voDelimitedTextImportDialogTest)
+SIMPLE_TEST(voDataBrowserWidgetTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
 SIMPLE_TEST(voDelimitedTextImportWidgetTest)
 
 

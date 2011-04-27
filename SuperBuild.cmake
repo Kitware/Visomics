@@ -51,6 +51,7 @@ endif()
 
 include(CMakeExternals/VTK.cmake)
 include(CMakeExternals/QtPropertyBrowser.cmake)
+include(CMakeExternals/VisomicsData.cmake)
 #include(CMakeExternals/CTK.cmake)
 
 #-----------------------------------------------------------------------------
@@ -98,6 +99,8 @@ ExternalProject_Add(${proj}
     -DCTEST_CONFIGURATION_TYPE:STRING=${CTEST_CONFIGURATION_TYPE}
     # QtPropertyBrowser
     -DQtPropertyBrowser_DIR:PATH=${QtPropertyBrowser_DIR}
+    # VisomicsData
+    -DVisomicsData_DIR:PATH=${VisomicsData_DIR}
     # VTK
     -DVTK_DIR:PATH=${VTK_DIR}
     #-DVTK_DEBUG_LEAKS:BOOL=${Slicer_USE_VTK_DEBUG_LEAKS}
@@ -110,6 +113,7 @@ ExternalProject_Add(${proj}
   DEPENDS 
     # Mandatory dependencies
     ${QtPropertyBrowser_DEPENDS}
+    ${VisomicsData_DEPENDS}
     #${CTK_DEPENDS}
     ${VTK_DEPENDS}
   )

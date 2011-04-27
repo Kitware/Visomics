@@ -21,9 +21,18 @@
 //-----------------------------------------------------------------------------
 int voDataBrowserWidgetTest(int argc, char * argv [])
 {
-  QApplication app(argc, argv);
+  QApplication app(argc, argv);  
 
   Q_INIT_RESOURCE(VisomicsApp);
+
+  if (argc < 2)
+    {
+    // TODO Add a better to handle arguments. May be by using ctkCommandLineParser
+    std::cerr << "Missing an argument !\n"
+              << "Usage: \n"
+              << "  " << argv[0] << " </path/to/data.csv>" << std::endl;
+    return EXIT_FAILURE;
+    }
 
   voDataBrowserWidget w;
   voDataModel model;
@@ -33,7 +42,7 @@ int voDataBrowserWidgetTest(int argc, char * argv [])
   w.show();
 
   // Read file
-  QString filename("/home/jchris/Projects/Bioinformatics/Data/UNC/All_conc_kitware_transposed.csv");
+  QString filename(argv[1]));
   vtkSmartPointer<vtkDelimitedTextReader> reader = vtkSmartPointer<vtkDelimitedTextReader>::New();
   reader->SetFieldDelimiterCharacters(",");
   reader->SetHaveHeaders(1);
@@ -67,11 +76,11 @@ int voDataBrowserWidgetTest(int argc, char * argv [])
   model.addContainer("Views", container2);
 
   QTimer autoExit;
-  if (argc < 2 || QString(argv[1]) != "-I")
-    {
+  //if (argc < 2 || QString(argv[1]) != "-I")
+  //  {
     QObject::connect(&autoExit, SIGNAL(timeout()), &app, SLOT(quit()));
     autoExit.start(1000);
-    }
+  //  }
   return app.exec();
 }
 
