@@ -54,13 +54,33 @@ void voDelimitedTextImportWidgetPrivate::initWidgetFromModel()
 
   this->NumberHeaderColumnsSpinBox->setValue(this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes());
 
-  this->HeaderColumnOfInterestSpinBox->setValue(this->DelimitedTextPreviewModel.rowMetaDataTypeOfInterest());
-  this->HeaderColumnOfInterestSpinBox->setMaximum(this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes()-1);
+  if(this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes() > 0)
+    {
+    this->HeaderColumnOfInterestSpinBox->setRange(0, this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes()-1);
+    this->HeaderColumnOfInterestSpinBox->setValue(this->DelimitedTextPreviewModel.rowMetaDataTypeOfInterest());
+    this->HeaderColumnOfInterestSpinBox->setEnabled(true);
+    }
+  else
+    {
+    this->HeaderColumnOfInterestSpinBox->setMinimum(-1);
+    this->HeaderColumnOfInterestSpinBox->setValue(-1);
+    this->HeaderColumnOfInterestSpinBox->setEnabled(false);
+    }
 
   this->NumberHeaderRowsSpinBox->setValue(this->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes());
 
-  this->HeaderRowOfInterestSpinBox->setValue(this->DelimitedTextPreviewModel.columnMetaDataTypeOfInterest());
-  this->HeaderRowOfInterestSpinBox->setMaximum(this->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes()-1);
+  if(this->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes() > 0)
+    {
+    this->HeaderRowOfInterestSpinBox->setRange(0, this->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes()-1);
+    this->HeaderRowOfInterestSpinBox->setValue(this->DelimitedTextPreviewModel.columnMetaDataTypeOfInterest());
+    this->HeaderRowOfInterestSpinBox->setEnabled(true);
+    }
+  else
+    {
+    this->HeaderRowOfInterestSpinBox->setMinimum(-1);
+    this->HeaderRowOfInterestSpinBox->setValue(-1);
+    this->HeaderRowOfInterestSpinBox->setEnabled(false);
+    }
 }
 
 // --------------------------------------------------------------------------
