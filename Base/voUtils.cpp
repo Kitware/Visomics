@@ -219,7 +219,7 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
     }
   else // Letters
     {
-    validRegEx.setPattern("^\\s*([A-Z]\\s*[-,]\\s*)*[A-Z]\\s*$");
+    validRegEx.setPattern("^\\s*([A-Z]+\\s*[-,]\\s*)*[A-Z]+\\s*$");
     validRegEx.setCaseSensitivity(Qt::CaseInsensitive);
     }
   if(!validRegEx.exactMatch(rangeString))
@@ -240,7 +240,7 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
     }
   else
     {
-    rangeRegEx.setPattern("^([A-Z])-([A-Z])$");
+    rangeRegEx.setPattern("^([A-Z]+)-([A-Z]+)$");
     rangeRegEx.setCaseSensitivity(Qt::CaseInsensitive);
     }
   foreach(QString subStr, rangeStringList)
@@ -256,8 +256,8 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
         }
       else
         {
-        subBegin = rangeRegEx.cap(1).toUpper().at(0).toLatin1() - 'A';
-        subEnd = rangeRegEx.cap(2).toUpper().at(0).toLatin1() - 'A';
+        subBegin = voUtils::counterAlphaToInt(rangeRegEx.cap(1));
+        subEnd = voUtils::counterAlphaToInt(rangeRegEx.cap(2));
         }
       for(int subCtr = subBegin; subCtr <= subEnd; subCtr++)
         {
@@ -278,5 +278,38 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
     }
 
   return true;
+}
+
+QString voUtils::counterIntToAlpha(int intVal)
+{
+  if (intVal < 0)
+    {
+    return QString();
+    }
+  else if (intVal < 26)
+    {
+    return QString(QChar('A' + intVal));
+    }
+  else
+    {
+    return voUtils::counterIntToAlpha((intVal / 26) - 1) + voUtils::counterIntToAlpha(intVal % 26);
+    }
+}
+
+int voUtils::counterAlphaToInt(QString alphaVal)
+{
+  if (alphaVal.length() < 1)
+    {
+    return -1;
+    }
+  else if (alphaVal.length() == 1)
+    {
+    return static_cast<int>(alphaVal.toUpper().at(0).toLatin1() - 'A');
+    }
+  else
+    {
+    return (voUtils::counterAlphaToInt(alphaVal.mid(0, alphaVal.length()-1)) + 1) * 26
+           + voUtils::counterAlphaToInt(alphaVal.mid(alphaVal.length()-1));
+    }
 }
 

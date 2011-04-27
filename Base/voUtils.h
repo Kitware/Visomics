@@ -19,6 +19,10 @@ bool insertColumnIntoTable(vtkTable * table, int position, vtkAbstractArray * co
 void setTableColumnNames(vtkTable * table, vtkStringArray * columnNames);
 
 bool parseRangeString(const QString& rangeString, QList<int>& rangeList, bool alpha);
+
+QString counterIntToAlpha(int intVal);
+
+int counterAlphaToInt(QString alphaVal);
 }
 
 #endif
