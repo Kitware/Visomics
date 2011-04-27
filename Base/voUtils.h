@@ -22,7 +22,7 @@ bool parseRangeString(const QString& rangeString, QList<int>& rangeList, bool al
 
 QString counterIntToAlpha(int intVal);
 
-int counterAlphaToInt(QString alphaVal);
+int counterAlphaToInt(const QString& alphaVal);
 }
 
 #endif

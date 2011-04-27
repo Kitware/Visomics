@@ -243,7 +243,7 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
     rangeRegEx.setPattern("^([A-Z]+)-([A-Z]+)$");
     rangeRegEx.setCaseSensitivity(Qt::CaseInsensitive);
     }
-  foreach(QString subStr, rangeStringList)
+  foreach(const QString& subStr, rangeStringList)
     {
     if(rangeRegEx.indexIn(subStr) != -1)
       {
@@ -298,7 +298,7 @@ QString voUtils::counterIntToAlpha(int intVal)
 }
 
 //----------------------------------------------------------------------------
-int voUtils::counterAlphaToInt(QString alphaVal)
+int voUtils::counterAlphaToInt(const QString& alphaVal)
 {
   if (alphaVal.length() < 1)
     {
