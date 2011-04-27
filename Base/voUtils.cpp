@@ -280,6 +280,7 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
   return true;
 }
 
+//----------------------------------------------------------------------------
 QString voUtils::counterIntToAlpha(int intVal)
 {
   if (intVal < 0)
@@ -296,6 +297,7 @@ QString voUtils::counterIntToAlpha(int intVal)
     }
 }
 
+//----------------------------------------------------------------------------
 int voUtils::counterAlphaToInt(QString alphaVal)
 {
   if (alphaVal.length() < 1)
