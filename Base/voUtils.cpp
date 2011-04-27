@@ -215,21 +215,21 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
   QRegExp validRegEx;
   if (!alpha) // Numbers
     {
-    validRegEx.setPattern("^\\s*(\\d+\\s*[-,]\\s*)*\\d+\\s*$");
+    validRegEx.setPattern("^(\\d+[-,])*\\d+$");
     }
   else // Letters
     {
-    validRegEx.setPattern("^\\s*([A-Z]+\\s*[-,]\\s*)*[A-Z]+\\s*$");
+    validRegEx.setPattern("^([A-Z]+[-,])*[A-Z]+$");
     validRegEx.setCaseSensitivity(Qt::CaseInsensitive);
     }
-  if(!validRegEx.exactMatch(rangeString))
+  QString scratchString(rangeString);
+  scratchString.replace(" ", "");
+  if(!validRegEx.exactMatch(scratchString))
     {
     return false;
     }
 
   // Parse
-  QString scratchString(rangeString);
-  scratchString.replace(" ", "");
   QStringList rangeStringList = scratchString.split(",");
   rangeStringList.removeDuplicates();
 
