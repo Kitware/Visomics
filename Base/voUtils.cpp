@@ -277,7 +277,7 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
         }
       else
         {
-        rangeList.push_back(subStr.toUpper().at(0).toLatin1() - 'A');
+        rangeList.push_back(voUtils::counterAlphaToInt(subStr));
         }
       }
     }
