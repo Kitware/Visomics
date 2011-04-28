@@ -711,7 +711,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   expectedRange.clear();
-  expectedRange << 26 << 2 << 3 << 4 << 0;
+  expectedRange << 0 << 2 << 3 << 4 << 26;
   if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("AA,C-E,A"), expectedRange))
     {
     return EXIT_FAILURE;

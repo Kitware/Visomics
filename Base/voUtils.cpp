@@ -282,6 +282,9 @@ bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList
       }
     }
 
+  rangeList = rangeList.toSet().toList(); // Remove duplicates
+  qSort(rangeList);
+
   return true;
 }
 
