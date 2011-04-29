@@ -56,6 +56,9 @@ void voTTest::setOutputInformation()
   this->addOutputType("TTest_table", "vtkTable" ,
                       "", "",
                       "voTableView", "Table");
+  this->addOutputType("TTest_volcano", "vtkTable" ,
+                      "voVolcanoView", "Volcano Plot",
+                      "voTableView", "Volcano Table");
 }
 
 // --------------------------------------------------------------------------
@@ -133,6 +136,7 @@ bool voTTest::execute()
   d->RCalc->PutArray("0", "sample1Array");
   d->RCalc->PutArray("1", "sample2Array");
   d->RCalc->GetArray("P-Value","pValue");
+  d->RCalc->GetArray("Fold Change (Sample 1 -> Sample 2)","foldChange");
   d->RCalc->GetArray("RerrValue","RerrValue");
   d->RCalc->SetRscript(
   "constErrFlag <- 0; genErrFlag <- 0\n"
@@ -147,6 +151,11 @@ bool voTTest::execute()
       "return(NA)}\n"
   "pValue <- sapply( seq(length=nrow(sample1Array)), "
                     "function(x) {my.t.test(sample1Array[x,], sample2Array[x,], \"two.sided\")})\n"
+  "log2FC<-log2(rowMeans(sample1Array))-log2(rowMeans(sample2Array))\n"
+  "FCFun <- function(x){"
+    "if(is.na(x)){genErrFlag <<- 1; return(0)}\n"
+    "if (x<0) {return(-1/(2^x))} else {return(2^x)}}\n"
+  "foldChange<-sapply(log2FC, FCFun)\n"
   "if(genErrFlag){"
     "RerrValue <- 2"
   "}else if(constErrFlag){"
@@ -172,11 +181,21 @@ bool voTTest::execute()
   vtkSmartPointer<vtkTable> pValueTable = vtkSmartPointer<vtkTable>::New();
   voUtils::arrayToTable(outputArrayData->GetArrayByName("P-Value"), pValueTable.GetPointer());
 
+  // Extract and build table for fold change
+  vtkSmartPointer<vtkTable> foldChangeTable = vtkSmartPointer<vtkTable>::New();
+  voUtils::arrayToTable(outputArrayData->GetArrayByName("Fold Change (Sample 1 -> Sample 2)"), foldChangeTable.GetPointer());
+
   // Combine tables
   vtkSmartPointer<vtkTable> outputDataTable = vtkSmartPointer<vtkTable>::New();
   voUtils::insertColumnIntoTable(outputDataTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
   outputDataTable->AddColumn(pValueTable->GetColumn(0));
 
+  vtkSmartPointer<vtkTable> outputVolcanoTable = vtkSmartPointer<vtkTable>::New();
+  voUtils::insertColumnIntoTable(outputVolcanoTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
+  outputVolcanoTable->AddColumn(foldChangeTable->GetColumn(0));
+  outputVolcanoTable->AddColumn(pValueTable->GetColumn(0));
+
   this->setOutput("TTest_table", new voTableDataObject("TTest_table", outputDataTable));
+  this->setOutput("TTest_volcano", new voTableDataObject("TTest_volcano", outputVolcanoTable));
   return true;
 }
