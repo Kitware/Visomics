@@ -56,6 +56,9 @@ void voFoldChange::setOutputInformation()
   this->addOutputType("foldChange", "vtkTable" ,
                       "", "",
                       "voTableView", "Table");
+  this->addOutputType("foldChangePlot", "vtkTable" ,
+                      "voHorizontalBarView", "Horizontal Plot",
+                      "", "");
 }
 
 // --------------------------------------------------------------------------
@@ -183,6 +186,11 @@ bool voFoldChange::execute()
   outputDataTable->AddColumn(avgFinalTable->GetColumn(0));
   outputDataTable->AddColumn(foldChangeTable->GetColumn(0));
 
+  vtkSmartPointer<vtkTable> outputPlotTable = vtkSmartPointer<vtkTable>::New();
+  voUtils::insertColumnIntoTable(outputPlotTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
+  outputPlotTable->AddColumn(foldChangeTable->GetColumn(0));
+
   this->setOutput("foldChange", new voTableDataObject("foldChange", outputDataTable));
+  this->setOutput("foldChangePlot", new voTableDataObject("foldChangePlot", outputPlotTable));
   return true;
 }
