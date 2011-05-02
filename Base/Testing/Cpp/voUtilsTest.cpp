@@ -1,6 +1,8 @@
 
 // Qt includes
 #include <QList>
+#include <QString>
+#include <QStringList>
 
 // Visomics includes
 #include "voUtils.h"
@@ -96,6 +98,55 @@ bool compareTable(vtkTable * table1, vtkTable * table2)
 
 return true;
 }
+
+//-----------------------------------------------------------------------------
+QStringList intListToStringList(const QList<int>& intList)
+{
+  QStringList strList;
+  foreach(int i, intList)
+    {
+    strList << QString::number(i);
+    }
+  return strList;
+}
+
+//-----------------------------------------------------------------------------
+bool counterAlphaToIntTestCase(int line, const QString& inputString, int expectedValue)
+{
+  int currentValue = voUtils::counterAlphaToInt(inputString);
+  if(currentValue != expectedValue)
+    {
+    std::cerr << "Line " << line << " - "
+              << "Problem with counterAlphaToInt()\n"
+              << "\tinputString:" << qPrintable(inputString) << "\n"
+              << "\tcurrentValue:" << currentValue << "\n"
+              << "\texpectedValue:" << expectedValue << std::endl;
+    return false;
+    }
+  return true;
+}
+
+//-----------------------------------------------------------------------------
+bool parseRangeStringAlphaTestCase(int line, const QString& inputRangeString, QList<int>& expectedRange)
+{
+  QList<int> computedRange;
+  bool success = voUtils::parseRangeString(inputRangeString, computedRange, /* alpha= */ true);
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with parseRangeString()" << std::endl;
+    return false;
+    }
+  if (expectedRange != computedRange)
+    {
+    std::cerr << "Line " << line << " - Problem with parseRangeString()\n"
+              << "\tinputRangeString:" << qPrintable(inputRangeString) << "\n"
+              << "\tCurrent:" << qPrintable(intListToStringList(computedRange).join(",")) << "\n"
+              << "\tExpected:" << qPrintable(intListToStringList(expectedRange).join(",")) << std::endl;
+    return false;
+    }
+  return true;
+}
+
 }
 
 //-----------------------------------------------------------------------------
@@ -546,6 +597,132 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     std::cerr << std::endl;
     }
 
+  //-----------------------------------------------------------------------------
+  // Test counterIntToAlpha(int intVal), counterAlphaToInt(QString alphaVal)
+  //-----------------------------------------------------------------------------
+
+  if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("A"), 0))
+    {
+    return EXIT_FAILURE;
+    }
+
+  if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("Z"), 25))
+    {
+    return EXIT_FAILURE;
+    }
+
+  if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("AA"), 26))
+    {
+    return EXIT_FAILURE;
+    }
+
+  if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("AZ"), 51))
+    {
+    return EXIT_FAILURE;
+    }
+
+  if (!counterAlphaToIntTestCase(__LINE__, QLatin1String("ABA"), 728))
+    {
+    return EXIT_FAILURE;
+    }
+
+  success = true;
+  for(int i = 680; i < 1000 && success;i++)
+    {
+    QString alpha = voUtils::counterIntToAlpha(i);
+    if (i != voUtils::counterAlphaToInt(alpha))
+      {
+      std::cerr << "Line " << __LINE__ << " - "
+                << "Problem with counterIntToAlpha(), counterAlphaToInt() - "
+                << "Functions are not mutually consistent" << std::endl;
+      std::cerr << "counterIntToAlpha(" << i << ") : " << voUtils::counterIntToAlpha(i).toLatin1().data() << std::endl;
+      std::cerr << "counterAlphaToInt(" << alpha.toLatin1().data() << ") : " << voUtils::counterAlphaToInt(alpha) << std::endl;
+      return EXIT_FAILURE;
+      }
+    }
+
+  // Don't need to also spot test counterIntToAlpha, since we've spot tested
+  // counterAlphaToInt and know its consistant with counterIntToAlpha
+
+  //-----------------------------------------------------------------------------
+  // Test parseRangeString(const QString& rangeString, QList<int>& rangeList, bool alpha)
+  //-----------------------------------------------------------------------------
+
+  QList<int> expectedRange;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String(""), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 25;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("Z"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 26;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("AA"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 51;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("AZ"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 1 << 2 << 3 << 4;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A,B,C,D,E"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 1 << 2 << 3 << 4;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A, B, C ,D ,E "), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 1 << 2 << 3 << 4;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A-E"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 1 << 2 << 3 << 4;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A  - E   "), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 2 << 3 << 4 << 26;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("AA,C-E,A"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
+
+  expectedRange.clear();
+  expectedRange << 0 << 1 << 2 << 3;
+  if (!parseRangeStringAlphaTestCase(__LINE__, QLatin1String("A-C,B-D"), expectedRange))
+    {
+    return EXIT_FAILURE;
+    }
 
   return EXIT_SUCCESS;
 }

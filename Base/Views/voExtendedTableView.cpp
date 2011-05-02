@@ -9,6 +9,7 @@
 #include "voExtendedTableView.h"
 #include "voDataObject.h"
 #include "vtkExtendedTable.h"
+#include "voUtils.h"
 
 // VTK includes
 #include <vtkDoubleArray.h>
@@ -113,6 +114,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
       QString value = QString(metadata->GetValue(tableColItr));
       if(tableRowItr == extendedTable->GetColumnMetaDataTypeOfInterest())
         {
+        value.prepend(QString("%1: ").arg(voUtils::counterIntToAlpha(tableColItr)));
         d->Model.setHeaderData(modelColItr, Qt::Horizontal, value);
         }
       else
@@ -145,6 +147,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
       QString value = QString(metadata->GetValue(tableRowItr));
       if(tableColItr == extendedTable->GetRowMetaDataTypeOfInterest())
         {
+        value.prepend(QString("%1: ").arg(1 + tableRowItr));
         d->Model.setHeaderData(modelRowItr, Qt::Vertical, value);
         }
       else

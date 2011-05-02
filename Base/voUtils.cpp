@@ -1,6 +1,8 @@
 
 // Qt includes
 #include <QtGlobal>
+#include <QStringList>
+#include <QRegExp>
 
 // Visomics includes
 #include "voUtils.h"
@@ -200,3 +202,124 @@ void voUtils::setTableColumnNames(vtkTable * table, vtkStringArray * columnNames
     column->SetName(columnNames->GetValue(cid));
     }
 }
+
+//----------------------------------------------------------------------------
+bool voUtils::parseRangeString(const QString& rangeString, QList<int>& rangeList, bool alpha)
+{
+  if(!rangeList.empty())
+    {
+    return false;
+    }
+
+  if(rangeString.isEmpty())
+    {
+    return true;
+    }
+
+  // Validate - checks for form, not semantics
+  QRegExp validRegEx;
+  if (!alpha) // Numbers
+    {
+    validRegEx.setPattern("^(\\d+[-,])*\\d+$");
+    }
+  else // Letters
+    {
+    validRegEx.setPattern("^([A-Z]+[-,])*[A-Z]+$");
+    validRegEx.setCaseSensitivity(Qt::CaseInsensitive);
+    }
+  QString scratchString(rangeString);
+  scratchString.replace(" ", "");
+  if(!validRegEx.exactMatch(scratchString))
+    {
+    return false;
+    }
+
+  // Parse
+  QStringList rangeStringList = scratchString.split(",");
+  rangeStringList.removeDuplicates();
+
+  QRegExp rangeRegEx;
+  if (!alpha)
+    {
+    rangeRegEx.setPattern("^(\\d+)-(\\d+)$");
+    }
+  else
+    {
+    rangeRegEx.setPattern("^([A-Z]+)-([A-Z]+)$");
+    rangeRegEx.setCaseSensitivity(Qt::CaseInsensitive);
+    }
+  foreach(const QString& subStr, rangeStringList)
+    {
+    if(rangeRegEx.indexIn(subStr) != -1)
+      {
+      int subBegin;
+      int subEnd;
+      if (!alpha)
+        {
+        subBegin = rangeRegEx.cap(1).toInt() - 1;
+        subEnd = rangeRegEx.cap(2).toInt() - 1;
+        }
+      else
+        {
+        subBegin = voUtils::counterAlphaToInt(rangeRegEx.cap(1));
+        subEnd = voUtils::counterAlphaToInt(rangeRegEx.cap(2));
+        }
+      for(int subCtr = subBegin; subCtr <= subEnd; subCtr++)
+        {
+        rangeList.push_back(subCtr);
+        }
+      }
+    else
+      {
+      if (!alpha)
+        {
+        rangeList.push_back(subStr.toInt() - 1);
+        }
+      else
+        {
+        rangeList.push_back(voUtils::counterAlphaToInt(subStr));
+        }
+      }
+    }
+
+  rangeList = rangeList.toSet().toList(); // Remove duplicates
+  qSort(rangeList);
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+QString voUtils::counterIntToAlpha(int intVal)
+{
+  if (intVal < 0)
+    {
+    return QString();
+    }
+  else if (intVal < 26)
+    {
+    return QString(QChar('A' + intVal));
+    }
+  else
+    {
+    return voUtils::counterIntToAlpha((intVal / 26) - 1) + voUtils::counterIntToAlpha(intVal % 26);
+    }
+}
+
+//----------------------------------------------------------------------------
+int voUtils::counterAlphaToInt(const QString& alphaVal)
+{
+  if (alphaVal.length() < 1)
+    {
+    return -1;
+    }
+  else if (alphaVal.length() == 1)
+    {
+    return static_cast<int>(alphaVal.toUpper().at(0).toLatin1() - 'A');
+    }
+  else
+    {
+    return (voUtils::counterAlphaToInt(alphaVal.mid(0, alphaVal.length()-1)) + 1) * 26
+           + voUtils::counterAlphaToInt(alphaVal.mid(alphaVal.length()-1));
+    }
+}
+

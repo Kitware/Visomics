@@ -4,6 +4,8 @@
 class vtkAbstractArray;
 class vtkStringArray;
 class vtkTable;
+template <class T> class QList;
+class QString;
 
 namespace voUtils 
 {
@@ -16,6 +18,11 @@ bool insertColumnIntoTable(vtkTable * table, int position, vtkAbstractArray * co
 
 void setTableColumnNames(vtkTable * table, vtkStringArray * columnNames);
 
+bool parseRangeString(const QString& rangeString, QList<int>& rangeList, bool alpha);
+
+QString counterIntToAlpha(int intVal);
+
+int counterAlphaToInt(const QString& alphaVal);
 }
 
 #endif
