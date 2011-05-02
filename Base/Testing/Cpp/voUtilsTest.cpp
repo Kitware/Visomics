@@ -758,6 +758,29 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     return EXIT_FAILURE;
     }
 
+
+  //-----------------------------------------------------------------------------
+  // Test tableToArray()
+  //-----------------------------------------------------------------------------
+
+  QList<int> intColumns;
+  intColumns << 1;
+  vtkSmartPointer<vtkArray> convertedIntColumns;
+  voUtils::tableToArray(inputTable.GetPointer(), convertedIntColumns, intColumns);
+
+  vtkArray * expectedIntArray = vtkArray::CreateArray(vtkArray::DENSE, VTK_UNSIGNED_INT);
+  expectedIntArray->Resize(vtkArrayRange(0, 5));
+  for (vtkArray::SizeT i = 0; i < 5; ++i)
+    {
+    expectedIntArray->SetVariantValueN(i, i);
+    }
+
+  if (!compareArray(convertedIntColumns.GetPointer(), expectedIntArray))
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with tableToArray method !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
   return EXIT_SUCCESS;
 }
 
