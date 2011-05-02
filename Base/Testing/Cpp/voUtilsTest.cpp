@@ -397,25 +397,25 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   vtkNew<vtkIntArray> intArray1;
   intArray1->SetNumberOfValues(4);
   intArray1->SetValue(0, 0);
-  intArray1->SetValue(0, 1);
-  intArray1->SetValue(0, 2);
-  intArray1->SetValue(0, 3);
+  intArray1->SetValue(1, 1);
+  intArray1->SetValue(2, 2);
+  intArray1->SetValue(3, 3);
   insertTableTest->AddColumn(intArray1.GetPointer());
 
   vtkNew<vtkIntArray> intArray2;
   intArray2->SetNumberOfValues(4);
   intArray2->SetValue(0, 10);
-  intArray2->SetValue(0, 11);
-  intArray2->SetValue(0, 12);
-  intArray2->SetValue(0, 13);
+  intArray2->SetValue(1, 11);
+  intArray2->SetValue(2, 12);
+  intArray2->SetValue(3, 13);
   insertTableTest->AddColumn(intArray2.GetPointer());
 
   vtkNew<vtkIntArray> intArray3;
   intArray3->SetNumberOfValues(4);
   intArray3->SetValue(0, 20);
-  intArray3->SetValue(0, 21);
-  intArray3->SetValue(0, 22);
-  intArray3->SetValue(0, 23);
+  intArray3->SetValue(1, 21);
+  intArray3->SetValue(2, 22);
+  intArray3->SetValue(3, 23);
   insertTableTest->AddColumn(intArray3.GetPointer());
 
 
