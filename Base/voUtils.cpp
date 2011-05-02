@@ -328,7 +328,7 @@ int voUtils::counterAlphaToInt(const QString& alphaVal)
 }
 
 //----------------------------------------------------------------------------
-bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray, QList<int>& columnList)
+bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray, const QList<int>& columnList)
 {
   vtkNew<vtkTableToArray> tabToArr;
   tabToArr->SetInputConnection(srcTable->GetProducerPort());

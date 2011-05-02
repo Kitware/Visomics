@@ -26,7 +26,7 @@ QString counterIntToAlpha(int intVal);
 
 int counterAlphaToInt(const QString& alphaVal);
 
-bool tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray, QList<int>& columnList);
+bool tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray, const QList<int>& columnList);
 
 void arrayToTable(vtkArray* srcArray, vtkSmartPointer<vtkTable>& destTable);
 }
