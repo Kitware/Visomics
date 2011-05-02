@@ -8,9 +8,11 @@
 #include "voUtils.h"
 
 // VTK includes
+#include <vtkArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include <vtkNew.h>
+#include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkVariantArray.h>
@@ -20,6 +22,38 @@
 
 namespace
 {
+
+//-----------------------------------------------------------------------------
+bool compareArray(vtkArray* array1, vtkArray* array2)
+{
+  if (array1 == 0 && array2 == 0)
+    {
+    return true;
+    }
+  if (array1 == 0 || array2 == 0)
+    {
+    return false;
+    }
+  if (array1->GetSize() != array2->GetSize())
+    {
+    std::cerr << "Compare array Failed !\n"
+              << "\tSize(array1): " << array1->GetSize() << "\n"
+              << "\tSize(array2): " << array2->GetSize() << std::endl;
+    return false;
+    }
+  for (vtkArray::SizeT i = 0; i < array1->GetSize(); ++i)
+    {
+    if (array1->GetVariantValueN(i) != array2->GetVariantValueN(i))
+      {
+      std::cerr << "Compare array Failed !\n"
+                << "\tValue(array1): " << array1->GetVariantValueN(i) << "\n"
+                << "\tValue(array2): " << array2->GetVariantValueN(i) << std::endl;
+      return false;
+      }
+    }
+  return true;
+}
+
 //-----------------------------------------------------------------------------
 bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
 {
