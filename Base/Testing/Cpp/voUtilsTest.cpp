@@ -34,15 +34,15 @@ bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
   if (array1->GetNumberOfTuples() != array2->GetNumberOfTuples())
     {
     std::cerr << "Compare array Failed !\n"
-              << "\tNumberOfTuples(table1): " << array1->GetNumberOfTuples() << "\n"
-              << "\tNumberOfTuples(table2): " << array2->GetNumberOfTuples() << std::endl;
+              << "\tNumberOfTuples(array1): " << array1->GetNumberOfTuples() << "\n"
+              << "\tNumberOfTuples(array2): " << array2->GetNumberOfTuples() << std::endl;
     return false;
     }
   if (array1->GetNumberOfComponents() != array2->GetNumberOfComponents())
     {
     std::cerr << "Compare array Failed !\n"
-              << "\tNumberOfComponents(table1): " << array1->GetNumberOfComponents() << "\n"
-              << "\tNumberOfComponents(table2): " << array2->GetNumberOfComponents() << std::endl;
+              << "\tNumberOfComponents(array1): " << array1->GetNumberOfComponents() << "\n"
+              << "\tNumberOfComponents(array2): " << array2->GetNumberOfComponents() << std::endl;
     return false;
     }
   for (int i = 0; i < array1->GetNumberOfTuples() * array1->GetNumberOfComponents(); ++i)
@@ -50,8 +50,8 @@ bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
     if (array1->GetVariantValue(i) != array2->GetVariantValue(i))
       {
       std::cerr << "Compare array Failed !\n"
-                << "\tValue(table1): " << array1->GetVariantValue(i) << "\n"
-                << "\tValue(table2): " << array2->GetVariantValue(i) << std::endl;
+                << "\tValue(array1): " << array1->GetVariantValue(i) << "\n"
+                << "\tValue(array2): " << array2->GetVariantValue(i) << std::endl;
       return false;
       }
     }
