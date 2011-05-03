@@ -93,6 +93,7 @@ bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
 }
 
 //-----------------------------------------------------------------------------
+// compareTable() does not and should not compare column names
 bool compareTable(vtkTable * table1, vtkTable * table2)
 {
   if (table1 == 0 && table2 == 0)
@@ -778,6 +779,38 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   if (!compareArray(convertedIntColumns.GetPointer(), expectedIntArray))
     {
     std::cerr << "Line " << __LINE__ << " - Problem with tableToArray method !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
+  // Test arrayToTable()
+  //-----------------------------------------------------------------------------
+
+  // Create 2D array
+  vtkArray * arrayToTableTestArray = vtkArray::CreateArray(vtkArray::DENSE, VTK_UNSIGNED_INT);
+  arrayToTableTestArray->Resize(4, 3);
+
+  // Fill array with data (use intArray objects from prior test)
+  QList<vtkIntArray*> intArrayObjectList;
+  intArrayObjectList << intArray1.GetPointer() << intArray2.GetPointer() << intArray3.GetPointer();
+  int i = 0;
+  foreach (vtkIntArray* intArrayObject, intArrayObjectList)
+    {
+    for (int j = 0; j < 4; j++)
+      {
+      arrayToTableTestArray->SetVariantValue(j, i, intArrayObject->GetVariantValue(j));
+      }
+    i++;
+    }
+
+  // Convert array to table
+  vtkSmartPointer<vtkTable> arrayToTableTestTable;
+  voUtils::arrayToTable(arrayToTableTestArray, arrayToTableTestTable);
+
+  // Compare arrayToTable converted table to table build directly from 1D arrays (created in prior test)
+  if (!compareTable(insertTableTest.GetPointer(), arrayToTableTestTable.GetPointer()))
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with arrayToTable method !" << std::endl;
     return EXIT_FAILURE;
     }
 
