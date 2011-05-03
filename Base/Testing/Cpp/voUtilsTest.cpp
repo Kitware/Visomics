@@ -765,6 +765,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   QList<int> intColumns;
   intColumns << 1;
   vtkSmartPointer<vtkArray> convertedIntColumns;
+  voUtils::tableToArray(0, convertedIntColumns, intColumns); // Passing a Null source array shouldn't crash
   voUtils::tableToArray(inputTable.GetPointer(), convertedIntColumns, intColumns);
 
   vtkArray * expectedIntArray = vtkArray::CreateArray(vtkArray::DENSE, VTK_UNSIGNED_INT);
@@ -803,6 +804,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
 
   // Convert array to table
   vtkSmartPointer<vtkTable> arrayToTableTestTable;
+  voUtils::arrayToTable(0, arrayToTableTestTable);  // Passing a Null source array shouldn't crash
   voUtils::arrayToTable(arrayToTableTestArray, arrayToTableTestTable);
 
   // Compare arrayToTable converted table to table build directly from 1D arrays (created in prior test)
