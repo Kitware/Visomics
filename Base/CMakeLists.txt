@@ -122,7 +122,7 @@ IF(Q_WS_X11)
   LIST(APPEND EXTRA_LIBRARIES ${X11_LIBRARIES})
 ENDIF()
 
-IF(UNIX)
+IF(UNIX AND NOT APPLE)
   # If the faster 'gold' linker is used, to avoid complaints about undefined symbol
   # '_gfortran_concat_string', '_gfortran_pow_i4_i4', ..., let's link against gfortran libraries.
   # These errors happen while linking against VTK static built with R support
