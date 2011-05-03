@@ -419,7 +419,6 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   intArray3->SetValue(3, 23);
   insertTableTest->AddColumn(intArray3.GetPointer());
 
-
   vtkNew<vtkTable> insertTableTest1;
   insertTableTest1->DeepCopy(insertTableTest.GetPointer());
 
@@ -759,7 +758,6 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     return EXIT_FAILURE;
     }
 
-
   //-----------------------------------------------------------------------------
   // Test tableToArray()
   //-----------------------------------------------------------------------------
@@ -816,4 +814,3 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
 
   return EXIT_SUCCESS;
 }
-
