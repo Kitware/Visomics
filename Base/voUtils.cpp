@@ -354,9 +354,9 @@ bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destAr
 }
 
 //----------------------------------------------------------------------------
-void voUtils::arrayToTable(vtkArray* srcArray, vtkSmartPointer<vtkTable>& destTable)
+void voUtils::arrayToTable(vtkArray* srcArray, vtkTable* destTable)
 {
-  if (!srcArray)
+  if (!srcArray || !destTable)
     {
     return;
     }
@@ -368,7 +368,6 @@ void voUtils::arrayToTable(vtkArray* srcArray, vtkSmartPointer<vtkTable>& destTa
   arrToTab->SetInputConnection(arrData->GetProducerPort());
   arrToTab->Update();
 
-  // Reference count will be incremented
-  destTable = arrToTab->GetOutput();
+  destTable->ShallowCopy(arrToTab->GetOutput());
 }
 

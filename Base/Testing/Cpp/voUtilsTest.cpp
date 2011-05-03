@@ -802,10 +802,12 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     i++;
     }
 
+  voUtils::arrayToTable(0, 0);  // Passing Null source array or destination table shouldn't crash
+
   // Convert array to table
-  vtkSmartPointer<vtkTable> arrayToTableTestTable;
-  voUtils::arrayToTable(0, arrayToTableTestTable);  // Passing a Null source array shouldn't crash
-  voUtils::arrayToTable(arrayToTableTestArray, arrayToTableTestTable);
+  vtkNew<vtkTable> arrayToTableTestTable;
+  voUtils::arrayToTable(0, arrayToTableTestTable.GetPointer());  // Passing a Null source array shouldn't crash
+  voUtils::arrayToTable(arrayToTableTestArray, arrayToTableTestTable.GetPointer());
 
   // Compare arrayToTable converted table to table build directly from 1D arrays (created in prior test)
   if (!compareTable(insertTableTest.GetPointer(), arrayToTableTestTable.GetPointer()))
