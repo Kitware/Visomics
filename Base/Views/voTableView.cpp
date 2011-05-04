@@ -5,6 +5,7 @@
 #include <QLayout>
 #include <QStandardItemModel>
 #include <QWidget>
+#include <QHeaderView>
 
 // Visomics includes
 #include "voTableView.h"
@@ -102,6 +103,9 @@ void voTableView::setDataObject(voDataObject *dataObject)
       }
   //  this->LastModelMTime = table->GetMTime();
   //  }
+
+    d->TableView->horizontalHeader()->setMinimumSectionSize(100);
+    d->TableView->resizeColumnsToContents();
 
   // Retrieve the selected subtable
   //vtkSmartPointer<vtkTable> ot = vtkSmartPointer<vtkTable>::New();

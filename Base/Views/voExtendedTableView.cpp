@@ -4,6 +4,7 @@
 #include <QLayout>
 #include <QTableView>
 #include <QStandardItemModel>
+#include <QHeaderView>
 
 // Visomics includes
 #include "voExtendedTableView.h"
@@ -197,4 +198,8 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
     {
     d->Model.setHeaderData(rid, Qt::Vertical, QString(""));
     }
+
+  // Expand column widths to fit long labels or data
+  d->TableView->horizontalHeader()->setMinimumSectionSize(100);
+  d->TableView->resizeColumnsToContents();
 }
