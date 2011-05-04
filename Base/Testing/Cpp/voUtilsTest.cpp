@@ -8,9 +8,11 @@
 #include "voUtils.h"
 
 // VTK includes
+#include <vtkArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include <vtkNew.h>
+#include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkVariantArray.h>
@@ -20,6 +22,38 @@
 
 namespace
 {
+
+//-----------------------------------------------------------------------------
+bool compareArray(vtkArray* array1, vtkArray* array2)
+{
+  if (array1 == 0 && array2 == 0)
+    {
+    return true;
+    }
+  if (array1 == 0 || array2 == 0)
+    {
+    return false;
+    }
+  if (array1->GetSize() != array2->GetSize())
+    {
+    std::cerr << "Compare array Failed !\n"
+              << "\tSize(array1): " << array1->GetSize() << "\n"
+              << "\tSize(array2): " << array2->GetSize() << std::endl;
+    return false;
+    }
+  for (vtkArray::SizeT i = 0; i < array1->GetSize(); ++i)
+    {
+    if (array1->GetVariantValueN(i) != array2->GetVariantValueN(i))
+      {
+      std::cerr << "Compare array Failed !\n"
+                << "\tValue(array1): " << array1->GetVariantValueN(i) << "\n"
+                << "\tValue(array2): " << array2->GetVariantValueN(i) << std::endl;
+      return false;
+      }
+    }
+  return true;
+}
+
 //-----------------------------------------------------------------------------
 bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
 {
@@ -34,15 +68,15 @@ bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
   if (array1->GetNumberOfTuples() != array2->GetNumberOfTuples())
     {
     std::cerr << "Compare array Failed !\n"
-              << "\tNumberOfTuples(table1): " << array1->GetNumberOfTuples() << "\n"
-              << "\tNumberOfTuples(table2): " << array2->GetNumberOfTuples() << std::endl;
+              << "\tNumberOfTuples(array1): " << array1->GetNumberOfTuples() << "\n"
+              << "\tNumberOfTuples(array2): " << array2->GetNumberOfTuples() << std::endl;
     return false;
     }
   if (array1->GetNumberOfComponents() != array2->GetNumberOfComponents())
     {
     std::cerr << "Compare array Failed !\n"
-              << "\tNumberOfComponents(table1): " << array1->GetNumberOfComponents() << "\n"
-              << "\tNumberOfComponents(table2): " << array2->GetNumberOfComponents() << std::endl;
+              << "\tNumberOfComponents(array1): " << array1->GetNumberOfComponents() << "\n"
+              << "\tNumberOfComponents(array2): " << array2->GetNumberOfComponents() << std::endl;
     return false;
     }
   for (int i = 0; i < array1->GetNumberOfTuples() * array1->GetNumberOfComponents(); ++i)
@@ -50,8 +84,8 @@ bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
     if (array1->GetVariantValue(i) != array2->GetVariantValue(i))
       {
       std::cerr << "Compare array Failed !\n"
-                << "\tValue(table1): " << array1->GetVariantValue(i) << "\n"
-                << "\tValue(table2): " << array2->GetVariantValue(i) << std::endl;
+                << "\tValue(array1): " << array1->GetVariantValue(i) << "\n"
+                << "\tValue(array2): " << array2->GetVariantValue(i) << std::endl;
       return false;
       }
     }
@@ -59,6 +93,7 @@ bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
 }
 
 //-----------------------------------------------------------------------------
+// compareTable() does not and should not compare column names
 bool compareTable(vtkTable * table1, vtkTable * table2)
 {
   if (table1 == 0 && table2 == 0)
@@ -363,27 +398,26 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   vtkNew<vtkIntArray> intArray1;
   intArray1->SetNumberOfValues(4);
   intArray1->SetValue(0, 0);
-  intArray1->SetValue(0, 1);
-  intArray1->SetValue(0, 2);
-  intArray1->SetValue(0, 3);
+  intArray1->SetValue(1, 1);
+  intArray1->SetValue(2, 2);
+  intArray1->SetValue(3, 3);
   insertTableTest->AddColumn(intArray1.GetPointer());
 
   vtkNew<vtkIntArray> intArray2;
   intArray2->SetNumberOfValues(4);
   intArray2->SetValue(0, 10);
-  intArray2->SetValue(0, 11);
-  intArray2->SetValue(0, 12);
-  intArray2->SetValue(0, 13);
+  intArray2->SetValue(1, 11);
+  intArray2->SetValue(2, 12);
+  intArray2->SetValue(3, 13);
   insertTableTest->AddColumn(intArray2.GetPointer());
 
   vtkNew<vtkIntArray> intArray3;
   intArray3->SetNumberOfValues(4);
   intArray3->SetValue(0, 20);
-  intArray3->SetValue(0, 21);
-  intArray3->SetValue(0, 22);
-  intArray3->SetValue(0, 23);
+  intArray3->SetValue(1, 21);
+  intArray3->SetValue(2, 22);
+  intArray3->SetValue(3, 23);
   insertTableTest->AddColumn(intArray3.GetPointer());
-
 
   vtkNew<vtkTable> insertTableTest1;
   insertTableTest1->DeepCopy(insertTableTest.GetPointer());
@@ -724,6 +758,63 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     return EXIT_FAILURE;
     }
 
+  //-----------------------------------------------------------------------------
+  // Test tableToArray()
+  //-----------------------------------------------------------------------------
+
+  QList<int> intColumns;
+  intColumns << 1;
+  vtkSmartPointer<vtkArray> convertedIntColumns;
+  voUtils::tableToArray(0, convertedIntColumns, intColumns); // Passing a Null source array shouldn't crash
+  voUtils::tableToArray(inputTable.GetPointer(), convertedIntColumns, intColumns);
+
+  vtkArray * expectedIntArray = vtkArray::CreateArray(vtkArray::DENSE, VTK_UNSIGNED_INT);
+  expectedIntArray->Resize(vtkArrayRange(0, 5));
+  for (vtkArray::SizeT i = 0; i < 5; ++i)
+    {
+    expectedIntArray->SetVariantValueN(i, i);
+    }
+
+  if (!compareArray(convertedIntColumns.GetPointer(), expectedIntArray))
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with tableToArray method !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
+  // Test arrayToTable()
+  //-----------------------------------------------------------------------------
+
+  // Create 2D array
+  vtkArray * arrayToTableTestArray = vtkArray::CreateArray(vtkArray::DENSE, VTK_UNSIGNED_INT);
+  arrayToTableTestArray->Resize(4, 3);
+
+  // Fill array with data (use intArray objects from prior test)
+  QList<vtkIntArray*> intArrayObjectList;
+  intArrayObjectList << intArray1.GetPointer() << intArray2.GetPointer() << intArray3.GetPointer();
+  int i = 0;
+  foreach (vtkIntArray* intArrayObject, intArrayObjectList)
+    {
+    for (int j = 0; j < 4; j++)
+      {
+      arrayToTableTestArray->SetVariantValue(j, i, intArrayObject->GetVariantValue(j));
+      }
+    i++;
+    }
+
+  voUtils::arrayToTable(0, 0);  // Passing Null source array or destination table shouldn't crash
+
+  // Convert array to table
+  vtkNew<vtkTable> arrayToTableTestTable;
+  voUtils::arrayToTable(0, arrayToTableTestTable.GetPointer());  // Passing a Null source array shouldn't crash
+  voUtils::arrayToTable(arrayToTableTestArray, arrayToTableTestTable.GetPointer());
+
+  // Compare arrayToTable converted table to table build directly from 1D arrays (created in prior test)
+  if (!compareTable(insertTableTest.GetPointer(), arrayToTableTestTable.GetPointer()))
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with arrayToTable method !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
   return EXIT_SUCCESS;
 }
-
