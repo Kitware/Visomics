@@ -7,12 +7,13 @@
 #include "voAnalysisFactory.h"
 #include "voQObjectFactory.h"
 
-#include "voPCAStatistics.h"
-#include "voXCorrel.h"
+#include "voFoldChange.h"
+#include "voHierarchicalClustering.h"
 #include "voKEGG.h"
 #include "voKMeansClustering.h"
-#include "voHierarchicalClustering.h"
-#include "voFoldChange.h"
+#include "voPCAStatistics.h"
+#include "voTTest.h"
+#include "voXCorrel.h"
 
 //----------------------------------------------------------------------------
 class voAnalysisFactoryPrivate
@@ -30,12 +31,13 @@ public:
 //----------------------------------------------------------------------------
 voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
 {
-  this->registerAnalysis<voPCAStatistics>("PCA");
-  this->registerAnalysis<voXCorrel>("Cross Correlation");
-  this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
+  this->registerAnalysis<voFoldChange>("Fold Change");
   this->registerAnalysis<voHierarchicalClustering>("Hierarchical Clustering");
   this->registerAnalysis<voKEGG>("KEGG Pathways");
-  this->registerAnalysis<voFoldChange>("Fold Change");
+  this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
+  this->registerAnalysis<voPCAStatistics>("PCA");
+  this->registerAnalysis<voTTest>("T-Test");
+  this->registerAnalysis<voXCorrel>("Cross Correlation");
 }
 
 //-----------------------------------------------------------------------------
