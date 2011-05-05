@@ -12,6 +12,7 @@
 #include "voKEGG.h"
 #include "voKMeansClustering.h"
 #include "voHierarchicalClustering.h"
+#include "voFoldChange.h"
 
 //----------------------------------------------------------------------------
 class voAnalysisFactoryPrivate
@@ -34,6 +35,7 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
   this->registerAnalysis<voHierarchicalClustering>("Hierarchical Clustering");
   this->registerAnalysis<voKEGG>("KEGG Pathways");
+  this->registerAnalysis<voFoldChange>("Fold Change");
 }
 
 //-----------------------------------------------------------------------------
