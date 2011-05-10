@@ -8,6 +8,7 @@
 #include "voApplication.h"
 #include "voDataModel.h"
 #include "voIOManager.h"
+#include "voNormalizerRegistry.h"
 #include "voViewManager.h"
 #include "voAnalysisFactory.h"
 #include "voViewFactory.h"
@@ -33,6 +34,7 @@ public:
   voIOManager            IOManager;
   voViewManager          ViewManager;
   voAnalysisFactory      AnalysisFactory;
+  voNormalizerRegistry   NormalizerRegistry;
   voViewFactory          ViewFactory;
 };
 
@@ -120,6 +122,13 @@ voAnalysisFactory* voApplication::analysisFactory()const
 {
   Q_D(const voApplication);
   return const_cast<voAnalysisFactory*>(&d->AnalysisFactory);
+}
+
+// --------------------------------------------------------------------------
+voNormalizerRegistry* voApplication::normalizerRegistry()const
+{
+  Q_D(const voApplication);
+  return const_cast<voNormalizerRegistry*>(&d->NormalizerRegistry);
 }
 
 // --------------------------------------------------------------------------
