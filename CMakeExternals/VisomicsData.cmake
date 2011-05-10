@@ -29,7 +29,7 @@ if(BUILD_TESTING)
       DEPENDS
         ${proj_DEPENDENCIES}
       )
-	  SET(VisomicsData_DIR ${${CMAKE_BINARY_DIR}}/${proj})
+	  SET(VisomicsData_DIR ${CMAKE_BINARY_DIR}/${proj})
 	ELSE()
 	  ctkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
   ENDIF()
