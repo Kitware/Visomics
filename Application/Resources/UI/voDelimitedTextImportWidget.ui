@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>791</width>
-    <height>521</height>
+    <height>431</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -182,35 +182,8 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="DocumentPreviewGroupBox">
-     <property name="title">
-      <string>Document Preview</string>
-     </property>
-     <layout class="QVBoxLayout" name="verticalLayout">
-      <item>
-       <widget class="voDelimitedTextPreview" name="DocumentPreviewWidget" native="true">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>voDelimitedTextPreview</class>
-   <extends>QWidget</extends>
-   <header>voDelimitedTextPreview.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

@@ -22,12 +22,12 @@ public:
     {
     DelimiterGroupBox = 0,
     RowsAndColumnsGroupBox,
-    DocumentPreviewGroupBox,
     };
 
   void insertWidget(QWidget * widget, InsertWidgetLocation location);
 
   voDelimitedTextPreviewModel* delimitedTextPreviewModel();
+  void setDelimitedTextPreviewModel(voDelimitedTextPreviewModel* model);
 
 public slots:
 

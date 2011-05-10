@@ -16,6 +16,9 @@ SET(KIT_SRCS
   Analysis/voTTest.h
   Analysis/voXCorrel.cpp
   Analysis/voXCorrel.h
+
+  Normalization/voLog2.cpp
+  Normalization/voLog2.h
   
   Views/voCorrelationGraphView.cpp
   Views/voCorrelationGraphView.h
@@ -56,6 +59,8 @@ SET(KIT_SRCS
   voInputFileDataObject.h
   voIOManager.cpp
   voIOManager.h
+  voNormalizerRegistry.cpp
+  voNormalizerRegistry.h
   voQObjectFactory.h
   voTableDataObject.cpp
   voTableDataObject.h
@@ -112,6 +117,8 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Analysis
   ${CMAKE_CURRENT_BINARY_DIR}/Analysis
+  ${CMAKE_CURRENT_SOURCE_DIR}/Normalization
+  ${CMAKE_CURRENT_BINARY_DIR}/Normalization
   ${CMAKE_CURRENT_SOURCE_DIR}/Views
   ${CMAKE_CURRENT_BINARY_DIR}/Views
   )
@@ -162,5 +169,6 @@ TARGET_LINK_LIBRARIES(
   
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)
+  ADD_SUBDIRECTORY(Normalization/Testing)
 ENDIF()
 

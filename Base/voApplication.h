@@ -12,6 +12,7 @@ class voAnalysisViewFactory;
 class voApplicationPrivate;
 class voDataModel;
 class voIOManager;
+class voNormalizerRegistry;
 class voViewFactory;
 class voViewManager;
 
@@ -43,6 +44,8 @@ public:
   voViewManager* viewManager()const;
 
   voAnalysisFactory* analysisFactory()const;
+
+  voNormalizerRegistry* normalizerRegistry()const;
 
   voViewFactory* viewFactory()const;
 

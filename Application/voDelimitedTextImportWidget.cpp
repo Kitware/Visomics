@@ -12,7 +12,8 @@ public:
   void initWidgetFromModel();
 
   QButtonGroup DelimiterButtonGroup;
-  voDelimitedTextPreviewModel DelimitedTextPreviewModel;
+
+  voDelimitedTextPreviewModel * DelimitedTextPreviewModel;
 };
 
 // --------------------------------------------------------------------------
@@ -21,13 +22,14 @@ public:
 // --------------------------------------------------------------------------
 voDelimitedTextImportWidgetPrivate::voDelimitedTextImportWidgetPrivate()
 {
+  this->DelimitedTextPreviewModel = 0;
 }
 
 // --------------------------------------------------------------------------
 void voDelimitedTextImportWidgetPrivate::initWidgetFromModel()
 {
   this->OtherLineEdit->setText(QString(":"));
-  switch (this->DelimitedTextPreviewModel.fieldDelimiterCharacters().at(0).toLatin1())
+  switch (this->DelimitedTextPreviewModel->fieldDelimiterCharacters().at(0).toLatin1())
     {
     case ',':
       this->CommaRadioButton->setChecked(true);
@@ -43,21 +45,21 @@ void voDelimitedTextImportWidgetPrivate::initWidgetFromModel()
       break;
     default:
       this->OtherRadioButton->setChecked(true);
-      this->OtherLineEdit->setText(this->DelimitedTextPreviewModel.fieldDelimiterCharacters());
+      this->OtherLineEdit->setText(this->DelimitedTextPreviewModel->fieldDelimiterCharacters());
       break;
     }
 
-  this->StringDelimiterCheckBox->setChecked(this->DelimitedTextPreviewModel.useStringDelimiter());
-  this->StringDelimiterLineEdit->setText(QString(QChar(this->DelimitedTextPreviewModel.stringDelimiter())));
+  this->StringDelimiterCheckBox->setChecked(this->DelimitedTextPreviewModel->useStringDelimiter());
+  this->StringDelimiterLineEdit->setText(QString(QChar(this->DelimitedTextPreviewModel->stringDelimiter())));
 
-  this->TransposeCheckBox->setChecked(this->DelimitedTextPreviewModel.transpose());
+  this->TransposeCheckBox->setChecked(this->DelimitedTextPreviewModel->transpose());
 
-  this->NumberHeaderColumnsSpinBox->setValue(this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes());
+  this->NumberHeaderColumnsSpinBox->setValue(this->DelimitedTextPreviewModel->numberOfRowMetaDataTypes());
 
-  if(this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes() > 0)
+  if(this->DelimitedTextPreviewModel->numberOfRowMetaDataTypes() > 0)
     {
-    this->HeaderColumnOfInterestSpinBox->setRange(0, this->DelimitedTextPreviewModel.numberOfRowMetaDataTypes()-1);
-    this->HeaderColumnOfInterestSpinBox->setValue(this->DelimitedTextPreviewModel.rowMetaDataTypeOfInterest());
+    this->HeaderColumnOfInterestSpinBox->setRange(0, this->DelimitedTextPreviewModel->numberOfRowMetaDataTypes()-1);
+    this->HeaderColumnOfInterestSpinBox->setValue(this->DelimitedTextPreviewModel->rowMetaDataTypeOfInterest());
     this->HeaderColumnOfInterestSpinBox->setEnabled(true);
     }
   else
@@ -67,12 +69,12 @@ void voDelimitedTextImportWidgetPrivate::initWidgetFromModel()
     this->HeaderColumnOfInterestSpinBox->setEnabled(false);
     }
 
-  this->NumberHeaderRowsSpinBox->setValue(this->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes());
+  this->NumberHeaderRowsSpinBox->setValue(this->DelimitedTextPreviewModel->numberOfColumnMetaDataTypes());
 
-  if(this->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes() > 0)
+  if(this->DelimitedTextPreviewModel->numberOfColumnMetaDataTypes() > 0)
     {
-    this->HeaderRowOfInterestSpinBox->setRange(0, this->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes()-1);
-    this->HeaderRowOfInterestSpinBox->setValue(this->DelimitedTextPreviewModel.columnMetaDataTypeOfInterest());
+    this->HeaderRowOfInterestSpinBox->setRange(0, this->DelimitedTextPreviewModel->numberOfColumnMetaDataTypes()-1);
+    this->HeaderRowOfInterestSpinBox->setValue(this->DelimitedTextPreviewModel->columnMetaDataTypeOfInterest());
     this->HeaderRowOfInterestSpinBox->setEnabled(true);
     }
   else
@@ -93,12 +95,6 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
   Q_D(voDelimitedTextImportWidget);
   d->setupUi(this);
 
-  d->DocumentPreviewWidget->setModel(&d->DelimitedTextPreviewModel);
-  d->DocumentPreviewWidget->horizontalHeader()->setVisible(false);
-  d->DocumentPreviewWidget->verticalHeader()->setVisible(false);
-
-  d->initWidgetFromModel();
-
   d->DelimiterButtonGroup.addButton(d->CommaRadioButton, ',');
   d->DelimiterButtonGroup.addButton(d->SemicolonRadioButton, ';');
   d->DelimiterButtonGroup.addButton(d->TabRadioButton, '\t');
@@ -112,33 +108,6 @@ voDelimitedTextImportWidget::voDelimitedTextImportWidget(QWidget* newParent) :
   // StringBeginEndCharacter connection
   connect(d->StringDelimiterCheckBox, SIGNAL(toggled(bool)),
           this, SLOT(onStringDelimiterEnabled(bool)));
-
-  // Widget -> Model connections
-  connect(d->TransposeCheckBox, SIGNAL(toggled(bool)),
-          &d->DelimitedTextPreviewModel, SLOT(setTranspose(bool)));
-
-  connect(d->NumberHeaderColumnsSpinBox, SIGNAL(valueChanged(int)),
-          &d->DelimitedTextPreviewModel, SLOT(setNumberOfRowMetaDataTypes(int)));
-
-  connect(d->HeaderColumnOfInterestSpinBox, SIGNAL(valueChanged(int)),
-          &d->DelimitedTextPreviewModel, SLOT(setRowMetaDataTypeOfInterest(int)));
-
-  connect(d->NumberHeaderRowsSpinBox, SIGNAL(valueChanged(int)),
-          &d->DelimitedTextPreviewModel, SLOT(setNumberOfColumnMetaDataTypes(int)));
-
-  connect(d->HeaderRowOfInterestSpinBox, SIGNAL(valueChanged(int)),
-          &d->DelimitedTextPreviewModel, SLOT(setColumnMetaDataTypeOfInterest(int)));
-
-  // Model -> Widget connections
-  connect(&d->DelimitedTextPreviewModel, SIGNAL(numberOfColumnMetaDataTypesChanged(int)),
-          this, SLOT(onNumberOfColumnMetaDataTypesChanged(int)));
-  connect(&d->DelimitedTextPreviewModel, SIGNAL(columnMetaDataTypeOfInterestChanged(int)),
-          this, SLOT(onColumnMetaDataTypeOfInterestChanged(int)));
-
-  connect(&d->DelimitedTextPreviewModel, SIGNAL(numberOfRowMetaDataTypesChanged(int)),
-          this, SLOT(onNumberOfRowMetaDataTypesChanged(int)));
-  connect(&d->DelimitedTextPreviewModel, SIGNAL(rowMetaDataTypeOfInterestChanged(int)),
-          this, SLOT(onRowMetaDataTypeOfInterestChanged(int)));
 }
 
 // --------------------------------------------------------------------------
@@ -163,10 +132,6 @@ void voDelimitedTextImportWidget::insertWidget(QWidget * widget, InsertWidgetLoc
     {
     index = d->MainVerticalLayout->indexOf(d->RowsColumnsGroupBox);
     }
-  else if (location == Self::DocumentPreviewGroupBox)
-    {
-    index = d->MainVerticalLayout->indexOf(d->DocumentPreviewGroupBox);
-    }
   Q_ASSERT(index != -1);
   d->MainVerticalLayout->insertWidget(index, widget);
 }
@@ -175,14 +140,89 @@ void voDelimitedTextImportWidget::insertWidget(QWidget * widget, InsertWidgetLoc
 voDelimitedTextPreviewModel* voDelimitedTextImportWidget::delimitedTextPreviewModel()
 {
   Q_D(voDelimitedTextImportWidget);
-  return &d->DelimitedTextPreviewModel;
+  return d->DelimitedTextPreviewModel;
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextImportWidget::setDelimitedTextPreviewModel(voDelimitedTextPreviewModel* model)
+{
+  Q_D(voDelimitedTextImportWidget);
+  if (d->DelimitedTextPreviewModel == model)
+    {
+    return;
+    }
+
+  // Disconnect model
+  if (d->DelimitedTextPreviewModel)
+    {
+    // Widget -> Model connections
+    disconnect(d->TransposeCheckBox, SIGNAL(toggled(bool)),
+              d->DelimitedTextPreviewModel, SLOT(setTranspose(bool)));
+
+    disconnect(d->NumberHeaderColumnsSpinBox, SIGNAL(valueChanged(int)),
+              d->DelimitedTextPreviewModel, SLOT(setNumberOfRowMetaDataTypes(int)));
+
+    disconnect(d->HeaderColumnOfInterestSpinBox, SIGNAL(valueChanged(int)),
+              d->DelimitedTextPreviewModel, SLOT(setRowMetaDataTypeOfInterest(int)));
+
+    disconnect(d->NumberHeaderRowsSpinBox, SIGNAL(valueChanged(int)),
+              d->DelimitedTextPreviewModel, SLOT(setNumberOfColumnMetaDataTypes(int)));
+
+    disconnect(d->HeaderRowOfInterestSpinBox, SIGNAL(valueChanged(int)),
+              d->DelimitedTextPreviewModel, SLOT(setColumnMetaDataTypeOfInterest(int)));
+
+    // Model -> Widget connections
+    disconnect(d->DelimitedTextPreviewModel, SIGNAL(numberOfColumnMetaDataTypesChanged(int)),
+              this, SLOT(onNumberOfColumnMetaDataTypesChanged(int)));
+    disconnect(d->DelimitedTextPreviewModel, SIGNAL(columnMetaDataTypeOfInterestChanged(int)),
+              this, SLOT(onColumnMetaDataTypeOfInterestChanged(int)));
+
+    disconnect(d->DelimitedTextPreviewModel, SIGNAL(numberOfRowMetaDataTypesChanged(int)),
+              this, SLOT(onNumberOfRowMetaDataTypesChanged(int)));
+    disconnect(d->DelimitedTextPreviewModel, SIGNAL(rowMetaDataTypeOfInterestChanged(int)),
+              this, SLOT(onRowMetaDataTypeOfInterestChanged(int)));
+    }
+
+  d->DelimitedTextPreviewModel = model;
+
+  if (d->DelimitedTextPreviewModel)
+    {
+    d->initWidgetFromModel();
+
+    // Widget -> Model connections
+    connect(d->TransposeCheckBox, SIGNAL(toggled(bool)),
+            d->DelimitedTextPreviewModel, SLOT(setTranspose(bool)));
+
+    connect(d->NumberHeaderColumnsSpinBox, SIGNAL(valueChanged(int)),
+            d->DelimitedTextPreviewModel, SLOT(setNumberOfRowMetaDataTypes(int)));
+
+    connect(d->HeaderColumnOfInterestSpinBox, SIGNAL(valueChanged(int)),
+            d->DelimitedTextPreviewModel, SLOT(setRowMetaDataTypeOfInterest(int)));
+
+    connect(d->NumberHeaderRowsSpinBox, SIGNAL(valueChanged(int)),
+            d->DelimitedTextPreviewModel, SLOT(setNumberOfColumnMetaDataTypes(int)));
+
+    connect(d->HeaderRowOfInterestSpinBox, SIGNAL(valueChanged(int)),
+            d->DelimitedTextPreviewModel, SLOT(setColumnMetaDataTypeOfInterest(int)));
+
+    // Model -> Widget connections
+    connect(d->DelimitedTextPreviewModel, SIGNAL(numberOfColumnMetaDataTypesChanged(int)),
+            this, SLOT(onNumberOfColumnMetaDataTypesChanged(int)));
+    connect(d->DelimitedTextPreviewModel, SIGNAL(columnMetaDataTypeOfInterestChanged(int)),
+            this, SLOT(onColumnMetaDataTypeOfInterestChanged(int)));
+
+    connect(d->DelimitedTextPreviewModel, SIGNAL(numberOfRowMetaDataTypesChanged(int)),
+            this, SLOT(onNumberOfRowMetaDataTypesChanged(int)));
+    connect(d->DelimitedTextPreviewModel, SIGNAL(rowMetaDataTypeOfInterestChanged(int)),
+            this, SLOT(onRowMetaDataTypeOfInterestChanged(int)));
+    }
 }
 
 // --------------------------------------------------------------------------
 void voDelimitedTextImportWidget::setFileName(const QString& fileName)
 {
   Q_D(voDelimitedTextImportWidget);
-  d->DelimitedTextPreviewModel.setFileName(fileName);
+  d->DelimitedTextPreviewModel->setFileName(fileName);
 }
 
 // --------------------------------------------------------------------------
@@ -255,7 +295,7 @@ void voDelimitedTextImportWidget::onDelimiterChanged(int delimiter)
     disconnect(d->OtherLineEdit, SIGNAL(textChanged(const QString&)),
                this, SLOT(onOtherDelimiterLineEditChanged(const QString&)));
     }
-  d->DelimitedTextPreviewModel.setFieldDelimiter(delimiter);
+  d->DelimitedTextPreviewModel->setFieldDelimiter(delimiter);
 }
 
 // --------------------------------------------------------------------------
@@ -267,7 +307,7 @@ void voDelimitedTextImportWidget::onOtherDelimiterLineEditChanged(const QString&
     return;
     }
   char delimiter = d->OtherLineEdit->text().at(0).toLatin1();
-  d->DelimitedTextPreviewModel.setFieldDelimiter(delimiter);
+  d->DelimitedTextPreviewModel->setFieldDelimiter(delimiter);
 }
 
 // --------------------------------------------------------------------------
@@ -293,7 +333,7 @@ void voDelimitedTextImportWidget::onStringDelimiterEnabled(bool value)
     disconnect(d->StringDelimiterLineEdit, SIGNAL(textChanged(const QString&)),
                this, SLOT(onStringDelimiterLineEditChanged(const QString&)));
     }
-  d->DelimitedTextPreviewModel.setStringDelimiter(character);
+  d->DelimitedTextPreviewModel->setStringDelimiter(character);
 }
 
 // --------------------------------------------------------------------------
@@ -305,5 +345,5 @@ void voDelimitedTextImportWidget::onStringDelimiterLineEditChanged(const QString
     return;
     }
   char character = d->StringDelimiterLineEdit->text().at(0).toLatin1();
-  d->DelimitedTextPreviewModel.setStringDelimiter(character);
+  d->DelimitedTextPreviewModel->setStringDelimiter(character);
 }

@@ -13,7 +13,7 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_4">
    <item>
     <widget class="QTabWidget" name="ImportStepTabWidget">
      <property name="currentIndex">
@@ -33,12 +33,36 @@
       <attribute name="title">
        <string>Normalization</string>
       </attribute>
+      <layout class="QVBoxLayout" name="verticalLayout_3">
+       <item>
+        <widget class="voNormalizationWidget" name="NormalizationWidget" native="true"/>
+       </item>
+      </layout>
      </widget>
      <widget class="QWidget" name="MissingValueIdentificationRectificationTab">
       <attribute name="title">
        <string>Missing value identification/rectification</string>
       </attribute>
      </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="DocumentPreviewGroupBox">
+     <property name="title">
+      <string>Document Preview</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
+      <item>
+       <widget class="voDelimitedTextPreview" name="DocumentPreviewWidget" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="MinimumExpanding">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
    <item>
@@ -55,9 +79,21 @@
  </widget>
  <customwidgets>
   <customwidget>
+   <class>voDelimitedTextPreview</class>
+   <extends>QWidget</extends>
+   <header>voDelimitedTextPreview.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
    <class>voDelimitedTextImportWidget</class>
    <extends>QWidget</extends>
    <header>voDelimitedTextImportWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>voNormalizationWidget</class>
+   <extends>QWidget</extends>
+   <header>voNormalizationWidget.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

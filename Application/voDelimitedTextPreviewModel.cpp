@@ -1,5 +1,5 @@
 
-//QT includes
+// QT includes
 #include <QDebug>
 #include <QFile>
 #include <QPalette>
@@ -7,11 +7,14 @@
 #include <QTemporaryFile>
 #include <QTextStream>
 
-//VTK includes
+// VTK includes
+#include <vtkCallbackCommand.h>
 #include <vtkDelimitedTextReader.h>
+#include <vtkDoubleArray.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
+#include <vtkStringToNumeric.h>
 #include <vtkTable.h>
 #include <vtkVariantArray.h>
 
@@ -19,17 +22,23 @@
 #include "voDelimitedTextPreviewModel.h"
 #include "voUtils.h"
 
-
 class voDelimitedTextPreviewModelPrivate
 {
   Q_DECLARE_PUBLIC(voDelimitedTextPreviewModel);
 
 public:
+  typedef voDelimitedTextPreviewModelPrivate Self;
   voDelimitedTextPreviewModelPrivate(voDelimitedTextPreviewModel& object);
 
   void loadFile();
 
   void configureReader(vtkDelimitedTextReader * reader);
+
+  void updateDataPreview();
+
+  static void updateDataPreviewCallback(vtkObject *caller, unsigned long eid,
+                                        void *clientData, void * callData);
+  vtkSmartPointer<vtkCallbackCommand> UpdateDataPreviewCallbackCommand;
 
   QTemporaryFile SampleCacheFile;
 
@@ -48,6 +57,9 @@ public:
   int NumberOfRowsToPreview;
 
   bool InlineUpdate;
+
+  vtkSmartPointer<vtkTable> DataTable;
+  vtkSmartPointer<vtkTable> OriginalDataTable;
 
 private:
   voDelimitedTextPreviewModel* const q_ptr;
@@ -79,6 +91,12 @@ voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimit
     {
     this->SampleCacheFile.close();
     }
+
+  this->DataTable = vtkSmartPointer<vtkTable>::New();
+  this->OriginalDataTable = vtkSmartPointer<vtkTable>::New();
+  this->UpdateDataPreviewCallbackCommand = vtkSmartPointer<vtkCallbackCommand>::New();
+  this->UpdateDataPreviewCallbackCommand->SetClientData(reinterpret_cast<void*>(this));
+  this->UpdateDataPreviewCallbackCommand->SetCallback(Self::updateDataPreviewCallback);
 }
 
 // --------------------------------------------------------------------------
@@ -144,6 +162,42 @@ void voDelimitedTextPreviewModelPrivate::configureReader(vtkDelimitedTextReader 
     }
 
   reader->SetHaveHeaders(false);
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextPreviewModelPrivate::updateDataPreview()
+{
+  Q_ASSERT(this->DataTable.GetPointer());
+  Q_Q(voDelimitedTextPreviewModel);
+
+  for (vtkIdType cid = 0; cid < this->DataTable->GetNumberOfColumns(); ++cid)
+    {
+    vtkDoubleArray * column = vtkDoubleArray::SafeDownCast(this->DataTable->GetColumn(cid));
+    Q_ASSERT(column);
+    for (int rid = 0; rid < column->GetNumberOfComponents() * column->GetNumberOfTuples(); ++rid)
+      {
+      QString value = QString::number(column->GetValue(rid));
+      QStandardItem * currentItem = new QStandardItem(value);
+      q->setItem(rid + this->NumberOfColumnMetaDataTypes,
+                    cid + this->NumberOfRowMetaDataTypes, currentItem);
+      currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
+      }
+    }
+}
+
+// --------------------------------------------------------------------------
+void voDelimitedTextPreviewModelPrivate::updateDataPreviewCallback(vtkObject *caller,
+                                                                   unsigned long eid,
+                                                                   void *clientData,
+                                                                   void * callData)
+{
+  Q_UNUSED(callData);
+  Q_ASSERT(eid == vtkCommand::ModifiedEvent);
+  Q_ASSERT(clientData);
+  voDelimitedTextPreviewModelPrivate * d =
+        reinterpret_cast<voDelimitedTextPreviewModelPrivate*>(clientData);
+  Q_ASSERT(d->DataTable.GetPointer() == caller);
+  d->updateDataPreview();
 }
 
 // --------------------------------------------------------------------------
@@ -482,6 +536,20 @@ void voDelimitedTextPreviewModel::setInlineUpdate(bool value)
 }
 
 // --------------------------------------------------------------------------
+void voDelimitedTextPreviewModel::resetDataTable()
+{
+  Q_D(voDelimitedTextPreviewModel);
+  d->DataTable->DeepCopy(d->OriginalDataTable);
+}
+
+// --------------------------------------------------------------------------
+vtkTable * voDelimitedTextPreviewModel::dataTable()
+{
+  Q_D(voDelimitedTextPreviewModel);
+  return d->DataTable;
+}
+
+// --------------------------------------------------------------------------
 void voDelimitedTextPreviewModel::updatePreview()
 {
   Q_D(voDelimitedTextPreviewModel);
@@ -509,6 +577,13 @@ void voDelimitedTextPreviewModel::updatePreview()
   // Build model (self)
   this->clear();
 
+  // Clear original data table
+  while (d->OriginalDataTable->GetNumberOfColumns() > 0)
+    {
+    d->OriginalDataTable->RemoveColumn(d->OriginalDataTable->GetNumberOfColumns() - 1); // columns should be named
+    }
+
+  // Update metadata preview and set DataTable
   QColor headerBackgroundColor = QPalette().color(QPalette::Window);
   QColor ofInterestBackgroundColor = QPalette().color(QPalette::Mid);
 
@@ -516,24 +591,53 @@ void voDelimitedTextPreviewModel::updatePreview()
     {
     vtkStringArray * column = vtkStringArray::SafeDownCast(table->GetColumn(cid));
     Q_ASSERT(column);
+    vtkSmartPointer<vtkStringArray> dataColumn;
+    if (cid >= d->NumberOfRowMetaDataTypes)
+      {
+      dataColumn = vtkSmartPointer<vtkStringArray>::New();
+      dataColumn->SetName(QString::number(cid - d->NumberOfRowMetaDataTypes + 1).toLatin1());
+      dataColumn->SetNumberOfValues(column->GetNumberOfValues() - d->NumberOfColumnMetaDataTypes);
+      }
     for (int rid = 0; rid < column->GetNumberOfValues(); ++rid)
       {
       QString value = QString(column->GetValue(rid));
-
       QStandardItem* currentItem = 0;
-
-      this->setItem(rid, cid, (currentItem = new QStandardItem(value)));
-      currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
-
       if (rid == d->ColumnMetaDataTypeOfInterest || cid == d->RowMetaDataTypeOfInterest)
         {
+        this->setItem(rid, cid, (currentItem = new QStandardItem(value)));
+        currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         currentItem->setData(ofInterestBackgroundColor, Qt::BackgroundRole);
         }
       else if (rid < d->NumberOfColumnMetaDataTypes || cid < d->NumberOfRowMetaDataTypes)
         {
+        this->setItem(rid, cid, (currentItem = new QStandardItem(value)));
+        currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         currentItem->setData(headerBackgroundColor, Qt::BackgroundRole);
         }
+      else
+        {
+        dataColumn->SetValue(rid - d->NumberOfColumnMetaDataTypes, value.toLatin1());
+        }
+      }
+    if (cid >= d->NumberOfRowMetaDataTypes)
+      {
+      d->OriginalDataTable->AddColumn(dataColumn.GetPointer());
       }
     }
+
+  // TODO: Add missing value identification/rectification step
+  vtkNew<vtkStringToNumeric> numericToStringFilter;
+  numericToStringFilter->SetInput(d->OriginalDataTable);
+  numericToStringFilter->Update();
+  vtkTable * numericDataTable = vtkTable::SafeDownCast(numericToStringFilter->GetOutput());
+  Q_ASSERT(numericDataTable);
+  d->OriginalDataTable = numericDataTable;
+
+  // Remove data table observer, copy data, and re-add observer
+  d->DataTable->RemoveObserver(d->UpdateDataPreviewCallbackCommand);
+  this->resetDataTable();
+  d->DataTable->AddObserver(vtkCommand::ModifiedEvent, d->UpdateDataPreviewCallbackCommand);
+
+  d->updateDataPreview();
 }
 

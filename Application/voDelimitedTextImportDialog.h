@@ -22,6 +22,9 @@ public:
 
   voDelimitedTextImportSettings importSettings()const;
 
+protected slots:
+  void setNormalizationMethod(const QString& normalizationMethodName);
+
 protected:
   QScopedPointer<voDelimitedTextImportDialogPrivate> d_ptr;
 

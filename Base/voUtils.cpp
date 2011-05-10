@@ -3,6 +3,7 @@
 #include <QtGlobal>
 #include <QStringList>
 #include <QRegExp>
+#include <QSet>
 
 // Visomics includes
 #include "voUtils.h"
@@ -18,8 +19,6 @@
 #include <vtkTable.h>
 #include <vtkTableToArray.h>
 #include <vtkVariantArray.h>
-
-#include <QDebug>
 
 namespace
 {

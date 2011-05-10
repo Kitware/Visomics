@@ -9,6 +9,7 @@
 // Macros - TODO: find a way to import and include ctkPimpl.h
 
 class voDelimitedTextPreviewModelPrivate;
+class vtkTable;
 
 class voDelimitedTextPreviewModel : public QStandardItemModel
 {
@@ -18,6 +19,7 @@ public:
   typedef QStandardItemModel Superclass;
   voDelimitedTextPreviewModel(QObject* newParent = 0);
   virtual ~voDelimitedTextPreviewModel();
+
 
   QString fileName() const;
 
@@ -42,6 +44,10 @@ public:
   bool mergeConsecutiveDelimiters()const;
 
   bool useStringDelimiter()const;
+
+  void resetDataTable();
+
+  vtkTable * dataTable();
 
 public slots:
 

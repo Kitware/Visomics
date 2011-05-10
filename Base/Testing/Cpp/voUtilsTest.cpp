@@ -11,6 +11,7 @@
 #include <vtkArray.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
+#include <vtkMath.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
@@ -81,12 +82,31 @@ bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
     }
   for (int i = 0; i < array1->GetNumberOfTuples() * array1->GetNumberOfComponents(); ++i)
     {
-    if (array1->GetVariantValue(i) != array2->GetVariantValue(i))
+    vtkVariant v1 = array1->GetVariantValue(i);
+    vtkVariant v2 = array2->GetVariantValue(i);
+    if (v1.IsDouble() || v1.IsFloat())
       {
-      std::cerr << "Compare array Failed !\n"
-                << "\tValue(array1): " << array1->GetVariantValue(i) << "\n"
-                << "\tValue(array2): " << array2->GetVariantValue(i) << std::endl;
-      return false;
+      if (vtkMath::IsInf(v1.ToDouble()) && vtkMath::IsInf(v2.ToDouble()))
+        {
+        continue;
+        }
+      else if (!qFuzzyCompare(1 + v1.ToDouble(), 1 + v2.ToDouble()))
+        {
+        std::cerr << "Compare array Failed !\n"
+                  << "\tValueAsDouble(table1): " << v1.ToDouble() << "\n"
+                  << "\tValueAsDouble(table2): " << v2.ToDouble() << std::endl;
+        return false;
+        }
+      }
+    else
+      {
+      if (v1 != v2)
+        {
+        std::cerr << "Compare array Failed !\n"
+                  << "\tValueAsVariant(table1): " << array1->GetVariantValue(i) << "\n"
+                  << "\tValueAsVariant(table2): " << array2->GetVariantValue(i) << std::endl;
+        return false;
+        }
       }
     }
   return true;
@@ -182,7 +202,7 @@ bool parseRangeStringAlphaTestCase(int line, const QString& inputRangeString, QL
   return true;
 }
 
-}
+} // end anonymous namespace
 
 //-----------------------------------------------------------------------------
 int voUtilsTest(int /*argc*/, char * /*argv*/ [])

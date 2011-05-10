@@ -5,18 +5,27 @@
 
 // Visomics includes
 #include "ui_voDelimitedTextImportDialog.h"
+#include "voApplication.h"
 #include "voDelimitedTextImportDialog.h"
 #include "voDelimitedTextImportWidget.h"
 #include "voDelimitedTextPreviewModel.h"
+#include "voNormalizerRegistry.h"
 
 class voDelimitedTextImportDialogPrivate : public Ui_voDelimitedTextImportDialog
 {
+
 public:
   typedef Ui_voDelimitedTextImportDialog Superclass;
 
   voDelimitedTextImportDialogPrivate();
 
+  QString preProcessingAndFilteringGroupBoxText(const QString& normalizationMethodName);
+
   void setupUi(QDialog *widget);
+
+  QLabel * NormalizationMethodLabel;
+
+  voDelimitedTextPreviewModel DelimitedTextPreviewModel;
 };
 
 // --------------------------------------------------------------------------
@@ -25,6 +34,15 @@ public:
 // --------------------------------------------------------------------------
 voDelimitedTextImportDialogPrivate::voDelimitedTextImportDialogPrivate()
 {
+  this->NormalizationMethodLabel = 0;
+}
+
+// --------------------------------------------------------------------------
+QString voDelimitedTextImportDialogPrivate::preProcessingAndFilteringGroupBoxText(
+  const QString& normalizationMethodName)
+{
+  return QString("<ul><li>%1 normalization method is selected. "
+      "Click on <i>Normalization</i> tab for more options.</li></ul>").arg(normalizationMethodName);
 }
 
 // --------------------------------------------------------------------------
@@ -32,16 +50,20 @@ void voDelimitedTextImportDialogPrivate::setupUi(QDialog *widget)
 {
   this->Superclass::setupUi(widget);
 
+  this->DelimitedTextImportWidget->setDelimitedTextPreviewModel(&this->DelimitedTextPreviewModel);
+
   // Add "PreProcessing&Filtering" groupbox to DelimitedTextImportWidget
   QGroupBox * preProcessingAndFilteringGroupBox = new QGroupBox("Pre-processing && Filtering");
   QVBoxLayout * layout = new QVBoxLayout(preProcessingAndFilteringGroupBox);
-  layout->addWidget(new QLabel("<ul><li>Default normalization technique is XXXX. "
-                               "Click on <i>Normalization</i> tab for more options.</li></ul>"));
+  this->NormalizationMethodLabel = new QLabel(this->preProcessingAndFilteringGroupBoxText("No"));
+  layout->addWidget(this->NormalizationMethodLabel);
   this->DelimitedTextImportWidget->insertWidget(
         preProcessingAndFilteringGroupBox, voDelimitedTextImportWidget::RowsAndColumnsGroupBox);
 
-  preProcessingAndFilteringGroupBox->setDisabled(true);
-  this->ImportStepTabWidget->setTabEnabled(1, false);
+  //
+  QObject::connect(this->NormalizationWidget, SIGNAL(normalizationMethodSelected(const QString&)),
+                   widget, SLOT(setNormalizationMethod(const QString&)));
+
   this->ImportStepTabWidget->setTabEnabled(2, false);
 }
 
@@ -54,6 +76,12 @@ voDelimitedTextImportDialog::voDelimitedTextImportDialog(QWidget* newParent) :
 {
   Q_D(voDelimitedTextImportDialog);
   d->setupUi(this);
+
+  d->DocumentPreviewWidget->setModel(&d->DelimitedTextPreviewModel);
+  d->DocumentPreviewWidget->horizontalHeader()->setVisible(false);
+  d->DocumentPreviewWidget->verticalHeader()->setVisible(false);
+
+  this->setNormalizationMethod("No");
 }
 
 // --------------------------------------------------------------------------
@@ -76,28 +104,44 @@ voDelimitedTextImportSettings voDelimitedTextImportDialog::importSettings()const
   Q_D(const voDelimitedTextImportDialog);
   voDelimitedTextImportSettings settings;
 
-  voDelimitedTextPreviewModel * model = d->DelimitedTextImportWidget->delimitedTextPreviewModel();
-
   // vtkDelimitedTextReader settings
   settings.insert(voDelimitedTextImportSettings::FieldDelimiterCharacters,
-                  model->fieldDelimiterCharacters());
+                  d->DelimitedTextPreviewModel.fieldDelimiterCharacters());
   settings.insert(voDelimitedTextImportSettings::MergeConsecutiveDelimiters,
-                  model->mergeConsecutiveDelimiters());
+                  d->DelimitedTextPreviewModel.mergeConsecutiveDelimiters());
   settings.insert(voDelimitedTextImportSettings::StringDelimiter,
-                  model->stringDelimiter());
+                  d->DelimitedTextPreviewModel.stringDelimiter());
   settings.insert(voDelimitedTextImportSettings::UseStringDelimiter,
-                  model->useStringDelimiter());
+                  d->DelimitedTextPreviewModel.useStringDelimiter());
   // vtkExtendedTable settings
   settings.insert(voDelimitedTextImportSettings::Transpose,
-                  model->transpose());
+                  d->DelimitedTextPreviewModel.transpose());
   settings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes,
-                  model->numberOfColumnMetaDataTypes());
+                  d->DelimitedTextPreviewModel.numberOfColumnMetaDataTypes());
   settings.insert(voDelimitedTextImportSettings::ColumnMetaDataTypeOfInterest,
-                  model->columnMetaDataTypeOfInterest());
+                  d->DelimitedTextPreviewModel.columnMetaDataTypeOfInterest());
   settings.insert(voDelimitedTextImportSettings::NumberOfRowMetaDataTypes,
-                  model->numberOfRowMetaDataTypes());
+                  d->DelimitedTextPreviewModel.numberOfRowMetaDataTypes());
   settings.insert(voDelimitedTextImportSettings::RowMetaDataTypeOfInterest,
-                  model->rowMetaDataTypeOfInterest());
+                  d->DelimitedTextPreviewModel.rowMetaDataTypeOfInterest());
+  // Normalization settings
+  settings.insert(voDelimitedTextImportSettings::NormalizationMethod,
+                  d->NormalizationWidget->selectedNormalizationMethod());
 
   return settings;
+}
+
+#include <QDebug>
+// --------------------------------------------------------------------------
+void voDelimitedTextImportDialog::setNormalizationMethod(const QString& normalizationMethodName)
+{
+  Q_D(voDelimitedTextImportDialog);
+  d->NormalizationMethodLabel->setText(d->preProcessingAndFilteringGroupBoxText(normalizationMethodName));
+
+  voDelimitedTextPreviewModel * model = &d->DelimitedTextPreviewModel;
+
+  // Apply normalization to document preview
+  model->resetDataTable();
+  voApplication::application()->normalizerRegistry()->applyNormalization(
+        normalizationMethodName, model->dataTable(), QHash<int, QVariant>());
 }
