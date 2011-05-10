@@ -70,7 +70,7 @@ private:
   void operator=(const voChartXY &);   // Not implemented.
 
   vtkstd::vector<vtkstd::string> PointLabels;
-  std::map< std::vector<float>, std::string > coordinateLabelMap;
+  std::map< std::vector<float>, std::string > CoordinateLabelMap;
  
 //ETX
 };
