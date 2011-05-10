@@ -133,7 +133,7 @@ void voDelimitedTextImportWidget::insertWidget(QWidget * widget, InsertWidgetLoc
     index = d->MainVerticalLayout->indexOf(d->RowsColumnsGroupBox);
     }
   Q_ASSERT(index != -1);
-  d->MainVerticalLayout->insertWidget(index, widget);
+  d->MainVerticalLayout->insertWidget(index + 1, widget);
 }
 
 // --------------------------------------------------------------------------
