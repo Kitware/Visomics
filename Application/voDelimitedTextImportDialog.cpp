@@ -78,8 +78,6 @@ voDelimitedTextImportDialog::voDelimitedTextImportDialog(QWidget* newParent) :
   d->setupUi(this);
 
   d->DocumentPreviewWidget->setModel(&d->DelimitedTextPreviewModel);
-  d->DocumentPreviewWidget->horizontalHeader()->setVisible(false);
-  d->DocumentPreviewWidget->verticalHeader()->setVisible(false);
 
   this->setNormalizationMethod("No");
 }

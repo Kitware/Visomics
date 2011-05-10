@@ -1,4 +1,7 @@
 
+// Qt includes
+#include <QHeaderView>
+
 // Visomics includes
 #include "voDelimitedTextPreview.h"
 
@@ -29,7 +32,8 @@ voDelimitedTextPreviewPrivate::voDelimitedTextPreviewPrivate(voDelimitedTextPrev
 voDelimitedTextPreview::voDelimitedTextPreview(QWidget* newParent) :
   Superclass(newParent), d_ptr(new voDelimitedTextPreviewPrivate(*this))
 {
-//  Q_D(voDelimitedTextPreview);
+  this->horizontalHeader()->setVisible(false);
+  this->verticalHeader()->setVisible(false);
 }
 
 // --------------------------------------------------------------------------
