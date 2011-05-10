@@ -11,6 +11,7 @@
 #include <vtkCallbackCommand.h>
 #include <vtkDelimitedTextReader.h>
 #include <vtkDoubleArray.h>
+#include <vtkIntArray.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
@@ -172,14 +173,26 @@ void voDelimitedTextPreviewModelPrivate::updateDataPreview()
 
   for (vtkIdType cid = 0; cid < this->DataTable->GetNumberOfColumns(); ++cid)
     {
-    vtkDoubleArray * column = vtkDoubleArray::SafeDownCast(this->DataTable->GetColumn(cid));
-    Q_ASSERT(column);
+    vtkAbstractArray * column = this->DataTable->GetColumn(cid);
     for (int rid = 0; rid < column->GetNumberOfComponents() * column->GetNumberOfTuples(); ++rid)
       {
-      QString value = QString::number(column->GetValue(rid));
+      QString value;
+      if (vtkDoubleArray * doubleColumn = vtkDoubleArray::SafeDownCast(column))
+        {
+        value = QString::number(doubleColumn->GetValue(rid));
+        }
+      if (vtkIntArray * intColumn = vtkIntArray::SafeDownCast(column))
+        {
+        value = QString::number(intColumn->GetValue(rid));
+        }
+      else if (vtkStringArray * stringColumn = vtkStringArray::SafeDownCast(column))
+        {
+        value = QString::fromStdString(stringColumn->GetValue(rid));
+        }
+      Q_ASSERT(!value.isNull());
       QStandardItem * currentItem = new QStandardItem(value);
       q->setItem(rid + this->NumberOfColumnMetaDataTypes,
-                    cid + this->NumberOfRowMetaDataTypes, currentItem);
+                 cid + this->NumberOfRowMetaDataTypes, currentItem);
       currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
       }
     }
