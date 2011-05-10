@@ -78,8 +78,6 @@ voDelimitedTextImportDialog::voDelimitedTextImportDialog(QWidget* newParent) :
   d->setupUi(this);
 
   d->DocumentPreviewWidget->setModel(&d->DelimitedTextPreviewModel);
-  d->DocumentPreviewWidget->horizontalHeader()->setVisible(false);
-  d->DocumentPreviewWidget->verticalHeader()->setVisible(false);
 
   this->setNormalizationMethod("No");
 }
@@ -95,7 +93,7 @@ void voDelimitedTextImportDialog::setFileName(const QString& fileName)
 {
   Q_D(voDelimitedTextImportDialog);
   this->setWindowTitle(QString("Import Data - ") + fileName);
-  d->DelimitedTextImportWidget->setFileName(fileName);
+  d->DelimitedTextPreviewModel.setFileName(fileName);
 }
 
 // --------------------------------------------------------------------------

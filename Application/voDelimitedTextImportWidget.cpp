@@ -28,6 +28,7 @@ voDelimitedTextImportWidgetPrivate::voDelimitedTextImportWidgetPrivate()
 // --------------------------------------------------------------------------
 void voDelimitedTextImportWidgetPrivate::initWidgetFromModel()
 {
+  Q_ASSERT(this->DelimitedTextPreviewModel);
   this->OtherLineEdit->setText(QString(":"));
   switch (this->DelimitedTextPreviewModel->fieldDelimiterCharacters().at(0).toLatin1())
     {
@@ -133,7 +134,7 @@ void voDelimitedTextImportWidget::insertWidget(QWidget * widget, InsertWidgetLoc
     index = d->MainVerticalLayout->indexOf(d->RowsColumnsGroupBox);
     }
   Q_ASSERT(index != -1);
-  d->MainVerticalLayout->insertWidget(index, widget);
+  d->MainVerticalLayout->insertWidget(index + 1, widget);
 }
 
 // --------------------------------------------------------------------------
@@ -219,13 +220,6 @@ void voDelimitedTextImportWidget::setDelimitedTextPreviewModel(voDelimitedTextPr
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextImportWidget::setFileName(const QString& fileName)
-{
-  Q_D(voDelimitedTextImportWidget);
-  d->DelimitedTextPreviewModel->setFileName(fileName);
-}
-
-// --------------------------------------------------------------------------
 void voDelimitedTextImportWidget::onNumberOfColumnMetaDataTypesChanged(int value)
 {
   Q_D(voDelimitedTextImportWidget);
@@ -295,7 +289,10 @@ void voDelimitedTextImportWidget::onDelimiterChanged(int delimiter)
     disconnect(d->OtherLineEdit, SIGNAL(textChanged(const QString&)),
                this, SLOT(onOtherDelimiterLineEditChanged(const QString&)));
     }
-  d->DelimitedTextPreviewModel->setFieldDelimiter(delimiter);
+  if (d->DelimitedTextPreviewModel)
+    {
+    d->DelimitedTextPreviewModel->setFieldDelimiter(delimiter);
+    }
 }
 
 // --------------------------------------------------------------------------
@@ -307,7 +304,10 @@ void voDelimitedTextImportWidget::onOtherDelimiterLineEditChanged(const QString&
     return;
     }
   char delimiter = d->OtherLineEdit->text().at(0).toLatin1();
-  d->DelimitedTextPreviewModel->setFieldDelimiter(delimiter);
+  if (d->DelimitedTextPreviewModel)
+    {
+    d->DelimitedTextPreviewModel->setFieldDelimiter(delimiter);
+    }
 }
 
 // --------------------------------------------------------------------------
@@ -333,7 +333,10 @@ void voDelimitedTextImportWidget::onStringDelimiterEnabled(bool value)
     disconnect(d->StringDelimiterLineEdit, SIGNAL(textChanged(const QString&)),
                this, SLOT(onStringDelimiterLineEditChanged(const QString&)));
     }
-  d->DelimitedTextPreviewModel->setStringDelimiter(character);
+  if (d->DelimitedTextPreviewModel)
+    {
+    d->DelimitedTextPreviewModel->setStringDelimiter(character);
+    }
 }
 
 // --------------------------------------------------------------------------
@@ -345,5 +348,8 @@ void voDelimitedTextImportWidget::onStringDelimiterLineEditChanged(const QString
     return;
     }
   char character = d->StringDelimiterLineEdit->text().at(0).toLatin1();
-  d->DelimitedTextPreviewModel->setStringDelimiter(character);
+  if (d->DelimitedTextPreviewModel)
+    {
+    d->DelimitedTextPreviewModel->setStringDelimiter(character);
+    }
 }

@@ -29,10 +29,6 @@ public:
   voDelimitedTextPreviewModel* delimitedTextPreviewModel();
   void setDelimitedTextPreviewModel(voDelimitedTextPreviewModel* model);
 
-public slots:
-
-  void setFileName(const QString& fileName);
-
 protected slots:
   void onNumberOfColumnMetaDataTypesChanged(int value);
   void onColumnMetaDataTypeOfInterestChanged(int value);
