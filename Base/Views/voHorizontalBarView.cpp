@@ -1,11 +1,11 @@
-// QT includes
-#include <QLayout>
+// Qt includes
 #include <QDebug>
+#include <QLayout>
 #include <QMap>
 
 // Visomics includes
-#include "voHorizontalBarView.h"
 #include "voDataObject.h"
+#include "voHorizontalBarView.h"
 #include "voUtils.h"
 
 // VTK includes
@@ -30,7 +30,7 @@ public:
   voHorizontalBarViewPrivate();
 
   vtkSmartPointer<vtkContextView> ChartView;
-  vtkSmartPointer<vtkChartXY>      Chart;
+  vtkSmartPointer<vtkChartXY>     Chart;
   QVTKWidget*                     Widget;
 };
 
@@ -42,7 +42,6 @@ voHorizontalBarViewPrivate::voHorizontalBarViewPrivate()
 {
   this->Widget = 0;
 }
-
 
 // --------------------------------------------------------------------------
 // voHorizontalBarView methods
@@ -56,11 +55,10 @@ voHorizontalBarView::voHorizontalBarView(QWidget * newParent):
 // --------------------------------------------------------------------------
 voHorizontalBarView::~voHorizontalBarView()
 {
-
 }
 
 // --------------------------------------------------------------------------
-void voHorizontalBarView::setupUi(QLayout *layout)
+void voHorizontalBarView::setupUi(QLayout * layout)
 {
   Q_D(voHorizontalBarView);
 
@@ -73,14 +71,12 @@ void voHorizontalBarView::setupUi(QLayout *layout)
   d->ChartView->GetScene()->AddItem(d->Chart);
   
   layout->addWidget(d->Widget);
-qCritical() << "UI setup";
 }
 
 // --------------------------------------------------------------------------
 void voHorizontalBarView::setDataObject(voDataObject *dataObject)
 {
    Q_D(voHorizontalBarView);
-qCritical() << "starting setDataObject";
   if (!dataObject)
     {
     qCritical() << "voHorizontalBarView - Failed to setDataObject - dataObject is NULL";
