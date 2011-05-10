@@ -88,6 +88,16 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
 
   //columnMetaData->Dump();
 
+  // ColumnMetaDataLabels
+  vtkNew<vtkStringArray> columnMetaDataLabels;
+  if (numberOfRowMetaDataTypes > 0) // If there are no row metadata types, there is no room for column metadata labels
+    {
+    for (int rid = 0; rid < numberOfColumnMetaDataTypes; rid++)
+      {
+      columnMetaDataLabels->InsertNextValue(table->GetValue(rid, 0).ToString());
+      }
+    }
+
   // RowMetaData
   vtkNew<vtkTable> rowMetaData;
   Q_ASSERT(numberOfRowMetaDataTypes <= table->GetNumberOfColumns());
@@ -115,6 +125,16 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
     }
 
   //rowMetaData->Dump();
+
+  // RowMetaDataLabels
+  vtkNew<vtkStringArray> rowMetaDataLabels;
+  if (numberOfColumnMetaDataTypes > 0) // If there are no column metadata types, there is no room for row metadata labels
+    {
+    for (int cid = 0; cid < numberOfRowMetaDataTypes; cid++)
+      {
+      rowMetaDataLabels->InsertNextValue(table->GetValue(0, cid).ToString());
+      }
+    }
 
   // Data
   vtkNew<vtkTable> data;
@@ -175,6 +195,8 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
   extendedTable->SetData(data.GetPointer());
   extendedTable->SetColumnMetaDataTypeOfInterest(columnMetaDataTypeOfInterest);
   extendedTable->SetRowMetaDataTypeOfInterest(rowMetaDataTypeOfInterest);
+  extendedTable->SetColumnMetaDataLabels(columnMetaDataLabels.GetPointer());
+  extendedTable->SetRowMetaDataLabels(rowMetaDataLabels.GetPointer());
 
   // Set column names
   voUtils::setTableColumnNames(extendedTable->GetData(), extendedTable->GetColumnMetaDataOfInterestAsString());

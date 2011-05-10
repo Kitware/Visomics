@@ -7,7 +7,7 @@
 ///
 /// This class allows to store numerical tabular data and their associated metadata.
 ///
-/// The diagram represented below shows the tabular data (D) and the associated 
+/// The diagram represented below shows the tabular data (D) and the associated
 /// row (RM) and column (CM) metadata.
 ///
 ///                           ---------------------------------------------
@@ -28,7 +28,7 @@
 ///  |   RM30   |   RM31   |  |    D30   |    D31   |    D32   |    D33   |
 ///  -----------------------  ---------------------------------------------
 ///
-/// Data and associated metadata are all store within vtkTable. The number 
+/// Data and associated metadata are all store within vtkTable. The number
 /// represented above corresponds to the <ROW><COLUMN> indices of the associated table.
 ///
 /// Note that the columns of the ColumnMetaData (CM) table are represented above as rows.
@@ -51,62 +51,70 @@ public:
   vtkIdType GetTotalNumberOfRows();
 
   vtkIdType GetTotalNumberOfColumns();
-  
+
   //
   // Data
   //
 
-  void SetData(vtkTable* data);
-  
-  vtkTable* GetData();
+  void        SetData(vtkTable* data);
 
-  vtkTable* GetDataWithRowHeader();
-  
+  vtkTable*   GetData();
+
+  vtkTable*   GetDataWithRowHeader();
+
   //
   // Column MetaData
   //
 
-  bool HasColumnMetaData() const;
+  bool                HasColumnMetaData() const;
 
-  void SetColumnMetaDataTable(vtkTable* columnMetaData);
-  
-  vtkIdType GetNumberOfColumnMetaDataTypes() const;
-  
-  vtkAbstractArray* GetColumnMetaData(vtkIdType id) const;
+  void                SetColumnMetaDataTable(vtkTable* columnMetaData);
 
-  vtkStringArray* GetColumnMetaDataAsString(vtkIdType id) const;
-  
-  vtkIdType GetColumnMetaDataTypeOfInterest() const;
-  
-  void SetColumnMetaDataTypeOfInterest(vtkIdType id);
+  vtkIdType           GetNumberOfColumnMetaDataTypes() const;
 
-  vtkAbstractArray* GetColumnMetaDataOfInterest() const;
+  vtkAbstractArray*   GetColumnMetaData(vtkIdType id) const;
 
-  vtkStringArray* GetColumnMetaDataOfInterestAsString() const;
-  
+  vtkStringArray*     GetColumnMetaDataAsString(vtkIdType id) const;
+
+  vtkIdType           GetColumnMetaDataTypeOfInterest() const;
+
+  void                SetColumnMetaDataTypeOfInterest(vtkIdType id);
+
+  vtkAbstractArray*   GetColumnMetaDataOfInterest() const;
+
+  vtkStringArray*     GetColumnMetaDataOfInterestAsString() const;
+
+  void                SetColumnMetaDataLabels(vtkStringArray* columnMetaDataLabels);
+
+  vtkStringArray*     GetColumnMetaDataLabels() const;
+
   //
   // Row MetaData
   //
 
-  bool HasRowMetaData() const;
+  bool                HasRowMetaData() const;
 
-  void SetRowMetaDataTable(vtkTable* rowMetaData);
-  
-  vtkIdType GetNumberOfRowMetaDataTypes()const;
-  
-  vtkAbstractArray* GetRowMetaData(vtkIdType id) const;
+  void                SetRowMetaDataTable(vtkTable* rowMetaData);
 
-  vtkStringArray* GetRowMetaDataAsString(vtkIdType id) const;
-  
-  vtkIdType GetRowMetaDataTypeOfInterest() const;
-  
-  void SetRowMetaDataTypeOfInterest(vtkIdType id);
+  vtkIdType           GetNumberOfRowMetaDataTypes()const;
 
-  vtkAbstractArray* GetRowMetaDataOfInterest() const;
+  vtkAbstractArray*   GetRowMetaData(vtkIdType id) const;
 
-  vtkStringArray* GetRowMetaDataOfInterestAsString() const;
-  
-  
+  vtkStringArray*     GetRowMetaDataAsString(vtkIdType id) const;
+
+  vtkIdType           GetRowMetaDataTypeOfInterest() const;
+
+  void                SetRowMetaDataTypeOfInterest(vtkIdType id);
+
+  vtkAbstractArray*   GetRowMetaDataOfInterest() const;
+
+  vtkStringArray*     GetRowMetaDataOfInterestAsString() const;
+
+  void                SetRowMetaDataLabels(vtkStringArray* rowMetaDataLabels);
+
+  vtkStringArray*     GetRowMetaDataLabels() const;
+
+
 protected:
   vtkExtendedTable();
   ~vtkExtendedTable();
@@ -114,10 +122,10 @@ protected:
 private:
   vtkExtendedTable(const vtkExtendedTable&); // Not implemented
   void operator=(const vtkExtendedTable&); // Not implemented
-  
+
   class vtkInternal;
   vtkInternal * Internal;
-  
+
 };
 
 #endif

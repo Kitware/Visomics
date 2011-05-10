@@ -189,14 +189,30 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
       }
     }
 
-  // Set upper-left "empty quadrant" headers to blank
-  for (int cid = 0; cid < extendedTable->GetNumberOfRowMetaDataTypes() - 1; ++cid)
+  // Set column metadata labels
+  for (int modelRowId = 0; modelRowId < extendedTable->GetColumnMetaDataLabels()->GetNumberOfValues() - 1; ++modelRowId)
     {
-    d->Model.setHeaderData(cid, Qt::Horizontal, QString(""));
+    int tableRowId = modelRowId;
+    if (tableRowId >= extendedTable->GetColumnMetaDataTypeOfInterest())
+      {
+      tableRowId++;
+      }
+    QString value = QString(extendedTable->GetColumnMetaDataLabels()->GetValue(tableRowId));
+    value.prepend(QString("%1: ").arg(voUtils::counterIntToAlpha(modelRowId)));
+    d->Model.setHeaderData(modelRowId, Qt::Vertical, value);
     }
-  for (int rid = 0; rid < extendedTable->GetNumberOfColumnMetaDataTypes() - 1; ++rid)
+
+  // Set row metadata labels
+  for (int modelColumnId = 0; modelColumnId < extendedTable->GetRowMetaDataLabels()->GetNumberOfValues() - 1; ++modelColumnId)
     {
-    d->Model.setHeaderData(rid, Qt::Vertical, QString(""));
+    int tableColumnId = modelColumnId;
+    if (tableColumnId >= extendedTable->GetRowMetaDataTypeOfInterest())
+      {
+      tableColumnId++;
+      }
+    QString value = QString(extendedTable->GetRowMetaDataLabels()->GetValue(tableColumnId));
+    value.prepend(QString("%1: ").arg(1 + modelColumnId));
+    d->Model.setHeaderData(modelColumnId, Qt::Horizontal, value);
     }
 
   // Expand column widths to fit long labels or data
