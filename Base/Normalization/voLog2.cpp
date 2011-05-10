@@ -8,8 +8,10 @@
 
 // VTK includes
 #include <vtkDoubleArray.h>
-#include <vtkMath.h>
 #include <vtkTable.h>
+
+// STD includes
+#include <cmath>
 
 
 namespace Normalization
@@ -33,7 +35,7 @@ bool applyLog2(vtkTable * dataTable, const QHash<int, QVariant>& settings)
       }
     for (int rid = 0; rid < column->GetNumberOfTuples() * column->GetNumberOfComponents(); ++rid)
       {
-      column->SetValue(rid, log2(column->GetValue(rid)));
+      column->SetValue(rid, std::log(column->GetValue(rid)) / log(2.0));
       }
     }
   dataTable->Modified();
