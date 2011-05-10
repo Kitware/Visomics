@@ -198,6 +198,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
       tableRowId++;
       }
     QString value = QString(extendedTable->GetColumnMetaDataLabels()->GetValue(tableRowId));
+    value.prepend(QString("%1: ").arg(voUtils::counterIntToAlpha(modelRowId)));
     d->Model.setHeaderData(modelRowId, Qt::Vertical, value);
     }
 
@@ -210,6 +211,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
       tableColumnId++;
       }
     QString value = QString(extendedTable->GetRowMetaDataLabels()->GetValue(tableColumnId));
+    value.prepend(QString("%1: ").arg(1 + modelColumnId));
     d->Model.setHeaderData(modelColumnId, Qt::Horizontal, value);
     }
 
