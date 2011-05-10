@@ -1,11 +1,11 @@
-// QT includes
-#include <QLayout>
+// Qt includes
 #include <QDebug>
+#include <QLayout>
 #include <QMap>
 
 // Visomics includes
-#include "voVolcanoView.h"
 #include "voDataObject.h"
+#include "voVolcanoView.h"
 
 // VTK includes
 #include <QVTKWidget.h>
@@ -27,7 +27,7 @@ public:
   voVolcanoViewPrivate();
 
   vtkSmartPointer<vtkContextView> ChartView;
-  vtkSmartPointer<voChartXY>     Chart;
+  vtkSmartPointer<voChartXY>      Chart;
   QVTKWidget*                     Widget;
 };
 
@@ -52,7 +52,6 @@ voVolcanoView::voVolcanoView(QWidget * newParent):
 // --------------------------------------------------------------------------
 voVolcanoView::~voVolcanoView()
 {
-
 }
 
 // --------------------------------------------------------------------------
@@ -95,32 +94,32 @@ void voVolcanoView::setDataObject(voDataObject *dataObject)
       {51, 160, 44}, {251, 154, 153}, {227, 26, 28},
       {253, 191, 111}, {255, 127, 0}, {202, 178, 214}, {106, 61, 154}
     };
-  vtkPlot* p = d->Chart->GetPlot(0);
-  if (!p) 
+  vtkPlot* plot = d->Chart->GetPlot(0);
+  if (!plot)
     {
-    vtkPlot* p = d->Chart->AddPlot(vtkChart::POINTS);
-    p->SetInput(table, 1, 2);
-    p->SetColor(colors[0][0], colors[0][1], colors[0][2], 255);
-    p->SetWidth(10);
+    plot = d->Chart->AddPlot(vtkChart::POINTS);
+    plot->SetInput(table, 1, 2);
+    plot->SetColor(colors[0][0], colors[0][1], colors[0][2], 255);
+    plot->SetWidth(10);
 
     unsigned int rows = table->GetNumberOfRows();
     std::vector<std::string> labels;
-    for( unsigned int j=0; j < rows ; j++)
+    for(unsigned int j = 0; j < rows ; ++j)
       {
       std::string experiment = table->GetValue(j,0).ToString();
-      labels.push_back( experiment );
+      labels.push_back(experiment);
       }
 
-    d->Chart->AddPointLabels( labels );
+    d->Chart->AddPointLabels(labels);
     //d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("Fold Change: Sample 1 -> Sample 2");
     //d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle("P-Value");
     d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(table->GetColumnName(1)); // x
     d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(table->GetColumnName(2)); // y
 
     double maxBound = qMax(qAbs(d->Chart->GetAxis(vtkAxis::BOTTOM)->GetMinimum()),
-                        qAbs(d->Chart->GetAxis(vtkAxis::BOTTOM)->GetMaximum()));
-    d->Chart->GetAxis(vtkAxis::BOTTOM)->SetBehavior(vtkAxis::FIXED);;
-    d->Chart->GetAxis(vtkAxis::BOTTOM)->SetRange(-1*maxBound, maxBound);
+                           qAbs(d->Chart->GetAxis(vtkAxis::BOTTOM)->GetMaximum()));
+    d->Chart->GetAxis(vtkAxis::BOTTOM)->SetBehavior(vtkAxis::FIXED);
+    d->Chart->GetAxis(vtkAxis::BOTTOM)->SetRange(-1 * maxBound, maxBound);
     }
   d->ChartView->GetRenderWindow()->SetMultiSamples(4);
   d->ChartView->Render();
