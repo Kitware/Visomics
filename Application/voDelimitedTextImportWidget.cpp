@@ -219,13 +219,6 @@ void voDelimitedTextImportWidget::setDelimitedTextPreviewModel(voDelimitedTextPr
 }
 
 // --------------------------------------------------------------------------
-void voDelimitedTextImportWidget::setFileName(const QString& fileName)
-{
-  Q_D(voDelimitedTextImportWidget);
-  d->DelimitedTextPreviewModel->setFileName(fileName);
-}
-
-// --------------------------------------------------------------------------
 void voDelimitedTextImportWidget::onNumberOfColumnMetaDataTypesChanged(int value)
 {
   Q_D(voDelimitedTextImportWidget);

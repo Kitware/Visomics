@@ -93,7 +93,7 @@ void voDelimitedTextImportDialog::setFileName(const QString& fileName)
 {
   Q_D(voDelimitedTextImportDialog);
   this->setWindowTitle(QString("Import Data - ") + fileName);
-  d->DelimitedTextImportWidget->setFileName(fileName);
+  d->DelimitedTextPreviewModel.setFileName(fileName);
 }
 
 // --------------------------------------------------------------------------

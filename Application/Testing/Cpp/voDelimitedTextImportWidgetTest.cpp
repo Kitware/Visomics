@@ -5,6 +5,7 @@
 #include <QDebug>
 
 // Visomics includes
+#include <voDelimitedTextPreview.h>
 #include <voDelimitedTextImportWidget.h>
 
 // STD includes
@@ -30,10 +31,16 @@ int voDelimitedTextImportWidgetTest(int argc, char * argv [])
   // Read file
   QString filename(argv[1]);
 
-  voDelimitedTextImportWidget w;
-  w.show();
+  voDelimitedTextPreviewModel model;
+  model.setFileName(filename);
 
-  w.setFileName(filename);
+  voDelimitedTextPreview * documentPreviewWidget = new voDelimitedTextPreview;
+  documentPreviewWidget->setModel(&model);
+
+  voDelimitedTextImportWidget w;
+  w.setDelimitedTextPreviewModel(&model);
+  w.insertWidget(documentPreviewWidget, voDelimitedTextImportWidget::RowsAndColumnsGroupBox);
+  w.show();
 
   QTimer autoExit;
   //if (argc < 2 || QString(argv[1]) != "-I")
