@@ -84,6 +84,10 @@ public:
 
   vtkStringArray*     GetColumnMetaDataOfInterestAsString() const;
 
+  void                SetColumnMetaDataLabels(vtkStringArray* columnMetaDataLabels);
+
+  vtkStringArray*     GetColumnMetaDataLabels() const;
+
   //
   // Row MetaData
   //
@@ -105,6 +109,10 @@ public:
   vtkAbstractArray*   GetRowMetaDataOfInterest() const;
 
   vtkStringArray*     GetRowMetaDataOfInterestAsString() const;
+
+  void                SetRowMetaDataLabels(vtkStringArray* rowMetaDataLabels);
+
+  vtkStringArray*     GetRowMetaDataLabels() const;
 
 
 protected:

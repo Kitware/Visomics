@@ -24,6 +24,9 @@ public:
   
   vtkIdType ColumnMetaDataTypeOfInterest;
   vtkIdType RowMetaDataTypeOfInterest;
+
+  vtkSmartPointer<vtkStringArray> ColumnMetaDataLabels;
+  vtkSmartPointer<vtkStringArray> RowMetaDataLabels;
 };
 
 //----------------------------------------------------------------------------
@@ -63,6 +66,21 @@ void vtkExtendedTable::PrintSelf(ostream &os, vtkIndent indent)
 //----------------------------------------------------------------------------
 void vtkExtendedTable::Dump()
 {
+  std::cout << "ColumnMetaDataLabels:";
+  if (this->Internal->ColumnMetaDataLabels)
+    {
+    std::cout << std::endl;
+    for (vtkIdType i = 0; i < this->Internal->ColumnMetaDataLabels->GetNumberOfValues(); i++)
+      {
+      std::cout << this->Internal->ColumnMetaDataLabels->GetValue(i) << std::endl;
+      }
+    }
+  else
+    {
+    std::cout << "(null)" << std::endl;
+    }
+  std::cout << std::endl;
+
   std::cout << "ColumnMetaData:";
   if (this->Internal->ColumnMetaData)
     {
@@ -73,6 +91,22 @@ void vtkExtendedTable::Dump()
     {
     std::cout << "(null)" << std::endl;
     }
+  std::cout << std::endl;
+
+  std::cout << "RowMetaDataLabels:";
+  if (this->Internal->RowMetaDataLabels)
+    {
+    std::cout << std::endl;
+    for (vtkIdType i = 0; i < this->Internal->RowMetaDataLabels->GetNumberOfValues(); i++)
+      {
+      std::cout << this->Internal->RowMetaDataLabels->GetValue(i) << std::endl;
+      }
+    }
+  else
+    {
+    std::cout << "(null)" << std::endl;
+    }
+  std::cout << std::endl;
 
   std::cout << "RowMetaData:";
   if (this->Internal->RowMetaData)
@@ -84,9 +118,11 @@ void vtkExtendedTable::Dump()
     {
     std::cout << "(null)" << std::endl;
     }
+  std::cout << std::endl;
 
   std::cout << "Data:"<< std::endl;
   Superclass::Dump();
+  std::cout << std::endl;
 }
 
 //----------------------------------------------------------------------------
@@ -238,6 +274,23 @@ void vtkExtendedTable::SetColumnMetaDataTable(vtkTable* columnMetaData)
 }
 
 //----------------------------------------------------------------------------
+void vtkExtendedTable::SetColumnMetaDataLabels(vtkStringArray* columnMetaDataLabels)
+{
+  if (columnMetaDataLabels == this->Internal->ColumnMetaDataLabels)
+    {
+    return;
+    }
+  this->Internal->ColumnMetaDataLabels = columnMetaDataLabels;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+vtkStringArray* vtkExtendedTable::GetColumnMetaDataLabels() const
+{
+  return this->Internal->ColumnMetaDataLabels;
+}
+
+//----------------------------------------------------------------------------
 vtkIdType vtkExtendedTable::GetNumberOfRowMetaDataTypes() const
 {
   return this->Internal->RowMetaData->GetNumberOfColumns();
@@ -330,4 +383,21 @@ vtkAbstractArray* vtkExtendedTable::GetRowMetaDataOfInterest() const
 vtkStringArray* vtkExtendedTable::GetRowMetaDataOfInterestAsString() const
 {
   return vtkStringArray::SafeDownCast(this->GetRowMetaDataOfInterest());
+}
+
+//----------------------------------------------------------------------------
+void vtkExtendedTable::SetRowMetaDataLabels(vtkStringArray* rowMetaDataLabels)
+{
+  if (rowMetaDataLabels == this->Internal->RowMetaDataLabels)
+    {
+    return;
+    }
+  this->Internal->RowMetaDataLabels = rowMetaDataLabels;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+vtkStringArray* vtkExtendedTable::GetRowMetaDataLabels() const
+{
+  return this->Internal->RowMetaDataLabels;
 }
