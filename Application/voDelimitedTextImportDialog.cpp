@@ -9,7 +9,7 @@
 #include "voDelimitedTextImportDialog.h"
 #include "voDelimitedTextImportWidget.h"
 #include "voDelimitedTextPreviewModel.h"
-#include "voNormalizerRegistry.h"
+#include "voRegistry.h"
 
 class voDelimitedTextImportDialogPrivate : public Ui_voDelimitedTextImportDialog
 {
@@ -140,6 +140,6 @@ void voDelimitedTextImportDialog::setNormalizationMethod(const QString& normaliz
 
   // Apply normalization to document preview
   model->resetDataTable();
-  voApplication::application()->normalizerRegistry()->applyNormalization(
+  voApplication::application()->normalizerRegistry()->apply(
         normalizationMethodName, model->dataTable(), QHash<int, QVariant>());
 }

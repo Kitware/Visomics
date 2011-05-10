@@ -59,9 +59,9 @@ SET(KIT_SRCS
   voInputFileDataObject.h
   voIOManager.cpp
   voIOManager.h
-  voNormalizerRegistry.cpp
-  voNormalizerRegistry.h
   voQObjectFactory.h
+  voRegistry.cpp
+  voRegistry.h
   voTableDataObject.cpp
   voTableDataObject.h
   voUtils.cpp

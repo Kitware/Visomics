@@ -8,7 +8,8 @@
 #include "voApplication.h"
 #include "voDataModel.h"
 #include "voIOManager.h"
-#include "voNormalizerRegistry.h"
+#include "voLog2.h"
+#include "voRegistry.h"
 #include "voViewManager.h"
 #include "voAnalysisFactory.h"
 #include "voViewFactory.h"
@@ -34,7 +35,7 @@ public:
   voIOManager            IOManager;
   voViewManager          ViewManager;
   voAnalysisFactory      AnalysisFactory;
-  voNormalizerRegistry   NormalizerRegistry;
+  voRegistry             NormalizerRegistry;
   voViewFactory          ViewFactory;
 };
 
@@ -81,6 +82,9 @@ voApplication* voApplication::application()
 void voApplication::initialize(bool& exitWhenDone)
 {
   Q_D(voApplication);
+
+  // Register normalization methods
+  this->normalizerRegistry()->registerMethod("Log2", Normalization::applyLog2);
   
   // TODO Parse command line arguments
   //d->parseArguments();
@@ -125,10 +129,10 @@ voAnalysisFactory* voApplication::analysisFactory()const
 }
 
 // --------------------------------------------------------------------------
-voNormalizerRegistry* voApplication::normalizerRegistry()const
+voRegistry* voApplication::normalizerRegistry()const
 {
   Q_D(const voApplication);
-  return const_cast<voNormalizerRegistry*>(&d->NormalizerRegistry);
+  return const_cast<voRegistry*>(&d->NormalizerRegistry);
 }
 
 // --------------------------------------------------------------------------

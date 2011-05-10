@@ -1,43 +1,41 @@
 
 // Visomics includes
-#include "voLog2.h"
-#include "voNormalizerRegistry.h"
+#include "voRegistry.h"
 
 // VTK includes
 #include <vtkTable.h>
 
 //----------------------------------------------------------------------------
-namespace Normalization
+namespace
 {
 bool applyNoop(vtkTable * /*dataTable*/, const QHash<int, QVariant>& /*settings*/){ return true; }
 } // end of Normalization namespace
 
 //----------------------------------------------------------------------------
-class voNormalizerRegistryPrivate
+class voRegistryPrivate
 {
 public:
-  QHash<QString, voNormalizerRegistry::ApplyNormalizationFunction> MethodNameToFunctionMap;
+  QHash<QString, voRegistry::ApplyNormalizationFunction> MethodNameToFunctionMap;
 };
 
 //----------------------------------------------------------------------------
-// voNormalizerRegistry methods
+// voRegistry methods
 
 //----------------------------------------------------------------------------
-voNormalizerRegistry::voNormalizerRegistry():d_ptr(new voNormalizerRegistryPrivate)
+voRegistry::voRegistry():d_ptr(new voRegistryPrivate)
 {
-  this->registerNormalizationMethod("No", Normalization::applyNoop);
-  this->registerNormalizationMethod("Log2", Normalization::applyLog2);
+  this->registerMethod("No", applyNoop);
 }
 
 //----------------------------------------------------------------------------
-voNormalizerRegistry::~voNormalizerRegistry()
+voRegistry::~voRegistry()
 {
 }
 
 //----------------------------------------------------------------------------
-void voNormalizerRegistry::registerNormalizationMethod(const QString& methodName, ApplyNormalizationFunction function)
+void voRegistry::registerMethod(const QString& methodName, ApplyNormalizationFunction function)
 {
-  Q_D(voNormalizerRegistry);
+  Q_D(voRegistry);
   if (d->MethodNameToFunctionMap.keys().contains(methodName))
     {
     return;
@@ -50,9 +48,9 @@ void voNormalizerRegistry::registerNormalizationMethod(const QString& methodName
 }
 
 //----------------------------------------------------------------------------  
-bool voNormalizerRegistry::applyNormalization(const QString& methodName, vtkTable * dataTable, const QHash<int, QVariant>& settings)
+bool voRegistry::apply(const QString& methodName, vtkTable * dataTable, const QHash<int, QVariant>& settings)
 {
-  Q_D(voNormalizerRegistry);
+  Q_D(voRegistry);
   if (!d->MethodNameToFunctionMap.keys().contains(methodName))
     {
     return false;
