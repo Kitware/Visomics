@@ -23,6 +23,8 @@ public:
     ColumnMetaDataTypeOfInterest,
     NumberOfRowMetaDataTypes,
     RowMetaDataTypeOfInterest,
+    // Normalization settings
+    NormalizationMethod,
     };
 
   voDelimitedTextImportSettings();

@@ -9,6 +9,7 @@
 #include "voDataModelItem.h"
 #include "voInputFileDataObject.h"
 #include "voIOManager.h"
+#include "voNormalizerRegistry.h"
 #include "voUtils.h"
 #include "vtkExtendedTable.h"
 
@@ -149,6 +150,14 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
       newColumn->SetValue(rid - numberOfColumnMetaDataTypes, doubleValue);
       }
     }
+
+  // NormalizationMethod
+  QString normalizationMethod =
+      settings.value(voDelimitedTextImportSettings::NormalizationMethod).toString();
+
+  // Normalize
+  voApplication::application()->normalizerRegistry()->applyNormalization(
+        normalizationMethod, data.GetPointer(), settings);
 
   //data->Dump();
 
