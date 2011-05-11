@@ -88,6 +88,7 @@ bool voUtils::transposeTable(vtkTable* srcTable, vtkTable* destTable)
     return true;
     }
 
+  // Check if column are all from the same type
   bool useVariant = false;
   vtkAbstractArray * firstColumn = srcTable->GetColumn(0);
   for (int cid = 1; cid < srcTable->GetNumberOfColumns(); ++cid)
@@ -184,6 +185,29 @@ bool voUtils::insertColumnIntoTable(vtkTable * table, int position, vtkAbstractA
     }
   table->ShallowCopy(updatedTable.GetPointer());
   return true;
+}
+
+//----------------------------------------------------------------------------
+vtkStringArray* voUtils::tableColumnNames(vtkTable * table)
+{
+  if (!table)
+    {
+    return 0;
+    }
+  vtkStringArray * columnNames = vtkStringArray::New();
+  columnNames->SetNumberOfValues(table->GetNumberOfColumns());
+
+  for (int cid = 0; cid < table->GetNumberOfColumns(); ++cid)
+    {
+    vtkAbstractArray * column = table->GetColumn(cid);
+    vtkStdString name;
+    if (column)
+      {
+      name = column->GetName();
+      }
+    columnNames->SetValue(cid, name);
+    }
+  return columnNames;
 }
 
 //----------------------------------------------------------------------------

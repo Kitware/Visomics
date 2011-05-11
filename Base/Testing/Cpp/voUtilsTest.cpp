@@ -652,6 +652,37 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   //-----------------------------------------------------------------------------
+  // Test vtkStringArray * tableColumnNames(vtkTable * table)
+  //-----------------------------------------------------------------------------
+  voUtils::tableColumnNames(0);
+
+  vtkNew<vtkTable> tableColumnNamesTest;
+  tableColumnNamesTest->DeepCopy(originalTable.GetPointer());
+
+  vtkNew<vtkStringArray> expectedColumnNames;
+  expectedColumnNames->SetNumberOfValues(4);
+  expectedColumnNames->SetValue(0, "String");
+  expectedColumnNames->SetValue(2, "Double");
+  expectedColumnNames->SetValue(3, "Variant");
+
+  for (int cid = 0; cid < tableColumnNamesTest->GetNumberOfColumns(); ++cid)
+    {
+    tableColumnNamesTest->GetColumn(cid)->SetName(expectedColumnNames->GetValue(cid));
+    }
+
+  vtkSmartPointer<vtkStringArray> currentColumnNames =
+      voUtils::tableColumnNames(tableColumnNamesTest.GetPointer());
+
+  success = compareArray(currentColumnNames.GetPointer(), expectedColumnNames.GetPointer());
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with tableColumnNames() - "
+              << "'currentColumnNames' is different from 'expectedColumnNames'" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
   // Test counterIntToAlpha(int intVal), counterAlphaToInt(QString alphaVal)
   //-----------------------------------------------------------------------------
 
