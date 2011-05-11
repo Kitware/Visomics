@@ -32,6 +32,7 @@ public:
 
   vtkSmartPointer<vtkContextView> ChartView;
   vtkSmartPointer<vtkChartXY>     Chart;
+  vtkPlot*                        Plot;
   QVTKWidget*                     Widget;
 };
 
@@ -42,6 +43,7 @@ public:
 voPCABarPlotPrivate::voPCABarPlotPrivate()
 {
   this->Widget = 0;
+  this->Plot = 0;
 }
 
 // --------------------------------------------------------------------------
@@ -51,13 +53,11 @@ voPCABarPlotPrivate::voPCABarPlotPrivate()
 voPCABarPlot::voPCABarPlot(QWidget * newParent):
     Superclass(newParent), d_ptr(new voPCABarPlotPrivate)
 {
-	//std::cout<<"we are in the bar plot initialization" <<std::endl;
 }
 
 // --------------------------------------------------------------------------
 voPCABarPlot::~voPCABarPlot()
 {
-
 }
 
 // --------------------------------------------------------------------------
@@ -72,6 +72,7 @@ void voPCABarPlot::setupUi(QLayout *layout)
   d->Widget->SetRenderWindow(d->ChartView->GetRenderWindow());
   d->ChartView->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
   d->ChartView->GetScene()->AddItem(d->Chart);
+  d->Plot = d->Chart->AddPlot(vtkChart::BAR);
   
   layout->addWidget(d->Widget);
 }
@@ -106,16 +107,10 @@ void voPCABarPlot::setDataObject(voDataObject *dataObject)
       {253, 191, 111}, {255, 127, 0}, {202, 178, 214}, {106, 61, 154}
     };
   int i = 0;
-  
-  vtkPlot* p = d->Chart->GetPlot(0);
-	if (!p) 
-    {
-    p = d->Chart->AddPlot(vtkChart::BAR);
-    }
 
-  p->SetInput(transpose, 1,2);
-  p->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
-  p->SetWidth(10);
+  d->Plot->SetInput(transpose.GetPointer(), 1, 2);
+  d->Plot->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
+  d->Plot->SetWidth(10);
 
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(transpose->GetColumnName(2)); // y

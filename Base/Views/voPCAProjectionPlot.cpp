@@ -31,7 +31,8 @@ public:
   voPCAProjectionPlotPrivate();
 
   vtkSmartPointer<vtkContextView> ChartView;
-  vtkSmartPointer<voChartXY>     Chart;
+  vtkSmartPointer<voChartXY>      Chart;
+  vtkPlot*                        Plot;
   QVTKWidget*                     Widget;
 };
 
@@ -42,6 +43,7 @@ public:
 voPCAProjectionPlotPrivate::voPCAProjectionPlotPrivate()
 {
   this->Widget = 0;
+  this->Plot = 0;
 }
 
 // --------------------------------------------------------------------------
@@ -70,6 +72,7 @@ void voPCAProjectionPlot::setupUi(QLayout *layout)
   d->Widget->SetRenderWindow(d->ChartView->GetRenderWindow());
   d->ChartView->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
   d->ChartView->GetScene()->AddItem(d->Chart);
+  d->Plot = d->Chart->AddPlot(vtkChart::POINTS);
 
   layout->addWidget(d->Widget);
 }
@@ -105,11 +108,10 @@ void voPCAProjectionPlot::setDataObject(voDataObject *dataObject)
       {253, 191, 111}, {255, 127, 0}, {202, 178, 214}, {106, 61, 154}
     };
   int i = 0;
-  vtkPlot* plot = d->Chart->AddPlot(vtkChart::POINTS);
   // TODO Extract only the first two rows of the data table instead of transposing the entire table
-  plot->SetInput(transpose, 1, 2);
-  plot->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
-  plot->SetWidth(10);
+  d->Plot->SetInput(transpose, 1, 2);
+  d->Plot->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
+  d->Plot->SetWidth(10);
 
   vtkStringArray* labelArray = vtkStringArray::SafeDownCast(transpose->GetColumn(0));
   if (labelArray)
