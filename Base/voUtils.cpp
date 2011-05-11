@@ -24,7 +24,9 @@ namespace
 {
 //----------------------------------------------------------------------------
 template<typename ArrayType, typename ValueType>
-bool transposeColumn(vtkTable* srcTable, vtkTable* destTable, int columnId, bool useVariant = false)
+bool transposeColumn(vtkTable* srcTable, vtkTable* destTable, int columnId,
+                     bool useVariant = false,
+                     const voUtils::TransposeOption& transposeOption = voUtils::WithoutHeaders)
 {
   if (!srcTable || !destTable)
     {
@@ -41,13 +43,24 @@ bool transposeColumn(vtkTable* srcTable, vtkTable* destTable, int columnId, bool
     return false;
     }
 
+  int numberOfRowsInTransposedColumn = srcTable->GetNumberOfColumns();
+  if (transposeOption & voUtils::FirstColumnIntoColumnNames)
+    {
+    if (columnId == 0)
+      {
+      return true;
+      }
+    columnId--;
+    numberOfRowsInTransposedColumn--;
+    }
+
   for (int rid = 0; rid < column->GetNumberOfTuples() * column->GetNumberOfComponents(); ++rid)
     {
     vtkSmartPointer<ArrayType> transposedColumn;
     if (columnId == 0)
       {
       transposedColumn = vtkSmartPointer<ArrayType>::New();
-      transposedColumn->SetNumberOfValues(srcTable->GetNumberOfColumns());
+      transposedColumn->SetNumberOfValues(numberOfRowsInTransposedColumn);
       destTable->AddColumn(transposedColumn);
       }
     else
@@ -71,27 +84,31 @@ bool transposeColumn(vtkTable* srcTable, vtkTable* destTable, int columnId, bool
 }
 
 //----------------------------------------------------------------------------
-bool voUtils::transposeTable(vtkTable* srcTable, vtkTable* destTable)
+bool voUtils::transposeTable(vtkTable* srcTable, vtkTable* destTable, const TransposeOption& transposeOption)
 {
   if (!srcTable)
     {
     return false;
     }
-
   if (!destTable)
     {
     return false;
     }
-
   if (srcTable->GetNumberOfColumns() == 0)
     {
     return true;
     }
 
+  int cidOffset = 0;
+  if (transposeOption & voUtils::FirstColumnIntoColumnNames)
+    {
+    cidOffset = 1;
+    }
+
   // Check if column are all from the same type
   bool useVariant = false;
-  vtkAbstractArray * firstColumn = srcTable->GetColumn(0);
-  for (int cid = 1; cid < srcTable->GetNumberOfColumns(); ++cid)
+  vtkAbstractArray * firstColumn = srcTable->GetColumn(cidOffset);
+  for (int cid = cidOffset; cid < srcTable->GetNumberOfColumns(); ++cid)
     {
     if (qstrcmp(firstColumn->GetClassName(), srcTable->GetColumn(cid)->GetClassName()) != 0)
       {
@@ -99,18 +116,17 @@ bool voUtils::transposeTable(vtkTable* srcTable, vtkTable* destTable)
       break;
       }
     }
-
-  for(int cid = 0; cid < srcTable->GetNumberOfColumns(); ++cid)
+  for(int cid = cidOffset; cid < srcTable->GetNumberOfColumns(); ++cid)
     {
     if (!useVariant)
       {
-      if (!transposeColumn<vtkDoubleArray, double>(srcTable, destTable, cid))
+      if (!transposeColumn<vtkDoubleArray, double>(srcTable, destTable, cid, useVariant, transposeOption))
         {
-        if (!transposeColumn<vtkIntArray, int>(srcTable, destTable, cid))
+        if (!transposeColumn<vtkIntArray, int>(srcTable, destTable, cid, useVariant, transposeOption))
           {
-          if (!transposeColumn<vtkStringArray, vtkStdString>(srcTable, destTable, cid))
+          if (!transposeColumn<vtkStringArray, vtkStdString>(srcTable, destTable, cid, useVariant, transposeOption))
             {
-            if (!transposeColumn<vtkVariantArray, vtkVariant>(srcTable, destTable, cid))
+            if (!transposeColumn<vtkVariantArray, vtkVariant>(srcTable, destTable, cid, useVariant, transposeOption))
               {
               return false;
               }
@@ -120,21 +136,50 @@ bool voUtils::transposeTable(vtkTable* srcTable, vtkTable* destTable)
       }
     else
       {
-      if (!transposeColumn<vtkVariantArray, vtkVariant>(srcTable, destTable, cid, useVariant))
+      if (!transposeColumn<vtkVariantArray, vtkVariant>(srcTable, destTable, cid, useVariant, transposeOption))
         {
         return false;
         }
       }
     }
 
+  // Set columnName on transposed table
+  if (transposeOption & voUtils::FirstColumnIntoColumnNames)
+    {
+    vtkAbstractArray * firstColumn = srcTable->GetColumn(0);
+    for (int rid = 0; rid < firstColumn->GetNumberOfComponents() * firstColumn->GetNumberOfTuples(); ++rid)
+      {
+      vtkAbstractArray * destColumn = destTable->GetColumn(rid);
+      destColumn->SetName(firstColumn->GetVariantValue(rid).ToString());
+      }
+    }
+
+  // Create and insert the columnName
+  // TODO Possible optimization could be to embed the following operation
+  //      within the first "for" loop.
+  if (transposeOption & voUtils::ColumnNamesIntoFirstColumn)
+    {
+    vtkNew<vtkStringArray> stringArray;
+    if (transposeOption & voUtils::FirstColumnIntoColumnNames)
+      {
+      stringArray->SetName(srcTable->GetColumn(0)->GetName());
+      }
+    stringArray->SetNumberOfValues(srcTable->GetNumberOfColumns() - cidOffset);
+    for(int cid = cidOffset; cid < srcTable->GetNumberOfColumns(); ++cid)
+      {
+      stringArray->SetValue(cid - cidOffset, srcTable->GetColumn(cid)->GetName());
+      }
+    voUtils::insertColumnIntoTable(destTable, 0, stringArray.GetPointer());
+    }
+
   return true;
 }
 
 //----------------------------------------------------------------------------
-bool voUtils::transposeTable(vtkTable* table)
+bool voUtils::transposeTable(vtkTable* table, const TransposeOption& transposeOption)
 {
   vtkNew<vtkTable> transposedTable;
-  bool success = voUtils::transposeTable(table, transposedTable.GetPointer());
+  bool success = voUtils::transposeTable(table, transposedTable.GetPointer(), transposeOption);
   if (!success)
     {
     return false;
@@ -200,12 +245,7 @@ vtkStringArray* voUtils::tableColumnNames(vtkTable * table)
   for (int cid = 0; cid < table->GetNumberOfColumns(); ++cid)
     {
     vtkAbstractArray * column = table->GetColumn(cid);
-    vtkStdString name;
-    if (column)
-      {
-      name = column->GetName();
-      }
-    columnNames->SetValue(cid, name);
+    columnNames->SetValue(cid, column->GetName());
     }
   return columnNames;
 }

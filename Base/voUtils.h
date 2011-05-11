@@ -12,9 +12,17 @@ template <class T> class vtkSmartPointer;
 namespace voUtils 
 {
 
-bool transposeTable(vtkTable* srcTable, vtkTable* destTable);
+enum TransposeOption
+  {
+  WithoutHeaders = 0x0,
+  FirstColumnIntoColumnNames = 0x1,
+  ColumnNamesIntoFirstColumn = 0x2,
+  Headers = 0x3,
+  };
 
-bool transposeTable(vtkTable* table);
+bool transposeTable(vtkTable* srcTable, vtkTable* destTable, const TransposeOption& transposeOption = WithoutHeaders);
+
+bool transposeTable(vtkTable* table, const TransposeOption& transposeOption = WithoutHeaders);
 
 bool insertColumnIntoTable(vtkTable * table, int position, vtkAbstractArray * column);
 
