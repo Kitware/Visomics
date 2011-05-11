@@ -60,11 +60,15 @@ void voChartXY::AddPointLabels( std::vector< std::string> labels )
   // Second and Thrid column contains the 2D coordinates
  for ( unsigned int i=0 ; i < rows ; i++ )
     {
+
     std::vector<float> vector;
     vector.push_back(data->GetValue(i,1).ToFloat());
     vector.push_back(data->GetValue(i,2).ToFloat());
-    //std::cout << "Vector values: " << vector[0] << "\t" << vector[1] <<  "\t" << labels[i] << std::endl;
-    coordinateLabelMap[vector] =labels[i];
+    if (i < labels.size())
+      {
+      //std::cout << "Vector values: " << vector[0] << "\t" << vector[1] <<  "\t" << labels[i] << std::endl;
+      this->CoordinateLabelMap[vector] = labels[i];
+      }
     }
 }
 
@@ -99,13 +103,13 @@ void voChartXY::SetTooltipInfo(const vtkContextMouseEvent& mouse,
   //Do something more robust here
 
   std::map<std::vector<float>, std::string>::iterator lowerBoundIterator;
-  lowerBoundIterator = coordinateLabelMap.lower_bound(vector);
+  lowerBoundIterator = this->CoordinateLabelMap.lower_bound(vector);
   std::string lowerBoundFoundLabel = (*lowerBoundIterator).second;
 
   std::string upperBoundFoundLabel;
   std::map<std::vector<float>, std::string>::iterator upperBoundIterator;
-  upperBoundIterator = coordinateLabelMap.upper_bound(vector);
-  if ( upperBoundIterator != coordinateLabelMap.end() )
+  upperBoundIterator = this->CoordinateLabelMap.upper_bound(vector);
+  if ( upperBoundIterator != this->CoordinateLabelMap.end() )
     {
     upperBoundFoundLabel = (*upperBoundIterator).second;
     }
