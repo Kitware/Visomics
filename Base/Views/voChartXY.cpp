@@ -60,11 +60,15 @@ void voChartXY::AddPointLabels( std::vector< std::string> labels )
   // Second and Thrid column contains the 2D coordinates
  for ( unsigned int i=0 ; i < rows ; i++ )
     {
+
     std::vector<float> vector;
     vector.push_back(data->GetValue(i,1).ToFloat());
     vector.push_back(data->GetValue(i,2).ToFloat());
-    //std::cout << "Vector values: " << vector[0] << "\t" << vector[1] <<  "\t" << labels[i] << std::endl;
-    this->CoordinateLabelMap[vector] =labels[i];
+    if (i < labels.size())
+      {
+      //std::cout << "Vector values: " << vector[0] << "\t" << vector[1] <<  "\t" << labels[i] << std::endl;
+      this->CoordinateLabelMap[vector] = labels[i];
+      }
     }
 }
 
