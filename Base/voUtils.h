@@ -18,6 +18,8 @@ bool transposeTable(vtkTable* table);
 
 bool insertColumnIntoTable(vtkTable * table, int position, vtkAbstractArray * column);
 
+vtkStringArray* tableColumnNames(vtkTable * table);
+
 void setTableColumnNames(vtkTable * table, vtkStringArray * columnNames);
 
 bool parseRangeString(const QString& rangeString, QList<int>& rangeList, bool alpha);
