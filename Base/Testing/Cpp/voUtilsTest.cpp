@@ -56,7 +56,7 @@ bool compareArray(vtkArray* array1, vtkArray* array2)
 }
 
 //-----------------------------------------------------------------------------
-bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
+bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2, bool compareArrayType = true)
 {
   if (array1 == 0 && array2 == 0)
     {
@@ -64,6 +64,13 @@ bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
     }
   if (array1 == 0 || array2 == 0)
     {
+    return false;
+    }
+  if (compareArrayType && qstrcmp(array1->GetClassName(), array2->GetClassName()) != 0)
+    {
+    std::cerr << "Compare array Failed !\n"
+              << "\tClassName(array1): " << array1->GetClassName() << "\n"
+              << "\tClassName(array2): " << array2->GetClassName() << std::endl;
     return false;
     }
   if (array1->GetNumberOfTuples() != array2->GetNumberOfTuples())
@@ -114,43 +121,59 @@ bool compareArray(vtkAbstractArray* array1, vtkAbstractArray* array2)
 
 //-----------------------------------------------------------------------------
 // compareTable() does not and should not compare column names
-bool compareTable(vtkTable * table1, vtkTable * table2)
+bool compareTable(int line, vtkTable * outputTable, vtkTable * expectedTable, bool compareArrayType = true)
 {
-  if (table1 == 0 && table2 == 0)
+  bool success = true;
+  if (outputTable == 0 && expectedTable == 0)
     {
     return true;
     }
-  if (table1 == 0 || table2 == 0)
+  if (outputTable == 0 || expectedTable == 0)
     {
-    return false;
+    success = false;
     }
 
-  if (table1->GetNumberOfColumns() != table2->GetNumberOfColumns())
+  if (success && (outputTable->GetNumberOfColumns() != expectedTable->GetNumberOfColumns()))
     {
+    std::cerr << "Line " << line << " - Problem with transposeTable()" << std::endl;
     std::cerr << "Compare table Failed !\n"
-              << "\tNumberOfColumns(table1): " << table1->GetNumberOfColumns() << "\n"
-              << "\tNumberOfColumns(table2): " << table2->GetNumberOfColumns() << std::endl;
-    return false;
+              << "\tNumberOfColumns(outputTable): " << outputTable->GetNumberOfColumns() << "\n"
+              << "\tNumberOfColumns(expectedTable): " << expectedTable->GetNumberOfColumns() << std::endl;
+    success = false;
     }
 
-  if (table1->GetNumberOfRows() != table2->GetNumberOfRows())
+  if (success && (outputTable->GetNumberOfRows() != expectedTable->GetNumberOfRows()))
     {
+    std::cerr << "Line " << line << " - Problem with transposeTable()" << std::endl;
     std::cerr << "Compare table Failed !\n"
-              << "\tNumberOfRows(table1): " << table1->GetNumberOfRows() << "\n"
-              << "\tNumberOfRows(table2): " << table2->GetNumberOfRows() << std::endl;
-    return false;
+              << "\tNumberOfRows(outputTable): " << outputTable->GetNumberOfRows() << "\n"
+              << "\tNumberOfRows(expectedTable): " << expectedTable->GetNumberOfRows() << std::endl;
+    success = false;
     }
 
-  for (int cid = 0; cid < table1->GetNumberOfColumns(); cid++)
+  if (success)
     {
-    if (!compareArray(table1->GetColumn(cid), table2->GetColumn(cid)))
+    for (int cid = 0; cid < outputTable->GetNumberOfColumns(); cid++)
       {
-      std::cerr << "Compare table Failed !\n"
-                << "\tArray in column "<< cid << " are different" << std::endl;
-      return false;
+      if (!compareArray(outputTable->GetColumn(cid), expectedTable->GetColumn(cid), compareArrayType))
+        {
+        std::cerr << "Line " << line << " - Problem with transposeTable()" << std::endl;
+        std::cerr << "Compare table Failed !\n"
+                  << "\tArray in column "<< cid << " are different" << std::endl;
+        success = false;
+        break;
+        }
       }
     }
+  if (!success)
+    {
+    std::cerr << "outputTable:" << std::endl;
+    outputTable->Dump();
 
+    std::cerr << "expectedTable:" << std::endl;
+    expectedTable->Dump();
+    return false;
+    }
 return true;
 }
 
@@ -202,6 +225,44 @@ bool parseRangeStringAlphaTestCase(int line, const QString& inputRangeString, QL
   return true;
 }
 
+//-----------------------------------------------------------------------------
+bool transposeAndCheckResult(int line, const voUtils::TransposeOption& transposeOption,
+                             vtkTable * srcTable, vtkTable * transposedTable,
+                             int expectedNumberOfRows, int expectedNumberOfColumns
+                             /*vtkTable* expectedTransposedTable*/)
+{
+  bool success = voUtils::transposeTable(srcTable, transposedTable, transposeOption);
+  if (!success)
+    {
+    std::cerr << "Line " << line << " - Problem with transposeTable()" << std::endl;
+    }
+  if (success && (transposedTable->GetNumberOfRows() != expectedNumberOfRows))
+    {
+    std::cerr << "Line " << line << " - "
+              << "Problem with transposeTable()\n"
+              << "\tExpectedNumberOfRows: " << expectedNumberOfRows << "\n"
+              << "\tNumberOfRows: " << transposedTable->GetNumberOfRows() << std::endl;
+    success = false;
+    }
+  if (success && (transposedTable->GetNumberOfColumns() != expectedNumberOfColumns))
+    {
+    std::cerr << "Line " << line << " - "
+              << "Problem with transposeTable()\n"
+              << "\tExpectedNumberOfColumns: " << expectedNumberOfColumns << "\n"
+              << "\tNumberOfColumns: " << transposedTable->GetNumberOfColumns() << std::endl;
+    success = false;
+    }
+  if (!success)
+    {
+    std::cerr << "srcTable:" << std::endl;
+    srcTable->Dump();
+    std::cerr << "transposedTable:" << std::endl;
+    transposedTable->Dump();
+    return false;
+    }
+  return true;
+}
+
 } // end anonymous namespace
 
 //-----------------------------------------------------------------------------
@@ -217,6 +278,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   // String column
   vtkNew<vtkStringArray> stringArray;
   stringArray->SetNumberOfValues(5);
+  stringArray->SetName("stringArray");
   stringArray->InsertValue(0, "zero");
   stringArray->InsertValue(1, "one");
   stringArray->InsertValue(2, "two");
@@ -227,6 +289,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   // Integer column
   vtkNew<vtkIntArray> intArray;
   intArray->SetNumberOfValues(5);
+  intArray->SetName("intArray");
   for (int i = 0; i < 5; ++i)
     {
     intArray->InsertValue(i, i);
@@ -236,6 +299,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   // Double column
   vtkNew<vtkDoubleArray> doubleArray;
   doubleArray->SetNumberOfValues(5);
+  doubleArray->SetName("doubleArray");
   for (double i = 0; i < 5; ++i)
     {
     doubleArray->InsertValue(static_cast<int>(i), i + 0.5);
@@ -245,6 +309,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   // Variant column
   vtkNew<vtkVariantArray> variantArray;
   variantArray->SetNumberOfValues(5);
+  variantArray->SetName("variantArray");
   variantArray->InsertValue(0, vtkVariant(0));
   variantArray->InsertValue(1, vtkVariant('1'));
   variantArray->InsertValue(2, vtkVariant(2.5));
@@ -256,16 +321,14 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
 
   // inputTable->Dump();
 
-  if (!compareTable(originalTable.GetPointer(), inputTable.GetPointer()))
+  if (!compareTable(__LINE__, originalTable.GetPointer(), inputTable.GetPointer()))
     {
-    // Tables are expected to be equals
-    std::cerr << "Line " << __LINE__ << " - "
-              << "Problem with compareTable()" << std::endl;
     return EXIT_FAILURE;
     }
 
   //-----------------------------------------------------------------------------
-  // Test transposeTable(vtkTable * srcTable, vtkTable * destTable)
+  // Test transposeTable(vtkTable * srcTable, vtkTable * destTable, const TransposeOption& transposeOption)
+  //  -> transposeOption = WithoutHeaders
   //-----------------------------------------------------------------------------
 
   bool success = voUtils::transposeTable(0, 0);
@@ -277,66 +340,308 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   vtkNew<vtkTable> transpose;
-  success = voUtils::transposeTable(inputTable.GetPointer(), transpose.GetPointer());
-  if (!success)
+  if (!transposeAndCheckResult(__LINE__, voUtils::WithoutHeaders,
+                               /* srcTable= */ inputTable.GetPointer(),
+                               /* transposedTable= */ transpose.GetPointer(),
+                               /* expectedNumberOfRows= */ inputTable->GetNumberOfColumns(),
+                               /* expectedNumberOfColumns= */ inputTable->GetNumberOfRows()))
     {
-    std::cerr << "Line " << __LINE__ << " - "
-              << "Problem with transposeTable()" << std::endl;
-
-    std::cerr << "inputTable:" << std::endl;
-    inputTable->Dump();
-
-    std::cerr << "transpose:" << std::endl;
-    transpose->Dump();
-
-    return EXIT_FAILURE;
-    }
-
-  if (inputTable->GetNumberOfColumns() != transpose->GetNumberOfRows())
-    {
-    std::cerr << "Line " << __LINE__ << " - "
-              << "Problem with transposeTable()\n"
-              << "\tNumberOfColumns(inputTable): " << inputTable->GetNumberOfColumns() << "\n"
-              << "\tNumberOfRows(transpose): " << transpose->GetNumberOfRows() << std::endl;
-
-    std::cerr << "inputTable:" << std::endl;
-    inputTable->Dump();
-
-    std::cerr << "transpose:" << std::endl;
-    transpose->Dump();
-
     return EXIT_FAILURE;
     }
 
   vtkNew<vtkTable> transposeTranspose;
-  success = voUtils::transposeTable(transpose.GetPointer(), transposeTranspose.GetPointer());
-  if (!success)
+  if (!transposeAndCheckResult(__LINE__, voUtils::WithoutHeaders,
+                               /* srcTable= */ transpose.GetPointer(),
+                               /* transposedTable= */ transposeTranspose.GetPointer(),
+                               /* expectedNumberOfRows= */ transpose->GetNumberOfColumns(),
+                               /* expectedNumberOfColumns= */ transpose->GetNumberOfRows()))
     {
-    std::cerr << "Line " << __LINE__ << " - "
-              << "Problem with transposeTable()" << std::endl;
-
-    std::cerr << "transpose:" << std::endl;
-    transpose->Dump();
-
-    std::cerr << "transposeTranspose:" << std::endl;
-    transposeTranspose->Dump();
-
     return EXIT_FAILURE;
     }
 
   // Compare table
-  if (!compareTable(originalTable.GetPointer(), transposeTranspose.GetPointer()))
+  if (!compareTable(__LINE__, originalTable.GetPointer(),
+                    transposeTranspose.GetPointer(),
+                    /* compareArrayType= */ false))
     {
-    // Tables are expected to be equals
-    std::cerr << "Line " << __LINE__ << " - "
-              << "Problem with transposeTable()" << std::endl;
+    return EXIT_FAILURE;
+    }
 
-    std::cerr << "originalTable:" << std::endl;
-    originalTable->Dump();
+  //-----------------------------------------------------------------------------
+  // Test transposeTable(vtkTable * srcTable, vtkTable * destTable, const TransposeOption& transposeOption)
+  //  -> transposeOption = FirstColumnIntoColumnNames
+  //-----------------------------------------------------------------------------
+  vtkNew<vtkTable> transposeFirstColumnIntoColumnNames;
+  if (!transposeAndCheckResult(__LINE__, voUtils::FirstColumnIntoColumnNames,
+                               /* srcTable= */ inputTable.GetPointer(),
+                               /* transposedTable= */ transposeFirstColumnIntoColumnNames.GetPointer(),
+                               /* expectedNumberOfRows= */ inputTable->GetNumberOfColumns() - 1,
+                               /* expectedNumberOfColumns= */ inputTable->GetNumberOfRows()))
+    {
+    return EXIT_FAILURE;
+    }
 
-    std::cerr << "transposeTranspose:" << std::endl;
-    transposeTranspose->Dump();
+  // Expected table
+  vtkNew<vtkTable> expectedTransposeTableFirstColumnIntoColumnNames;
 
+  vtkNew<vtkVariantArray> var0Array;
+  var0Array->SetNumberOfValues(3);
+  var0Array->SetName("zero");
+  var0Array->InsertValue(0, vtkVariant(0));
+  var0Array->InsertValue(1, vtkVariant(0.5));
+  var0Array->InsertValue(2, vtkVariant(0));
+  expectedTransposeTableFirstColumnIntoColumnNames->AddColumn(var0Array.GetPointer());
+
+  vtkNew<vtkVariantArray> var1Array;
+  var1Array->SetNumberOfValues(3);
+  var1Array->SetName("one");
+  var1Array->InsertValue(0, vtkVariant(1));
+  var1Array->InsertValue(1, vtkVariant(1.5));
+  var1Array->InsertValue(2, vtkVariant('1'));
+  expectedTransposeTableFirstColumnIntoColumnNames->AddColumn(var1Array.GetPointer());
+
+  vtkNew<vtkVariantArray> var2Array;
+  var2Array->SetNumberOfValues(3);
+  var2Array->SetName("two");
+  var2Array->InsertValue(0, vtkVariant(2));
+  var2Array->InsertValue(1, vtkVariant(2.5));
+  var2Array->InsertValue(2, vtkVariant(2.5));
+  expectedTransposeTableFirstColumnIntoColumnNames->AddColumn(var2Array.GetPointer());
+
+  vtkNew<vtkVariantArray> var3Array;
+  var3Array->SetNumberOfValues(3);
+  var3Array->SetName("three");
+  var3Array->InsertValue(0, vtkVariant(3));
+  var3Array->InsertValue(1, vtkVariant(3.5));
+  var3Array->InsertValue(2, vtkVariant('3'));
+  expectedTransposeTableFirstColumnIntoColumnNames->AddColumn(var3Array.GetPointer());
+
+  vtkNew<vtkVariantArray> var4Array;
+  var4Array->SetNumberOfValues(3);
+  var4Array->SetName("four");
+  var4Array->InsertValue(0, vtkVariant(4));
+  var4Array->InsertValue(1, vtkVariant(4.5));
+  var4Array->InsertValue(2, vtkVariant("four"));
+  expectedTransposeTableFirstColumnIntoColumnNames->AddColumn(var4Array.GetPointer());
+
+  // Compare table
+  if (!compareTable(__LINE__, transposeFirstColumnIntoColumnNames.GetPointer(), expectedTransposeTableFirstColumnIntoColumnNames.GetPointer()))
+    {
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
+  // Test transposeTable(vtkTable * srcTable, vtkTable * destTable, const TransposeOption& transposeOption)
+  //  -> transposeOption = ColumnNamesIntoFirstColumn
+  //-----------------------------------------------------------------------------
+
+  vtkNew<vtkTable> transposeColumnNamesIntoFirstColumn;
+  if (!transposeAndCheckResult(__LINE__, voUtils::ColumnNamesIntoFirstColumn,
+                               /* srcTable= */ inputTable.GetPointer(),
+                               /* transposedTable= */ transposeColumnNamesIntoFirstColumn.GetPointer(),
+                               /* expectedNumberOfRows= */ inputTable->GetNumberOfColumns(),
+                               /* expectedNumberOfColumns= */ inputTable->GetNumberOfRows() + 1))
+    {
+    return EXIT_FAILURE;
+    }
+
+  // Expected table
+  vtkNew<vtkTable> expectedTransposeTableColumnNamesIntoFirstColumn;
+
+  vtkNew<vtkVariantArray> stringArray2;
+  stringArray2->SetNumberOfValues(4);
+  stringArray2->InsertValue(0, vtkVariant("stringArray"));
+  stringArray2->InsertValue(1, vtkVariant("intArray"));
+  stringArray2->InsertValue(2, vtkVariant("doubleArray"));
+  stringArray2->InsertValue(3, vtkVariant("variantArray"));
+  expectedTransposeTableColumnNamesIntoFirstColumn->AddColumn(stringArray2.GetPointer());
+
+  vtkNew<vtkVariantArray> var0Array2;
+  var0Array2->SetNumberOfValues(4);
+  var0Array2->InsertValue(0, vtkVariant("zero"));
+  var0Array2->InsertValue(1, vtkVariant(0));
+  var0Array2->InsertValue(2, vtkVariant(0.5));
+  var0Array2->InsertValue(3, vtkVariant(0));
+  expectedTransposeTableColumnNamesIntoFirstColumn->AddColumn(var0Array2.GetPointer());
+
+  vtkNew<vtkVariantArray> var1Array2;
+  var1Array2->SetNumberOfValues(4);
+  var1Array2->InsertValue(0, vtkVariant("one"));
+  var1Array2->InsertValue(1, vtkVariant(1));
+  var1Array2->InsertValue(2, vtkVariant(1.5));
+  var1Array2->InsertValue(3, vtkVariant('1'));
+  expectedTransposeTableColumnNamesIntoFirstColumn->AddColumn(var1Array2.GetPointer());
+
+  vtkNew<vtkVariantArray> var2Array2;
+  var2Array2->SetNumberOfValues(4);
+  var2Array2->InsertValue(0, vtkVariant("two"));
+  var2Array2->InsertValue(1, vtkVariant(2));
+  var2Array2->InsertValue(2, vtkVariant(2.5));
+  var2Array2->InsertValue(3, vtkVariant(2.5));
+  expectedTransposeTableColumnNamesIntoFirstColumn->AddColumn(var2Array2.GetPointer());
+
+  vtkNew<vtkVariantArray> var3Array2;
+  var3Array2->SetNumberOfValues(4);
+  var3Array2->InsertValue(0, vtkVariant("three"));
+  var3Array2->InsertValue(1, vtkVariant(3));
+  var3Array2->InsertValue(2, vtkVariant(3.5));
+  var3Array2->InsertValue(3, vtkVariant('3'));
+  expectedTransposeTableColumnNamesIntoFirstColumn->AddColumn(var3Array2.GetPointer());
+
+  vtkNew<vtkVariantArray> var4Array2;
+  var4Array2->SetNumberOfValues(4);
+  var4Array2->InsertValue(0, vtkVariant("four"));
+  var4Array2->InsertValue(1, vtkVariant(4));
+  var4Array2->InsertValue(2, vtkVariant(4.5));
+  var4Array2->InsertValue(3, vtkVariant("four"));
+  expectedTransposeTableColumnNamesIntoFirstColumn->AddColumn(var4Array2.GetPointer());
+
+  // Compare table
+  if (!compareTable(__LINE__, transposeColumnNamesIntoFirstColumn.GetPointer(),
+                    expectedTransposeTableColumnNamesIntoFirstColumn.GetPointer(),
+                    /* compareArrayType= */ false))
+    {
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
+  // Test transposeTable(vtkTable * srcTable, vtkTable * destTable, const TransposeOption& transposeOption)
+  //  -> transposeOption = Headers
+  //-----------------------------------------------------------------------------
+  vtkNew<vtkTable> transposeHeaders;
+  if (!transposeAndCheckResult(__LINE__, voUtils::Headers,
+                               /* srcTable= */ inputTable.GetPointer(),
+                               /* transposedTable= */ transposeHeaders.GetPointer(),
+                               /* expectedNumberOfRows= */ inputTable->GetNumberOfColumns() - 1,
+                               /* expectedNumberOfColumns= */ inputTable->GetNumberOfRows() + 1))
+    {
+    return EXIT_FAILURE;
+    }
+
+  // Expected table
+  vtkNew<vtkTable> expectedTransposeTableHeaders;
+
+  vtkNew<vtkVariantArray> stringArray3;
+  stringArray3->SetNumberOfValues(3);
+  stringArray3->SetName("stringArray");
+  stringArray3->InsertValue(0, vtkVariant("intArray"));
+  stringArray3->InsertValue(1, vtkVariant("doubleArray"));
+  stringArray3->InsertValue(2, vtkVariant("variantArray"));
+  expectedTransposeTableHeaders->AddColumn(stringArray3.GetPointer());
+
+  vtkNew<vtkVariantArray> var0Array3;
+  var0Array3->SetNumberOfValues(3);
+  var0Array3->SetName("zero");
+  var0Array3->InsertValue(0, vtkVariant(0));
+  var0Array3->InsertValue(1, vtkVariant(0.5));
+  var0Array3->InsertValue(2, vtkVariant(0));
+  expectedTransposeTableHeaders->AddColumn(var0Array3.GetPointer());
+
+  vtkNew<vtkVariantArray> var1Array3;
+  var1Array3->SetNumberOfValues(3);
+  var1Array3->SetName("one");
+  var1Array3->InsertValue(0, vtkVariant(1));
+  var1Array3->InsertValue(1, vtkVariant(1.5));
+  var1Array3->InsertValue(2, vtkVariant('1'));
+  expectedTransposeTableHeaders->AddColumn(var1Array3.GetPointer());
+
+  vtkNew<vtkVariantArray> var2Array3;
+  var2Array3->SetNumberOfValues(3);
+  var2Array3->SetName("two");
+  var2Array3->InsertValue(0, vtkVariant(2));
+  var2Array3->InsertValue(1, vtkVariant(2.5));
+  var2Array3->InsertValue(2, vtkVariant(2.5));
+  expectedTransposeTableHeaders->AddColumn(var2Array3.GetPointer());
+
+  vtkNew<vtkVariantArray> var3Array3;
+  var3Array3->SetNumberOfValues(3);
+  var3Array3->SetName("three");
+  var3Array3->InsertValue(0, vtkVariant(3));
+  var3Array3->InsertValue(1, vtkVariant(3.5));
+  var3Array3->InsertValue(2, vtkVariant('3'));
+  expectedTransposeTableHeaders->AddColumn(var3Array3.GetPointer());
+
+  vtkNew<vtkVariantArray> var4Array3;
+  var4Array3->SetNumberOfValues(3);
+  var4Array3->SetName("four");
+  var4Array3->InsertValue(0, vtkVariant(4));
+  var4Array3->InsertValue(1, vtkVariant(4.5));
+  var4Array3->InsertValue(2, vtkVariant("four"));
+  expectedTransposeTableHeaders->AddColumn(var4Array3.GetPointer());
+
+  // Compare table
+  if (!compareTable(__LINE__, transposeHeaders.GetPointer(),
+                    expectedTransposeTableHeaders.GetPointer(),
+                    /* compareArrayType= */ false))
+    {
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
+  // Test transposeTable(vtkTable * srcTable, vtkTable * destTable, const TransposeOption& transposeOption)
+  //  -> transposeOption = Headers + Check array type
+  //-----------------------------------------------------------------------------
+
+  vtkNew<vtkTable> inputDoubleTableWithHeaderColumn;
+
+  vtkNew<vtkStringArray> rowLabelArray;
+  rowLabelArray->SetNumberOfValues(5);
+  rowLabelArray->SetName("rowLabels");
+  for (int rid = 0; rid < 5; ++rid)
+    {
+    rowLabelArray->InsertValue(rid, QString("row%1").arg(rid).toLatin1());
+    }
+  inputDoubleTableWithHeaderColumn->AddColumn(rowLabelArray.GetPointer());
+  for (int cid = 1; cid < 4; ++cid)
+    {
+    vtkNew<vtkDoubleArray> doubleArray;
+    doubleArray->SetNumberOfValues(5);
+    doubleArray->SetName(QString("doubleArray%1").arg(cid).toLatin1());
+    for (int rid = 0; rid < 5; ++rid)
+      {
+      doubleArray->InsertValue(rid, cid + rid + 0.5);
+      }
+    inputDoubleTableWithHeaderColumn->AddColumn(doubleArray.GetPointer());
+    }
+  inputDoubleTableWithHeaderColumn->Dump();
+
+  vtkNew<vtkTable> transposedDoubleTableWithHeaderColumn;
+  if (!transposeAndCheckResult(__LINE__, voUtils::Headers,
+                               /* srcTable= */ inputDoubleTableWithHeaderColumn.GetPointer(),
+                               /* transposedTable= */ transposedDoubleTableWithHeaderColumn.GetPointer(),
+                               /* expectedNumberOfRows= */ inputTable->GetNumberOfColumns() - 1,
+                               /* expectedNumberOfColumns= */ inputTable->GetNumberOfRows() + 1))
+    {
+    return EXIT_FAILURE;
+    }
+
+  vtkNew<vtkTable> expectedTransposeDoubleTableWithHeaderColumn;
+
+  vtkNew<vtkStringArray> rowLabelArray2;
+  rowLabelArray2->SetNumberOfValues(3);
+  rowLabelArray2->SetName("rowLabels");
+  for (int rid = 0; rid < 3; ++rid)
+    {
+    rowLabelArray2->InsertValue(rid, QString("doubleArray%1").arg(rid + 1).toLatin1());
+    }
+  expectedTransposeDoubleTableWithHeaderColumn->AddColumn(rowLabelArray2.GetPointer());
+  for (int cid = 0; cid < 5; ++cid)
+    {
+    vtkNew<vtkDoubleArray> doubleArray;
+    doubleArray->SetNumberOfValues(3);
+    doubleArray->SetName(QString("row%1").arg(cid).toLatin1());
+    for (int rid = 0; rid < 3; ++rid)
+      {
+      doubleArray->SetValue(rid, cid + 1 + rid + 0.5);
+      }
+    expectedTransposeDoubleTableWithHeaderColumn->AddColumn(doubleArray.GetPointer());
+    }
+
+  // Compare table
+  if (!compareTable(__LINE__, transposedDoubleTableWithHeaderColumn.GetPointer(),
+                    expectedTransposeDoubleTableWithHeaderColumn.GetPointer(),
+                    /* compareArrayType= */ true))
+    {
     return EXIT_FAILURE;
     }
 
@@ -356,18 +661,8 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   // Compare table
-  if (!compareTable(testTranspose.GetPointer(), transpose.GetPointer()))
+  if (!compareTable(__LINE__, testTranspose.GetPointer(), transpose.GetPointer()))
     {
-    // Tables are expected to be equals
-    std::cerr << "Line " << __LINE__ << " - "
-              << "Problem with transposeTable()" << std::endl;
-
-    std::cerr << "testTranspose:" << std::endl;
-    testTranspose->Dump();
-
-    std::cerr << "transpose:" << std::endl;
-    transpose->Dump();
-
     return EXIT_FAILURE;
     }
 
@@ -380,18 +675,10 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   // Compare table
-  if (!compareTable(originalTable.GetPointer(), testTranspose.GetPointer()))
+  if (!compareTable(__LINE__, originalTable.GetPointer(),
+                    testTranspose.GetPointer(),
+                    /* compareArrayType= */ false))
     {
-    // Tables are expected to be equals
-    std::cerr << "Line " << __LINE__ << " - "
-              << "Problem with transposeTable()" << std::endl;
-
-    std::cerr << "originalTable:" << std::endl;
-    originalTable->Dump();
-
-    std::cerr << "testTranspose:" << std::endl;
-    testTranspose->Dump();
-
     return EXIT_FAILURE;
     }
 
@@ -451,18 +738,8 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   // Compare table
-  if (!compareTable(insertTableTest.GetPointer(), insertTableTest1.GetPointer()))
+  if (!compareTable(__LINE__, insertTableTest.GetPointer(), insertTableTest1.GetPointer()))
     {
-    // Tables are expected to be equals
-    std::cerr << "Line " << __LINE__ << " - "
-              << "Problem with transposeTable()" << std::endl;
-
-    std::cerr << "insertTableTest:" << std::endl;
-    insertTableTest->Dump();
-
-    std::cerr << "insertTableTest1:" << std::endl;
-    insertTableTest1->Dump();
-
     return EXIT_FAILURE;
     }
 
@@ -488,7 +765,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   success = voUtils::insertColumnIntoTable(insertTableTest1.GetPointer(), -10, stringArraytoInsert.GetPointer());
-  if (!success)
+  if (!success)/*compareArrayType=*/
     {
     std::cerr << "Line " << __LINE__ << " - "
               << "Problem with insertColumnIntoTable()" << std::endl;
@@ -819,13 +1096,12 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   voUtils::tableToArray(0, convertedIntColumns, intColumns); // Passing a Null source array shouldn't crash
   voUtils::tableToArray(inputTable.GetPointer(), convertedIntColumns, intColumns);
 
-  vtkArray * expectedIntArray = vtkArray::CreateArray(vtkArray::DENSE, VTK_UNSIGNED_INT);
+  vtkArray * expectedIntArray = vtkArray::CreateArray(vtkArray::DENSE, VTK_INT);
   expectedIntArray->Resize(vtkArrayRange(0, 5));
   for (vtkArray::SizeT i = 0; i < 5; ++i)
     {
     expectedIntArray->SetVariantValueN(i, i);
     }
-
   if (!compareArray(convertedIntColumns.GetPointer(), expectedIntArray))
     {
     std::cerr << "Line " << __LINE__ << " - Problem with tableToArray method !" << std::endl;
@@ -861,9 +1137,9 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   voUtils::arrayToTable(arrayToTableTestArray, arrayToTableTestTable.GetPointer());
 
   // Compare arrayToTable converted table to table build directly from 1D arrays (created in prior test)
-  if (!compareTable(insertTableTest.GetPointer(), arrayToTableTestTable.GetPointer()))
+  if (!compareTable(__LINE__, insertTableTest.GetPointer(),
+                    arrayToTableTestTable.GetPointer(), /* comparetype= */ false))
     {
-    std::cerr << "Line " << __LINE__ << " - Problem with arrayToTable method !" << std::endl;
     return EXIT_FAILURE;
     }
 
