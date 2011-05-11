@@ -1,11 +1,12 @@
-// QT includes
-#include <QLayout>
+// Qt includes
 #include <QDebug>
+#include <QLayout>
 #include <QMap>
 
 // Visomics includes
-#include "voPCABarPlot.h"
 #include "voDataObject.h"
+#include "voPCABarPlot.h"
+#include "voUtils.h"
 
 // VTK includes
 #include <QVTKWidget.h>
@@ -14,6 +15,7 @@
 #include <vtkContext2D.h>
 #include <vtkContextScene.h>
 #include <vtkContextView.h>
+#include <vtkNew.h>
 #include <vtkPlot.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -94,27 +96,8 @@ void voPCABarPlot::setDataObject(voDataObject *dataObject)
   // Transpose table - this is pretty much unavoidable: vtkPlot expects each dimension
   // to be a column, but the information should be presented to the user with each
   // data point (principle component) in its own column
-  vtkSmartPointer<vtkTable> transpose = vtkSmartPointer<vtkTable>::New();
-  // Note: dont actually need to keep header, but will for consistancy
-  vtkSmartPointer<vtkStringArray> header = vtkSmartPointer<vtkStringArray>::New();
-  header->SetName("header");
-  header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
-  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-    {
-    header->SetValue(c-1, table->GetColumnName(c));
-    }
-  transpose->AddColumn(header);
-  for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
-    {
-    vtkSmartPointer<vtkDoubleArray> newcol = vtkSmartPointer<vtkDoubleArray>::New();
-    newcol->SetName(table->GetValue(r, 0).ToString().c_str());
-    newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
-    for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-      {
-      newcol->SetValue(c-1, table->GetValue(r, c).ToDouble());
-      }
-    transpose->AddColumn(newcol);
-    }
+  vtkNew<vtkTable> transpose;
+  voUtils::transposeTable(table, transpose.GetPointer(), voUtils::Headers);
 
   unsigned char colors[10][3] =
     {
