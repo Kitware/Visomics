@@ -12,6 +12,7 @@
 // Visomics include
 #include "voAnalysis.h"
 #include "voDataObject.h"
+#include "voIOManager.h"
 
 // --------------------------------------------------------------------------
 class voAnalysisPrivate
@@ -445,7 +446,12 @@ void voAnalysis::setAbortExecution(bool abortExecutionValue)
 // --------------------------------------------------------------------------
 bool voAnalysis::run()
 {
-  return this->execute();
+  bool success = this->execute();
+//  if (success)
+//    {
+//    voIOManager::writeAnalysisOutputsToCVSFiles(this);
+//    }
+  return success;
 }
 
 // --------------------------------------------------------------------------

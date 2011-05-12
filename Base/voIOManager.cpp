@@ -4,6 +4,7 @@
 #include <QDebug>
 
 // Visomics includes
+#include "voAnalysis.h"
 #include "voApplication.h"
 #include "voDataModel.h"
 #include "voDataModelItem.h"
@@ -15,18 +16,20 @@
 
 // VTK includes
 #include <vtkDelimitedTextReader.h>
+#include <vtkDelimitedTextWriter.h>
 #include <vtkDoubleArray.h>
+#include <vtkGenericDataObjectWriter.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 
 // --------------------------------------------------------------------------
-void voIOManager::readCSVFileIntoTable(const QString& fileName, vtkTable * outputTable, const voDelimitedTextImportSettings& settings)
+bool voIOManager::readCSVFileIntoTable(const QString& fileName, vtkTable * outputTable, const voDelimitedTextImportSettings& settings)
 {
   if (!outputTable)
     {
-    return;
+    return false;
     }
 
   vtkNew<vtkDelimitedTextReader> reader;
@@ -47,6 +50,40 @@ void voIOManager::readCSVFileIntoTable(const QString& fileName, vtkTable * outpu
   reader->Update();
 
   outputTable->ShallowCopy(reader->GetOutput());
+
+  return true;
+}
+
+// --------------------------------------------------------------------------
+bool voIOManager::writeTableToCVSFile(vtkTable* table, const QString& fileName)
+{
+  if (!table)
+    {
+    return false;
+    }
+  if (!QFile::exists(fileName))
+    {
+    return false;
+    }
+
+  vtkNew<vtkDelimitedTextWriter> writer;
+
+  voDelimitedTextImportSettings settings;
+
+  // Configure writer
+  writer->SetFieldDelimiter(
+        settings.value(voDelimitedTextImportSettings::FieldDelimiterCharacters).toString().toLatin1());
+  writer->SetStringDelimiter(
+        QString(settings.value(voDelimitedTextImportSettings::StringDelimiter).toChar()).toLatin1());
+  writer->SetUseStringDelimiter(
+        settings.value(voDelimitedTextImportSettings::UseStringDelimiter).toBool());
+
+  writer->SetFileName(fileName.toLatin1());
+
+  writer->SetInput(table);
+  writer->Update();
+
+  return true;
 }
 
 // --------------------------------------------------------------------------
@@ -238,4 +275,20 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
   model->setSelected(newItem);
 
   //extendedTable->Dump();
+}
+
+// --------------------------------------------------------------------------
+bool voIOManager::writeDataObjectToFile(vtkDataObject * dataObject, const QString& fileName)
+{
+  if (!dataObject)
+    {
+    return false;
+    }
+
+  vtkNew<vtkGenericDataObjectWriter> dataWriter;
+  dataWriter->SetFileName(fileName.toLatin1());
+  dataWriter->SetInput(dataObject);
+  dataWriter->Update();
+
+  return true;
 }
