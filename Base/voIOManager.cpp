@@ -204,8 +204,11 @@ void voIOManager::fillExtendedTable(vtkTable* sourceTable, vtkExtendedTable* des
       settings.value(voDelimitedTextImportSettings::NormalizationMethod).toString();
 
   // Normalize
-  voApplication::application()->normalizerRegistry()->applyNormalization(
-        normalizationMethod, destTable->GetData(), settings);
+  if (voApplication::application())
+    {
+    voApplication::application()->normalizerRegistry()->applyNormalization(
+          normalizationMethod, destTable->GetData(), settings);
+    }
 
   //destTable->GetData()->Dump();
 }
