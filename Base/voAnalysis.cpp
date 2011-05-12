@@ -104,6 +104,15 @@ QString voAnalysis::uuid()const
 namespace
 {
 // --------------------------------------------------------------------------
+bool checkIfEmpty(const char* className, const char* funcName,
+                  const char* varName, const QString& value)
+{
+  // Check for spaces
+  QString msg = QObject::tr("voAnalysis::%1 [%2]- Parameter %3 shouldn't be empty !");
+  if (value.trimmed().isEmpty()){ qCritical() << msg.arg(funcName, className, varName); return true; }
+  return false;
+}
+// --------------------------------------------------------------------------
 void checkForSpaces(const char* className, const char* funcName,
                     const char* varName, const QString& value)
 {
@@ -132,6 +141,12 @@ void voAnalysis::addInputType(const QString& inputName, const QString& inputType
   checkForSpaces(className, "addInputType", "inputName", inputName);
   checkForSpaces(className, "addInputType", "inputType", inputType);
 
+  if (checkIfEmpty(className, "addInputType", "inputName", inputName) ||
+      checkIfEmpty(className, "addInputType", "inputType", inputType))
+    {
+    return;
+    }
+
   if (this->hasInput(inputName))
     {
     return;
@@ -154,7 +169,6 @@ QString voAnalysis::inputType(const QString& inputName) const
 int voAnalysis::numberOfInput()
 {
   Q_D(const voAnalysis);
-  this->initializeInputInformation();
   return d->InputInformation.count();
 }
 
@@ -220,6 +234,13 @@ void voAnalysis::addOutputType(const QString& outputName, const QString& outputT
   checkForSpaces(className, "addOutputType", "viewType", viewType);
   checkForSpaces(className, "addOutputType", "rawViewType", rawViewType);
 
+  if (checkIfEmpty(className, "addOutputType", "outputName", outputName) ||
+      checkIfEmpty(className, "addOutputType", "outputType", outputType) ||
+      checkIfEmpty(className, "addOutputType", "viewType", viewType))
+    {
+    return;
+    }
+
   if (this->hasOutput(outputName))
     {
     return;
@@ -270,7 +291,6 @@ QString voAnalysis::viewPrettyName(const QString& outputName, const QString& vie
 int voAnalysis::numberOfOutput()
 {
   Q_D(const voAnalysis);
-  this->initializeOutputInformation();
   return d->OutputInformation.count();
 }
 
@@ -292,11 +312,17 @@ bool voAnalysis::hasOutput(const QString& outputName)const
 void voAnalysis::setOutput(const QString& outputName, voDataObject * dataObject)
 {
   Q_D(voAnalysis);
-  if (!this->hasOutput(outputName))
+  if (!dataObject ||
+      !this->hasOutput(outputName))
     {
     return;
     }
-  Q_ASSERT(outputName == dataObject->name());
+  if (outputName != dataObject->name())
+    {
+    qCritical() << tr("voAnalysis::setOutput [%1]- outputName [%2] doesn't match dataObject name [%3] !")
+                   .arg(this->metaObject()->className()).arg(outputName).arg(dataObject->name());
+    return;
+    }
   d->OutputDataObjects.insert(outputName, QExplicitlySharedDataPointer<voDataObject>(dataObject));
 
   emit this->outputSet(outputName, dataObject, this);

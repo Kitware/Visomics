@@ -2,6 +2,7 @@
 SET(KIT ${PROJECT_NAME})
 
 CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
+  voAnalysisTest.cpp
   voUtilsTest.cpp
   vtkExtendedTableTest.cpp
   )
@@ -19,6 +20,7 @@ MACRO(SIMPLE_TEST TESTNAME)
   #SET_PROPERTY(TEST ${TESTNAME} PROPERTY LABELS ${PROJECT_NAME})
 ENDMACRO()
 
+SIMPLE_TEST(voAnalysisTest)
 SIMPLE_TEST(voUtilsTest)
 SIMPLE_TEST(vtkExtendedTableTest)
 
