@@ -235,8 +235,7 @@ void voAnalysis::addOutputType(const QString& outputName, const QString& outputT
   checkForSpaces(className, "addOutputType", "rawViewType", rawViewType);
 
   if (checkIfEmpty(className, "addOutputType", "outputName", outputName) ||
-      checkIfEmpty(className, "addOutputType", "outputType", outputType) ||
-      checkIfEmpty(className, "addOutputType", "viewType", viewType))
+      checkIfEmpty(className, "addOutputType", "outputType", outputType))
     {
     return;
     }
@@ -247,7 +246,15 @@ void voAnalysis::addOutputType(const QString& outputName, const QString& outputT
     }
   d->OutputInformation.insert(outputName, outputType);
 
-  d->OutputViewInformation.insertMulti(outputName, viewType);
+  if (!viewType.isEmpty())
+    {
+    d->OutputViewInformation.insertMulti(outputName, viewType);
+
+    if (!viewPrettyName.isEmpty())
+      {
+      d->OutputViewPrettyName.insert(outputName + viewType, viewPrettyName);
+      }
+    }
 
   if (!rawViewType.isEmpty())
     {
@@ -257,11 +264,6 @@ void voAnalysis::addOutputType(const QString& outputName, const QString& outputT
       {
       d->OutputRawViewPrettyName.insert(outputName + rawViewType, rawViewPrettyName);
       }
-    }
-
-  if (!viewPrettyName.isEmpty())
-    {
-    d->OutputViewPrettyName.insert(outputName + viewType, viewPrettyName);
     }
 }
 

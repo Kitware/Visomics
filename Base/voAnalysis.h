@@ -44,7 +44,8 @@ public:
 
 
   void addOutputType(const QString& outputName, const QString& outputType,
-                     const QString& viewType, const QString& viewPrettyName,
+                     const QString& viewType = QString(),
+                     const QString& viewPrettyName = QString(),
                      const QString& rawViewType = QString(),
                      const QString& rawViewPrettyName = QString());
 
