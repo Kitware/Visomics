@@ -22,9 +22,12 @@
 #include <vtkTable.h>
 
 // --------------------------------------------------------------------------
-void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImportSettings& settings)
+void voIOManager::readCSVFileIntoTable(const QString& fileName, vtkTable * outputTable, const voDelimitedTextImportSettings& settings)
 {
-  // settings.printAdditionalInfo();
+  if (!outputTable)
+    {
+    return;
+    }
 
   vtkNew<vtkDelimitedTextReader> reader;
   reader->SetFileName(fileName.toLatin1());
@@ -43,13 +46,18 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
   // Read data
   reader->Update();
 
-  vtkTable* table = reader->GetOutput();
+  outputTable->ShallowCopy(reader->GetOutput());
+}
 
+// --------------------------------------------------------------------------
+void voIOManager::fillExtendedTable(vtkTable* sourceTable, vtkExtendedTable* destTable,
+                                    const voDelimitedTextImportSettings& settings)
+{
   // vtkExtendedTable settings
   bool transpose = settings.value(voDelimitedTextImportSettings::Transpose).toBool();
   if (transpose)
     {
-    voUtils::transposeTable(table);
+    voUtils::transposeTable(sourceTable);
     }
 
   int numberOfRowMetaDataTypes =
@@ -57,15 +65,15 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
   int numberOfColumnMetaDataTypes =
       settings.value(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes).toInt();
 
-  Q_ASSERT(numberOfColumnMetaDataTypes <= table->GetNumberOfRows());
+  Q_ASSERT(numberOfColumnMetaDataTypes <= sourceTable->GetNumberOfRows());
 
-  //table->Dump();
+  //sourceTable->Dump();
 
   // ColumnMetaData
   vtkNew<vtkTable> columnMetaData;
-  for (int cid = numberOfRowMetaDataTypes; cid < table->GetNumberOfColumns(); ++cid)
+  for (int cid = numberOfRowMetaDataTypes; cid < sourceTable->GetNumberOfColumns(); ++cid)
     {
-    vtkStringArray * column = vtkStringArray::SafeDownCast(table->GetColumn(cid));
+    vtkStringArray * column = vtkStringArray::SafeDownCast(sourceTable->GetColumn(cid));
     Q_ASSERT(column);
     for (int rid = 0; rid < numberOfColumnMetaDataTypes; ++rid)
       {
@@ -73,7 +81,7 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
       if (cid == numberOfRowMetaDataTypes)
         {
         newColumn = vtkSmartPointer<vtkStringArray>::New();
-        newColumn->SetNumberOfValues(table->GetNumberOfColumns() - numberOfRowMetaDataTypes);
+        newColumn->SetNumberOfValues(sourceTable->GetNumberOfColumns() - numberOfRowMetaDataTypes);
         columnMetaData->AddColumn(newColumn);
         }
       else
@@ -94,16 +102,16 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
     {
     for (int rid = 0; rid < numberOfColumnMetaDataTypes; rid++)
       {
-      columnMetaDataLabels->InsertNextValue(table->GetValue(rid, 0).ToString());
+      columnMetaDataLabels->InsertNextValue(sourceTable->GetValue(rid, 0).ToString());
       }
     }
 
   // RowMetaData
   vtkNew<vtkTable> rowMetaData;
-  Q_ASSERT(numberOfRowMetaDataTypes <= table->GetNumberOfColumns());
+  Q_ASSERT(numberOfRowMetaDataTypes <= sourceTable->GetNumberOfColumns());
   for (int cid = 0; cid < numberOfRowMetaDataTypes; ++cid)
     {
-    vtkStringArray * column = vtkStringArray::SafeDownCast(table->GetColumn(cid));
+    vtkStringArray * column = vtkStringArray::SafeDownCast(sourceTable->GetColumn(cid));
     Q_ASSERT(column);
     for (int rid = numberOfColumnMetaDataTypes; rid < column->GetNumberOfValues(); ++rid)
       {
@@ -111,7 +119,7 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
       if (rid == numberOfColumnMetaDataTypes)
         {
         newColumn = vtkSmartPointer<vtkStringArray>::New();
-        newColumn->SetNumberOfValues(table->GetNumberOfRows() - numberOfColumnMetaDataTypes);
+        newColumn->SetNumberOfValues(sourceTable->GetNumberOfRows() - numberOfColumnMetaDataTypes);
         rowMetaData->AddColumn(newColumn);
         }
       else
@@ -132,15 +140,15 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
     {
     for (int cid = 0; cid < numberOfRowMetaDataTypes; cid++)
       {
-      rowMetaDataLabels->InsertNextValue(table->GetValue(0, cid).ToString());
+      rowMetaDataLabels->InsertNextValue(sourceTable->GetValue(0, cid).ToString());
       }
     }
 
   // Data
   vtkNew<vtkTable> data;
-  for (int cid = numberOfRowMetaDataTypes; cid < table->GetNumberOfColumns(); ++cid)
+  for (int cid = numberOfRowMetaDataTypes; cid < sourceTable->GetNumberOfColumns(); ++cid)
     {
-    vtkStringArray * column = vtkStringArray::SafeDownCast(table->GetColumn(cid));
+    vtkStringArray * column = vtkStringArray::SafeDownCast(sourceTable->GetColumn(cid));
     Q_ASSERT(column);
     for (int rid = numberOfColumnMetaDataTypes; rid < column->GetNumberOfValues(); ++rid)
       {
@@ -148,7 +156,7 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
       if (rid == numberOfColumnMetaDataTypes)
         {
         newColumn = vtkSmartPointer<vtkDoubleArray>::New();
-        newColumn->SetNumberOfValues(table->GetNumberOfRows() - numberOfColumnMetaDataTypes);
+        newColumn->SetNumberOfValues(sourceTable->GetNumberOfRows() - numberOfColumnMetaDataTypes);
         data->AddColumn(newColumn);
         }
       else
@@ -162,22 +170,13 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
       double doubleValue = vtkVariant(value).ToDouble(&ok);
       if (!ok)
         {
-        qCritical() << "Problem loading file" << fileName
-                    << " - data at column" << cid << "and row" << rid << "is not a numeric value !"
+        qCritical() << "Data at column" << cid << "and row" << rid << "is not a numeric value !"
                     << " - Defaulting to 0";
         doubleValue = 0;
         }
       newColumn->SetValue(rid - numberOfColumnMetaDataTypes, doubleValue);
       }
     }
-
-  // NormalizationMethod
-  QString normalizationMethod =
-      settings.value(voDelimitedTextImportSettings::NormalizationMethod).toString();
-
-  // Normalize
-  voApplication::application()->normalizerRegistry()->applyNormalization(
-        normalizationMethod, data.GetPointer(), settings);
 
   //data->Dump();
 
@@ -189,17 +188,38 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
   int rowMetaDataTypeOfInterest =
       settings.value(voDelimitedTextImportSettings::RowMetaDataTypeOfInterest).toInt();
 
-  vtkNew<vtkExtendedTable> extendedTable;
-  extendedTable->SetColumnMetaDataTable(columnMetaData.GetPointer());
-  extendedTable->SetRowMetaDataTable(rowMetaData.GetPointer());
-  extendedTable->SetData(data.GetPointer());
-  extendedTable->SetColumnMetaDataTypeOfInterest(columnMetaDataTypeOfInterest);
-  extendedTable->SetRowMetaDataTypeOfInterest(rowMetaDataTypeOfInterest);
-  extendedTable->SetColumnMetaDataLabels(columnMetaDataLabels.GetPointer());
-  extendedTable->SetRowMetaDataLabels(rowMetaDataLabels.GetPointer());
+  destTable->SetColumnMetaDataTable(columnMetaData.GetPointer());
+  destTable->SetRowMetaDataTable(rowMetaData.GetPointer());
+  destTable->SetData(data.GetPointer());
+  destTable->SetColumnMetaDataTypeOfInterest(columnMetaDataTypeOfInterest);
+  destTable->SetRowMetaDataTypeOfInterest(rowMetaDataTypeOfInterest);
+  destTable->SetColumnMetaDataLabels(columnMetaDataLabels.GetPointer());
+  destTable->SetRowMetaDataLabels(rowMetaDataLabels.GetPointer());
 
   // Set column names
-  voUtils::setTableColumnNames(extendedTable->GetData(), extendedTable->GetColumnMetaDataOfInterestAsString());
+  voUtils::setTableColumnNames(destTable->GetData(), destTable->GetColumnMetaDataOfInterestAsString());
+
+  // NormalizationMethod
+  QString normalizationMethod =
+      settings.value(voDelimitedTextImportSettings::NormalizationMethod).toString();
+
+  // Normalize
+  voApplication::application()->normalizerRegistry()->applyNormalization(
+        normalizationMethod, destTable->GetData(), settings);
+
+  //destTable->GetData()->Dump();
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImportSettings& settings)
+{
+  // settings.printAdditionalInfo();
+
+  vtkNew<vtkTable> table;
+  Self::readCSVFileIntoTable(fileName, table.GetPointer(), settings);
+
+  vtkNew<vtkExtendedTable> extendedTable;
+  Self::fillExtendedTable(table.GetPointer(), extendedTable.GetPointer(), settings);
 
   voInputFileDataObject * dataObject = new voInputFileDataObject();
   dataObject->setData(extendedTable.GetPointer());
