@@ -1,9 +1,11 @@
 
 // Qt includes
-#include <QHash>
-#include <QExplicitlySharedDataPointer>
-#include <QUuid>
+#include <QCryptographicHash>
 #include <QDebug>
+#include <QExplicitlySharedDataPointer>
+#include <QFile>
+#include <QHash>
+#include <QUuid>
 
 // QtPropertyBrowser includes
 #include <QtVariantPropertyManager>
@@ -12,7 +14,12 @@
 // Visomics include
 #include "voAnalysis.h"
 #include "voDataObject.h"
+#include "voInputFileDataObject.h"
 #include "voIOManager.h"
+
+// VTK includes
+#include <vtkDataObject.h>
+#include <vtkSmartPointer.h>
 
 // --------------------------------------------------------------------------
 class voAnalysisPrivate
@@ -51,6 +58,8 @@ public:
 
   bool AbortExecution;
 
+  bool WriteOutputsToFilesEnabled;
+
   QtVariantPropertyManager*          VariantManager;
 };
 
@@ -72,6 +81,7 @@ void voAnalysisPrivate::init()
   this->ParameterInformationInitialized = false;
   this->AcceptDefaultParameterValues = false;
   this->AbortExecution = false;
+  this->WriteOutputsToFilesEnabled = false;
   this->VariantManager = new QtVariantPropertyManager(q);
 }
 
@@ -444,13 +454,28 @@ void voAnalysis::setAbortExecution(bool abortExecutionValue)
 }
 
 // --------------------------------------------------------------------------
+bool voAnalysis::writeOutputsToFilesEnabled()const
+{
+  Q_D(const voAnalysis);
+  return d->WriteOutputsToFilesEnabled;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::setWriteOutputsToFilesEnabled(bool enabled)
+{
+  Q_D(voAnalysis);
+  d->WriteOutputsToFilesEnabled = enabled;
+}
+
+// --------------------------------------------------------------------------
 bool voAnalysis::run()
 {
+  Q_D(voAnalysis);
   bool success = this->execute();
-//  if (success)
-//    {
-//    voIOManager::writeAnalysisOutputsToCVSFiles(this);
-//    }
+  if (success && d->WriteOutputsToFilesEnabled)
+    {
+    this->writeOutputsToFiles();
+    }
   return success;
 }
 
@@ -482,6 +507,42 @@ void voAnalysis::initializeOutputInformation()
     }
   this->setOutputInformation();
   d->OutputInformationInitialized = true;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::writeOutputsToFiles(const QString& directory) const
+{
+  QString inputHash;
+  voInputFileDataObject * inputDataObject = qobject_cast<voInputFileDataObject*>(this->input());
+  if (inputDataObject)
+    {
+    QFile inputFile(inputDataObject->fileName());
+    if (inputFile.open(QIODevice::ReadOnly))
+      {
+      QByteArray sha1 = QCryptographicHash::hash(inputFile.readAll(), QCryptographicHash::Md5);
+      inputHash = sha1.toHex();
+      inputHash.append("_");
+      inputFile.close();
+      }
+    }
+
+  foreach(const QString& outputName, this->outputNames())
+    {
+    voDataObject * dataObject = this->output(outputName);
+    if (!dataObject || !dataObject->data())
+      {
+      continue;
+      }
+    QString filename("%1/%2%3_%4.vtk"); // <directory>/(<inputHash>_)<analysisName>_<outputName>.vtk
+    filename = filename.arg(directory).arg(inputHash).arg(this->metaObject()->className()).arg(outputName);
+    bool success = voIOManager::writeDataObjectToFile(dataObject->data(), filename);
+    if (!success)
+      {
+      qCritical() << this->metaObject()->className()
+                  << "- Failed to write output" << outputName << "of type" << dataObject->type()
+                  << "into file" << filename;
+      }
+    }
 }
 
 // --------------------------------------------------------------------------

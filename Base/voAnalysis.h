@@ -80,10 +80,15 @@ public:
   bool abortExecution()const;
   void setAbortExecution(bool abortExecutionValue);
 
+  bool writeOutputsToFilesEnabled()const;
+  void setWriteOutputsToFilesEnabled(bool enabled);
+
   bool run();
 
   void initializeInputInformation();
   void initializeOutputInformation();
+
+  void writeOutputsToFiles(const QString& directory = QLatin1String(".")) const;
   
   typedef QHash<QString, QVariant> AvoidParserBugWithGcc420; // Hack to get around a bug in Gcc 4.2.0
   void initializeParameterInformation(
