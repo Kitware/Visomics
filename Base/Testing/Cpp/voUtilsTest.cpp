@@ -948,7 +948,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   vtkSmartPointer<vtkStringArray> currentColumnNames =
-      voUtils::tableColumnNames(tableColumnNamesTest.GetPointer());
+      vtkSmartPointer<vtkStringArray>::Take(voUtils::tableColumnNames(tableColumnNamesTest.GetPointer()));
 
   success = compareArray(currentColumnNames.GetPointer(), expectedColumnNames.GetPointer());
   if (!success)
