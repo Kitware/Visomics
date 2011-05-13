@@ -85,7 +85,8 @@ void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem*
     return;
     }
   voAnalysisFactory * analysisFactory = voApplication::application()->analysisFactory();
-  voAnalysis * analysis = analysisFactory->createAnalysis(analysisName);
+  voAnalysis * analysis = analysisFactory->createAnalysis(
+        analysisFactory->analysisNameFromPrettyName(analysisName));
   Q_ASSERT(analysis);
   analysis->setParent(qApp);
   analysis->setAcceptDefaultParameterValues(acceptDefaultParameter);
@@ -183,7 +184,8 @@ void voAnalysisDriver::runAnalysisForCurrentInput(
   Q_ASSERT(inputTarget);
 
   voAnalysisFactory * analysisFactory = voApplication::application()->analysisFactory();
-  voAnalysis * newAnalysis = analysisFactory->createAnalysis(analysisName);
+  voAnalysis * newAnalysis = analysisFactory->createAnalysis(
+        analysisFactory->analysisNameFromPrettyName(analysisName));
   Q_ASSERT(newAnalysis);
   newAnalysis->initializeParameterInformation(parameters);
   newAnalysis->setAcceptDefaultParameterValues(true);

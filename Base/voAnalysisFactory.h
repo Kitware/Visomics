@@ -22,11 +22,17 @@ public:
   /// Return list of registered analysis names
   QStringList registeredAnalysisNames() const;
 
+  /// If any, return the \a analysisName associated with \a analysisPrettyName
+  QString analysisNameFromPrettyName(const QString& analysisPrettyName) const;
+
+  /// Return list of registered analysis pretty names
+  QStringList registeredAnalysisPrettyNames() const;
+
 protected:
 
-  /// Register an analysis and its associated view
+  /// Register an analysis
   template<typename AnalysisClassType>
-  void registerAnalysis(const QString& analysisName);
+  void registerAnalysis(const QString& analysisPrettyName);
 
 protected:
   QScopedPointer<voAnalysisFactoryPrivate> d_ptr;

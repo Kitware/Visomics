@@ -1,0 +1,7 @@
+#ifndef __voTestConfigure_h
+#define __voTestConfigure_h
+
+#define VISOMICS_DATA_DIR "@VisomicsData_DIR@"
+
+#endif
+

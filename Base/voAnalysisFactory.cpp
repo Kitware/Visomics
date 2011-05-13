@@ -20,6 +20,8 @@ class voAnalysisFactoryPrivate
 {
 public:
   voQObjectFactory<voAnalysis> AnalysisFactory;
+  QHash<QString, QString>      PrettyNameToNameMap;
+  QHash<QString, QString>      NameToPrettyNameMap;
 };
 
 //----------------------------------------------------------------------------
@@ -49,7 +51,12 @@ voAnalysisFactory::~voAnalysisFactory()
 voAnalysis* voAnalysisFactory::createAnalysis(const QString& className)
 {
   Q_D(voAnalysisFactory);
-  return d->AnalysisFactory.Create(className);
+  voAnalysis * analysis = d->AnalysisFactory.Create(className);
+  if (analysis)
+    {
+    analysis->setObjectName(d->NameToPrettyNameMap.value(className));
+    }
+  return analysis;
 }
 
 //-----------------------------------------------------------------------------
@@ -60,21 +67,45 @@ QStringList voAnalysisFactory::registeredAnalysisNames() const
 }
 
 //-----------------------------------------------------------------------------
+QStringList voAnalysisFactory::registeredAnalysisPrettyNames() const
+{
+   Q_D(const voAnalysisFactory);
+  return d->PrettyNameToNameMap.keys();
+}
+
+//-----------------------------------------------------------------------------
+QString voAnalysisFactory::analysisNameFromPrettyName(const QString& analysisPrettyName) const
+{
+  Q_D(const voAnalysisFactory);
+  return d->PrettyNameToNameMap.value(analysisPrettyName);
+}
+
+//-----------------------------------------------------------------------------
 template<typename AnalysisClassType>
-void voAnalysisFactory::registerAnalysis(const QString& analysisName)
+void voAnalysisFactory::registerAnalysis(const QString& analysisPrettyName)
 {
   Q_D(voAnalysisFactory);
   
-  if (analysisName.isEmpty())
+  if (analysisPrettyName.isEmpty())
     {
-    qCritical() << "Failed to register analysis - analysisName is an empty string";
+    qCritical() << "Failed to register analysis - analysisPrettyName is an empty string";
     return;
     }
 
-  if (this->registeredAnalysisNames().contains(analysisName))
+  if (this->registeredAnalysisPrettyNames().contains(analysisPrettyName))
     {
     return;
     }
+
+  QString analysisName = AnalysisClassType::staticMetaObject.className();
+
+  if (d->AnalysisFactory.registeredObjectKeys().contains(analysisName))
+    {
+    return;
+    }
+
+  d->PrettyNameToNameMap.insert(analysisPrettyName, analysisName);
+  d->NameToPrettyNameMap.insert(analysisName, analysisPrettyName);
 
   d->AnalysisFactory.registerObject<AnalysisClassType>(analysisName);
 }

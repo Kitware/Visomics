@@ -1,9 +1,11 @@
 
 // Qt includes
-#include <QHash>
-#include <QExplicitlySharedDataPointer>
-#include <QUuid>
+#include <QCryptographicHash>
 #include <QDebug>
+#include <QExplicitlySharedDataPointer>
+#include <QFile>
+#include <QHash>
+#include <QUuid>
 
 // QtPropertyBrowser includes
 #include <QtVariantPropertyManager>
@@ -12,6 +14,12 @@
 // Visomics include
 #include "voAnalysis.h"
 #include "voDataObject.h"
+#include "voInputFileDataObject.h"
+#include "voIOManager.h"
+
+// VTK includes
+#include <vtkDataObject.h>
+#include <vtkSmartPointer.h>
 
 // --------------------------------------------------------------------------
 class voAnalysisPrivate
@@ -50,6 +58,9 @@ public:
 
   bool AbortExecution;
 
+  QString OutputDirectory;
+  bool WriteOutputsToFilesEnabled;
+
   QtVariantPropertyManager*          VariantManager;
 };
 
@@ -71,6 +82,8 @@ void voAnalysisPrivate::init()
   this->ParameterInformationInitialized = false;
   this->AcceptDefaultParameterValues = false;
   this->AbortExecution = false;
+  this->OutputDirectory = QLatin1String(".");
+  this->WriteOutputsToFilesEnabled = false;
   this->VariantManager = new QtVariantPropertyManager(q);
 }
 
@@ -235,8 +248,7 @@ void voAnalysis::addOutputType(const QString& outputName, const QString& outputT
   checkForSpaces(className, "addOutputType", "rawViewType", rawViewType);
 
   if (checkIfEmpty(className, "addOutputType", "outputName", outputName) ||
-      checkIfEmpty(className, "addOutputType", "outputType", outputType) ||
-      checkIfEmpty(className, "addOutputType", "viewType", viewType))
+      checkIfEmpty(className, "addOutputType", "outputType", outputType))
     {
     return;
     }
@@ -247,7 +259,15 @@ void voAnalysis::addOutputType(const QString& outputName, const QString& outputT
     }
   d->OutputInformation.insert(outputName, outputType);
 
-  d->OutputViewInformation.insertMulti(outputName, viewType);
+  if (!viewType.isEmpty())
+    {
+    d->OutputViewInformation.insertMulti(outputName, viewType);
+
+    if (!viewPrettyName.isEmpty())
+      {
+      d->OutputViewPrettyName.insert(outputName + viewType, viewPrettyName);
+      }
+    }
 
   if (!rawViewType.isEmpty())
     {
@@ -257,11 +277,6 @@ void voAnalysis::addOutputType(const QString& outputName, const QString& outputT
       {
       d->OutputRawViewPrettyName.insert(outputName + rawViewType, rawViewPrettyName);
       }
-    }
-
-  if (!viewPrettyName.isEmpty())
-    {
-    d->OutputViewPrettyName.insert(outputName + viewType, viewPrettyName);
     }
 }
 
@@ -441,9 +456,43 @@ void voAnalysis::setAbortExecution(bool abortExecutionValue)
 }
 
 // --------------------------------------------------------------------------
+QString voAnalysis::outputDirectory()const
+{
+  Q_D(const voAnalysis);
+  return d->OutputDirectory;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::setOutputDirectory(const QString& directory)
+{
+  Q_D(voAnalysis);
+  d->OutputDirectory = directory;
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysis::writeOutputsToFilesEnabled()const
+{
+  Q_D(const voAnalysis);
+  return d->WriteOutputsToFilesEnabled;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::setWriteOutputsToFilesEnabled(bool enabled)
+{
+  Q_D(voAnalysis);
+  d->WriteOutputsToFilesEnabled = enabled;
+}
+
+// --------------------------------------------------------------------------
 bool voAnalysis::run()
 {
-  return this->execute();
+  Q_D(voAnalysis);
+  bool success = this->execute();
+  if (success && d->WriteOutputsToFilesEnabled)
+    {
+    this->writeOutputsToFiles(d->OutputDirectory);
+    }
+  return success;
 }
 
 // --------------------------------------------------------------------------
@@ -474,6 +523,42 @@ void voAnalysis::initializeOutputInformation()
     }
   this->setOutputInformation();
   d->OutputInformationInitialized = true;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::writeOutputsToFiles(const QString& directory) const
+{
+  QString inputHash;
+  voInputFileDataObject * inputDataObject = qobject_cast<voInputFileDataObject*>(this->input());
+  if (inputDataObject)
+    {
+    QFile inputFile(inputDataObject->fileName());
+    if (inputFile.open(QIODevice::ReadOnly))
+      {
+      QByteArray sha1 = QCryptographicHash::hash(inputFile.readAll(), QCryptographicHash::Md5);
+      inputHash = sha1.toHex();
+      inputHash.append("_");
+      inputFile.close();
+      }
+    }
+
+  foreach(const QString& outputName, this->outputNames())
+    {
+    voDataObject * dataObject = this->output(outputName);
+    if (!dataObject || !dataObject->data())
+      {
+      continue;
+      }
+    QString filename("%1/%2%3_%4.vtk"); // <directory>/(<inputHash>_)<analysisName>_<outputName>.vtk
+    filename = filename.arg(directory).arg(inputHash).arg(this->metaObject()->className()).arg(outputName);
+    bool success = voIOManager::writeDataObjectToFile(dataObject->data(), filename);
+    if (!success)
+      {
+      qCritical() << this->metaObject()->className()
+                  << "- Failed to write output" << outputName << "of type" << dataObject->type()
+                  << "into file" << filename;
+      }
+    }
 }
 
 // --------------------------------------------------------------------------

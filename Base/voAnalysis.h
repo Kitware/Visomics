@@ -44,7 +44,8 @@ public:
 
 
   void addOutputType(const QString& outputName, const QString& outputType,
-                     const QString& viewType, const QString& viewPrettyName,
+                     const QString& viewType = QString(),
+                     const QString& viewPrettyName = QString(),
                      const QString& rawViewType = QString(),
                      const QString& rawViewPrettyName = QString());
 
@@ -79,10 +80,18 @@ public:
   bool abortExecution()const;
   void setAbortExecution(bool abortExecutionValue);
 
+  QString outputDirectory()const;
+  void setOutputDirectory(const QString& directory);
+
+  bool writeOutputsToFilesEnabled()const;
+  void setWriteOutputsToFilesEnabled(bool enabled);
+
   bool run();
 
   void initializeInputInformation();
   void initializeOutputInformation();
+
+  void writeOutputsToFiles(const QString& directory = QLatin1String(".")) const;
   
   typedef QHash<QString, QVariant> AvoidParserBugWithGcc420; // Hack to get around a bug in Gcc 4.2.0
   void initializeParameterInformation(

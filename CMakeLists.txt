@@ -167,6 +167,19 @@ SET(CMAKE_CXX_FLAGS ${Visomics_CXX_FLAGS} CACHE STRING "CMake C Flags" FORCE)
 SET(CMAKE_C_FLAGS ${Visomics_C_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 
 #-----------------------------------------------------------------------------
+# Configure headers
+#
+CONFIGURE_FILE(
+  voTestConfigure.h.in
+  ${CMAKE_CURRENT_BINARY_DIR}/voTestConfigure.h
+  )
+
+#-----------------------------------------------------------------------------
+# Include directories
+#
+INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
+
+#-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(Base)
 ADD_SUBDIRECTORY(Application)
 

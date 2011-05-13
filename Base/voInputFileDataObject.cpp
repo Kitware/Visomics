@@ -1,4 +1,6 @@
 
+// Qt includes
+#include <QFileInfo>
 
 // Visomics includes
 #include "voInputFileDataObject.h"
@@ -30,7 +32,18 @@ voInputFileDataObjectPrivate::voInputFileDataObjectPrivate()
 voInputFileDataObject::voInputFileDataObject(QObject* newParent) :
     Superclass(newParent), d_ptr(new voInputFileDataObjectPrivate)
 {
+}
 
+// --------------------------------------------------------------------------
+voInputFileDataObject::voInputFileDataObject(const QString& fileName,
+                                             vtkDataObject * newData,
+                                             QObject* newParent) :
+  Superclass(newParent), d_ptr(new voInputFileDataObjectPrivate)
+{
+  Q_D(voInputFileDataObject);
+  this->setName(QFileInfo(fileName).baseName());
+  this->setData(newData);
+  d->FileName = fileName;
 }
 
 // --------------------------------------------------------------------------

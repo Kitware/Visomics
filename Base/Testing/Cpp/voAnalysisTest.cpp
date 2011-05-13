@@ -222,6 +222,20 @@ int voAnalysisTest(int argc, char * argv [])
 
   analysis.addOutputType("output", "vtkTable", "", "");
 
+  if (analysis.numberOfOutput() != 1)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with numberOfOutput() !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  if (analysis.viewTypesForOutput("output").size() != 0)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with viewTypesForOutput() !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  analysis.removeAllOutputs();
+
   if (analysis.numberOfOutput() != 0)
     {
     std::cerr << "Line " << __LINE__ << " - Problem with numberOfOutput() !" << std::endl;

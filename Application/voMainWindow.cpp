@@ -77,7 +77,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
   // Populate Analysis menu
   voAnalysisFactory* analysisFactory = voApplication::application()->analysisFactory();
   QList<QAction*> analysisActions;
-  foreach(const QString& analysisName, analysisFactory->registeredAnalysisNames())
+  foreach(const QString& analysisName, analysisFactory->registeredAnalysisPrettyNames())
     {
     QAction * action = new QAction(analysisName, this);
     d->AnalysisActionMapper.setMapping(action, analysisName);
