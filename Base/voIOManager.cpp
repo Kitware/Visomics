@@ -261,10 +261,8 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
   vtkNew<vtkExtendedTable> extendedTable;
   Self::fillExtendedTable(table.GetPointer(), extendedTable.GetPointer(), settings);
 
-  voInputFileDataObject * dataObject = new voInputFileDataObject();
-  dataObject->setData(extendedTable.GetPointer());
-  dataObject->setName(QFileInfo(fileName).baseName());
-  dataObject->setFileName(fileName);
+  voInputFileDataObject * dataObject =
+      new voInputFileDataObject(fileName, extendedTable.GetPointer());
 
   voDataModel * model = voApplication::application()->dataModel();
 

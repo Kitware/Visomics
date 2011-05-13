@@ -16,6 +16,7 @@ class voInputFileDataObject : public voDataObject
 public:
   typedef voDataObject Superclass;
   voInputFileDataObject(QObject* newParent = 0);
+  voInputFileDataObject(const QString& fileName, vtkDataObject * newData, QObject* newParent = 0);
   virtual ~voInputFileDataObject();
 
   QString fileName()const;
