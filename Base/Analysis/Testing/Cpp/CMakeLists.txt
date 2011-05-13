@@ -1,0 +1,28 @@
+
+SET(KIT ${PROJECT_NAME}Analysis)
+
+CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
+  voAnalysisRunTest.cpp
+  )
+  
+SET(TestsToRun ${Tests})
+REMOVE(TestsToRun ${KIT}CppTests.cpp)
+
+ADD_EXECUTABLE(${KIT}CppTests ${Tests})
+TARGET_LINK_LIBRARIES(${KIT}CppTests ${PROJECT_NAME}Lib)
+
+SET(KIT_TESTS ${CPP_TEST_PATH}/${KIT}CppTests)
+
+MACRO(ANALYSIS_RUN_TEST ANALYSISNAME)
+  SET(TESTNAME ${ANALYSISNAME}AnalysisTest)
+  #MESSAGE(STATUS "Adding: ${TESTNAME}")
+  ADD_TEST(${TESTNAME} ${KIT_TESTS} voAnalysisRunTest ${ANALYSISNAME} ${ARGN})
+  #SET_PROPERTY(TEST ${TESTNAME} PROPERTY LABELS ${PROJECT_NAME})
+ENDMACRO()
+
+# Glob all analysis
+FILE(GLOB allAnalysis RELATIVE ${VisomicsBase_SOURCE_DIR}/Analysis/ "${VisomicsBase_SOURCE_DIR}/Analysis/*.h")
+FOREACH(analysisHeader ${allAnalysis})
+  get_filename_component(analysisName ${analysisHeader} NAME_WE)
+  ANALYSIS_RUN_TEST(${analysisName})
+ENDFOREACH()

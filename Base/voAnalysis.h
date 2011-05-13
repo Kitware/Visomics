@@ -80,6 +80,9 @@ public:
   bool abortExecution()const;
   void setAbortExecution(bool abortExecutionValue);
 
+  QString outputDirectory()const;
+  void setOutputDirectory(const QString& directory);
+
   bool writeOutputsToFilesEnabled()const;
   void setWriteOutputsToFilesEnabled(bool enabled);
 

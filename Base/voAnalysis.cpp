@@ -58,6 +58,7 @@ public:
 
   bool AbortExecution;
 
+  QString OutputDirectory;
   bool WriteOutputsToFilesEnabled;
 
   QtVariantPropertyManager*          VariantManager;
@@ -81,6 +82,7 @@ void voAnalysisPrivate::init()
   this->ParameterInformationInitialized = false;
   this->AcceptDefaultParameterValues = false;
   this->AbortExecution = false;
+  this->OutputDirectory = QLatin1String(".");
   this->WriteOutputsToFilesEnabled = false;
   this->VariantManager = new QtVariantPropertyManager(q);
 }
@@ -454,6 +456,20 @@ void voAnalysis::setAbortExecution(bool abortExecutionValue)
 }
 
 // --------------------------------------------------------------------------
+QString voAnalysis::outputDirectory()const
+{
+  Q_D(const voAnalysis);
+  return d->OutputDirectory;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::setOutputDirectory(const QString& directory)
+{
+  Q_D(voAnalysis);
+  d->OutputDirectory = directory;
+}
+
+// --------------------------------------------------------------------------
 bool voAnalysis::writeOutputsToFilesEnabled()const
 {
   Q_D(const voAnalysis);
@@ -474,7 +490,7 @@ bool voAnalysis::run()
   bool success = this->execute();
   if (success && d->WriteOutputsToFilesEnabled)
     {
-    this->writeOutputsToFiles();
+    this->writeOutputsToFiles(d->OutputDirectory);
     }
   return success;
 }
