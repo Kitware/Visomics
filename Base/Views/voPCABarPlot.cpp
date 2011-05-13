@@ -1,11 +1,12 @@
-// QT includes
-#include <QLayout>
+// Qt includes
 #include <QDebug>
+#include <QLayout>
 #include <QMap>
 
 // Visomics includes
-#include "voPCABarPlot.h"
 #include "voDataObject.h"
+#include "voPCABarPlot.h"
+#include "voUtils.h"
 
 // VTK includes
 #include <QVTKWidget.h>
@@ -14,6 +15,7 @@
 #include <vtkContext2D.h>
 #include <vtkContextScene.h>
 #include <vtkContextView.h>
+#include <vtkNew.h>
 #include <vtkPlot.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -30,6 +32,7 @@ public:
 
   vtkSmartPointer<vtkContextView> ChartView;
   vtkSmartPointer<vtkChartXY>     Chart;
+  vtkPlot*                        Plot;
   QVTKWidget*                     Widget;
 };
 
@@ -40,6 +43,7 @@ public:
 voPCABarPlotPrivate::voPCABarPlotPrivate()
 {
   this->Widget = 0;
+  this->Plot = 0;
 }
 
 // --------------------------------------------------------------------------
@@ -49,13 +53,11 @@ voPCABarPlotPrivate::voPCABarPlotPrivate()
 voPCABarPlot::voPCABarPlot(QWidget * newParent):
     Superclass(newParent), d_ptr(new voPCABarPlotPrivate)
 {
-	//std::cout<<"we are in the bar plot initialization" <<std::endl;
 }
 
 // --------------------------------------------------------------------------
 voPCABarPlot::~voPCABarPlot()
 {
-
 }
 
 // --------------------------------------------------------------------------
@@ -70,6 +72,7 @@ void voPCABarPlot::setupUi(QLayout *layout)
   d->Widget->SetRenderWindow(d->ChartView->GetRenderWindow());
   d->ChartView->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
   d->ChartView->GetScene()->AddItem(d->Chart);
+  d->Plot = d->Chart->AddPlot(vtkChart::BAR);
   
   layout->addWidget(d->Widget);
 }
@@ -94,45 +97,15 @@ void voPCABarPlot::setDataObject(voDataObject *dataObject)
   // Transpose table - this is pretty much unavoidable: vtkPlot expects each dimension
   // to be a column, but the information should be presented to the user with each
   // data point (principle component) in its own column
-  vtkSmartPointer<vtkTable> transpose = vtkSmartPointer<vtkTable>::New();
-  // Note: dont actually need to keep header, but will for consistancy
-  vtkSmartPointer<vtkStringArray> header = vtkSmartPointer<vtkStringArray>::New();
-  header->SetName("header");
-  header->SetNumberOfTuples(table->GetNumberOfColumns()-1);
-  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-    {
-    header->SetValue(c-1, table->GetColumnName(c));
-    }
-  transpose->AddColumn(header);
-  for (vtkIdType r = 0; r < table->GetNumberOfRows(); ++r)
-    {
-    vtkSmartPointer<vtkDoubleArray> newcol = vtkSmartPointer<vtkDoubleArray>::New();
-    newcol->SetName(table->GetValue(r, 0).ToString().c_str());
-    newcol->SetNumberOfTuples(table->GetNumberOfColumns() - 1);
-    for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-      {
-      newcol->SetValue(c-1, table->GetValue(r, c).ToDouble());
-      }
-    transpose->AddColumn(newcol);
-    }
+  vtkNew<vtkTable> transpose;
+  voUtils::transposeTable(table, transpose.GetPointer(), voUtils::Headers);
 
-  unsigned char colors[10][3] =
-    {
-      {166, 206, 227}, {31, 120, 180}, {178, 223, 13},
-      {51, 160, 44}, {251, 154, 153}, {227, 26, 28},
-      {253, 191, 111}, {255, 127, 0}, {202, 178, 214}, {106, 61, 154}
-    };
-  int i = 0;
-  
-  vtkPlot* p = d->Chart->GetPlot(0);
-	if (!p) 
-    {
-    p = d->Chart->AddPlot(vtkChart::BAR);
-    }
+  // See http://www.colorjack.com/?swatch=A6CEE3
+  unsigned char color[3] = {166, 206, 227};
 
-  p->SetInput(transpose, 1,2);
-  p->SetColor(colors[i][0], colors[i][1], colors[i][2], 255);
-  p->SetWidth(10);
+  d->Plot->SetInput(transpose.GetPointer(), 1, 2);
+  d->Plot->SetColor(color[0], color[1], color[2], 255);
+  d->Plot->SetWidth(10);
 
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(transpose->GetColumnName(2)); // y
