@@ -5,7 +5,7 @@
 
 // Visomics includes
 #include "voDataObject.h"
-#include "voPCABarPlot.h"
+#include "voPCABarView.h"
 #include "voUtils.h"
 
 // VTK includes
@@ -25,10 +25,10 @@
 #include <vtkDoubleArray.h>
 
 // --------------------------------------------------------------------------
-class voPCABarPlotPrivate
+class voPCABarViewPrivate
 {
 public:
-  voPCABarPlotPrivate();
+  voPCABarViewPrivate();
 
   vtkSmartPointer<vtkContextView> ChartView;
   vtkSmartPointer<vtkChartXY>     Chart;
@@ -37,33 +37,33 @@ public:
 };
 
 // --------------------------------------------------------------------------
-// voPCABarPlotPrivate methods
+// voPCABarViewPrivate methods
 
 // --------------------------------------------------------------------------
-voPCABarPlotPrivate::voPCABarPlotPrivate()
+voPCABarViewPrivate::voPCABarViewPrivate()
 {
   this->Widget = 0;
   this->Plot = 0;
 }
 
 // --------------------------------------------------------------------------
-// voPCABarPlot methods
+// voPCABarView methods
 
 // --------------------------------------------------------------------------
-voPCABarPlot::voPCABarPlot(QWidget * newParent):
-    Superclass(newParent), d_ptr(new voPCABarPlotPrivate)
+voPCABarView::voPCABarView(QWidget * newParent):
+    Superclass(newParent), d_ptr(new voPCABarViewPrivate)
 {
 }
 
 // --------------------------------------------------------------------------
-voPCABarPlot::~voPCABarPlot()
+voPCABarView::~voPCABarView()
 {
 }
 
 // --------------------------------------------------------------------------
-void voPCABarPlot::setupUi(QLayout *layout)
+void voPCABarView::setupUi(QLayout *layout)
 {
-  Q_D(voPCABarPlot);
+  Q_D(voPCABarView);
 
   d->ChartView = vtkSmartPointer<vtkContextView>::New();
   d->Chart = vtkSmartPointer<vtkChartXY>::New();
@@ -78,19 +78,19 @@ void voPCABarPlot::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voPCABarPlot::setDataObject(voDataObject *dataObject)
+void voPCABarView::setDataObject(voDataObject *dataObject)
 {
-  Q_D(voPCABarPlot);
+  Q_D(voPCABarView);
   if (!dataObject)
     {
-    qCritical() << "voPCABarPlot - Failed to setDataObject - dataObject is NULL";
+    qCritical() << "voPCABarView - Failed to setDataObject - dataObject is NULL";
     return;
     }
 
   vtkTable * table = vtkTable::SafeDownCast(dataObject->data());
   if (!table)
     {
-    qCritical() << "voPCABarPlot - Failed to setDataObject - vtkTable data is expected !";
+    qCritical() << "voPCABarView - Failed to setDataObject - vtkTable data is expected !";
     return;
     }
 

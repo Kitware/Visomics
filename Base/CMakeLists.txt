@@ -24,8 +24,8 @@ SET(KIT_SRCS
   Views/voCorrelationGraphView.h
   Views/voExtendedTableView.cpp
   Views/voExtendedTableView.h
-  Views/voPCABarPlot.cpp
-  Views/voPCABarPlot.h
+  Views/voPCABarView.cpp
+  Views/voPCABarView.h
   Views/voPCAProjectionView.cpp
   Views/voPCAProjectionView.h
   Views/voTableView.cpp
@@ -88,7 +88,7 @@ SET(KIT_MOC_SRCS
   
   Views/voCorrelationGraphView.h
   Views/voExtendedTableView.h
-  Views/voPCABarPlot.h
+  Views/voPCABarView.h
   Views/voPCAProjectionView.h
   Views/voTableView.h
   Views/voTreeGraphView.h

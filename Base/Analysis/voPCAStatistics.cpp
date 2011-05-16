@@ -65,11 +65,11 @@ void voPCAStatistics::setOutputInformation()
                       "voTableView", "Table (Std. Deviation)");
     
   this->addOutputType("loading", "vtkTable" ,
-                      "voPCABarPlot", "Percent Loading Plot",
+                      "voPCABarView", "Percent Loading Plot",
                       "voTableView", "Table (Percent Loading Plot)");
    
   this->addOutputType("sumloading", "vtkTable" ,
-                      "voPCABarPlot", "Cumulative Percent Loading Plot",
+                      "voPCABarView", "Cumulative Percent Loading Plot",
                       "voTableView", "Table (Cumulative Percent Loading Plot)");
 }
 
