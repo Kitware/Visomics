@@ -1,7 +1,7 @@
+
 // Qt includes
 #include <QDebug>
 #include <QLayout>
-#include <QMap>
 
 // Visomics includes
 #include "voDataObject.h"
@@ -12,17 +12,15 @@
 #include <QVTKWidget.h>
 #include <vtkAxis.h>
 #include <vtkChartXY.h>
-#include <vtkContext2D.h>
 #include <vtkContextScene.h>
 #include <vtkContextView.h>
 #include <vtkNew.h>
 #include <vtkPlot.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include <vtkTable.h>
-//#include <vtkVariantArray.h> //Needed by splitTable
+#include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
-#include <vtkDoubleArray.h>
+#include <vtkTable.h>
 
 // --------------------------------------------------------------------------
 class voPCABarViewPrivate
@@ -81,6 +79,7 @@ void voPCABarView::setupUi(QLayout *layout)
 void voPCABarView::setDataObject(voDataObject *dataObject)
 {
   Q_D(voPCABarView);
+
   if (!dataObject)
     {
     qCritical() << "voPCABarView - Failed to setDataObject - dataObject is NULL";
@@ -100,12 +99,19 @@ void voPCABarView::setDataObject(voDataObject *dataObject)
   vtkNew<vtkTable> transpose;
   voUtils::transposeTable(table, transpose.GetPointer(), voUtils::Headers);
 
+  vtkStringArray* labels = vtkStringArray::SafeDownCast(transpose->GetColumn(0));
+  if (!labels)
+    {
+    qCritical() << "voPCABarView - Failed to setDataObject - first column of vtkTable data could not be converted to string !";
+    return;
+    }
+
   // See http://www.colorjack.com/?swatch=A6CEE3
   unsigned char color[3] = {166, 206, 227};
 
   d->Plot->SetInput(transpose.GetPointer(), 1, 2);
   d->Plot->SetColor(color[0], color[1], color[2], 255);
-  d->Plot->SetWidth(10);
+  d->Plot->SetIndexedLabels(labels);
 
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(transpose->GetColumnName(2)); // y
