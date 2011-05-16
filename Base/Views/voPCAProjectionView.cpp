@@ -2,7 +2,6 @@
 // QT includes
 #include <QLayout>
 #include <QDebug>
-#include <QMap>
 
 // Visomics includes
 #include "voDataObject.h"
@@ -12,17 +11,16 @@
 // VTK includes
 #include <QVTKWidget.h>
 #include <vtkAxis.h>
-#include <voChartXY.h>
-#include <vtkContext2D.h>
+#include <vtkChartXY.h>
 #include <vtkContextScene.h>
 #include <vtkContextView.h>
 #include <vtkNew.h>
 #include <vtkPlot.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include <vtkTable.h>
+#include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
-#include <vtkDoubleArray.h>
+#include <vtkTable.h>
 
 // --------------------------------------------------------------------------
 class voPCAProjectionViewPrivate
@@ -31,7 +29,7 @@ public:
   voPCAProjectionViewPrivate();
 
   vtkSmartPointer<vtkContextView> ChartView;
-  vtkSmartPointer<voChartXY>      Chart;
+  vtkSmartPointer<vtkChartXY>     Chart;
   vtkPlot*                        Plot;
   QVTKWidget*                     Widget;
 };
@@ -66,7 +64,7 @@ void voPCAProjectionView::setupUi(QLayout *layout)
   Q_D(voPCAProjectionView);
 
   d->ChartView = vtkSmartPointer<vtkContextView>::New();
-  d->Chart = vtkSmartPointer<voChartXY>::New();
+  d->Chart = vtkSmartPointer<vtkChartXY>::New();
   d->Widget = new QVTKWidget();
   d->ChartView->SetInteractor(d->Widget->GetInteractor());
   d->Widget->SetRenderWindow(d->ChartView->GetRenderWindow());
@@ -95,30 +93,27 @@ void voPCAProjectionView::setDataObject(voDataObject *dataObject)
     return;
     }
 
+  vtkStringArray* labels = vtkStringArray::SafeDownCast(table->GetColumn(0));
+  if (!labels)
+    {
+    qCritical() << "voPCAProjectionView - Failed to setDataObject - first column of vtkTable data could not be converted to string !";
+    return;
+    }
+
   // Transpose table - this is pretty much unavoidable: vtkPlot expects each dimension
   // to be a column, but the information should be presented to the user with each
   // data point (principle component) in its own column
-  vtkSmartPointer<vtkTable> transpose = vtkSmartPointer<vtkTable>::New();
-  voUtils::transposeTable(table, transpose, voUtils::Headers);
+  vtkNew<vtkTable> transpose;
+  voUtils::transposeTable(table, transpose.GetPointer(), voUtils::Headers);
 
   // See http://www.colorjack.com/?swatch=A6CEE3
   unsigned char color[3] = {166, 206, 227};
 
   // TODO Extract only the first two rows of the data table instead of transposing the entire table
-  d->Plot->SetInput(transpose, 1, 2);
+  d->Plot->SetInput(transpose.GetPointer(), 1, 2);
   d->Plot->SetColor(color[0], color[1], color[2], 255);
   d->Plot->SetWidth(10);
-
-  vtkStringArray* labelArray = vtkStringArray::SafeDownCast(transpose->GetColumn(0));
-  if (labelArray)
-    {
-    std::vector<std::string> labels;
-    for(int rid = 0; rid < labelArray->GetNumberOfValues(); ++rid)
-      {
-      labels.push_back(labelArray->GetValue(rid));
-      }
-    d->Chart->AddPointLabels(labels);
-    }
+  d->Plot->SetIndexedLabels(labels);
 
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(transpose->GetColumnName(2)); // y

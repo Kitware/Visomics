@@ -34,9 +34,6 @@ SET(KIT_SRCS
   Views/voTreeGraphView.cpp
   Views/voCorrelationHeatMapView.cpp
   Views/voCorrelationHeatMapView.h
-  Views/voChartXY.h
-  Views/voChartXY.cpp
-
   
   voAnalysis.cpp
   voAnalysis.h
