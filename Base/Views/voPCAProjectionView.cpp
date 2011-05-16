@@ -6,7 +6,7 @@
 
 // Visomics includes
 #include "voDataObject.h"
-#include "voPCAProjectionPlot.h"
+#include "voPCAProjectionView.h"
 #include "voUtils.h"
 
 // VTK includes
@@ -25,10 +25,10 @@
 #include <vtkDoubleArray.h>
 
 // --------------------------------------------------------------------------
-class voPCAProjectionPlotPrivate
+class voPCAProjectionViewPrivate
 {
 public:
-  voPCAProjectionPlotPrivate();
+  voPCAProjectionViewPrivate();
 
   vtkSmartPointer<vtkContextView> ChartView;
   vtkSmartPointer<voChartXY>      Chart;
@@ -37,33 +37,33 @@ public:
 };
 
 // --------------------------------------------------------------------------
-// voPCAProjectionPlotPrivate methods
+// voPCAProjectionViewPrivate methods
 
 // --------------------------------------------------------------------------
-voPCAProjectionPlotPrivate::voPCAProjectionPlotPrivate()
+voPCAProjectionViewPrivate::voPCAProjectionViewPrivate()
 {
   this->Widget = 0;
   this->Plot = 0;
 }
 
 // --------------------------------------------------------------------------
-// voPCAProjectionPlot methods
+// voPCAProjectionView methods
 
 // --------------------------------------------------------------------------
-voPCAProjectionPlot::voPCAProjectionPlot(QWidget * newParent):
-    Superclass(newParent), d_ptr(new voPCAProjectionPlotPrivate)
+voPCAProjectionView::voPCAProjectionView(QWidget * newParent):
+    Superclass(newParent), d_ptr(new voPCAProjectionViewPrivate)
 {
 }
 
 // --------------------------------------------------------------------------
-voPCAProjectionPlot::~voPCAProjectionPlot()
+voPCAProjectionView::~voPCAProjectionView()
 {
 }
 
 // --------------------------------------------------------------------------
-void voPCAProjectionPlot::setupUi(QLayout *layout)
+void voPCAProjectionView::setupUi(QLayout *layout)
 {
-  Q_D(voPCAProjectionPlot);
+  Q_D(voPCAProjectionView);
 
   d->ChartView = vtkSmartPointer<vtkContextView>::New();
   d->Chart = vtkSmartPointer<voChartXY>::New();
@@ -78,20 +78,20 @@ void voPCAProjectionPlot::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voPCAProjectionPlot::setDataObject(voDataObject *dataObject)
+void voPCAProjectionView::setDataObject(voDataObject *dataObject)
 {
-  Q_D(voPCAProjectionPlot);
+  Q_D(voPCAProjectionView);
 
   if (!dataObject)
     {
-    qCritical() << "voPCAProjectionPlot - Failed to setDataObject - dataObject is NULL";
+    qCritical() << "voPCAProjectionView - Failed to setDataObject - dataObject is NULL";
     return;
     }
 
   vtkTable * table = vtkTable::SafeDownCast(dataObject->data());
   if (!table)
     {
-    qCritical() << "voPCAProjectionPlot - Failed to setDataObject - vtkTable data is expected !";
+    qCritical() << "voPCAProjectionView - Failed to setDataObject - vtkTable data is expected !";
     return;
     }
 

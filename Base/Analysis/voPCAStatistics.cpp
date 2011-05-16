@@ -53,7 +53,7 @@ void voPCAStatistics::setInputInformation()
 void voPCAStatistics::setOutputInformation()
 {
   this->addOutputType("x", "vtkTable",
-                      "voPCAProjectionPlot", "Projection Plot",
+                      "voPCAProjectionView", "Projection Plot",
                       "voTableView", "Table (Projection Plot)");
 
   this->addOutputType("rot", "vtkTable",
