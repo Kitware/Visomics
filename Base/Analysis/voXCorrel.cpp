@@ -58,14 +58,14 @@ void voXCorrel::setInputInformation()
 void voXCorrel::setOutputInformation()
 {
   this->addOutputType("corr", "vtkTable",
-                      "", "",
+                      "voCorrelationHeatMapView", "Correlation Heat Map",
                       "voTableView", "Table (Correlation)");
   
   this->addOutputType("correlation_graph", "vtkGraph",
                       "voCorrelationGraphView", "Correlation Graph");
 
-  this->addOutputType("correlation_heatmap", "vtkImageData",
-                      "voCorrelationHeatMapView", "Correlation Heat Map");   
+/*  this->addOutputType("correlation_heatmap", "vtkImageData",
+                      "voCorrelationHeatMapView", "Correlation Heat Map");   */
 }
 
 // --------------------------------------------------------------------------
@@ -164,31 +164,9 @@ bool voXCorrel::execute()
   this->setOutput("corr", new voTableDataObject("corr", corr));
 
   // Generate image of the correlation table 
-  vtkSmartPointer<vtkImageData> imageData = vtkSmartPointer<vtkImageData>::New();
-//  vtkIdType corrMatrixNumberOfCols = corr->GetNumberOfColumns();
-  vtkIdType corrMatrixNumberOfRows = corr->GetNumberOfRows();
-
-  imageData->SetExtent(0, corrMatrixNumberOfRows-1, 
-                       0, corrMatrixNumberOfRows-1,
-                       0,
-                       0);
-  imageData->SetNumberOfScalarComponents(1);
-  imageData->SetScalarTypeToDouble();
-  imageData->AllocateScalars();
-  imageData->SetOrigin(0.0, 0.0, 0.0);
-  imageData->SetSpacing(1.0, 1.0, 1.0);
-
-  double *dPtr = static_cast<double *>(imageData->GetScalarPointer(0, 0, 0));
-  for (vtkIdType i = 0; i < corrMatrixNumberOfRows; ++i)
-    {
-    for (vtkIdType j = 1 ; j < corrMatrixNumberOfRows+1 ; ++j)
-      {
-      dPtr[i * (corrMatrixNumberOfRows ) + j - 1 ] = corr->GetValue(i,j).ToDouble();
-      //std::cout << corr->GetValue(i,j).ToDouble() << " ";
-      }
-      //std::cout << "\n" << std::endl;
-    }
-  this->setOutput("correlation_heatmap", new voDataObject("correlation_heatmap", imageData));
+  //  vtkIdType corrMatrixNumberOfCols = corr->GetNumberOfColumns();
+    vtkIdType corrMatrixNumberOfRows = corr->GetNumberOfRows();
+  //this->setOutput("correlation_heatmap", new voDataObject("correlation_heatmap", imageData));
  
   // Find high correlations to put in graph
   vtkSmartPointer<vtkTable> sparseCorr = vtkSmartPointer<vtkTable>::New();
