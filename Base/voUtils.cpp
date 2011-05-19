@@ -233,19 +233,23 @@ bool voUtils::insertColumnIntoTable(vtkTable * table, int position, vtkAbstractA
 }
 
 //----------------------------------------------------------------------------
-vtkStringArray* voUtils::tableColumnNames(vtkTable * table)
+vtkStringArray* voUtils::tableColumnNames(vtkTable * table, int offset)
 {
   if (!table)
     {
     return 0;
     }
+  if (offset > table->GetNumberOfColumns())
+    {
+    return 0;
+    }
   vtkStringArray * columnNames = vtkStringArray::New();
-  columnNames->SetNumberOfValues(table->GetNumberOfColumns());
+  columnNames->SetNumberOfValues(table->GetNumberOfColumns() - offset);
 
-  for (int cid = 0; cid < table->GetNumberOfColumns(); ++cid)
+  for (int cid = offset; cid < table->GetNumberOfColumns(); ++cid)
     {
     vtkAbstractArray * column = table->GetColumn(cid);
-    columnNames->SetValue(cid, column->GetName());
+    columnNames->SetValue((cid - offset), column->GetName());
     }
   return columnNames;
 }

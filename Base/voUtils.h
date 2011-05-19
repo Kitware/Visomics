@@ -26,7 +26,7 @@ bool transposeTable(vtkTable* table, const TransposeOption& transposeOption = Wi
 
 bool insertColumnIntoTable(vtkTable * table, int position, vtkAbstractArray * column);
 
-vtkStringArray* tableColumnNames(vtkTable * table);
+vtkStringArray* tableColumnNames(vtkTable * table, int offset = 0);
 
 void setTableColumnNames(vtkTable * table, vtkStringArray * columnNames);
 
