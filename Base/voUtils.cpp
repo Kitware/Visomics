@@ -395,6 +395,17 @@ int voUtils::counterAlphaToInt(const QString& alphaVal)
 }
 
 //----------------------------------------------------------------------------
+bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray)
+{
+  if (!srcTable)
+    {
+    return false;
+    }
+
+  return voUtils::tableToArray(srcTable, destArray, voUtils::range(0, srcTable->GetNumberOfColumns()));
+}
+
+//----------------------------------------------------------------------------
 bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray, const QList<int>& columnList)
 {
   if (!srcTable)
