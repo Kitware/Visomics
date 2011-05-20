@@ -17,8 +17,8 @@ SET(KIT_SRCS
   Analysis/voXCorrel.cpp
   Analysis/voXCorrel.h
 
+  Normalization/voNormalization.h
   Normalization/voLog2.cpp
-  Normalization/voLog2.h
   
   Views/voCorrelationGraphView.cpp
   Views/voCorrelationGraphView.h
