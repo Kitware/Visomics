@@ -89,6 +89,7 @@ voNormalizationWidget::voNormalizationWidget(QWidget* newParent) :
 
   d->registerNormalizationWidget("No");
   d->registerNormalizationWidget("Log2");
+  d->registerNormalizationWidget("Quantile");
 
   // Set default
   QRadioButton * button = this->findChild<QRadioButton*>("No");
