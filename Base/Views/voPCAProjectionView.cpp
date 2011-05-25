@@ -1,34 +1,32 @@
-// Qt includes
-#include <QDebug>
+
+// QT includes
 #include <QLayout>
-#include <QMap>
+#include <QDebug>
 
 // Visomics includes
 #include "voDataObject.h"
-#include "voPCABarPlot.h"
+#include "voPCAProjectionView.h"
 #include "voUtils.h"
 
 // VTK includes
 #include <QVTKWidget.h>
 #include <vtkAxis.h>
 #include <vtkChartXY.h>
-#include <vtkContext2D.h>
 #include <vtkContextScene.h>
 #include <vtkContextView.h>
 #include <vtkNew.h>
 #include <vtkPlot.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
-#include <vtkTable.h>
-//#include <vtkVariantArray.h> //Needed by splitTable
+#include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
-#include <vtkDoubleArray.h>
+#include <vtkTable.h>
 
 // --------------------------------------------------------------------------
-class voPCABarPlotPrivate
+class voPCAProjectionViewPrivate
 {
 public:
-  voPCABarPlotPrivate();
+  voPCAProjectionViewPrivate();
 
   vtkSmartPointer<vtkContextView> ChartView;
   vtkSmartPointer<vtkChartXY>     Chart;
@@ -37,33 +35,33 @@ public:
 };
 
 // --------------------------------------------------------------------------
-// voPCABarPlotPrivate methods
+// voPCAProjectionViewPrivate methods
 
 // --------------------------------------------------------------------------
-voPCABarPlotPrivate::voPCABarPlotPrivate()
+voPCAProjectionViewPrivate::voPCAProjectionViewPrivate()
 {
   this->Widget = 0;
   this->Plot = 0;
 }
 
 // --------------------------------------------------------------------------
-// voPCABarPlot methods
+// voPCAProjectionView methods
 
 // --------------------------------------------------------------------------
-voPCABarPlot::voPCABarPlot(QWidget * newParent):
-    Superclass(newParent), d_ptr(new voPCABarPlotPrivate)
+voPCAProjectionView::voPCAProjectionView(QWidget * newParent):
+    Superclass(newParent), d_ptr(new voPCAProjectionViewPrivate)
 {
 }
 
 // --------------------------------------------------------------------------
-voPCABarPlot::~voPCABarPlot()
+voPCAProjectionView::~voPCAProjectionView()
 {
 }
 
 // --------------------------------------------------------------------------
-void voPCABarPlot::setupUi(QLayout *layout)
+void voPCAProjectionView::setupUi(QLayout *layout)
 {
-  Q_D(voPCABarPlot);
+  Q_D(voPCAProjectionView);
 
   d->ChartView = vtkSmartPointer<vtkContextView>::New();
   d->Chart = vtkSmartPointer<vtkChartXY>::New();
@@ -72,25 +70,26 @@ void voPCABarPlot::setupUi(QLayout *layout)
   d->Widget->SetRenderWindow(d->ChartView->GetRenderWindow());
   d->ChartView->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
   d->ChartView->GetScene()->AddItem(d->Chart);
-  d->Plot = d->Chart->AddPlot(vtkChart::BAR);
-  
+  d->Plot = d->Chart->AddPlot(vtkChart::POINTS);
+
   layout->addWidget(d->Widget);
 }
 
 // --------------------------------------------------------------------------
-void voPCABarPlot::setDataObject(voDataObject *dataObject)
+void voPCAProjectionView::setDataObject(voDataObject *dataObject)
 {
-  Q_D(voPCABarPlot);
+  Q_D(voPCAProjectionView);
+
   if (!dataObject)
     {
-    qCritical() << "voPCABarPlot - Failed to setDataObject - dataObject is NULL";
+    qCritical() << "voPCAProjectionView - Failed to setDataObject - dataObject is NULL";
     return;
     }
 
   vtkTable * table = vtkTable::SafeDownCast(dataObject->data());
   if (!table)
     {
-    qCritical() << "voPCABarPlot - Failed to setDataObject - vtkTable data is expected !";
+    qCritical() << "voPCAProjectionView - Failed to setDataObject - vtkTable data is expected !";
     return;
     }
 
@@ -100,12 +99,21 @@ void voPCABarPlot::setDataObject(voDataObject *dataObject)
   vtkNew<vtkTable> transpose;
   voUtils::transposeTable(table, transpose.GetPointer(), voUtils::Headers);
 
+  vtkStringArray* labels = vtkStringArray::SafeDownCast(transpose->GetColumn(0));
+  if (!labels)
+    {
+    qCritical() << "voPCAProjectionView - Failed to setDataObject - first column of vtkTable data could not be converted to string !";
+    return;
+    }
+
   // See http://www.colorjack.com/?swatch=A6CEE3
   unsigned char color[3] = {166, 206, 227};
 
+  // TODO Extract only the first two rows of the data table instead of transposing the entire table
   d->Plot->SetInput(transpose.GetPointer(), 1, 2);
   d->Plot->SetColor(color[0], color[1], color[2], 255);
   d->Plot->SetWidth(10);
+  d->Plot->SetIndexedLabels(labels);
 
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(transpose->GetColumnName(2)); // y
