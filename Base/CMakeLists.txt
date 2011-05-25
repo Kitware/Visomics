@@ -22,8 +22,12 @@ SET(KIT_SRCS
   
   Views/voCorrelationGraphView.cpp
   Views/voCorrelationGraphView.h
+  Views/voCorrelationHeatMapView.cpp
+  Views/voCorrelationHeatMapView.h
   Views/voExtendedTableView.cpp
   Views/voExtendedTableView.h
+  Views/voHorizontalBarView.h
+  Views/voHorizontalBarView.cpp
   Views/voPCABarView.cpp
   Views/voPCABarView.h
   Views/voPCAProjectionView.cpp
@@ -32,10 +36,6 @@ SET(KIT_SRCS
   Views/voTableView.h
   Views/voTreeGraphView.h
   Views/voTreeGraphView.cpp
-  Views/voCorrelationHeatMapView.cpp
-  Views/voCorrelationHeatMapView.h
-  Views/voHorizontalBarView.h
-  Views/voHorizontalBarView.cpp
   Views/voVolcanoView.cpp
   Views/voVolcanoView.h
   
@@ -88,13 +88,13 @@ SET(KIT_MOC_SRCS
   Analysis/voXCorrel.h
   
   Views/voCorrelationGraphView.h
+  Views/voCorrelationHeatMapView.h
   Views/voExtendedTableView.h
+  Views/voHorizontalBarView.h
   Views/voPCABarView.h
   Views/voPCAProjectionView.h
   Views/voTableView.h
   Views/voTreeGraphView.h
-  Views/voCorrelationHeatMapView.h
-  Views/voHorizontalBarView.h
   Views/voVolcanoView.h
   
   voAnalysis.h
