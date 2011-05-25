@@ -6,24 +6,31 @@
 // Visomics includes
 #include "voCorrelationHeatMapView.h"
 #include "voDataObject.h"
+#include "voUtils.h"
 
 // VTK includes
 #include <QVTKWidget.h>
+#include <vtkAxis.h>
 #include <vtkChartHistogram2D.h>
-#include <vtkSmartPointer.h>
+#include <vtkColorTransferFunction.h>
 #include <vtkContextView.h>
 #include <vtkContextScene.h>
+#include <vtkDoubleArray.h>
 #include <vtkImageData.h>
-#include <vtkColorTransferFunction.h>
+#include <vtkNew.h>
+#include <vtkSmartPointer.h>
+#include <vtkStringArray.h>
+#include <vtkTable.h>
+#include <vtkTextProperty.h>
 
 // --------------------------------------------------------------------------
 class voCorrelationHeatMapViewPrivate
 {
 public:
   voCorrelationHeatMapViewPrivate();
-  vtkSmartPointer<vtkContextView> ChartView;
+  vtkSmartPointer<vtkContextView>       ChartView;
   vtkSmartPointer<vtkChartHistogram2D>  Chart;
-  QVTKWidget*                         Widget;
+  QVTKWidget*                           Widget;
 };
 
 // --------------------------------------------------------------------------
@@ -77,42 +84,93 @@ void voCorrelationHeatMapView::setDataObject(voDataObject* dataObject)
     return;
     }
 
-  vtkImageData * imageData = vtkImageData::SafeDownCast(dataObject->data());
-  if (!imageData)
+  vtkTable * table = vtkTable::SafeDownCast(dataObject->data());
+  if (!table)
     {
-    qCritical() << "voCorrelationHeatMapView - Failed to setDataObject - vtkImageData data is expected !";
+    qCritical() << "voCorrelationHeatMapView - Failed to setDataObject - vtkTable data is expected !";
     return;
+    }
+
+  vtkStringArray* verticalLabels = vtkStringArray::SafeDownCast(table->GetColumn(0));
+  if (!verticalLabels)
+    {
+    qCritical() << "voCorrelationHeatMapView - Failed to setDataObject - first column of vtkTable data could not be converted to string !";
+    return;
+    }
+
+  vtkSmartPointer<vtkStringArray> horizontalLabels = vtkSmartPointer<vtkStringArray>::Take(voUtils::tableColumnNames(table, 1));
+
+  vtkNew<vtkDoubleArray> verticalTicks;
+  for(double i = table->GetNumberOfRows() - 1; i >= 0; i--)
+    {
+    verticalTicks->InsertNextValue(i + 0.5);
+    }
+
+  vtkNew<vtkDoubleArray> horizontalTicks;
+  for(double i = 0.0; i < table->GetNumberOfColumns()-1; i++)
+    {
+    horizontalTicks->InsertNextValue(i + 0.5);
+    }
+
+  // Generate image of the correlation table
+  vtkSmartPointer<vtkImageData> imageData = vtkSmartPointer<vtkImageData>::New();
+  vtkIdType corrMatrixNumberOfCols = table->GetNumberOfColumns();
+  vtkIdType corrMatrixNumberOfRows = table->GetNumberOfRows();
+
+  imageData->SetExtent(0, corrMatrixNumberOfCols-2,
+                       0, corrMatrixNumberOfRows-1,
+                       0,
+                       0);
+  imageData->SetNumberOfScalarComponents(1);
+  imageData->SetScalarTypeToDouble();
+  imageData->AllocateScalars();
+  imageData->SetOrigin(0.0, 0.0, 0.0);
+  imageData->SetSpacing(1.0, 1.0, 1.0);
+
+  double *dPtr = static_cast<double *>(imageData->GetScalarPointer(0, 0, 0));
+  //double *dPtr = static_cast<double *>(imageData->GetScalarPointer());
+  for (vtkIdType i = 0; i < corrMatrixNumberOfRows; ++i)
+    {
+    for (vtkIdType j = 1 ; j < corrMatrixNumberOfCols; ++j) // Skip first column (header labels)
+      {
+      // Flip vertically for table -> image mapping
+      dPtr[((corrMatrixNumberOfRows - i -1) * (corrMatrixNumberOfCols - 1)) + (j - 1) ] = table->GetValue(i,j).ToDouble();
+      }
     }
 
   d->Chart->SetInput( imageData );
 
-  /*
-  int* dims = imageData->GetDimensions();
- 
-  for (int y=0; y<dims[1]; y++)
-    {
-    for (int x=0; x<dims[0]; x++)
-      {
-      double v = imageData->GetScalarComponentAsDouble(x,y,0,0);
-      std::cout << v << "  ";
-      }
-    std::cout << "\n" << std::endl;
-    }
-  */
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle("");
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetBehavior(vtkAxis::FIXED);
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetTickLabels(verticalLabels);
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetRange(0.0, static_cast<double>(table->GetNumberOfRows()));
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetTickPositions(verticalTicks.GetPointer());
 
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("");
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetBehavior(vtkAxis::FIXED);
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTickLabels(horizontalLabels.GetPointer());
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetRange(0.0, static_cast<double>(table->GetNumberOfColumns()-1));
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTickPositions(horizontalTicks.GetPointer());
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetOrientation(270.0);
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetJustificationToRight(); // This actually justifies to the left
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetVerticalJustificationToCentered();
+
+  double hsvScalars[3] = {-1.0, 0.0, 1.0};
+  //double hsvHues[3] = {1.0/3.0, 1.0/6.0, 0.0}; // Red - green
+  double hsvHues[3] = {0.5, 0.25, 0.0}; // Red - cyan
+  double hsvSats[3] = {1.0, 0.3, 1.0};
+  double hsvValues[3] = {1.0, 0.3, 1.0};
 
   vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-  transferFunction->AddHSVSegment(0.0, 0.0, 1.0, 1.0,
-                                  0.3333, 0.3333, 1.0, 1.0);
-  transferFunction->AddHSVSegment(0.3333, 0.3333, 1.0, 1.0,
-                                  0.6666, 0.6666, 1.0, 1.0);
-  transferFunction->AddHSVSegment(0.6666, 0.6666, 1.0, 1.0,
-                                  1.0, 0.2, 1.0, 0.3);
+  for(int i = 0; i < 3 - 1; i++)
+    {
+    transferFunction->AddHSVSegment(hsvScalars[i], hsvHues[i], hsvSats[i], hsvValues[i],
+                                    hsvScalars[i+1], hsvHues[i+1], hsvSats[i+1], hsvValues[i+1]);
+    }
   transferFunction->Build();
+
   d->Chart->SetTransferFunction(transferFunction.GetPointer());
 
-  d->ChartView->GetRenderWindow();
- 
   d->ChartView->Render();
 }
 
