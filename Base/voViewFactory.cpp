@@ -15,6 +15,7 @@
 #include "voTableView.h"
 #include "voTreeGraphView.h"
 #include "voHorizontalBarView.h"
+#include "voVolcanoView.h"
 
 //----------------------------------------------------------------------------
 class voViewFactoryPrivate
@@ -41,6 +42,7 @@ voViewFactory::voViewFactory():d_ptr(new voViewFactoryPrivate)
   this->registerView<voCorrelationHeatMapView>();
   this->registerView<voExtendedTableView>();
   this->registerView<voHorizontalBarView>();
+  this->registerView<voVolcanoView>();
 }
 
 //-----------------------------------------------------------------------------
