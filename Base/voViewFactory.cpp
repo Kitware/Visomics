@@ -10,11 +10,11 @@
 #include "voCorrelationGraphView.h"
 #include "voCorrelationHeatMapView.h"
 #include "voExtendedTableView.h"
+#include "voHorizontalBarView.h"
 #include "voPCAProjectionView.h"
 #include "voPCABarView.h"
 #include "voTableView.h"
 #include "voTreeGraphView.h"
-#include "voHorizontalBarView.h"
 #include "voVolcanoView.h"
 
 //----------------------------------------------------------------------------
@@ -34,14 +34,14 @@ public:
 //----------------------------------------------------------------------------
 voViewFactory::voViewFactory():d_ptr(new voViewFactoryPrivate)
 {
-  this->registerView<voTableView>();
-  this->registerView<voPCAProjectionView>();
   this->registerView<voCorrelationGraphView>();
-  this->registerView<voPCABarView>();
-  this->registerView<voTreeGraphView>();
   this->registerView<voCorrelationHeatMapView>();
   this->registerView<voExtendedTableView>();
   this->registerView<voHorizontalBarView>();
+  this->registerView<voPCABarView>();
+  this->registerView<voPCAProjectionView>();
+  this->registerView<voTableView>();
+  this->registerView<voTreeGraphView>();
   this->registerView<voVolcanoView>();
 }
 
