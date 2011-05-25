@@ -960,6 +960,36 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   //-----------------------------------------------------------------------------
+  // Test vtkStringArray * tableColumnNames(vtkTable * table, int offset)
+  //-----------------------------------------------------------------------------
+  voUtils::tableColumnNames(0, 0);
+
+  vtkNew<vtkTable> tableColumnNamesOffsetTest; // Should end up being identical to tableColumnNamesTest, but we won't trust that
+  tableColumnNamesOffsetTest->DeepCopy(originalTable.GetPointer());
+
+  vtkNew<vtkStringArray> expectedOffsetColumnNames;
+  expectedOffsetColumnNames->SetNumberOfValues(3);
+  expectedOffsetColumnNames->SetValue(1, "Double");
+  expectedOffsetColumnNames->SetValue(2, "Variant");
+
+  for (int cid = 0; cid < tableColumnNamesTest->GetNumberOfColumns(); ++cid)
+    {
+    tableColumnNamesOffsetTest->GetColumn(cid)->SetName(expectedColumnNames->GetValue(cid)); // Set with original vtkStringArray
+    }
+
+  vtkSmartPointer<vtkStringArray> currentOffsetColumnNames =
+      vtkSmartPointer<vtkStringArray>::Take(voUtils::tableColumnNames(tableColumnNamesOffsetTest.GetPointer(), 1));
+
+  success = compareArray(currentOffsetColumnNames.GetPointer(), expectedOffsetColumnNames.GetPointer()); // Compare with offset vtkStringArray
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with tableColumnNames(.., offset) - "
+              << "'currentColumnNames' is different from 'expectedColumnNames'" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
   // Test counterIntToAlpha(int intVal), counterAlphaToInt(QString alphaVal)
   //-----------------------------------------------------------------------------
 
