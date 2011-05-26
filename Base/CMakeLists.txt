@@ -67,6 +67,8 @@ SET(KIT_SRCS
   voTableDataObject.h
   voUtils.cpp
   voUtils.h
+  voUtilsSoap.cpp
+  voUtilsSoap.h
   voView.cpp
   voView.h
   voViewFactory.cpp
@@ -163,6 +165,7 @@ SET(${PROJECT_NAME}_LINK_LIBRARIES
   ${VTK_LIBRARIES}
   ${EXTRA_LIBRARIES}
   ${QT_LIBRARIES}
+  ${QtSOAP_LIBRARIES}
   QtPropertyBrowser
   )
 TARGET_LINK_LIBRARIES(
