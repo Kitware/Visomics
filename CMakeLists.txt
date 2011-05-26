@@ -54,7 +54,7 @@ ENDFOREACH()
 #-----------------------------------------------------------------------------
 # Qt
 #
-FIND_PACKAGE(Qt4 4.7 COMPONENTS QtCore QtGui QtNetwork QtScript REQUIRED)
+FIND_PACKAGE(Qt4 4.7 COMPONENTS QtCore QtGui QtNetwork QtScript QtXML REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
 #-----------------------------------------------------------------------------
@@ -159,6 +159,12 @@ ENDIF()
 
 FIND_PACKAGE(QtPropertyBrowser REQUIRED)
 INCLUDE(${QtPropertyBrowser_USE_FILE})
+
+#-----------------------------------------------------------------------------
+# QtSOAP
+
+FIND_PACKAGE(QtSOAP REQUIRED)
+INCLUDE(${QtSOAP_USE_FILE})
 
 #-----------------------------------------------------------------------------
 # Set C/CXX Flags
