@@ -2,6 +2,8 @@
 PROJECT(VisomicsBase)
 
 SET(KIT_SRCS
+  Analysis/voFoldChange.cpp
+  Analysis/voFoldChange.h
   Analysis/voHierarchicalClustering.h
   Analysis/voHierarchicalClustering.cpp
   Analysis/voKEGG.h
@@ -10,26 +12,32 @@ SET(KIT_SRCS
   Analysis/voKMeansClustering.h
   Analysis/voPCAStatistics.cpp
   Analysis/voPCAStatistics.h
+  Analysis/voTTest.cpp
+  Analysis/voTTest.h
   Analysis/voXCorrel.cpp
   Analysis/voXCorrel.h
+
+  Normalization/voLog2.cpp
+  Normalization/voLog2.h
   
   Views/voCorrelationGraphView.cpp
   Views/voCorrelationGraphView.h
+  Views/voCorrelationHeatMapView.cpp
+  Views/voCorrelationHeatMapView.h
   Views/voExtendedTableView.cpp
   Views/voExtendedTableView.h
-  Views/voPCABarPlot.cpp
-  Views/voPCABarPlot.h
-  Views/voPCAProjectionPlot.cpp
-  Views/voPCAProjectionPlot.h
+  Views/voHorizontalBarView.h
+  Views/voHorizontalBarView.cpp
+  Views/voPCABarView.cpp
+  Views/voPCABarView.h
+  Views/voPCAProjectionView.cpp
+  Views/voPCAProjectionView.h
   Views/voTableView.cpp
   Views/voTableView.h
   Views/voTreeGraphView.h
   Views/voTreeGraphView.cpp
-  Views/voCorrelationHeatMapView.cpp
-  Views/voCorrelationHeatMapView.h
-  Views/voChartXY.h
-  Views/voChartXY.cpp
-
+  Views/voVolcanoView.cpp
+  Views/voVolcanoView.h
   
   voAnalysis.cpp
   voAnalysis.h
@@ -53,6 +61,8 @@ SET(KIT_SRCS
   voIOManager.cpp
   voIOManager.h
   voQObjectFactory.h
+  voRegistry.cpp
+  voRegistry.h
   voTableDataObject.cpp
   voTableDataObject.h
   voUtils.cpp
@@ -69,19 +79,23 @@ SET(KIT_SRCS
   )
   
 SET(KIT_MOC_SRCS
+  Analysis/voFoldChange.h
   Analysis/voHierarchicalClustering.h
   Analysis/voKEGG.h
   Analysis/voKMeansClustering.h
   Analysis/voPCAStatistics.h
+  Analysis/voTTest.h
   Analysis/voXCorrel.h
   
   Views/voCorrelationGraphView.h
+  Views/voCorrelationHeatMapView.h
   Views/voExtendedTableView.h
-  Views/voPCABarPlot.h
-  Views/voPCAProjectionPlot.h
+  Views/voHorizontalBarView.h
+  Views/voPCABarView.h
+  Views/voPCAProjectionView.h
   Views/voTableView.h
   Views/voTreeGraphView.h
-  Views/voCorrelationHeatMapView.h
+  Views/voVolcanoView.h
   
   voAnalysis.h
   voAnalysisDriver.h
@@ -106,6 +120,8 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_BINARY_DIR}
   ${CMAKE_CURRENT_SOURCE_DIR}/Analysis
   ${CMAKE_CURRENT_BINARY_DIR}/Analysis
+  ${CMAKE_CURRENT_SOURCE_DIR}/Normalization
+  ${CMAKE_CURRENT_BINARY_DIR}/Normalization
   ${CMAKE_CURRENT_SOURCE_DIR}/Views
   ${CMAKE_CURRENT_BINARY_DIR}/Views
   )
@@ -156,5 +172,7 @@ TARGET_LINK_LIBRARIES(
   
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)
+  ADD_SUBDIRECTORY(Analysis/Testing)
+  ADD_SUBDIRECTORY(Normalization/Testing)
 ENDIF()
 
