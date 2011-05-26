@@ -438,3 +438,13 @@ void voUtils::arrayToTable(vtkArray* srcArray, vtkTable* destTable)
   destTable->ShallowCopy(arrToTab->GetOutput());
 }
 
+QList<int> voUtils::range(int start, int stop, int step)
+{
+  QList<int> rangeList;
+  for (int ctr = start; ctr < stop; ctr += step)
+    {
+    rangeList << ctr;
+    }
+  return rangeList;
+}
+
