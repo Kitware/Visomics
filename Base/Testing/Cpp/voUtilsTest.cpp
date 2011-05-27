@@ -1139,6 +1139,35 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   //-----------------------------------------------------------------------------
+  // Test tableToArray() (all columns)
+  //-----------------------------------------------------------------------------
+
+  vtkNew<vtkTable> tableToArrayBaseTable;
+  vtkArray * tableToArrayBaseArray = vtkArray::CreateArray(vtkArray::DENSE, VTK_INT);
+
+  tableToArrayBaseArray->Resize(2, 3);
+  for (int col = 0; col < 3; ++col)
+    {
+    vtkNew<vtkIntArray> tempColArray;
+    for(int row = 0; row < 2; ++row)
+      {
+      tempColArray->InsertNextValue(col*2 + row);
+      tableToArrayBaseArray->SetVariantValue(row, col, vtkVariant(col*2 + row));
+      }
+    tableToArrayBaseTable->AddColumn(tempColArray.GetPointer());
+    }
+
+vtkSmartPointer<vtkArray> tableToArrayConvertedArray;
+voUtils::tableToArray(0, tableToArrayConvertedArray); // Passing a Null source array shouldn't crash
+voUtils::tableToArray(tableToArrayBaseTable.GetPointer(), tableToArrayConvertedArray);
+
+  if (!compareArray(tableToArrayBaseArray, tableToArrayConvertedArray.GetPointer()))
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with tableToArray method !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
   // Test arrayToTable()
   //-----------------------------------------------------------------------------
 
