@@ -1173,5 +1173,19 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     return EXIT_FAILURE;
     }
 
+  //-----------------------------------------------------------------------------
+  // Test range()
+  //-----------------------------------------------------------------------------
+  QList<int> baseIntList;
+  baseIntList << 1 << 3 << 5;
+
+  QList<int> generatedIntList = voUtils::range(1, 7, 2);
+
+  if(baseIntList != generatedIntList)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with range method !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
   return EXIT_SUCCESS;
 }
