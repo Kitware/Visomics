@@ -9,6 +9,7 @@
 
 #include "voCorrelationGraphView.h"
 #include "voCorrelationHeatMapView.h"
+#include "voHierarchicalClusteringHeatMapView.h"
 #include "voExtendedTableView.h"
 #include "voHorizontalBarView.h"
 #include "voPCAProjectionView.h"
@@ -36,6 +37,7 @@ voViewFactory::voViewFactory():d_ptr(new voViewFactoryPrivate)
 {
   this->registerView<voCorrelationGraphView>();
   this->registerView<voCorrelationHeatMapView>();
+  this->registerView<voHierarchicalClusteringHeatMapView>();
   this->registerView<voExtendedTableView>();
   this->registerView<voHorizontalBarView>();
   this->registerView<voPCABarView>();

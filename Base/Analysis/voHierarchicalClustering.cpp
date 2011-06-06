@@ -9,6 +9,7 @@
 #include "voDataObject.h"
 #include "voHierarchicalClustering.h"
 #include "vtkExtendedTable.h"
+#include "voTableDataObject.h"
 
 // VTK includes
 #include <vtkDataSetAttributes.h>
@@ -49,6 +50,9 @@ void voHierarchicalClustering::setOutputInformation()
 {
   this->addOutputType("clusterTree", "vtkTree",
                       "voTreeGraphView", "clusterTree");
+  this->addOutputType("cluster", "vtkTable",
+                      "voHierarchicalClusteringHeatMapView", "Hierarchical Clustering Heat Map",
+                      "voTableView", "Table (Hierarchical Clustering)");
 }
 
 // --------------------------------------------------------------------------
@@ -318,6 +322,26 @@ bool voHierarchicalClustering::execute()
   tree->GetVertexData()->AddArray(distanceArray);
 
   this->setOutput("clusterTree", new voDataObject("clusterTree", tree));
+
+  vtkSmartPointer<vtkTable> clusterTable = vtkSmartPointer<vtkTable>::New();
+  // Set up headers for the rows.
+  vtkSmartPointer<vtkStringArray> header = vtkStringArray::SafeDownCast(table->GetColumn(0));
+  if (!header)
+    {
+    std::cout << "Downcast DID NOT work." << std::endl;
+    return 1;
+    }
+
+  clusterTable->AddColumn(header);
+
+  for (vtkIdType c = 0;c < table->GetNumberOfColumns(); ++c)
+    {
+    vtkAbstractArray* col = table->GetColumn(c);
+    col->SetName(header->GetValue(c));
+    clusterTable->AddColumn(col);
+    }
+  this->setOutput("cluster", new voTableDataObject("cluster", clusterTable));
+
 
   return true;
 }
