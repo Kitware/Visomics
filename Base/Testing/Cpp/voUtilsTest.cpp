@@ -960,6 +960,36 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   //-----------------------------------------------------------------------------
+  // Test vtkStringArray * tableColumnNames(vtkTable * table, int offset)
+  //-----------------------------------------------------------------------------
+  voUtils::tableColumnNames(0, 0);
+
+  vtkNew<vtkTable> tableColumnNamesOffsetTest; // Should end up being identical to tableColumnNamesTest, but we won't trust that
+  tableColumnNamesOffsetTest->DeepCopy(originalTable.GetPointer());
+
+  vtkNew<vtkStringArray> expectedOffsetColumnNames;
+  expectedOffsetColumnNames->SetNumberOfValues(3);
+  expectedOffsetColumnNames->SetValue(1, "Double");
+  expectedOffsetColumnNames->SetValue(2, "Variant");
+
+  for (int cid = 0; cid < tableColumnNamesTest->GetNumberOfColumns(); ++cid)
+    {
+    tableColumnNamesOffsetTest->GetColumn(cid)->SetName(expectedColumnNames->GetValue(cid)); // Set with original vtkStringArray
+    }
+
+  vtkSmartPointer<vtkStringArray> currentOffsetColumnNames =
+      vtkSmartPointer<vtkStringArray>::Take(voUtils::tableColumnNames(tableColumnNamesOffsetTest.GetPointer(), 1));
+
+  success = compareArray(currentOffsetColumnNames.GetPointer(), expectedOffsetColumnNames.GetPointer()); // Compare with offset vtkStringArray
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with tableColumnNames(.., offset) - "
+              << "'currentColumnNames' is different from 'expectedColumnNames'" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
   // Test counterIntToAlpha(int intVal), counterAlphaToInt(QString alphaVal)
   //-----------------------------------------------------------------------------
 
@@ -1109,6 +1139,35 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   //-----------------------------------------------------------------------------
+  // Test tableToArray() (all columns)
+  //-----------------------------------------------------------------------------
+
+  vtkNew<vtkTable> tableToArrayBaseTable;
+  vtkArray * tableToArrayBaseArray = vtkArray::CreateArray(vtkArray::DENSE, VTK_INT);
+
+  tableToArrayBaseArray->Resize(2, 3);
+  for (int col = 0; col < 3; ++col)
+    {
+    vtkNew<vtkIntArray> tempColArray;
+    for(int row = 0; row < 2; ++row)
+      {
+      tempColArray->InsertNextValue(col*2 + row);
+      tableToArrayBaseArray->SetVariantValue(row, col, vtkVariant(col*2 + row));
+      }
+    tableToArrayBaseTable->AddColumn(tempColArray.GetPointer());
+    }
+
+vtkSmartPointer<vtkArray> tableToArrayConvertedArray;
+voUtils::tableToArray(0, tableToArrayConvertedArray); // Passing a Null source array shouldn't crash
+voUtils::tableToArray(tableToArrayBaseTable.GetPointer(), tableToArrayConvertedArray);
+
+  if (!compareArray(tableToArrayBaseArray, tableToArrayConvertedArray.GetPointer()))
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with tableToArray method !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
   // Test arrayToTable()
   //-----------------------------------------------------------------------------
 
@@ -1140,6 +1199,20 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   if (!compareTable(__LINE__, insertTableTest.GetPointer(),
                     arrayToTableTestTable.GetPointer(), /* comparetype= */ false))
     {
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
+  // Test range()
+  //-----------------------------------------------------------------------------
+  QList<int> baseIntList;
+  baseIntList << 1 << 3 << 5;
+
+  QList<int> generatedIntList = voUtils::range(1, 7, 2);
+
+  if(baseIntList != generatedIntList)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with range method !" << std::endl;
     return EXIT_FAILURE;
     }
 

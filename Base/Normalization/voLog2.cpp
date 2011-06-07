@@ -4,7 +4,7 @@
 //#include <QVariant>
 
 // Visomics includes
-#include "voLog2.h"
+#include "voNormalization.h"
 
 // VTK includes
 #include <vtkDoubleArray.h>

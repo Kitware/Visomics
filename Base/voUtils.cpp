@@ -395,6 +395,17 @@ int voUtils::counterAlphaToInt(const QString& alphaVal)
 }
 
 //----------------------------------------------------------------------------
+bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray)
+{
+  if (!srcTable)
+    {
+    return false;
+    }
+
+  return voUtils::tableToArray(srcTable, destArray, voUtils::range(0, srcTable->GetNumberOfColumns()));
+}
+
+//----------------------------------------------------------------------------
 bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray, const QList<int>& columnList)
 {
   if (!srcTable)
@@ -436,5 +447,15 @@ void voUtils::arrayToTable(vtkArray* srcArray, vtkTable* destTable)
   arrToTab->Update();
 
   destTable->ShallowCopy(arrToTab->GetOutput());
+}
+
+QList<int> voUtils::range(int start, int stop, int step)
+{
+  QList<int> rangeList;
+  for (int ctr = start; ctr < stop; ctr += step)
+    {
+    rangeList << ctr;
+    }
+  return rangeList;
 }
 
