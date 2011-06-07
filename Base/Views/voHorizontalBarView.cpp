@@ -119,6 +119,7 @@ void voHorizontalBarView::setDataObject(voDataObject *dataObject)
   d->BarPlot->SetOrientation(vtkPlotBar::HORIZONTAL);
   d->BarPlot->SetColor(color[0], color[1], color[2], 255);
   d->BarPlot->SetIndexedLabels(verticalLabels);
+  d->BarPlot->SetTooltipLabelFormat("%i: %y");
 
   d->Chart->GetAxis(vtkAxis::LEFT)->SetBehavior(vtkAxis::FIXED);
   // Default vertical zoom shows all bars at once. If we have many bars, we may want to change this.
