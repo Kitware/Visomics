@@ -50,9 +50,6 @@ void voHierarchicalClustering::setOutputInformation()
 {
   this->addOutputType("clusterTree", "vtkTree",
                       "voTreeGraphView", "clusterTree");
-/*  this->addOutputType("cluster", "vtkTable",
-                      "voHierarchicalClusteringHeatMapView", "HeatMap",
-                      "voTableView", "Table (Hierarchical Clustering)"); */
 
   this->addOutputType("cluster", "vtkTable",
                       "voHierarchicalClusteringHeatMapView", "HeatMap");
@@ -326,8 +323,11 @@ bool voHierarchicalClustering::execute()
 
   this->setOutput("clusterTree", new voDataObject("clusterTree", tree));
 
+
+  //Generate the heat map for the cluster
+
   vtkSmartPointer<vtkTable> clusterTable = vtkSmartPointer<vtkTable>::New();
-  // Set up headers for the rows.
+
   vtkSmartPointer<vtkStringArray> header = vtkStringArray::SafeDownCast(table->GetColumn(0));
   if (!header)
     {
@@ -337,10 +337,10 @@ bool voHierarchicalClustering::execute()
 
   clusterTable->AddColumn(header);
 
-  for (vtkIdType c = 0;c < table->GetNumberOfColumns(); ++c)
+  for (vtkIdType c = 1;c < table->GetNumberOfColumns(); ++c)
     {
     vtkAbstractArray* col = table->GetColumn(c);
-    col->SetName(header->GetValue(c));
+    col->SetName(col->GetName());
     clusterTable->AddColumn(col);
     }
   this->setOutput("cluster", new voTableDataObject("cluster", clusterTable));

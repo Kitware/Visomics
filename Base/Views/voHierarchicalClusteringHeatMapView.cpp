@@ -90,15 +90,21 @@ void voHierarchicalClusteringHeatMapView::setDataObject(voDataObject* dataObject
     qCritical() << "voHierarchicalClusteringHeatMapView - Failed to setDataObject - vtkTable data is expected !";
     return;
     }
+  vtkSmartPointer<vtkStringArray> verticalLabels = vtkStringArray::SafeDownCast(table->GetColumn(0)); 
 
-  vtkStringArray* verticalLabels = vtkStringArray::SafeDownCast(table->GetColumn(0));
   if (!verticalLabels)
     {
     qCritical() << "voHierarchicalClusteringHeatMapView - Failed to setDataObject - first column of vtkTable data could not be converted to string !";
     return;
     }
 
-  vtkSmartPointer<vtkStringArray> horizontalLabels = vtkSmartPointer<vtkStringArray>::Take(voUtils::tableColumnNames(table, 1));
+  vtkSmartPointer<vtkStringArray> horizontalLabels = vtkSmartPointer<vtkStringArray>::New();
+  horizontalLabels->SetNumberOfValues( table->GetNumberOfColumns() - 1);
+  for (int cid = 1; cid < table->GetNumberOfColumns(); ++cid)
+    {
+    vtkAbstractArray * column = table->GetColumn(cid);
+    horizontalLabels->SetValue((cid - 1), column->GetName());
+    }
 
   vtkNew<vtkDoubleArray> verticalTicks;
   for(double i = table->GetNumberOfRows() - 1; i >= 0; i--)
@@ -142,7 +148,7 @@ void voHierarchicalClusteringHeatMapView::setDataObject(voDataObject* dataObject
 
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle("");
   d->Chart->GetAxis(vtkAxis::LEFT)->SetBehavior(vtkAxis::FIXED);
-  d->Chart->GetAxis(vtkAxis::LEFT)->SetTickLabels(verticalLabels);
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetTickLabels(verticalLabels.GetPointer());
   d->Chart->GetAxis(vtkAxis::LEFT)->SetRange(0.0, static_cast<double>(table->GetNumberOfRows()));
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTickPositions(verticalTicks.GetPointer());
 
