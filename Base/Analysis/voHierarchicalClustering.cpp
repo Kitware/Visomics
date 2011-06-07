@@ -50,9 +50,12 @@ void voHierarchicalClustering::setOutputInformation()
 {
   this->addOutputType("clusterTree", "vtkTree",
                       "voTreeGraphView", "clusterTree");
+/*  this->addOutputType("cluster", "vtkTable",
+                      "voHierarchicalClusteringHeatMapView", "HeatMap",
+                      "voTableView", "Table (Hierarchical Clustering)"); */
+
   this->addOutputType("cluster", "vtkTable",
-                      "voHierarchicalClusteringHeatMapView", "Hierarchical Clustering Heat Map",
-                      "voTableView", "Table (Hierarchical Clustering)");
+                      "voHierarchicalClusteringHeatMapView", "HeatMap");
 }
 
 // --------------------------------------------------------------------------
