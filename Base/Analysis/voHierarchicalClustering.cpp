@@ -54,7 +54,7 @@ void voHierarchicalClustering::setOutputInformation()
                       "voTreeGraphView", "clusterTree");
 
   this->addOutputType("cluster", "vtkTable",
-                      "voHierarchicalClusteringHeatMapView", "HeatMap");
+                      "voHeatMapView", "HeatMap");
 }
 
 // --------------------------------------------------------------------------
@@ -326,15 +326,6 @@ bool voHierarchicalClustering::execute()
   this->setOutput("clusterTree", new voDataObject("clusterTree", tree));
 
 
-  //Generate the heat map for the cluster
-    vtkSmartPointer<vtkAdjacentVertexIterator> it =
-    vtkSmartPointer<vtkAdjacentVertexIterator>::New();
-
-  int numberOfChildren = clusterLabel->GetNumberOfValues();
-  qDebug() << "Number of Children" << numberOfChildren;
-
-  unsigned int childrenIndex = 0;
-  vtkIdType vertex;
   vtkIdType level;
   vtkIdType root = tree->GetRoot();
 
@@ -344,7 +335,7 @@ bool voHierarchicalClustering::execute()
   if( tree->GetVertexData()->GetAbstractArray(labelArray) == NULL || 
       tree->GetVertexData()->GetAbstractArray(heightArray) == NULL )
     {
-    qDebug() << "ERROR: The label or height attribute is not defined in the tree."; 
+    //qDebug() << "ERROR: The label or height attribute is not defined in the tree."; 
     }
   else
     {
@@ -354,7 +345,7 @@ bool voHierarchicalClustering::execute()
     for (int i = 0; i < labels->GetNumberOfValues(); ++i)
       {
       double * value = heights->GetTuple(i);
-      qDebug() << "\t\tValue " << i << ": " << labels->GetValue(i) <<"\t" << value[0] << endl;
+      //qDebug() << "\t\tValue " << i << ": " << labels->GetValue(i) <<"\t" << value[0] << endl;
       }
     }
 
@@ -387,11 +378,11 @@ bool voHierarchicalClustering::execute()
 
     level = tree->GetLevel(vertex);
   
-    qDebug() << "Vertex:\t " << vertex << "\t" << level << "\t" << labels->GetValue(vertex); 
+    //qDebug() << "Vertex:\t " << vertex << "\t" << level << "\t" << labels->GetValue(vertex); 
 
     }
 
-  qDebug() << "Maximum Level: " << maxLevel;
+  //qDebug() << "Maximum Level: " << maxLevel;
 
   vtkSmartPointer<vtkTable> clusterTable = vtkSmartPointer<vtkTable>::New();
 
@@ -406,7 +397,7 @@ bool voHierarchicalClustering::execute()
 
   for( int i=maxLevel; i >= 0; i-- )
     {
-    qDebug() << "Dealing with level \t" << i;
+    //qDebug() << "Dealing with level \t" << i;
 
     vtkSmartPointer<vtkTreeDFSIterator> dfs =
       vtkSmartPointer<vtkTreeDFSIterator>::New();
@@ -419,12 +410,12 @@ bool voHierarchicalClustering::execute()
       vtkIdType vertex = dfs->Next();
 
       level = tree->GetLevel(vertex);
-      qDebug() << "\t\t..." << level;
+      //qDebug() << "\t\t..." << level;
       if ( level == i )
         {
         if ( labels->GetValue(vertex) != "")
           {
-          qDebug() << "\t" << labels->GetValue(vertex);
+          //qDebug() << "\t" << labels->GetValue(vertex);
           vtkAbstractArray* col = table->GetColumnByName(labels->GetValue(vertex));
           col->SetName(col->GetName());
           clusterTable->AddColumn(col);
