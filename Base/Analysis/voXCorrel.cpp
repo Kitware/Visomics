@@ -8,6 +8,7 @@
 // Visomics includes
 #include "voXCorrel.h"
 #include "voTableDataObject.h"
+#include "voUtils.h"
 #include "vtkExtendedTable.h"
 
 // VTK includes
@@ -161,6 +162,7 @@ bool voXCorrel::execute()
     col->SetName(header->GetValue(c));
     corr->AddColumn(col);
     }
+  voUtils::flipTable(corr, voUtils::AboutVerticalAxis, 1);
   this->setOutput("corr", new voTableDataObject("corr", corr));
 
   // Generate image of the correlation table 
