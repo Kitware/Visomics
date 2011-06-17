@@ -223,7 +223,7 @@ bool voUtils::flipTable(vtkTable* srcTable, vtkTable* destTable, const FlipOptio
 
   if(flipOption & voUtils::AboutHorizonalAxis)
     {
-    for(int topRid = offset; topRid < destTable->GetNumberOfRows() / 2; topRid++)
+    for(int topRid = offset; topRid <= (destTable->GetNumberOfRows() - offset) / 2; topRid++)
       {
       int bottomRid = destTable->GetNumberOfRows() - (topRid - offset) - 1;
       for(int cid = 0; cid < destTable->GetNumberOfColumns(); cid++)
@@ -237,7 +237,7 @@ bool voUtils::flipTable(vtkTable* srcTable, vtkTable* destTable, const FlipOptio
 
   if(flipOption & voUtils::AboutVerticalAxis)
     {
-    for(int leftCid = offset; leftCid < srcTable->GetNumberOfColumns() / 2; leftCid++)
+    for(int leftCid = offset; leftCid <= (srcTable->GetNumberOfColumns() - offset) / 2; leftCid++)
       {
       int rightCid = srcTable->GetNumberOfColumns() - (leftCid - offset) - 1;
       tempString = srcTable->GetColumn(leftCid)->GetName();
