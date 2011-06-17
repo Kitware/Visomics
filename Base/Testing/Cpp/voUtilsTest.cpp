@@ -603,7 +603,6 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
       }
     inputDoubleTableWithHeaderColumn->AddColumn(doubleArray.GetPointer());
     }
-  inputDoubleTableWithHeaderColumn->Dump();
 
   vtkNew<vtkTable> transposedDoubleTableWithHeaderColumn;
   if (!transposeAndCheckResult(__LINE__, voUtils::Headers,
