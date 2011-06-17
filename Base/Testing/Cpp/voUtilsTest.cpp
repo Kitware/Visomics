@@ -683,6 +683,43 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   //-----------------------------------------------------------------------------
+  // Test flipTable(vtkTable* table, const FlipOption& flipOption, int offset)
+  //-----------------------------------------------------------------------------
+  vtkNew<vtkTable> flipTableBaseTable;
+  vtkNew<vtkTable> flipTableVerticalFlipExpectedTable;
+
+  flipTableBaseTable->AddColumn(stringArray3.GetPointer());
+  flipTableBaseTable->AddColumn(var0Array3.GetPointer());
+  flipTableBaseTable->AddColumn(var1Array3.GetPointer());
+  flipTableBaseTable->AddColumn(var2Array3.GetPointer());
+  flipTableBaseTable->AddColumn(var3Array3.GetPointer());
+  flipTableBaseTable->AddColumn(var4Array3.GetPointer());
+
+  flipTableVerticalFlipExpectedTable->AddColumn(stringArray3.GetPointer());
+  flipTableVerticalFlipExpectedTable->AddColumn(var4Array3.GetPointer());
+  flipTableVerticalFlipExpectedTable->AddColumn(var3Array3.GetPointer());
+  flipTableVerticalFlipExpectedTable->AddColumn(var2Array3.GetPointer());
+  flipTableVerticalFlipExpectedTable->AddColumn(var1Array3.GetPointer());
+  flipTableVerticalFlipExpectedTable->AddColumn(var0Array3.GetPointer());
+
+  success = voUtils::flipTable(flipTableBaseTable.GetPointer(), voUtils::AboutVerticalAxis, 1);
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with flipTable()" << std::endl;
+    flipTableBaseTable->Dump();
+    return EXIT_FAILURE;
+    }
+
+  // Compare table
+  if (!compareTable(__LINE__, flipTableBaseTable.GetPointer(), flipTableVerticalFlipExpectedTable.GetPointer()))
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with flipTable method !" << std::endl;
+    flipTableBaseTable->Dump();
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
   // Test insertColumnIntoTable(vtkTable * table, int position, vtkAbstractArray * column)
   //-----------------------------------------------------------------------------
 
