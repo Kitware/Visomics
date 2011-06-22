@@ -162,8 +162,10 @@ bool voXCorrel::execute()
     col->SetName(header->GetValue(c));
     corr->AddColumn(col);
     }
-  voUtils::flipTable(corr, voUtils::AboutVerticalAxis, 1);
-  this->setOutput("corr", new voTableDataObject("corr", corr));
+
+  vtkSmartPointer<vtkTable> corrFlip = vtkSmartPointer<vtkTable>::New();
+  voUtils::flipTable(corr, corrFlip, voUtils::AboutVerticalAxis, 1);
+  this->setOutput("corr", new voTableDataObject("corr", corrFlip));
 
   // Generate image of the correlation table 
   //  vtkIdType corrMatrixNumberOfCols = corr->GetNumberOfColumns();
