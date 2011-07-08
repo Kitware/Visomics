@@ -1,22 +1,22 @@
 
 // Qt includes
-#include <QLayout>
 #include <QDebug>
+#include <QLayout>
 
 // Visomics includes
-#include "voTreeGraphView.h"
 #include "voDataObject.h"
+#include "voTreeGraphView.h"
 
 // VTK includes
 #include <QVTKWidget.h>
-#include <vtkTreeLayoutStrategy.h>
 #include <vtkGraph.h>
-#include <vtkTree.h>
 #include <vtkGraphLayoutView.h>
 #include <vtkLookupTable.h>
 #include <vtkRenderedGraphRepresentation.h>
 #include <vtkSmartPointer.h>
 #include <vtkTextProperty.h>
+#include <vtkTree.h>
+#include <vtkTreeLayoutStrategy.h>
 #include <vtkViewTheme.h>
 
 // --------------------------------------------------------------------------
