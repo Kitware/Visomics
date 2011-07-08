@@ -92,6 +92,6 @@ void voTreeGraphView::setDataObject(voDataObject* dataObject)
     }
 
   d->GraphView->SetRepresentationFromInputConnection(tree->GetProducerPort());
+  d->GraphView->ResetCamera();
   d->GraphView->Render();
 }
-
