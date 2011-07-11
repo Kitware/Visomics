@@ -3,6 +3,7 @@ SET(KIT ${PROJECT_NAME})
 
 CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voAnalysisTest.cpp
+  voCheckR_HOMETest.cpp
   voUtilsTest.cpp
   voSoapClientTest.cpp
   vtkExtendedTableTest.cpp
@@ -22,6 +23,8 @@ MACRO(SIMPLE_TEST TESTNAME)
 ENDMACRO()
 
 SIMPLE_TEST(voAnalysisTest)
+SIMPLE_TEST(voCheckR_HOMETest)
+SET_PROPERTY(TEST voCheckR_HOMETest PROPERTY FAIL_REGULAR_EXPRESSION "R_HOME:[ ]+")
 SIMPLE_TEST(voUtilsTest)
 SIMPLE_TEST(voSoapClientTest)
 SIMPLE_TEST(vtkExtendedTableTest)
