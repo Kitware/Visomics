@@ -1,5 +1,5 @@
-# run: R CMD BATCH GetRExternalPackages.R
-# note: recommend that this be run with administrative/root privileges
+# Run: R CMD BATCH GetRExternalPackages.R
+# Note: It's recommended to run this script with administrative/root privileges
 
 is.installed <- function(mypkg) is.element(mypkg, installed.packages()[,1])
 
@@ -18,4 +18,4 @@ if( !is.installed("preprocessCore") ) {
   biocLite("preprocessCore")
 } else {
   write("  Package 'preprocessCore' found", file = "")
-  }
+}
