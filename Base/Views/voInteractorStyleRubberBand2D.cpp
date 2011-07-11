@@ -12,10 +12,14 @@
 vtkStandardNewMacro(voInteractorStyleRubberBand2D);
 
 // --------------------------------------------------------------------------
-voInteractorStyleRubberBand2D::voInteractorStyleRubberBand2D() {} // Superclass constructor called automatically
+voInteractorStyleRubberBand2D::voInteractorStyleRubberBand2D()
+{
+}
 
 // --------------------------------------------------------------------------
-voInteractorStyleRubberBand2D::~voInteractorStyleRubberBand2D() {} // Superclass destructor called automatically
+voInteractorStyleRubberBand2D::~voInteractorStyleRubberBand2D()
+{
+}
 
 // --------------------------------------------------------------------------
 void voInteractorStyleRubberBand2D::OnLeftButtonDown()
