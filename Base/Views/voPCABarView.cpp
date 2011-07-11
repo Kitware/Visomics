@@ -112,6 +112,7 @@ void voPCABarView::setDataObject(voDataObject *dataObject)
   d->Plot->SetInput(transpose.GetPointer(), 1, 2);
   d->Plot->SetColor(color[0], color[1], color[2], 255);
   d->Plot->SetIndexedLabels(labels);
+  d->Plot->SetTooltipLabelFormat("%i: %y");
 
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(transpose->GetColumnName(2)); // y
