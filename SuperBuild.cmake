@@ -55,11 +55,11 @@ include(CMakeExternals/VisomicsData.cmake)
 #-----------------------------------------------------------------------------
 
 SET(project_cmake_boolean_args
-  BUILD_DOCUMENTATION
+  #BUILD_DOCUMENTATION # Not used
   BUILD_TESTING
   BUILD_SHARED_LIBS
   WITH_COVERAGE
-  WITH_MEMCHECK
+  #WITH_MEMCHECK # Not used
   )
   
 SET(project_superbuild_boolean_args)
@@ -73,6 +73,15 @@ ENDFOREACH()
 # ENDFOREACH()
 
 #-----------------------------------------------------------------------------
+# Define list of additional options used to configure Visomics
+#------------------------------------------------------------------------------
+set(project_superbuild_extra_args)
+
+if(DEFINED CTEST_CONFIGURATION_TYPE)
+  list(APPEND project_superbuild_extra_args -DCTEST_CONFIGURATION_TYPE:STRING=${CTEST_CONFIGURATION_TYPE})
+endif()
+
+#-----------------------------------------------------------------------------
 # Configure and build the project
 #------------------------------------------------------------------------------
 
@@ -83,16 +92,16 @@ ExternalProject_Add(${proj}
   CMAKE_GENERATOR ${gen}
   PREFIX ${proj}${ep_suffix}
   CMAKE_ARGS
+    ${project_superbuild_extra_args}
     ${project_superbuild_boolean_args}
     -DBUILD_SHARED_LIBS:BOOL=${BUILD_SHARED_LIBS}
     -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
     -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-    -DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE}
+    #-DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE} # Not used
     -DVisomics_SUPERBUILD:BOOL=OFF
     -DVisomics_C_FLAGS:STRING=${Visomics_C_FLAGS}
     -DVisomics_CXX_FLAGS:STRING=${Visomics_CXX_FLAGS}
-    -DCTEST_CONFIGURATION_TYPE:STRING=${CTEST_CONFIGURATION_TYPE}
     # QtPropertyBrowser
     -DQtPropertyBrowser_DIR:PATH=${QtPropertyBrowser_DIR}
     # QtSOAP
