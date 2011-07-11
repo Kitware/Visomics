@@ -8,7 +8,7 @@
 #include "voApplication.h"
 #include "voDataModel.h"
 #include "voIOManager.h"
-#include "voLog2.h"
+#include "voNormalization.h"
 #include "voRegistry.h"
 #include "voViewManager.h"
 #include "voAnalysisFactory.h"
