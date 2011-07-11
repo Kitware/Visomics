@@ -6,6 +6,7 @@
 #       cmake <OTHER_OPTIONS> -DR_COMMAND:FILEPATH=/path/to/R-2.11.1/bin/R ../Visomics
 
 find_package(R REQUIRED)
+include(CMakeExternals/RExternalPackages.cmake)
 
 #-----------------------------------------------------------------------------
 # Git protocole option
