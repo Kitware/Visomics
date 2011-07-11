@@ -1,22 +1,24 @@
 
 // Qt includes
-#include <QLayout>
 #include <QDebug>
+#include <QLayout>
 
 // Visomics includes
-#include "voTreeGraphView.h"
 #include "voDataObject.h"
+#include "voInteractorStyleRubberBand2D.h"
+#include "voTreeGraphView.h"
 
 // VTK includes
 #include <QVTKWidget.h>
-#include <vtkTreeLayoutStrategy.h>
 #include <vtkGraph.h>
-#include <vtkTree.h>
 #include <vtkGraphLayoutView.h>
 #include <vtkLookupTable.h>
 #include <vtkRenderedGraphRepresentation.h>
+#include <vtkRenderWindow.h>
 #include <vtkSmartPointer.h>
 #include <vtkTextProperty.h>
+#include <vtkTree.h>
+#include <vtkTreeLayoutStrategy.h>
 #include <vtkViewTheme.h>
 
 // --------------------------------------------------------------------------
@@ -60,6 +62,7 @@ void voTreeGraphView::setupUi(QLayout *layout)
   d->GraphView = vtkSmartPointer<vtkGraphLayoutView>::New();
   d->Widget = new QVTKWidget();
   d->GraphView->SetInteractor(d->Widget->GetInteractor());
+  d->GraphView->SetInteractorStyle(vtkSmartPointer<voInteractorStyleRubberBand2D>::New());
   d->Widget->SetRenderWindow(d->GraphView->GetRenderWindow());
   d->GraphView->DisplayHoverTextOn();
 
@@ -92,6 +95,6 @@ void voTreeGraphView::setDataObject(voDataObject* dataObject)
     }
 
   d->GraphView->SetRepresentationFromInputConnection(tree->GetProducerPort());
+  d->GraphView->ResetCamera();
   d->GraphView->Render();
 }
-

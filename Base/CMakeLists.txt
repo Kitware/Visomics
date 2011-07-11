@@ -28,6 +28,8 @@ SET(KIT_SRCS
   Views/voExtendedTableView.h
   Views/voHorizontalBarView.h
   Views/voHorizontalBarView.cpp
+  Views/voInteractorStyleRubberBand2D.h
+  Views/voInteractorStyleRubberBand2D.cpp
   Views/voPCABarView.cpp
   Views/voPCABarView.h
   Views/voPCAProjectionView.cpp
