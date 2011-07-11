@@ -31,6 +31,7 @@ IF(NOT DEFINED VTK_DIR)
       -DR_LIBRARY_BLAS:FILEPATH=${R_LIBRARY_BLAS}
       -DR_LIBRARY_LAPACK:FILEPATH=${R_LIBRARY_LAPACK}
       -DR_LIBRARY_READLINE:FILEPATH=${R_LIBRARY_READLINE}
+      -DVTK_R_HOME:PATH=${VTK_R_HOME} # HACK - Required because vtkConfigure.h is configured before find_package(R) is called !
       -DVTK_USE_N_WAY_ARRAYS:BOOL=ON # Required for using R interface
       -DVTK_USE_INFOVIS:BOOL=ON # Required for using R interface
       -DBUILD_EXAMPLES:BOOL=OFF
