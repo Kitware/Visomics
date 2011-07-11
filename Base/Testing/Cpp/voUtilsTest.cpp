@@ -1193,9 +1193,9 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     tableToArrayBaseTable->AddColumn(tempColArray.GetPointer());
     }
 
-vtkSmartPointer<vtkArray> tableToArrayConvertedArray;
-voUtils::tableToArray(0, tableToArrayConvertedArray); // Passing a Null source array shouldn't crash
-voUtils::tableToArray(tableToArrayBaseTable.GetPointer(), tableToArrayConvertedArray);
+  vtkSmartPointer<vtkArray> tableToArrayConvertedArray;
+  voUtils::tableToArray(0, tableToArrayConvertedArray); // Passing a Null source array shouldn't crash
+  voUtils::tableToArray(tableToArrayBaseTable.GetPointer(), tableToArrayConvertedArray);
 
   if (!compareArray(tableToArrayBaseArray, tableToArrayConvertedArray.GetPointer()))
     {
