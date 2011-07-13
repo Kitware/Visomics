@@ -34,7 +34,8 @@ int voAnalysisRunTest(int argc, char * argv [])
     std::cerr << "Usage:\n\n"
               << "  " << argv[0] << " <AnalysisName> [-I]\n"
               << "\nOptions:\n"
-              << "\n  -I If specified, the baseline output file will be generated\n" << std::endl;
+              << "\n  -I If specified, the baseline output file will be generated\n"
+              << "\n  -K If specified, the temporary output generated won't be deleted\n" << std::endl;
     return EXIT_FAILURE;
     }
 
@@ -43,6 +44,7 @@ int voAnalysisRunTest(int argc, char * argv [])
   QString fileName("Data/UNC/All_conc_kitware_transposed.csv");
   QString analysisName(argv[1]);
   bool generateOutputBaselines = app.arguments().contains("-I");
+  bool keepTemporaryOutput = app.arguments().contains("-K");
 
   if (QFileInfo(fileName).isRelative())
     {
@@ -139,6 +141,10 @@ int voAnalysisRunTest(int argc, char * argv [])
 
     // Output file
     QTemporaryFile tempFile;
+    if(keepTemporaryOutput)
+      {
+      tempFile.setAutoRemove(false);
+      }
     if (!tempFile.open())
       {
       std::cerr << "Line " << __LINE__ << " - "
