@@ -65,6 +65,9 @@ void voKMeansClustering::setParameterInformation()
   kmeans_algorithms << "Hartigan-Wong" << "Lloyd" << "Forgy" << "MacQueen";
   kmeans_parameters << this->addEnumParameter("algorithm", "Algorithm", kmeans_algorithms);
 
+   // KMeans / number of random start 
+  kmeans_parameters << this->addIntegerParameter("nstart", QObject::tr("Number of random start"), 1, 50, 10);
+
   this->addParameterGroup("KMeans parameters", kmeans_parameters);
 }
 
@@ -83,6 +86,7 @@ bool voKMeansClustering::execute()
   // Parameters
   int kmeans_centers = this->integerParameter("centers");
   int kmeans_iter_max = this->integerParameter("iter.max");
+  int kmeans_number_of_random_start = this->integerParameter("nstart");
   QString kmeans_algorithm = this->enumParameter("algorithm");
 
   vtkSmartPointer< vtkTableToArray > tableToArray = vtkSmartPointer< vtkTableToArray>::New();
@@ -108,7 +112,7 @@ bool voKMeansClustering::execute()
   calc->GetArray("kmSize", "kmSize");
   calc->SetRscript(QString(
                      "metabDatat <- t(metabData)\n"
-                     "km<-kmeans(metabDatat, %1, iter.max = %2, algorithm = \"%3\")\n"
+                     "km<-kmeans(metabDatat, %1, iter.max = %2, nstart = %3, algorithm = \"%4\")\n"
                      "kmCenters<-km$centers \n"
                      "kmCluster<-km$cluster\n"
                      "kmWithinss<-km$withinss\n"
@@ -117,7 +121,7 @@ bool voKMeansClustering::execute()
                      "kmCluster\n"
                      "kmWithinss\n"
                      "kmSize"
-                     ).arg(kmeans_centers).arg(kmeans_iter_max).arg(kmeans_algorithm).toLatin1());
+                     ).arg(kmeans_centers).arg(kmeans_iter_max).arg(kmeans_number_of_random_start).arg(kmeans_algorithm).toLatin1());
 
   calc->Update();
 
