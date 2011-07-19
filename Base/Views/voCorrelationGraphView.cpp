@@ -6,6 +6,7 @@
 // Visomics includes
 #include "voCorrelationGraphView.h"
 #include "voDataObject.h"
+#include "voInteractorStyleRubberBand2D.h"
 
 // VTK includes
 #include <QVTKWidget.h>
@@ -59,6 +60,7 @@ void voCorrelationGraphView::setupUi(QLayout *layout)
   d->GraphView = vtkSmartPointer<vtkGraphLayoutView>::New();
   d->Widget = new QVTKWidget();
   d->GraphView->SetInteractor(d->Widget->GetInteractor());
+  d->GraphView->SetInteractorStyle(vtkSmartPointer<voInteractorStyleRubberBand2D>::New());
   d->Widget->SetRenderWindow(d->GraphView->GetRenderWindow());
   d->GraphView->DisplayHoverTextOn();
   d->GraphView->SetLayoutStrategyToCircular();
@@ -117,6 +119,6 @@ void voCorrelationGraphView::setDataObject(voDataObject* dataObject)
     }
 
   d->GraphView->SetRepresentationFromInput(graph);
+  d->GraphView->ResetCamera();
   d->GraphView->Render();
 }
-
