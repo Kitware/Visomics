@@ -4,7 +4,7 @@
 #include <QDebug>
 
 // Visomics includes
-#include "voCorrelationHeatMapView.h"
+#include "voHeatMapView.h"
 #include "voDataObject.h"
 #include "voUtils.h"
 
@@ -24,20 +24,20 @@
 #include <vtkTextProperty.h>
 
 // --------------------------------------------------------------------------
-class voCorrelationHeatMapViewPrivate
+class voHeatMapViewPrivate
 {
 public:
-  voCorrelationHeatMapViewPrivate();
+  voHeatMapViewPrivate();
   vtkSmartPointer<vtkContextView>       ChartView;
   vtkSmartPointer<vtkChartHistogram2D>  Chart;
   QVTKWidget*                           Widget;
 };
 
 // --------------------------------------------------------------------------
-// voCorrelationHeatMapViewPrivate methods
+// voHeatMapViewPrivate methods
 
 // --------------------------------------------------------------------------
-voCorrelationHeatMapViewPrivate::voCorrelationHeatMapViewPrivate()
+voHeatMapViewPrivate::voHeatMapViewPrivate()
 {
   this->ChartView = 0;
   this->Chart= 0;
@@ -45,23 +45,23 @@ voCorrelationHeatMapViewPrivate::voCorrelationHeatMapViewPrivate()
 }
 
 // --------------------------------------------------------------------------
-// voCorrelationHeatMapView methods
+// voHeatMapView methods
 
 // --------------------------------------------------------------------------
-voCorrelationHeatMapView::voCorrelationHeatMapView(QWidget * newParent):
-    Superclass(newParent), d_ptr(new voCorrelationHeatMapViewPrivate)
+voHeatMapView::voHeatMapView(QWidget * newParent):
+    Superclass(newParent), d_ptr(new voHeatMapViewPrivate)
 {
 }
 
 // --------------------------------------------------------------------------
-voCorrelationHeatMapView::~voCorrelationHeatMapView()
+voHeatMapView::~voHeatMapView()
 {
 }
 
 // --------------------------------------------------------------------------
-void voCorrelationHeatMapView::setupUi(QLayout *layout)
+void voHeatMapView::setupUi(QLayout *layout)
 {
-  Q_D(voCorrelationHeatMapView);
+  Q_D(voHeatMapView);
 
   d->ChartView = vtkSmartPointer<vtkContextView>::New();
   d->Chart = vtkSmartPointer<vtkChartHistogram2D>::New();
@@ -74,27 +74,27 @@ void voCorrelationHeatMapView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voCorrelationHeatMapView::setDataObject(voDataObject* dataObject)
+void voHeatMapView::setDataObject(voDataObject* dataObject)
 {
-  Q_D(voCorrelationHeatMapView);
+  Q_D(voHeatMapView);
 
   if (!dataObject)
     {
-    qCritical() << "voCorrelationHeatMapView - Failed to setDataObject - dataObject is NULL";
+    qCritical() << "voHeatMapView - Failed to setDataObject - dataObject is NULL";
     return;
     }
 
   vtkTable * table = vtkTable::SafeDownCast(dataObject->data());
   if (!table)
     {
-    qCritical() << "voCorrelationHeatMapView - Failed to setDataObject - vtkTable data is expected !";
+    qCritical() << "voHeatMapView - Failed to setDataObject - vtkTable data is expected !";
     return;
     }
 
-  vtkStringArray* verticalLabels = vtkStringArray::SafeDownCast(table->GetColumn(0));
+  vtkSmartPointer<vtkStringArray> verticalLabels = vtkStringArray::SafeDownCast(table->GetColumn(0));
   if (!verticalLabels)
     {
-    qCritical() << "voCorrelationHeatMapView - Failed to setDataObject - first column of vtkTable data could not be converted to string !";
+    qCritical() << "voHeatMapView - Failed to setDataObject - first column of vtkTable data could not be converted to string !";
     return;
     }
 
@@ -142,7 +142,7 @@ void voCorrelationHeatMapView::setDataObject(voDataObject* dataObject)
 
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle("");
   d->Chart->GetAxis(vtkAxis::LEFT)->SetBehavior(vtkAxis::FIXED);
-  d->Chart->GetAxis(vtkAxis::LEFT)->SetTickLabels(verticalLabels);
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetTickLabels(verticalLabels.GetPointer());
   d->Chart->GetAxis(vtkAxis::LEFT)->SetRange(0.0, static_cast<double>(table->GetNumberOfRows()));
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTickPositions(verticalTicks.GetPointer());
 

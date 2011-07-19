@@ -9,6 +9,7 @@
 #include "voDataObject.h"
 #include "voHierarchicalClustering.h"
 #include "vtkExtendedTable.h"
+#include "voTableDataObject.h"
 
 // VTK includes
 #include <vtkDataSetAttributes.h>
@@ -21,6 +22,8 @@
 #include <vtkTable.h>
 #include <vtkTableToArray.h>
 #include <vtkTree.h>
+#include <vtkAdjacentVertexIterator.h>
+#include <vtkTreeDFSIterator.h>
 
 // --------------------------------------------------------------------------
 // voHierarchicalClustering methods
@@ -49,6 +52,9 @@ void voHierarchicalClustering::setOutputInformation()
 {
   this->addOutputType("clusterTree", "vtkTree",
                       "voTreeGraphView", "clusterTree");
+
+  this->addOutputType("cluster", "vtkTable",
+                      "voHeatMapView", "HeatMap");
 }
 
 // --------------------------------------------------------------------------
@@ -318,6 +324,116 @@ bool voHierarchicalClustering::execute()
   tree->GetVertexData()->AddArray(distanceArray);
 
   this->setOutput("clusterTree", new voDataObject("clusterTree", tree));
+
+
+  vtkIdType level;
+  vtkIdType root = tree->GetRoot();
+
+  const char* labelArray = "id";
+  const char* heightArray = "Height";
+
+  if( tree->GetVertexData()->GetAbstractArray(labelArray) == NULL || 
+      tree->GetVertexData()->GetAbstractArray(heightArray) == NULL )
+    {
+    //qDebug() << "ERROR: The label or height attribute is not defined in the tree."; 
+    }
+  else
+    {
+    vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(labelArray));
+    vtkDoubleArray* heights = vtkDoubleArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(heightArray));
+
+    for (int i = 0; i < labels->GetNumberOfValues(); ++i)
+      {
+      double * value = heights->GetTuple(i);
+      //qDebug() << "\t\tValue " << i << ": " << labels->GetValue(i) <<"\t" << value[0] << endl;
+      }
+    }
+
+    
+  vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(labelArray));
+
+  vtkSmartPointer<vtkTreeDFSIterator> dfs =
+    vtkSmartPointer<vtkTreeDFSIterator>::New();
+
+  dfs->SetStartVertex(root);
+  dfs->SetTree(tree);
+
+  vtkIdType leafCount = 0;
+  vtkIdType maxLevel = 0;
+  vtkIdType lastLeafLevel = 0;
+
+  while (dfs->HasNext())
+    {
+    vtkIdType vertex = dfs->Next();
+
+    if (tree->IsLeaf(vertex))
+      {   
+      leafCount++;
+      lastLeafLevel = tree->GetLevel(vertex);
+      }   
+    if (tree->GetLevel(vertex) > maxLevel)
+      {   
+      maxLevel = tree->GetLevel(vertex);
+      }   
+
+    level = tree->GetLevel(vertex);
+  
+    //qDebug() << "Vertex:\t " << vertex << "\t" << level << "\t" << labels->GetValue(vertex); 
+
+    }
+
+  //qDebug() << "Maximum Level: " << maxLevel;
+
+  vtkSmartPointer<vtkTable> clusterTable = vtkSmartPointer<vtkTable>::New();
+
+  vtkSmartPointer<vtkStringArray> header = vtkStringArray::SafeDownCast(table->GetColumn(0));
+  if (!header)
+    {
+    std::cout << "Downcast DID NOT work." << std::endl;
+    return 1;
+    }
+
+  clusterTable->AddColumn(header);
+
+  for( int i=maxLevel; i >= 0; i-- )
+    {
+    //qDebug() << "Dealing with level \t" << i;
+
+    vtkSmartPointer<vtkTreeDFSIterator> dfs =
+      vtkSmartPointer<vtkTreeDFSIterator>::New();
+
+    dfs->SetStartVertex(root);
+    dfs->SetTree(tree);
+
+    while (dfs->HasNext())
+      {
+      vtkIdType vertex = dfs->Next();
+
+      level = tree->GetLevel(vertex);
+      //qDebug() << "\t\t..." << level;
+      if ( level == i )
+        {
+        if ( labels->GetValue(vertex) != "")
+          {
+          //qDebug() << "\t" << labels->GetValue(vertex);
+          vtkAbstractArray* col = table->GetColumnByName(labels->GetValue(vertex));
+          col->SetName(col->GetName());
+          clusterTable->AddColumn(col);
+          }
+        } 
+      }
+    }
+
+  /*
+  for (vtkIdType c = 1;c < table->GetNumberOfColumns(); ++c)
+    {
+    vtkAbstractArray* col = table->GetColumn(c);
+    col->SetName(col->GetName());
+    clusterTable->AddColumn(col);
+    }
+    */
+  this->setOutput("cluster", new voTableDataObject("cluster", clusterTable));
+
 
   return true;
 }
