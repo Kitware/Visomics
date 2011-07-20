@@ -8,9 +8,9 @@
 // Visomics includes
 #include "voDataObject.h"
 #include "voHierarchicalClustering.h"
+#include "voTableDataObject.h"
 #include "voUtils.h"
 #include "vtkExtendedTable.h"
-#include "voTableDataObject.h"
 
 // VTK includes
 #include <vtkDataSetAttributes.h>
@@ -220,18 +220,18 @@ bool voHierarchicalClustering::execute()
   vtkIdType level;
   vtkIdType root = tree->GetRoot();
 
-  const char* labelArray = "id";
-  const char* heightArray = "Height";
+  const char* labelArrayName = "id";
+  const char* heightArrayName = "Height";
 
-  if( tree->GetVertexData()->GetAbstractArray(labelArray) == NULL || 
-      tree->GetVertexData()->GetAbstractArray(heightArray) == NULL )
+  if( tree->GetVertexData()->GetAbstractArray(labelArrayName) == NULL ||
+      tree->GetVertexData()->GetAbstractArray(heightArrayName) == NULL )
     {
     //qDebug() << "ERROR: The label or height attribute is not defined in the tree."; 
     }
   else
     {
-    vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(labelArray));
-    vtkDoubleArray* heights = vtkDoubleArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(heightArray));
+    vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(labelArrayName));
+    vtkDoubleArray* heights = vtkDoubleArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(heightArrayName));
 
     for (int i = 0; i < labels->GetNumberOfValues(); ++i)
       {
@@ -241,13 +241,13 @@ bool voHierarchicalClustering::execute()
     }
 
     
-  vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(labelArray));
+  vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(labelArrayName));
 
   vtkSmartPointer<vtkTreeDFSIterator> dfs =
     vtkSmartPointer<vtkTreeDFSIterator>::New();
 
   dfs->SetStartVertex(root);
-  dfs->SetTree(tree);
+  dfs->SetTree(tree.GetPointer());
 
   vtkIdType leafCount = 0;
   vtkIdType maxLevel = 0;
@@ -277,12 +277,7 @@ bool voHierarchicalClustering::execute()
 
   vtkSmartPointer<vtkTable> clusterTable = vtkSmartPointer<vtkTable>::New();
 
-  vtkSmartPointer<vtkStringArray> header = vtkStringArray::SafeDownCast(table->GetColumn(0));
-  if (!header)
-    {
-    std::cout << "Downcast DID NOT work." << std::endl;
-    return 1;
-    }
+  vtkSmartPointer<vtkStringArray> header = extendedTable->GetRowMetaDataOfInterestAsString();
 
   clusterTable->AddColumn(header);
 
@@ -294,7 +289,7 @@ bool voHierarchicalClustering::execute()
       vtkSmartPointer<vtkTreeDFSIterator>::New();
 
     dfs->SetStartVertex(root);
-    dfs->SetTree(tree);
+    dfs->SetTree(tree.GetPointer());
 
     while (dfs->HasNext())
       {
@@ -307,7 +302,7 @@ bool voHierarchicalClustering::execute()
         if ( labels->GetValue(vertex) != "")
           {
           //qDebug() << "\t" << labels->GetValue(vertex);
-          vtkAbstractArray* col = table->GetColumnByName(labels->GetValue(vertex));
+          vtkAbstractArray* col = inputDataTable->GetColumnByName(labels->GetValue(vertex));
           col->SetName(col->GetName());
           clusterTable->AddColumn(col);
           }
