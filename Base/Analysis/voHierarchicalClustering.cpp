@@ -220,73 +220,27 @@ bool voHierarchicalClustering::execute()
   vtkIdType level;
   vtkIdType root = tree->GetRoot();
 
-  const char* labelArrayName = "id";
-  const char* heightArrayName = "Height";
+  vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray("id"));
 
-  if( tree->GetVertexData()->GetAbstractArray(labelArrayName) == NULL ||
-      tree->GetVertexData()->GetAbstractArray(heightArrayName) == NULL )
-    {
-    //qDebug() << "ERROR: The label or height attribute is not defined in the tree."; 
-    }
-  else
-    {
-    vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(labelArrayName));
-    vtkDoubleArray* heights = vtkDoubleArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(heightArrayName));
-
-    for (int i = 0; i < labels->GetNumberOfValues(); ++i)
-      {
-      double * value = heights->GetTuple(i);
-      //qDebug() << "\t\tValue " << i << ": " << labels->GetValue(i) <<"\t" << value[0] << endl;
-      }
-    }
-
-    
-  vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(labelArrayName));
-
-  vtkSmartPointer<vtkTreeDFSIterator> dfs =
-    vtkSmartPointer<vtkTreeDFSIterator>::New();
-
+  vtkNew<vtkTreeDFSIterator> dfs;
   dfs->SetStartVertex(root);
   dfs->SetTree(tree.GetPointer());
 
-  vtkIdType leafCount = 0;
   vtkIdType maxLevel = 0;
-  vtkIdType lastLeafLevel = 0;
 
   while (dfs->HasNext())
     {
     vtkIdType vertex = dfs->Next();
 
-    if (tree->IsLeaf(vertex))
-      {   
-      leafCount++;
-      lastLeafLevel = tree->GetLevel(vertex);
-      }   
-    if (tree->GetLevel(vertex) > maxLevel)
-      {   
-      maxLevel = tree->GetLevel(vertex);
-      }   
-
-    level = tree->GetLevel(vertex);
-  
-    //qDebug() << "Vertex:\t " << vertex << "\t" << level << "\t" << labels->GetValue(vertex); 
-
+    maxLevel = qMax(tree->GetLevel(vertex), maxLevel);
     }
 
-  //qDebug() << "Maximum Level: " << maxLevel;
-
-  vtkSmartPointer<vtkTable> clusterTable = vtkSmartPointer<vtkTable>::New();
-
-  vtkSmartPointer<vtkStringArray> header = extendedTable->GetRowMetaDataOfInterestAsString();
-
-  clusterTable->AddColumn(header);
+  vtkNew<vtkTable> clusterTable;
+  clusterTable->AddColumn(extendedTable->GetRowMetaDataOfInterestAsString());
 
   for( int i=maxLevel; i >= 0; i-- )
     {
-    //qDebug() << "Dealing with level \t" << i;
-
-    vtkSmartPointer<vtkTreeDFSIterator> dfs =
-      vtkSmartPointer<vtkTreeDFSIterator>::New();
+    vtkNew<vtkTreeDFSIterator> dfs;
 
     dfs->SetStartVertex(root);
     dfs->SetTree(tree.GetPointer());
@@ -296,30 +250,19 @@ bool voHierarchicalClustering::execute()
       vtkIdType vertex = dfs->Next();
 
       level = tree->GetLevel(vertex);
-      //qDebug() << "\t\t..." << level;
       if ( level == i )
         {
         if ( labels->GetValue(vertex) != "")
           {
-          //qDebug() << "\t" << labels->GetValue(vertex);
           vtkAbstractArray* col = inputDataTable->GetColumnByName(labels->GetValue(vertex));
           col->SetName(col->GetName());
           clusterTable->AddColumn(col);
           }
-        } 
+        }
       }
     }
 
-  /*
-  for (vtkIdType c = 1;c < table->GetNumberOfColumns(); ++c)
-    {
-    vtkAbstractArray* col = table->GetColumn(c);
-    col->SetName(col->GetName());
-    clusterTable->AddColumn(col);
-    }
-    */
-  this->setOutput("cluster", new voTableDataObject("cluster", clusterTable));
-
+  this->setOutput("cluster", new voTableDataObject("cluster", clusterTable.GetPointer()));
 
   return true;
 }
