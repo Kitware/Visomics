@@ -1,6 +1,6 @@
 
-#ifndef __voLog2_h
-#define __voLog2_h
+#ifndef __voNormalization_h
+#define __voNormalization_h
 
 // Qt includes
 #include <QHash>
