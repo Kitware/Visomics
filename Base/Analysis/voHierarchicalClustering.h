@@ -8,8 +8,6 @@
 // Visomics includes
 #include "voAnalysis.h"
 
-class voHierarchicalClusteringPrivate;
-
 class voHierarchicalClustering : public voAnalysis
 {
   Q_OBJECT
@@ -26,7 +24,6 @@ protected:
   virtual bool execute();
 
 private:
-  Q_DECLARE_PRIVATE(voHierarchicalClustering);
   Q_DISABLE_COPY(voHierarchicalClustering);
 };
 
