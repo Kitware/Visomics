@@ -27,6 +27,7 @@
 #include <vtkTree.h>
 #include <vtkAdjacentVertexIterator.h>
 #include <vtkTreeDFSIterator.h>
+#include <vtkTreeBFSIterator.h>
 
 // --------------------------------------------------------------------------
 // voHierarchicalClustering methods
@@ -217,49 +218,36 @@ bool voHierarchicalClustering::execute()
   this->setOutput("clusterTree", new voDataObject("clusterTree", tree.GetPointer()));
 
 
-  vtkIdType level;
-  vtkIdType root = tree->GetRoot();
-
-  vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray("id"));
-
-  vtkNew<vtkTreeDFSIterator> dfs;
-  dfs->SetStartVertex(root);
-  dfs->SetTree(tree.GetPointer());
-
-  vtkIdType maxLevel = 0;
-
-  while (dfs->HasNext())
+  QStringList reverseBFSLabels;
     {
-    vtkIdType vertex = dfs->Next();
-
-    maxLevel = qMax(tree->GetLevel(vertex), maxLevel);
+    vtkNew<vtkTreeBFSIterator> bfs;
+    bfs->SetTree(tree.GetPointer());
+    int prevTreeLevel = 0;
+    QStringList levelLabels;
+    vtkStringArray* treeLabels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray("id"));
+    while (bfs->HasNext())
+      {
+      vtkIdType curVertex = bfs->Next();
+      vtkIdType curLevel = tree->GetLevel(curVertex);
+      if (prevTreeLevel != curLevel)
+        {
+        reverseBFSLabels = levelLabels + reverseBFSLabels; // Prepend level list to master list
+        levelLabels.clear();
+        prevTreeLevel = curLevel;
+        }
+      if (treeLabels->GetValue(curVertex) != "")
+        {
+        levelLabels << QString(treeLabels->GetValue(curVertex));
+        }
+      }
+    reverseBFSLabels = levelLabels + reverseBFSLabels;
     }
 
   vtkNew<vtkTable> clusterTable;
   clusterTable->AddColumn(extendedTable->GetRowMetaDataOfInterestAsString());
-
-  for( int i=maxLevel; i >= 0; i-- )
+  foreach(QString colLabel, reverseBFSLabels)
     {
-    vtkNew<vtkTreeDFSIterator> dfs;
-
-    dfs->SetStartVertex(root);
-    dfs->SetTree(tree.GetPointer());
-
-    while (dfs->HasNext())
-      {
-      vtkIdType vertex = dfs->Next();
-
-      level = tree->GetLevel(vertex);
-      if ( level == i )
-        {
-        if ( labels->GetValue(vertex) != "")
-          {
-          vtkAbstractArray* col = inputDataTable->GetColumnByName(labels->GetValue(vertex));
-          col->SetName(col->GetName());
-          clusterTable->AddColumn(col);
-          }
-        }
-      }
+    clusterTable->AddColumn(inputDataTable->GetColumnByName(colLabel.toLatin1()));
     }
 
   this->setOutput("cluster", new voTableDataObject("cluster", clusterTable.GetPointer()));
