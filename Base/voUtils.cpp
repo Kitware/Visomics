@@ -1,5 +1,6 @@
 
 // Qt includes
+#include <QDebug>
 #include <QtGlobal>
 #include <QStringList>
 #include <QRegExp>
@@ -189,7 +190,7 @@ bool voUtils::transposeTable(vtkTable* table, const TransposeOption& transposeOp
 }
 
 //----------------------------------------------------------------------------
-bool voUtils::flipTable(vtkTable* srcTable, vtkTable* destTable, const FlipOption& flipOption, int offset)
+bool voUtils::flipTable(vtkTable* srcTable, vtkTable* destTable, const FlipOption& flipOption, int horizontalOffset, int verticalOffset)
 {
   if (!srcTable)
     {
@@ -199,15 +200,15 @@ bool voUtils::flipTable(vtkTable* srcTable, vtkTable* destTable, const FlipOptio
     {
     return false;
     }
-  if(offset < 0)
+  if(horizontalOffset < 0 || verticalOffset < 0)
     {
     return false;
     }
-  if((flipOption & voUtils::AboutHorizonalAxis) && offset >=  srcTable->GetNumberOfRows())
+  if((flipOption & voUtils::FlipVerticalAxis) && verticalOffset >=  srcTable->GetNumberOfRows())
     {
     return false;
     }
-  if((flipOption & voUtils::AboutVerticalAxis) && offset >=  srcTable->GetNumberOfColumns())
+  if((flipOption & voUtils::FlipHorizontalAxis) && horizontalOffset >=  srcTable->GetNumberOfColumns())
     {
     return false;
     }
@@ -221,11 +222,11 @@ bool voUtils::flipTable(vtkTable* srcTable, vtkTable* destTable, const FlipOptio
   vtkVariant tempVariant;
   vtkStdString tempString;
 
-  if(flipOption & voUtils::AboutHorizonalAxis)
+  if(flipOption & voUtils::FlipVerticalAxis) // Top - bottom
     {
-    for(int topRid = offset; topRid <= (destTable->GetNumberOfRows() - offset) / 2; topRid++)
+    for(int topRid = verticalOffset; topRid <= (destTable->GetNumberOfRows() - verticalOffset) / 2; topRid++)
       {
-      int bottomRid = destTable->GetNumberOfRows() - (topRid - offset) - 1;
+      int bottomRid = destTable->GetNumberOfRows() - (topRid - verticalOffset) - 1;
       for(int cid = 0; cid < destTable->GetNumberOfColumns(); cid++)
         {
         tempVariant = destTable->GetValue(topRid, cid);
@@ -235,11 +236,16 @@ bool voUtils::flipTable(vtkTable* srcTable, vtkTable* destTable, const FlipOptio
       }
     }
 
-  if(flipOption & voUtils::AboutVerticalAxis)
+  if(flipOption & voUtils::FlipHorizontalAxis) // Left - right
     {
-    for(int leftCid = offset; leftCid <= (srcTable->GetNumberOfColumns() - offset) / 2; leftCid++)
+    for(int leftCid = horizontalOffset; leftCid <= (srcTable->GetNumberOfColumns() - horizontalOffset) / 2; leftCid++)
       {
-      int rightCid = srcTable->GetNumberOfColumns() - (leftCid - offset) - 1;
+      int rightCid = srcTable->GetNumberOfColumns() - (leftCid - horizontalOffset) - 1;
+      if(srcTable->GetColumn(leftCid)->GetDataType() != srcTable->GetColumn(leftCid)->GetDataType())
+        {
+        qWarning() << "Warning in voUtils::flipTable() - attemping to swap columns of different data types";
+        return false;
+        }
       tempString = srcTable->GetColumn(leftCid)->GetName();
       destTable->GetColumn(leftCid)->SetName(srcTable->GetColumn(rightCid)->GetName());
       destTable->GetColumn(rightCid)->SetName(tempString.c_str());
@@ -256,10 +262,10 @@ bool voUtils::flipTable(vtkTable* srcTable, vtkTable* destTable, const FlipOptio
 }
 
 //----------------------------------------------------------------------------
-bool voUtils::flipTable(vtkTable* table, const FlipOption& flipOption, int offset)
+bool voUtils::flipTable(vtkTable* table, const FlipOption& flipOption, int horizontalOffset, int verticalOffset)
 {
   vtkNew<vtkTable> flippedTable;
-  bool success = voUtils::flipTable(table, flippedTable.GetPointer(), flipOption, offset);
+  bool success = voUtils::flipTable(table, flippedTable.GetPointer(), flipOption, horizontalOffset, verticalOffset);
   if (!success)
     {
     return false;

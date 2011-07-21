@@ -165,7 +165,7 @@ bool voXCorrel::execute()
     }
 
   vtkNew<vtkTable> flippedCorrTable;
-  voUtils::flipTable(corr.GetPointer(), flippedCorrTable.GetPointer(), voUtils::AboutVerticalAxis, 1);
+  voUtils::flipTable(corr.GetPointer(), flippedCorrTable.GetPointer(), voUtils::FlipHorizontalAxis, 1, 0);
   this->setOutput("corr", new voTableDataObject("corr", flippedCorrTable.GetPointer()));
 
   // Generate image of the correlation table 

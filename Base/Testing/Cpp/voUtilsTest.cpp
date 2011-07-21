@@ -682,7 +682,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   //-----------------------------------------------------------------------------
-  // Test flipTable(vtkTable* table, const FlipOption& flipOption, int offset)
+  // Test flipTable(vtkTable* table, const FlipOption& flipOption, int horizontalOffset, int verticalOffset)
   //-----------------------------------------------------------------------------
   vtkNew<vtkTable> flipTableBaseTable;
   vtkNew<vtkTable> flipTableVerticalFlipExpectedTable;
@@ -701,7 +701,7 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   flipTableVerticalFlipExpectedTable->AddColumn(var1Array3.GetPointer());
   flipTableVerticalFlipExpectedTable->AddColumn(var0Array3.GetPointer());
 
-  success = voUtils::flipTable(flipTableBaseTable.GetPointer(), voUtils::AboutVerticalAxis, 1);
+  success = voUtils::flipTable(flipTableBaseTable.GetPointer(), voUtils::FlipHorizontalAxis, 1, 0);
   if (!success)
     {
     std::cerr << "Line " << __LINE__ << " - "
