@@ -53,10 +53,11 @@ void voHierarchicalClustering::setInputInformation()
 void voHierarchicalClustering::setOutputInformation()
 {
   this->addOutputType("clusterTree", "vtkTree",
-                      "voTreeGraphView", "clusterTree");
+                      "voTreeGraphView", "Cluster Tree");
 
-  this->addOutputType("cluster", "vtkTable",
-                      "voHeatMapView", "HeatMap");
+  this->addOutputType("clusterHeatMap", "vtkTable",
+                      "voHeatMapView", "Clustered Data (HeatMap)",
+                      "voTableView", "Clustered Data (Table)");
 }
 
 // --------------------------------------------------------------------------
@@ -217,7 +218,9 @@ bool voHierarchicalClustering::execute()
 
   this->setOutput("clusterTree", new voDataObject("clusterTree", tree.GetPointer()));
 
-
+  // Generate a list of data in reverse BFS (bottom-up) order;
+  // We may want a different order later, if we overlay a cluster tree on the tabular data
+  // For now, this puts data with the strongest clustering on the left
   QStringList reverseBFSLabels;
     {
     vtkNew<vtkTreeBFSIterator> bfs;
@@ -243,14 +246,14 @@ bool voHierarchicalClustering::execute()
     reverseBFSLabels = levelLabels + reverseBFSLabels;
     }
 
+  // Generate table for heatmap
   vtkNew<vtkTable> clusterTable;
   clusterTable->AddColumn(extendedTable->GetRowMetaDataOfInterestAsString());
   foreach(QString colLabel, reverseBFSLabels)
     {
     clusterTable->AddColumn(inputDataTable->GetColumnByName(colLabel.toLatin1()));
     }
-
-  this->setOutput("cluster", new voTableDataObject("cluster", clusterTable.GetPointer()));
+  this->setOutput("clusterHeatMap", new voTableDataObject("clusterHeatMap", clusterTable.GetPointer()));
 
   return true;
 }
