@@ -167,8 +167,7 @@ void voHeatMapView::setDataObject(voDataObject* dataObject)
     hsvScalars[1] = (maxVal-minVal)/2.0;
     hsvScalars[2] = maxVal;
     }
-  //double hsvHues[3] = {1.0/3.0, 1.0/6.0, 0.0}; // Red - green
-  double hsvHues[3] = {0.5, 0.25, 0.0}; // Red - cyan
+  double hsvHues[3] = {0.3, 0.15, 0.0}; // green - red
   double hsvSats[3] = {1.0, 0.3, 1.0};
   double hsvValues[3] = {1.0, 0.3, 1.0};
 
