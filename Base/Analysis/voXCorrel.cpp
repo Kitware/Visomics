@@ -16,6 +16,7 @@
 #include <vtkDoubleArray.h>
 #include <vtkGraph.h>
 #include <vtkImageData.h>
+#include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
@@ -160,9 +161,9 @@ bool voXCorrel::execute()
     corr->AddColumn(col);
     }
 
-  vtkSmartPointer<vtkTable> corrFlip = vtkSmartPointer<vtkTable>::New();
-  voUtils::flipTable(corr, corrFlip, voUtils::AboutVerticalAxis, 1);
-  this->setOutput("corr", new voTableDataObject("corr", corrFlip));
+  vtkNew<vtkTable> flippedCorrTable;
+  voUtils::flipTable(corr.GetPointer(), flippedCorrTable.GetPointer(), voUtils::FlipHorizontalAxis, 1, 0);
+  this->setOutput("corr", new voTableDataObject("corr", flippedCorrTable.GetPointer()));
 
   // Generate image of the correlation table 
   //  vtkIdType corrMatrixNumberOfCols = corr->GetNumberOfColumns();

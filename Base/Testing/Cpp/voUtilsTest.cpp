@@ -682,39 +682,101 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
     }
 
   //-----------------------------------------------------------------------------
-  // Test flipTable(vtkTable* table, const FlipOption& flipOption, int offset)
+  // Test flipTable(vtkTable* table, const FlipOption& flipOption, int horizontalOffset, int verticalOffset)
+  //  -> flipOption = FlipHorizontalAxis
   //-----------------------------------------------------------------------------
-  vtkNew<vtkTable> flipTableBaseTable;
-  vtkNew<vtkTable> flipTableVerticalFlipExpectedTable;
+  vtkNew<vtkTable> flipTableHorizontalBaseTable;
+  vtkNew<vtkTable> flipTableHorizontalExpectedTable;
 
-  flipTableBaseTable->AddColumn(stringArray3.GetPointer());
-  flipTableBaseTable->AddColumn(var0Array3.GetPointer());
-  flipTableBaseTable->AddColumn(var1Array3.GetPointer());
-  flipTableBaseTable->AddColumn(var2Array3.GetPointer());
-  flipTableBaseTable->AddColumn(var3Array3.GetPointer());
-  flipTableBaseTable->AddColumn(var4Array3.GetPointer());
+  flipTableHorizontalBaseTable->AddColumn(stringArray3.GetPointer());
+  flipTableHorizontalBaseTable->AddColumn(var0Array3.GetPointer());
+  flipTableHorizontalBaseTable->AddColumn(var1Array3.GetPointer());
+  flipTableHorizontalBaseTable->AddColumn(var2Array3.GetPointer());
+  flipTableHorizontalBaseTable->AddColumn(var3Array3.GetPointer());
+  flipTableHorizontalBaseTable->AddColumn(var4Array3.GetPointer());
 
-  flipTableVerticalFlipExpectedTable->AddColumn(stringArray3.GetPointer());
-  flipTableVerticalFlipExpectedTable->AddColumn(var4Array3.GetPointer());
-  flipTableVerticalFlipExpectedTable->AddColumn(var3Array3.GetPointer());
-  flipTableVerticalFlipExpectedTable->AddColumn(var2Array3.GetPointer());
-  flipTableVerticalFlipExpectedTable->AddColumn(var1Array3.GetPointer());
-  flipTableVerticalFlipExpectedTable->AddColumn(var0Array3.GetPointer());
+  flipTableHorizontalExpectedTable->AddColumn(stringArray3.GetPointer());
+  flipTableHorizontalExpectedTable->AddColumn(var4Array3.GetPointer());
+  flipTableHorizontalExpectedTable->AddColumn(var3Array3.GetPointer());
+  flipTableHorizontalExpectedTable->AddColumn(var2Array3.GetPointer());
+  flipTableHorizontalExpectedTable->AddColumn(var1Array3.GetPointer());
+  flipTableHorizontalExpectedTable->AddColumn(var0Array3.GetPointer());
 
-  success = voUtils::flipTable(flipTableBaseTable.GetPointer(), voUtils::AboutVerticalAxis, 1);
+  success = voUtils::flipTable(flipTableHorizontalBaseTable.GetPointer(), voUtils::FlipHorizontalAxis, 1, 0);
   if (!success)
     {
     std::cerr << "Line " << __LINE__ << " - "
               << "Problem with flipTable()" << std::endl;
-    flipTableBaseTable->Dump();
+    flipTableHorizontalBaseTable->Dump();
     return EXIT_FAILURE;
     }
 
   // Compare table
-  if (!compareTable(__LINE__, flipTableBaseTable.GetPointer(), flipTableVerticalFlipExpectedTable.GetPointer()))
+  if (!compareTable(__LINE__, flipTableHorizontalBaseTable.GetPointer(), flipTableHorizontalExpectedTable.GetPointer()))
     {
-    std::cerr << "Line " << __LINE__ << " - Problem with flipTable method !" << std::endl;
-    flipTableBaseTable->Dump();
+    std::cerr << "Line " << __LINE__ << " - Problem with flipTable() horizontal !" << std::endl;
+    flipTableHorizontalBaseTable->Dump();
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
+  // Test flipTable(vtkTable* table, const FlipOption& flipOption, int horizontalOffset, int verticalOffset)
+  //  -> flipOption = FlipVerticalAxis
+  //-----------------------------------------------------------------------------
+  vtkNew<vtkTable> flipTableVerticalBaseTable;
+  vtkNew<vtkTable> flipTableVerticalExpectedTable;
+
+  for (int col = 1; col <= 3; col++)
+    {
+    vtkNew<vtkDoubleArray> baseColumn;
+    vtkNew<vtkDoubleArray> reverseColumn;
+    baseColumn->InsertNextValue(15.0);
+    reverseColumn->InsertNextValue(15.0);
+    for(double j = 1.0; j <= 6.0; j+=1.0)
+      {
+      baseColumn->InsertNextValue(col*j);
+      reverseColumn->InsertNextValue(col*(7.0-j));
+      }
+    flipTableVerticalBaseTable->AddColumn(baseColumn.GetPointer());
+    flipTableVerticalExpectedTable->AddColumn(reverseColumn.GetPointer());
+    }
+  /* flipTableVerticalBaseTable:
+  +------+------+-------+
+  | 15   | 15   | 15    |
+  | 1    | 2    | 3     |
+  | 2    | 4    | 6     |
+  | 3    | 6    | 9     |
+  | 4    | 8    | 12    |
+  | 5    | 10   | 15    |
+  | 6    | 12   | 18    |
+  +------+------+-------+
+
+  flipTableVerticalExpectedTable:
+  +------+------+-------+
+  | 15   | 15   | 15    |
+  | 6    | 12   | 18    |
+  | 5    | 10   | 15    |
+  | 4    | 8    | 12    |
+  | 3    | 6    | 9     |
+  | 2    | 4    | 6     |
+  | 1    | 2    | 3     |
+  +------+------+-------+
+  */
+
+  success = voUtils::flipTable(flipTableVerticalBaseTable.GetPointer(), voUtils::FlipVerticalAxis, 0, 1);
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with flipTable()" << std::endl;
+    flipTableVerticalBaseTable->Dump();
+    return EXIT_FAILURE;
+    }
+
+  // Compare table
+  if (!compareTable(__LINE__, flipTableVerticalBaseTable.GetPointer(), flipTableVerticalExpectedTable.GetPointer()))
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with flipTable() vertical !" << std::endl;
+    flipTableVerticalBaseTable->Dump();
     return EXIT_FAILURE;
     }
 
