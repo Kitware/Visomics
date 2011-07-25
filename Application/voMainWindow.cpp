@@ -165,7 +165,7 @@ void voMainWindow::about()
   QMessageBox::about(this, tr("About Visomics"),
           tr("<h2>Visomics %1</h2>"
              "<p>Copyright &copy; 2010 Kitware Inc."
-             "<p>Visomics is a platform for visualization and analysis of omiccs data.").arg(Visomics_VERSION_STRING));
+             "<p>Visomics is a platform for visualization and analysis of 'omics data.").arg(Visomics_VERSION_STRING));
 }
 
 // --------------------------------------------------------------------------
