@@ -1,5 +1,6 @@
 
 // Qt includes
+#include <QDebug>
 #include <QtGlobal>
 #include <QStringList>
 #include <QRegExp>
@@ -185,6 +186,91 @@ bool voUtils::transposeTable(vtkTable* table, const TransposeOption& transposeOp
     return false;
     }
   table->ShallowCopy(transposedTable.GetPointer());
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool voUtils::flipTable(vtkTable* srcTable, vtkTable* destTable, const FlipOption& flipOption, int horizontalOffset, int verticalOffset)
+{
+  if (!srcTable)
+    {
+    return false;
+    }
+  if (!destTable)
+    {
+    return false;
+    }
+  if(horizontalOffset < 0 || verticalOffset < 0)
+    {
+    return false;
+    }
+  if((flipOption & voUtils::FlipVerticalAxis) && verticalOffset >=  srcTable->GetNumberOfRows())
+    {
+    return false;
+    }
+  if((flipOption & voUtils::FlipHorizontalAxis) && horizontalOffset >=  srcTable->GetNumberOfColumns())
+    {
+    return false;
+    }
+
+  // This will only support flipping columns with the same data type, which should be all
+  // that's required for typical use
+  // To support heterogeneous column types, we must rebuild a new table from scratch, instead of
+  // just deep copying the old one
+  destTable->DeepCopy(srcTable);
+
+  vtkVariant tempVariant;
+  vtkStdString tempString;
+
+  if(flipOption & voUtils::FlipVerticalAxis) // Top - bottom
+    {
+    for(int topRid = verticalOffset; topRid <= (destTable->GetNumberOfRows() - verticalOffset) / 2; topRid++)
+      {
+      int bottomRid = destTable->GetNumberOfRows() - (topRid - verticalOffset) - 1;
+      for(int cid = 0; cid < destTable->GetNumberOfColumns(); cid++)
+        {
+        tempVariant = destTable->GetValue(topRid, cid);
+        destTable->SetValue(topRid, cid, destTable->GetValue(bottomRid, cid));
+        destTable->SetValue(bottomRid, cid, tempVariant);
+        }
+      }
+    }
+
+  if(flipOption & voUtils::FlipHorizontalAxis) // Left - right
+    {
+    for(int leftCid = horizontalOffset; leftCid <= (srcTable->GetNumberOfColumns() - horizontalOffset) / 2; leftCid++)
+      {
+      int rightCid = srcTable->GetNumberOfColumns() - (leftCid - horizontalOffset) - 1;
+      if(srcTable->GetColumn(leftCid)->GetDataType() != srcTable->GetColumn(leftCid)->GetDataType())
+        {
+        qWarning() << "Warning in voUtils::flipTable() - attemping to swap columns of different data types";
+        return false;
+        }
+      tempString = srcTable->GetColumn(leftCid)->GetName();
+      destTable->GetColumn(leftCid)->SetName(srcTable->GetColumn(rightCid)->GetName());
+      destTable->GetColumn(rightCid)->SetName(tempString.c_str());
+      for(int rid = 0; rid < srcTable->GetNumberOfRows(); rid++)
+        {
+        tempVariant = srcTable->GetValue(rid, leftCid);
+        destTable->SetValue(rid, leftCid, srcTable->GetValue(rid, rightCid));
+        destTable->SetValue(rid, rightCid, tempVariant);
+        }
+      }
+    }
+
+  return true;
+}
+
+//----------------------------------------------------------------------------
+bool voUtils::flipTable(vtkTable* table, const FlipOption& flipOption, int horizontalOffset, int verticalOffset)
+{
+  vtkNew<vtkTable> flippedTable;
+  bool success = voUtils::flipTable(table, flippedTable.GetPointer(), flipOption, horizontalOffset, verticalOffset);
+  if (!success)
+    {
+    return false;
+    }
+  table->ShallowCopy(flippedTable.GetPointer());
   return true;
 }
 

@@ -8,6 +8,7 @@
 // Visomics includes
 #include "voXCorrel.h"
 #include "voTableDataObject.h"
+#include "voUtils.h"
 #include "vtkExtendedTable.h"
 
 // VTK includes
@@ -15,6 +16,7 @@
 #include <vtkDoubleArray.h>
 #include <vtkGraph.h>
 #include <vtkImageData.h>
+#include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
@@ -161,7 +163,10 @@ bool voXCorrel::execute()
     col->SetName(header->GetValue(c));
     corr->AddColumn(col);
     }
-  this->setOutput("corr", new voTableDataObject("corr", corr));
+
+  vtkNew<vtkTable> flippedCorrTable;
+  voUtils::flipTable(corr.GetPointer(), flippedCorrTable.GetPointer(), voUtils::FlipHorizontalAxis, 1, 0);
+  this->setOutput("corr", new voTableDataObject("corr", flippedCorrTable.GetPointer()));
 
   // Generate image of the correlation table 
   //  vtkIdType corrMatrixNumberOfCols = corr->GetNumberOfColumns();

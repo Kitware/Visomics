@@ -20,9 +20,19 @@ enum TransposeOption
   Headers = 0x3,
   };
 
+enum FlipOption
+  {
+  FlipHorizontalAxis = 0x1,
+  FlipVerticalAxis = 0x2,
+  };
+
 bool transposeTable(vtkTable* srcTable, vtkTable* destTable, const TransposeOption& transposeOption = WithoutHeaders);
 
 bool transposeTable(vtkTable* table, const TransposeOption& transposeOption = WithoutHeaders);
+
+bool flipTable(vtkTable* srcTable, vtkTable* destTable, const FlipOption& flipOption, int horizontalOffset = 0, int verticalOffset = 0);
+
+bool flipTable(vtkTable* table, const FlipOption& flipOption, int horizontalOffset = 0, int verticalOffset = 0);
 
 bool insertColumnIntoTable(vtkTable * table, int position, vtkAbstractArray * column);
 
