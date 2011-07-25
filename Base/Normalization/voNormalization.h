@@ -6,6 +6,7 @@
 #include <QHash>
 #include <QVariant>
 
+
 class vtkTable;
 //template <class Key, class T> class QHash
 
@@ -14,7 +15,9 @@ namespace Normalization
 {
 
   bool applyLog2(vtkTable * dataTable, const QHash<int, QVariant>& settings);
-  
+
+  bool applyQuantile(vtkTable * dataTable, const QHash<int, QVariant>& settings);
+
 } // end of Normalization namespace
 
 #endif

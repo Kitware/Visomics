@@ -19,6 +19,7 @@ SET(KIT_SRCS
 
   Normalization/voNormalization.h
   Normalization/voLog2.cpp
+  Normalization/voQuantile.cpp
   
   Views/voCorrelationGraphView.cpp
   Views/voCorrelationGraphView.h
