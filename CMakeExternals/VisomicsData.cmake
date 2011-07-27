@@ -19,7 +19,7 @@ if(BUILD_TESTING)
     MESSAGE(STATUS "Adding external project: ${proj}")
     ExternalProject_Add(${proj}
       GIT_REPOSITORY ${git_protocol}://kwsource.kitwarein.com/bioinformatics/visomicsdata.git
-      GIT_TAG "origin/master"
+      GIT_TAG "origin/next"
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
       BINARY_DIR ${proj}-build
       PREFIX ${proj}${ep_suffix}
