@@ -8,22 +8,26 @@
 // Visomics includes
 #include "voDataObject.h"
 #include "voHierarchicalClustering.h"
-#include "vtkExtendedTable.h"
 #include "voTableDataObject.h"
+#include "voUtils.h"
+#include "vtkExtendedTable.h"
 
 // VTK includes
 #include <vtkDataSetAttributes.h>
+#include <vtkArrayData.h>
 #include <vtkDenseArray.h>
 #include <vtkDoubleArray.h>
+#include <vtkIntArray.h>
 #include <vtkMutableDirectedGraph.h>
+#include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
-#include <vtkTableToArray.h>
 #include <vtkTree.h>
 #include <vtkAdjacentVertexIterator.h>
 #include <vtkTreeDFSIterator.h>
+#include <vtkTreeBFSIterator.h>
 
 // --------------------------------------------------------------------------
 // voHierarchicalClustering methods
@@ -32,8 +36,6 @@
 voHierarchicalClustering::voHierarchicalClustering():
     Superclass()
 {
-  // Q_D(voHierarchicalClustering);
-
 }
 
 // --------------------------------------------------------------------------
@@ -51,10 +53,11 @@ void voHierarchicalClustering::setInputInformation()
 void voHierarchicalClustering::setOutputInformation()
 {
   this->addOutputType("clusterTree", "vtkTree",
-                      "voTreeGraphView", "clusterTree");
+                      "voTreeGraphView", "Cluster Tree");
 
-  this->addOutputType("cluster", "vtkTable",
-                      "voHeatMapView", "HeatMap");
+  this->addOutputType("clusterHeatMap", "vtkTable",
+                      "voHeatMapView", "Clustered Data (HeatMap)",
+                      "voTableView", "Clustered Data (Table)");
 }
 
 // --------------------------------------------------------------------------
@@ -73,8 +76,7 @@ void voHierarchicalClustering::setParameterInformation()
 // --------------------------------------------------------------------------
 bool voHierarchicalClustering::execute()
 {
-  // Q_D(voHierarchicalClustering);
-
+  // Import data table
   vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->data());
   if (!extendedTable)
     {
@@ -82,44 +84,36 @@ bool voHierarchicalClustering::execute()
     return false;
     }
 
-  vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
+  vtkSmartPointer<vtkTable> inputDataTable = extendedTable->GetData();
+
+  vtkSmartPointer<vtkStringArray> columnNames = extendedTable->GetColumnMetaDataOfInterestAsString();
 
   // Parameters
   QString hclust_method = this->enumParameter("method");
 
-  vtkSmartPointer< vtkTableToArray > tableToArray = vtkSmartPointer< vtkTableToArray>::New();
-  tableToArray->SetInput(table);
+  // R input
+  vtkSmartPointer<vtkArray> RInputArray;
+  voUtils::tableToArray(inputDataTable.GetPointer(), RInputArray);
 
-  int start = 1;
-  int end = table->GetNumberOfColumns();
+  vtkNew<vtkArrayData> RInputArrayData;
+  RInputArrayData->AddArray(RInputArray.GetPointer());
 
-  for (int ctr=start; ctr<end; ctr++)
-    {
-    tableToArray->AddColumn(table->GetColumnName(ctr));
-    }
-  tableToArray->Update();
-
-  //Print ouf the array data for debugging purposes
-//  vtkSmartPointer< vtkArrayData > arrayData = vtkSmartPointer< vtkArrayData>::New();
-//  arrayData = tableToArray->GetOutput();
-//  vtkIdType numberOfArrays = arrayData->GetNumberOfArrays();
-//  for( vtkIdType i=0; i < numberOfArrays; i++)
-//    {
-//    vtkDenseArray<double> *array = vtkDenseArray<double>::SafeDownCast(arrayData->GetArray(i));
-//    const vtkArrayExtents extents = array->GetExtents();
-//    for(vtkIdType i = extents[0].GetBegin(); i != extents[0].GetEnd(); ++i)
-//      {
-//      for(vtkIdType j = extents[1].GetBegin(); j != extents[1].GetEnd(); ++j)
-//        {
-//        std::cout << array->GetValue(vtkArrayCoordinates(i, j)) << "\t";
-//        }
-//        std::cout << std::endl;
-//      }
-//    }
-
-  vtkSmartPointer< vtkRCalculatorFilter > calc = vtkSmartPointer< vtkRCalculatorFilter>::New();
-  calc->SetRoutput(0);
-  calc->SetInput(tableToArray->GetOutput());
+  // Run R
+  vtkNew <vtkRCalculatorFilter> RCalc;
+  RCalc->SetRoutput(0);
+  RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
+  RCalc->PutArray("0", "metabData");
+  RCalc->GetArray("height","height");
+//  RCalc->GetArray("order","order");
+  RCalc->GetArray("merge","merge");
+  RCalc->SetRscript(QString(
+                     "dEuc<-dist(t(metabData))\n"
+                     "cluster<-hclust(dEuc,method=\"%1\")\n"
+                     "height<-cluster$height\n"
+//                     "order<-cluster$order\n"
+                     "merge<-cluster$merge\n"
+                     ).arg(hclust_method).toLatin1());
+  RCalc->Update();
 
   /*
    * hclust class in R has the following attributes
@@ -149,291 +143,117 @@ bool voHierarchicalClustering::execute()
    * labels : labels for each of the objects being clustered.
    *
    */
-  calc->PutArray("0", "metabData");
-  calc->GetArray("height","height");
-  calc->GetArray("order","order");
-  calc->GetArray("merge","merge");
-  calc->SetRscript(QString(
-                     "dEuc<-dist(t(metabData))\n"
-                     "cluster<-hclust(dEuc,method=\"%1\")\n"
-                     "height<-as.numeric(cluster$height)\n"
-                     "order<-as.numeric(cluster$order)\n"
-                     "merge<-as.numeric(cluster$merge)\n"
-                     ).arg(hclust_method).toLatin1());
 
-  calc->Update();
+  // Get R output
+  vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(RCalc->GetOutput());
 
-  vtkArrayData *temp = vtkArrayData::SafeDownCast(calc->GetOutput());
-  if (!temp)
-    {
-    std::cout << "Downcast DID NOT work." << std::endl;
-    return 1;
-    }
+  vtkSmartPointer< vtkDenseArray<double> > heightArray;
+  heightArray = vtkDenseArray<double>::SafeDownCast(outputArrayData->GetArrayByName("height"));
 
-  vtkSmartPointer<vtkArrayData> clustReturn = vtkSmartPointer<vtkArrayData>::New();
-  clustReturn->DeepCopy(temp);
+  vtkSmartPointer< vtkDenseArray<double> > mergeArray;
+  mergeArray = vtkDenseArray<double>::SafeDownCast(outputArrayData->GetArrayByName("merge"));
 
-  vtkSmartPointer<vtkArrayData> heightData = vtkSmartPointer<vtkArrayData>::New();
-  heightData->AddArray(clustReturn->GetArrayByName("height"));
+  // Analysis outputs
+  vtkNew<vtkMutableDirectedGraph> graph;
 
-  vtkDenseArray<double> *heigtArray = vtkDenseArray<double>::SafeDownCast(heightData->GetArray(0));
-  const vtkArrayExtents heightExtent = heigtArray->GetExtents();
+  vtkNew<vtkStringArray> clusterLabelArray; // Array to label the vertices
+  clusterLabelArray->SetName("id");
 
-  vtkSmartPointer<vtkArrayData> orderData = vtkSmartPointer<vtkArrayData>::New();
-  orderData->AddArray(clustReturn->GetArrayByName("order"));
-
-  vtkSmartPointer<vtkArrayData> mergeData = vtkSmartPointer<vtkArrayData>::New();
-  mergeData->AddArray(clustReturn->GetArrayByName("merge"));
-
-  vtkDenseArray<double> *mergeArray = vtkDenseArray<double>::SafeDownCast(mergeData->GetArray(0));
-
-//  const vtkArrayExtents matrixExtent = mergeArray->GetExtents();
-
-  //Start constructing the graph too
-  vtkSmartPointer<vtkMutableDirectedGraph> builder = vtkSmartPointer<vtkMutableDirectedGraph>::New();
-
-  //generate array to label the vertices
-  vtkSmartPointer<vtkStringArray> clusterLabel = vtkSmartPointer<vtkStringArray>::New();
-  clusterLabel->SetName("id");
-
-  //generate array to store the vertices height
-  vtkSmartPointer<vtkDoubleArray> distanceArray = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkNew<vtkDoubleArray> distanceArray; // Array to store the vertices height
   distanceArray->SetName("Height");
 
+  // Build graph
+  vtkNew<vtkIntArray> clusterMap; // [clusterIndex] -> clusterVertexID
+  clusterMap->SetNumberOfValues(mergeArray->GetExtent(0).GetSize());
 
-  /* Each time we create a parent "id", store the corresponding vertex id */
-
-  vtkstd::map<int,int> clusterMap;
-
-  int clusterIndex=0;
-
-
-  for(int i = 0; i != heightExtent[0].GetEnd(); ++i)
+  for(int clusterIndex = 0; clusterIndex < mergeArray->GetExtent(0).GetSize(); ++clusterIndex)
     {
-    int firstClusterIndex;
-    int secondClusterIndex;
+    // R cluster index starts from 1; when firstCluster/secondCluster is used, its value must be taken as: abs(cluster) - 1
+    int firstCluster  =  mergeArray->GetValue(clusterIndex, 0);
+    int secondCluster =  mergeArray->GetValue(clusterIndex, 1);
 
-    /* The following is needed to find the corresponding indices in the matrix */
-    firstClusterIndex = i;
-    secondClusterIndex = firstClusterIndex + heightExtent[0].GetEnd();
+    double heightParent =  heightArray->GetValue(clusterIndex);
+    double heightChildren = heightParent - 0.1;// arbitrary
 
-    int firstCluster  =  mergeArray->GetValue(vtkArrayCoordinates(firstClusterIndex));
-    int secondCluster =  mergeArray->GetValue(vtkArrayCoordinates(secondClusterIndex));
+    vtkIdType parentID = graph->AddVertex();
+    clusterLabelArray->InsertNextValue ("");
+    distanceArray->InsertNextValue(heightParent);
 
+    clusterMap->SetValue(clusterIndex, parentID);
 
-    /** Three scenario:
-    *  if both  values are negative, create two new childs and a new vertex in the tree
-    *  if either one is positive,  create a new child and join it with already existing vertex
-    *  if both positive, join two already existing vertices in the tree
-    */
-
-    if( firstCluster < 0 && secondCluster < 0 )
+    vtkIdType child1ID;
+    if ( firstCluster < 0 )
       {
-      vtkIdType parent = builder->AddVertex();
-      clusterLabel->InsertNextValue( "" );
-      clusterMap[clusterIndex] = parent;
-      clusterIndex++;
-
-      double heightParent =  heigtArray->GetValue(vtkArrayCoordinates(i));
-      double heightChildrean = heightParent - 0.02; // arbitrary
-      distanceArray->InsertNextValue(heightParent);
-
-      vtkIdType child1 = builder->AddVertex();
-      clusterLabel->InsertNextValue( table->GetColumnName( abs(firstCluster)) );
-      distanceArray->InsertNextValue(heightChildrean);
-
-      vtkIdType child2 = builder->AddVertex();
-      clusterLabel->InsertNextValue( table->GetColumnName( abs(secondCluster)) );
-      distanceArray->InsertNextValue(heightChildrean);
-
-      builder->AddEdge( parent, child1);
-      builder->AddEdge( parent, child2);
-
+      child1ID = graph->AddVertex();
+      clusterLabelArray->InsertNextValue(columnNames->GetValue(abs(firstCluster) - 1));
+      distanceArray->InsertNextValue(heightChildren);
       }
-    else if( firstCluster > 0 && secondCluster > 0 )
+    else // ( firstCluster > 0 )
       {
-      vtkIdType parent = builder->AddVertex();
-      clusterLabel->InsertNextValue ( "");
-      clusterMap[clusterIndex] = parent;
-      clusterIndex++;
-
-      double heightParent =  heigtArray->GetValue(vtkArrayCoordinates(i));
-      // double heightChildrean = heightParent - 0.1; // arbitrary
-      distanceArray->InsertNextValue(heightParent);
-
-
-      int clusterNumber1 = clusterMap[firstCluster - 1];
-      int clusterNumber2 = clusterMap[secondCluster - 1];
-
-      builder->AddEdge( parent, clusterNumber1 );
-      builder->AddEdge( parent, clusterNumber2 );
+      child1ID = clusterMap->GetValue(firstCluster - 1);
       }
-    else
+
+    vtkIdType child2ID;
+    if (secondCluster < 0)
       {
-
-      if ( firstCluster < 0 )
-        {
-        vtkIdType parent = builder->AddVertex();
-        clusterLabel->InsertNextValue ( "");
-        clusterMap[clusterIndex] = parent;
-        clusterIndex++;
-
-
-        double heightParent =  heigtArray->GetValue(vtkArrayCoordinates(i));
-        double heightChildrean = heightParent - 0.1;// arbitrary
-        distanceArray->InsertNextValue(heightParent);
-
-
-        vtkIdType child = builder->AddVertex();
-        clusterLabel->InsertNextValue( table->GetColumnName( abs(firstCluster)) );
-        distanceArray->InsertNextValue(heightChildrean);
-
-        int clusterNumber  = clusterMap[secondCluster - 1]; // R cluster index starts from 1
-
-        builder->AddEdge( parent, child );
-        builder->AddEdge( parent, clusterNumber );
-        }
-      else
-        {
-        vtkIdType parent = builder->AddVertex();
-        clusterLabel->InsertNextValue ( "");
-        clusterMap[clusterIndex] = parent;
-        clusterIndex++;
-
-        double heightParent =  heigtArray->GetValue(vtkArrayCoordinates(i));
-        double heightChildrean = heightParent-0.1; // arbitrary
-        distanceArray->InsertNextValue(heightParent);
-
-        vtkIdType child = builder->AddVertex();
-        clusterLabel->InsertNextValue( table->GetColumnName( abs(secondCluster)) );
-        distanceArray->InsertNextValue(heightChildrean);
-
-
-        // int clusterNumber = clusterMap[firstCluster - 1]; // R cluster index start from 1
-        builder->AddEdge( parent, child );
-        builder->AddEdge( parent, firstCluster );
-        }
+      child2ID = graph->AddVertex();
+      clusterLabelArray->InsertNextValue(columnNames->GetValue(abs(secondCluster) - 1));
+      distanceArray->InsertNextValue(heightChildren);
       }
+    else // ( secondCluster > 0 )
+      {
+      child2ID = clusterMap->GetValue(secondCluster - 1);
+      }
+
+    graph->AddEdge( parentID, child1ID );
+    graph->AddEdge( parentID, child2ID );
     }
 
-  vtkSmartPointer<vtkTree> tree = vtkSmartPointer<vtkTree>::New();
-  tree->ShallowCopy(builder);
+  vtkNew<vtkTree> tree;
+  tree->ShallowCopy(graph.GetPointer());
 
   //Add vertex attributes
-  tree->GetVertexData()->AddArray(clusterLabel);
-  tree->GetVertexData()->AddArray(distanceArray);
+  tree->GetVertexData()->AddArray(clusterLabelArray.GetPointer());
+  tree->GetVertexData()->AddArray(distanceArray.GetPointer());
 
-  this->setOutput("clusterTree", new voDataObject("clusterTree", tree));
+  this->setOutput("clusterTree", new voDataObject("clusterTree", tree.GetPointer()));
 
-
-  vtkIdType level;
-  vtkIdType root = tree->GetRoot();
-
-  const char* labelArray = "id";
-  const char* heightArray = "Height";
-
-  if( tree->GetVertexData()->GetAbstractArray(labelArray) == NULL || 
-      tree->GetVertexData()->GetAbstractArray(heightArray) == NULL )
+  // Generate a list of data in reverse BFS (bottom-up) order;
+  // We may want a different order later, if we overlay a cluster tree on the tabular data
+  // For now, this puts data with the strongest clustering on the left
+  QStringList reverseBFSLabels;
     {
-    //qDebug() << "ERROR: The label or height attribute is not defined in the tree."; 
-    }
-  else
-    {
-    vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(labelArray));
-    vtkDoubleArray* heights = vtkDoubleArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(heightArray));
-
-    for (int i = 0; i < labels->GetNumberOfValues(); ++i)
+    vtkNew<vtkTreeBFSIterator> bfs;
+    bfs->SetTree(tree.GetPointer());
+    int prevTreeLevel = 0;
+    QStringList levelLabels;
+    vtkStringArray* treeLabels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray("id"));
+    while (bfs->HasNext())
       {
-      double * value = heights->GetTuple(i);
-      //qDebug() << "\t\tValue " << i << ": " << labels->GetValue(i) <<"\t" << value[0] << endl;
-      }
-    }
-
-    
-  vtkStringArray* labels = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray(labelArray));
-
-  vtkSmartPointer<vtkTreeDFSIterator> dfs =
-    vtkSmartPointer<vtkTreeDFSIterator>::New();
-
-  dfs->SetStartVertex(root);
-  dfs->SetTree(tree);
-
-  vtkIdType leafCount = 0;
-  vtkIdType maxLevel = 0;
-  vtkIdType lastLeafLevel = 0;
-
-  while (dfs->HasNext())
-    {
-    vtkIdType vertex = dfs->Next();
-
-    if (tree->IsLeaf(vertex))
-      {   
-      leafCount++;
-      lastLeafLevel = tree->GetLevel(vertex);
-      }   
-    if (tree->GetLevel(vertex) > maxLevel)
-      {   
-      maxLevel = tree->GetLevel(vertex);
-      }   
-
-    level = tree->GetLevel(vertex);
-  
-    //qDebug() << "Vertex:\t " << vertex << "\t" << level << "\t" << labels->GetValue(vertex); 
-
-    }
-
-  //qDebug() << "Maximum Level: " << maxLevel;
-
-  vtkSmartPointer<vtkTable> clusterTable = vtkSmartPointer<vtkTable>::New();
-
-  vtkSmartPointer<vtkStringArray> header = vtkStringArray::SafeDownCast(table->GetColumn(0));
-  if (!header)
-    {
-    std::cout << "Downcast DID NOT work." << std::endl;
-    return 1;
-    }
-
-  clusterTable->AddColumn(header);
-
-  for( int i=maxLevel; i >= 0; i-- )
-    {
-    //qDebug() << "Dealing with level \t" << i;
-
-    vtkSmartPointer<vtkTreeDFSIterator> dfs =
-      vtkSmartPointer<vtkTreeDFSIterator>::New();
-
-    dfs->SetStartVertex(root);
-    dfs->SetTree(tree);
-
-    while (dfs->HasNext())
-      {
-      vtkIdType vertex = dfs->Next();
-
-      level = tree->GetLevel(vertex);
-      //qDebug() << "\t\t..." << level;
-      if ( level == i )
+      vtkIdType curVertex = bfs->Next();
+      vtkIdType curLevel = tree->GetLevel(curVertex);
+      if (prevTreeLevel != curLevel)
         {
-        if ( labels->GetValue(vertex) != "")
-          {
-          //qDebug() << "\t" << labels->GetValue(vertex);
-          vtkAbstractArray* col = table->GetColumnByName(labels->GetValue(vertex));
-          col->SetName(col->GetName());
-          clusterTable->AddColumn(col);
-          }
-        } 
+        reverseBFSLabels = levelLabels + reverseBFSLabels; // Prepend level list to master list
+        levelLabels.clear();
+        prevTreeLevel = curLevel;
+        }
+      if (treeLabels->GetValue(curVertex) != "")
+        {
+        levelLabels << QString(treeLabels->GetValue(curVertex));
+        }
       }
+    reverseBFSLabels = levelLabels + reverseBFSLabels;
     }
 
-  /*
-  for (vtkIdType c = 1;c < table->GetNumberOfColumns(); ++c)
+  // Generate table for heatmap
+  vtkNew<vtkTable> clusterTable;
+  clusterTable->AddColumn(extendedTable->GetRowMetaDataOfInterestAsString());
+  foreach(QString colLabel, reverseBFSLabels)
     {
-    vtkAbstractArray* col = table->GetColumn(c);
-    col->SetName(col->GetName());
-    clusterTable->AddColumn(col);
+    clusterTable->AddColumn(inputDataTable->GetColumnByName(colLabel.toLatin1()));
     }
-    */
-  this->setOutput("cluster", new voTableDataObject("cluster", clusterTable));
-
+  this->setOutput("clusterHeatMap", new voTableDataObject("clusterHeatMap", clusterTable.GetPointer()));
 
   return true;
 }

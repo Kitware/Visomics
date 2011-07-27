@@ -129,12 +129,17 @@ void voHeatMapView::setDataObject(voDataObject* dataObject)
 
   double *dPtr = static_cast<double *>(imageData->GetScalarPointer(0, 0, 0));
   //double *dPtr = static_cast<double *>(imageData->GetScalarPointer());
+  double minVal = table->GetValue(0,1).ToDouble();
+  double maxVal = table->GetValue(0,1).ToDouble();
   for (vtkIdType i = 0; i < corrMatrixNumberOfRows; ++i)
     {
     for (vtkIdType j = 1 ; j < corrMatrixNumberOfCols; ++j) // Skip first column (header labels)
       {
+      double cellValue = table->GetValue(i,j).ToDouble();
       // Flip vertically for table -> image mapping
-      dPtr[((corrMatrixNumberOfRows - i -1) * (corrMatrixNumberOfCols - 1)) + (j - 1) ] = table->GetValue(i,j).ToDouble();
+      dPtr[((corrMatrixNumberOfRows - i -1) * (corrMatrixNumberOfCols - 1)) + (j - 1) ] = cellValue;
+      minVal = qMin(minVal, cellValue);
+      maxVal = qMax(maxVal, cellValue);
       }
     }
 
@@ -156,8 +161,13 @@ void voHeatMapView::setDataObject(voDataObject* dataObject)
   d->Chart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetVerticalJustificationToCentered();
 
   double hsvScalars[3] = {-1.0, 0.0, 1.0};
-  //double hsvHues[3] = {1.0/3.0, 1.0/6.0, 0.0}; // Red - green
-  double hsvHues[3] = {0.5, 0.25, 0.0}; // Red - cyan
+  if (dataObject->name() == QString("clusterHeatMap"))
+    {
+    hsvScalars[0] = minVal;
+    hsvScalars[1] = (maxVal-minVal)/2.0;
+    hsvScalars[2] = maxVal;
+    }
+  double hsvHues[3] = {0.3, 0.15, 0.0}; // green - red
   double hsvSats[3] = {1.0, 0.3, 1.0};
   double hsvValues[3] = {1.0, 0.3, 1.0};
 
