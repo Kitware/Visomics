@@ -64,15 +64,15 @@ void voPLSStatistics::setOutputInformation()
 // --------------------------------------------------------------------------
 void voPLSStatistics::setParameterInformation()
 {
-  QList<QtProperty*> PLS_parameters;
+  QList<QtProperty*> pls_parameters;
 
-  PLS_parameters << this->addStringParameter("predictor_range", QObject::tr("Predictor Analyte(s)"), "1-3,6");
-  PLS_parameters << this->addStringParameter("response_range", QObject::tr("Response Analyte(s)"), "4,5,7-10");
-  PLS_parameters << this->addEnumParameter("algorithm", tr("Algorithm"), 
+  pls_parameters << this->addStringParameter("predictor_range", QObject::tr("Predictor Analyte(s)"), "1-3,6");
+  pls_parameters << this->addStringParameter("response_range", QObject::tr("Response Analyte(s)"), "4,5,7-10");
+  pls_parameters << this->addEnumParameter("algorithm", tr("Algorithm"), 
                             (QStringList() << "Kernel" << "Wide Kernel" << "SIMPLS" << "Orthogonal Scores"), 
                             "Kernel");
 
-  this->addParameterGroup("PLS parameters", PLS_parameters);
+  this->addParameterGroup("PLS parameters", pls_parameters);
 
 }
 
