@@ -83,15 +83,15 @@ bool voPLSStatistics::execute()
 
   // Get and parse parameters
   QString algorithmString;
-  if (this->enumParameter("algorithm") == QString("Kernel"))
+  if (this->enumParameter("algorithm") == QLatin1String("Kernel"))
     {
     algorithmString = "kernelpls";
     }
-  else if (this->enumParameter("algorithm") == QString("Wide Kernel"))
+  else if (this->enumParameter("algorithm") == QLatin1String("Wide Kernel"))
     {
     algorithmString = "widekernelpls";
     }
-  else if (this->enumParameter("algorithm") == QString("SIMPLS"))
+  else if (this->enumParameter("algorithm") == QLatin1String("SIMPLS"))
     {
     algorithmString = "simpls";
     }
