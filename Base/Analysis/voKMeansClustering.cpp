@@ -134,35 +134,13 @@ bool voKMeansClustering::execute()
 
   vtkSmartPointer< vtkArrayData > kmReturn = vtkSmartPointer< vtkArrayData>::New();
   kmReturn->DeepCopy(temp);
-/*
-  vtkSmartPointer< vtkArrayData > kmCentersData = vtkSmartPointer< vtkArrayData>::New();
-  kmCentersData->AddArray(kmReturn->GetArrayByName("kmCenters"));
 
-  vtkSmartPointer< vtkArrayToTable > kmCenters = vtkSmartPointer< vtkArrayToTable>::New();
-  kmCenters->SetInputConnection(kmCentersData->GetProducerPort());
-  kmCenters->Update();
-*/
   vtkSmartPointer< vtkArrayData > kmClusterData = vtkSmartPointer< vtkArrayData>::New();
   kmClusterData->AddArray(kmReturn->GetArrayByName("kmCluster"));
 
   vtkSmartPointer< vtkArrayToTable > kmCluster= vtkSmartPointer< vtkArrayToTable>::New();
   kmCluster->SetInputConnection(kmClusterData->GetProducerPort());
   kmCluster->Update();
-/*
-  vtkSmartPointer< vtkArrayData > kmWithinssData= vtkSmartPointer< vtkArrayData >::New();
-  kmWithinssData->AddArray(kmReturn->GetArrayByName("kmWithinss"));
-
-  vtkSmartPointer< vtkArrayToTable > kmWithinss= vtkSmartPointer< vtkArrayToTable >::New();
-  kmWithinss->SetInputConnection(kmWithinssData->GetProducerPort());
-  kmWithinss->Update();
-
-  vtkSmartPointer< vtkArrayData > kmSizeData= vtkSmartPointer< vtkArrayData >::New();
-  kmSizeData->AddArray(kmReturn->GetArrayByName("kmSize"));
-
-  vtkSmartPointer< vtkArrayToTable > kmSize= vtkSmartPointer< vtkArrayToTable >::New();
-  kmSize->SetInputConnection(kmSizeData->GetProducerPort());
-  kmSize->Update();
-*/
 
   // Create a table with sample name and cluster number
   // NOTE: This transpose is necessary because the one-dimensional vtkArray returned by R is
