@@ -17,6 +17,7 @@
 #include <vtkContextScene.h>
 #include <vtkDoubleArray.h>
 #include <vtkImageData.h>
+#include <vtkPlotHistogram2D.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
@@ -91,17 +92,27 @@ void voHeatMapView::setDataObject(voDataObject* dataObject)
     return;
     }
 
-  vtkSmartPointer<vtkStringArray> verticalLabels = vtkStringArray::SafeDownCast(table->GetColumn(0));
-  if (!verticalLabels)
+  vtkNew<vtkStringArray> verticalLabels;
     {
-    qCritical() << "voHeatMapView - Failed to setDataObject - first column of vtkTable data could not be converted to string !";
-    return;
+    // Flip vertical labels
+    vtkSmartPointer<vtkStringArray> verticalLabelsRaw = vtkStringArray::SafeDownCast(table->GetColumn(0));
+    if (!verticalLabelsRaw)
+      {
+      qCritical() << "voHeatMapView - Failed to setDataObject - first column of vtkTable data could not be converted to string !";
+      return;
+      }
+    vtkIdType numVertLabels = verticalLabelsRaw->GetNumberOfValues();
+    verticalLabels->SetNumberOfValues(numVertLabels);
+    for (vtkIdType i = 0; i < numVertLabels; i++)
+      {
+      verticalLabels->SetValue(i, verticalLabelsRaw->GetValue(numVertLabels-i-1));
+      }
     }
 
   vtkSmartPointer<vtkStringArray> horizontalLabels = vtkSmartPointer<vtkStringArray>::Take(voUtils::tableColumnNames(table, 1));
 
   vtkNew<vtkDoubleArray> verticalTicks;
-  for(double i = table->GetNumberOfRows() - 1; i >= 0; i--)
+  for(double i = 0.0; i < table->GetNumberOfRows(); i++)
     {
     verticalTicks->InsertNextValue(i + 0.5);
     }
@@ -159,6 +170,11 @@ void voHeatMapView::setDataObject(voDataObject* dataObject)
   d->Chart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetOrientation(270.0);
   d->Chart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetJustificationToRight(); // This actually justifies to the left
   d->Chart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetVerticalJustificationToCentered();
+
+  vtkPlotHistogram2D* plotHistogram = vtkPlotHistogram2D::SafeDownCast(d->Chart->GetPlot(0));
+  plotHistogram->SetTooltipPrecision(2);
+  plotHistogram->SetTooltipNotation(vtkAxis::FIXED_NOTATION);
+  plotHistogram->SetTooltipLabelFormat("%j / %i : %v");
 
   double hsvScalars[3] = {-1.0, 0.0, 1.0};
   if (dataObject->name() == QString("clusterHeatMap"))
