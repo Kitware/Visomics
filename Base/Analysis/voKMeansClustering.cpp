@@ -13,6 +13,7 @@
 // VTK includes
 #include <vtkArrayToTable.h>
 #include <vtkDataSetAttributes.h>
+#include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
@@ -89,10 +90,10 @@ bool voKMeansClustering::execute()
   int kmeans_number_of_random_start = this->integerParameter("nstart");
   QString kmeans_algorithm = this->enumParameter("algorithm");
 
-  vtkSmartPointer< vtkTableToArray > tableToArray = vtkSmartPointer< vtkTableToArray>::New();
+  vtkNew<vtkTableToArray> tableToArray;
   tableToArray->SetInput(table);
 
-  vtkSmartPointer< vtkStringArray > names = vtkSmartPointer< vtkStringArray >::New();
+  vtkNew<vtkStringArray> names;
 
   names->SetName("Samples");
   for (int ctr = 1; ctr < table->GetNumberOfColumns(); ctr++)
@@ -102,7 +103,7 @@ bool voKMeansClustering::execute()
     }
   tableToArray->Update();
 
-  vtkSmartPointer< vtkRCalculatorFilter > calc = vtkSmartPointer< vtkRCalculatorFilter>::New();
+  vtkNew<vtkRCalculatorFilter> calc;
   calc->SetRoutput(0);
   calc->SetInput(tableToArray->GetOutput());
   calc->PutArray("0", "metabData");
@@ -132,13 +133,13 @@ bool voKMeansClustering::execute()
     return 1;
     }
 
-  vtkSmartPointer< vtkArrayData > kmReturn = vtkSmartPointer< vtkArrayData>::New();
+  vtkNew<vtkArrayData> kmReturn;
   kmReturn->DeepCopy(temp);
 
-  vtkSmartPointer< vtkArrayData > kmClusterData = vtkSmartPointer< vtkArrayData>::New();
+  vtkNew<vtkArrayData> kmClusterData;
   kmClusterData->AddArray(kmReturn->GetArrayByName("kmCluster"));
 
-  vtkSmartPointer< vtkArrayToTable > kmCluster= vtkSmartPointer< vtkArrayToTable>::New();
+  vtkNew<vtkArrayToTable> kmCluster;
   kmCluster->SetInputConnection(kmClusterData->GetProducerPort());
   kmCluster->Update();
 
@@ -149,20 +150,20 @@ bool voKMeansClustering::execute()
   //       To keep the orientation of experiments consistant between input and output, a
   //       transpose and manually building the table is necessary. If a vertially-oriented
   //       table is acceptable, simply output kmCluster->GetOutput()
-  vtkSmartPointer< vtkTable > clusterTable = vtkSmartPointer< vtkTable >::New();
+  vtkNew<vtkTable> clusterTable;
 
-  vtkSmartPointer<vtkStringArray> headerCol = vtkSmartPointer<vtkStringArray>::New();
+  vtkNew<vtkStringArray> headerCol;
   headerCol->InsertNextValue(QObject::tr("Cluster number").toLatin1());
-  clusterTable->AddColumn(headerCol);
+  clusterTable->AddColumn(headerCol.GetPointer());
   for(unsigned int i = 0; i < kmClusterData->GetArray(0)->GetSize(); ++i)
     {
-    vtkSmartPointer<vtkIntArray> newCol = vtkSmartPointer<vtkIntArray>::New();
+    vtkNew<vtkIntArray> newCol;
     newCol->SetName(table->GetColumnName(i+1)); // "table" contains a name column that must be offset from
     newCol->InsertNextValue(kmClusterData->GetArray(0)->GetVariantValue(i).ToInt());
-    clusterTable->AddColumn(newCol);
+    clusterTable->AddColumn(newCol.GetPointer());
     }
 
-  this->setOutput("cluster", new voTableDataObject("cluster", clusterTable));
+  this->setOutput("cluster", new voTableDataObject("cluster", clusterTable.GetPointer()));
 
   return true;
 }
