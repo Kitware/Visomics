@@ -87,7 +87,7 @@ void voTreeGraphView::setDataObject(voDataObject* dataObject)
     return;
     }
 
-  vtkTree * tree = vtkTree::SafeDownCast(dataObject->data());
+  vtkTree * tree = vtkTree::SafeDownCast(dataObject->dataAsVTKDataObject());
   if (!tree)
     {
     qCritical() << "voTreeGraphView - Failed to setDataObject - vtkTree data is expected !";

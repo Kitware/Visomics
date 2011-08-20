@@ -86,7 +86,7 @@ void voPCABarView::setDataObject(voDataObject *dataObject)
     return;
     }
 
-  vtkTable * table = vtkTable::SafeDownCast(dataObject->data());
+  vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
   if (!table)
     {
     qCritical() << "voPCABarView - Failed to setDataObject - vtkTable data is expected !";

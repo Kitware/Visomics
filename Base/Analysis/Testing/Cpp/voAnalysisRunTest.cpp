@@ -152,7 +152,7 @@ int voAnalysisRunTest(int argc, char * argv [])
       return EXIT_FAILURE;
       }
     voDataObject * dataObject = analysis->output(outputName);
-    voIOManager::writeDataObjectToFile(dataObject->data(), tempFile.fileName().toLatin1());
+    voIOManager::writeDataObjectToFile(dataObject->dataAsVTKDataObject(), tempFile.fileName().toLatin1());
 
     QByteArray outputMD5 = QCryptographicHash::hash(tempFile.readAll(), QCryptographicHash::Md5);
 
