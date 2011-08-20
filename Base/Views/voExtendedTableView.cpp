@@ -72,7 +72,7 @@ void voExtendedTableView::setDataObject(voDataObject *dataObject)
     return;
     }
 
-  vtkExtendedTable * extendedTable = vtkExtendedTable::SafeDownCast(dataObject->data());
+  vtkExtendedTable * extendedTable = vtkExtendedTable::SafeDownCast(dataObject->dataAsVTKDataObject());
   if (!extendedTable)
     {
     qCritical() << "voExtendedTableView - Failed to setDataObject - vtkExtendedTable data is expected !";

@@ -40,7 +40,7 @@ public:
       //std::cerr << "There is no Data associated with the input." << std::endl;
       return false;
       }
-    vtkTable* table =  vtkTable::SafeDownCast(this->input()->data());
+    vtkTable* table =  vtkTable::SafeDownCast(this->input()->dataAsVTKDataObject());
     if (!table)
       {
       std::cerr << "Input is Null" << std::endl;
@@ -570,7 +570,7 @@ int voAnalysisTest(int argc, char * argv [])
     return EXIT_FAILURE;
     }
 
-  vtkTable * outputTable2 = vtkTable::SafeDownCast(analysis.output("output")->data());
+  vtkTable * outputTable2 = vtkTable::SafeDownCast(analysis.output("output")->dataAsVTKDataObject());
   if (!outputTable2 || outputTable2->GetNumberOfColumns() != 1)
     {
     std::cerr << "Line " << __LINE__ << " - Problem with output() !" << std::endl;
