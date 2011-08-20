@@ -24,6 +24,7 @@ class voDataObject : public QObject, public QSharedData
 public:
   typedef QObject Superclass;
   voDataObject(QObject* newParent = 0);
+  voDataObject(const QString& newName, const QVariant& newData, QObject* newParent = 0);
   voDataObject(const QString& newName, vtkDataObject * newData, QObject* newParent = 0);
   virtual ~voDataObject();
   

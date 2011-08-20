@@ -40,6 +40,15 @@ voDataObject::voDataObject(QObject* newParent) :
 }
 
 // --------------------------------------------------------------------------
+voDataObject::voDataObject(const QString& newName, const QVariant& newData, QObject* newParent):
+    Superclass(newParent), d_ptr(new voDataObjectPrivate)
+{
+  Q_D(voDataObject);
+  d->Name = newName;
+  this->setData(newData);
+}
+
+// --------------------------------------------------------------------------
 voDataObject::voDataObject(const QString& newName, vtkDataObject * newData, QObject* newParent):
     Superclass(newParent), d_ptr(new voDataObjectPrivate)
 {
