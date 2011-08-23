@@ -7,6 +7,7 @@
 // Visomics includes
 #include "voAnalysisDriver.h"
 #include "voApplication.h"
+#include "voConfigure.h" // For Visomics_INSTALL_BIN_DIR, Visomics_INSTALL_LIB_DIR
 #include "voDataModel.h"
 #include "voIOManager.h"
 #include "voNormalization.h"
@@ -65,8 +66,8 @@ void voApplicationPrivate::init()
 QString voApplicationPrivate::discoverHomeDirectory()
 {
   QDir binDir(QApplication::instance()->applicationDirPath());
-  if (binDir.dirName() != QLatin1String("bin")
-      && binDir.dirName() != QLatin1String("lib"))
+  if (binDir.dirName() != QLatin1String(Visomics_INSTALL_BIN_DIR)
+      && binDir.dirName() != QLatin1String(Visomics_INSTALL_LIB_DIR))
     {
     binDir.cdUp();
     }
