@@ -175,7 +175,10 @@ TARGET_LINK_LIBRARIES(
   ${libname}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
   )
-  
+
+# Install rules
+INSTALL(DIRECTORY Views/Resources/dynamicviews DESTINATION share COMPONENT Runtime)
+
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)
   ADD_SUBDIRECTORY(Analysis/Testing)
