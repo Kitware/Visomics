@@ -29,6 +29,8 @@ SET(KIT_SRCS
   Views/voExtendedTableView.h
   Views/voHeatMapView.cpp
   Views/voHeatMapView.h
+  Views/voHierarchicalClusteringDynView.cpp
+  Views/voHierarchicalClusteringDynView.h
   Views/voHorizontalBarView.h
   Views/voHorizontalBarView.cpp
   Views/voInteractorStyleRubberBand2D.h
@@ -100,6 +102,7 @@ SET(KIT_MOC_SRCS
   Views/voCorrelationGraphView.h
   Views/voExtendedTableView.h
   Views/voHeatMapView.h
+  Views/voHierarchicalClusteringDynView.h
   Views/voHorizontalBarView.h
   Views/voPCABarView.h
   Views/voPCAProjectionDynView.h
