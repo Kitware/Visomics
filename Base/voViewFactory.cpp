@@ -35,8 +35,8 @@ public:
 voViewFactory::voViewFactory():d_ptr(new voViewFactoryPrivate)
 {
   this->registerView<voCorrelationGraphView>();
-  this->registerView<voHeatMapView>();
   this->registerView<voExtendedTableView>();
+  this->registerView<voHeatMapView>();
   this->registerView<voHorizontalBarView>();
   this->registerView<voPCABarView>();
   this->registerView<voPCAProjectionView>();

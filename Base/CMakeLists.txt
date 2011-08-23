@@ -25,10 +25,10 @@ SET(KIT_SRCS
   
   Views/voCorrelationGraphView.cpp
   Views/voCorrelationGraphView.h
-  Views/voHeatMapView.cpp
-  Views/voHeatMapView.h
   Views/voExtendedTableView.cpp
   Views/voExtendedTableView.h
+  Views/voHeatMapView.cpp
+  Views/voHeatMapView.h
   Views/voHorizontalBarView.h
   Views/voHorizontalBarView.cpp
   Views/voInteractorStyleRubberBand2D.h
@@ -94,8 +94,8 @@ SET(KIT_MOC_SRCS
   Analysis/voXCorrel.h
   
   Views/voCorrelationGraphView.h
-  Views/voHeatMapView.h
   Views/voExtendedTableView.h
+  Views/voHeatMapView.h
   Views/voHorizontalBarView.h
   Views/voPCABarView.h
   Views/voPCAProjectionView.h
