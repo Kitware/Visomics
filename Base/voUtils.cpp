@@ -1,8 +1,10 @@
 
 // Qt includes
 #include <QDebug>
-#include <QtGlobal>
+#include <QScriptEngine>
+#include <QScriptValue>
 #include <QStringList>
+#include <QtGlobal>
 #include <QRegExp>
 #include <QSet>
 
@@ -544,5 +546,102 @@ QList<int> voUtils::range(int start, int stop, int step)
     rangeList << ctr;
     }
   return rangeList;
+}
+
+//----------------------------------------------------------------------------
+QString voUtils::stringify(QScriptEngine* scriptEngine, const QScriptValue& scriptValue)
+{
+  if (!scriptEngine)
+    {
+    return QString();
+    }
+  QScriptValue stringify = scriptEngine->evaluate("(function(obj) { return JSON.stringify(obj); })");
+  return stringify.call(QScriptValue(), QScriptValueList() << scriptValue).toString();
+}
+
+//----------------------------------------------------------------------------
+QString voUtils::stringify(const QString& name, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip)
+{
+  if (!table)
+    {
+    return QString();
+    }
+  QScriptEngine scriptEngine;
+  QScriptValue object = scriptEngine.newObject();
+  object.setProperty("name", QScriptValue(name));
+  object.setProperty("data", voUtils::scriptValueFromTable(&scriptEngine, table, columnIdsToSkip));
+  return voUtils::stringify(&scriptEngine, object);
+}
+
+//----------------------------------------------------------------------------
+QScriptValue voUtils::scriptValueFromTable(QScriptEngine* scriptEngine,
+                                           vtkTable * table,
+                                           const QList<vtkIdType>& columnIdsToSkip)
+{
+  if (!scriptEngine || !table)
+    {
+    return QScriptValue();
+    }
+  QScriptValueList list;
+  for(vtkIdType cid = 0; cid < table->GetNumberOfColumns(); ++cid)
+    {
+    if (columnIdsToSkip.contains(cid))
+      {
+      continue;
+      }
+    QScriptValue scriptValue = voUtils::scriptValueFromArray<vtkDoubleArray>(scriptEngine, table->GetColumn(cid));
+    if (scriptValue.isValid())
+      {
+      list << scriptValue;
+      }
+    else
+      {
+      scriptValue = voUtils::scriptValueFromArray<vtkIntArray>(scriptEngine, table->GetColumn(cid));
+      if (scriptValue.isValid())
+        {
+        list << scriptValue;
+        }
+      else
+        {
+        scriptValue = voUtils::scriptValueFromArray<vtkStringArray>(scriptEngine, table->GetColumn(cid));
+        if (scriptValue.isValid())
+          {
+          list << scriptValue;
+          }
+        }
+      }
+    }
+  QScriptValue array = scriptEngine->newArray();
+  QScriptValueList::const_iterator it;
+  quint32 i;
+  for(it = list.constBegin(), i = 0; it != list.constEnd(); ++it, ++i)
+    {
+    array.setProperty(i, *it);
+    }
+  return array;
+}
+
+//----------------------------------------------------------------------------
+template<typename ArrayType>
+QScriptValue voUtils::scriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstractArray * array)
+{
+  if (!scriptEngine || !array)
+    {
+    return QScriptValue();
+    }
+  ArrayType * typedArray = ArrayType::SafeDownCast(array);
+  if (!typedArray)
+    {
+    return QScriptValue();
+    }
+  QVariantList list;
+  for (vtkIdType i = 0; i < typedArray->GetNumberOfTuples() * typedArray->GetNumberOfComponents(); ++i)
+    {
+    list << QVariant(typedArray->GetValue(i));
+    }
+  QScriptValue object = scriptEngine->newObject();
+  object.setProperty("name", array->GetName());
+  object.setProperty("data", qScriptValueFromSequence<QVariantList>(scriptEngine, list));
+  return object;
 }
 
