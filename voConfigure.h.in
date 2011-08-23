@@ -1,0 +1,8 @@
+#ifndef __voConfigure_h
+#define __voConfigure_h
+
+#define Visomics_INSTALL_BIN_DIR "@Visomics_INSTALL_BIN_DIR@"
+#define Visomics_INSTALL_LIB_DIR "@Visomics_INSTALL_LIB_DIR@"
+
+#endif
+

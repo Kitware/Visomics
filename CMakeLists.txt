@@ -169,10 +169,12 @@ SET(CMAKE_C_FLAGS ${Visomics_C_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 #-----------------------------------------------------------------------------
 # Configure headers
 #
-CONFIGURE_FILE(
-  voTestConfigure.h.in
-  ${CMAKE_CURRENT_BINARY_DIR}/voTestConfigure.h
-  )
+FOREACH(header voConfigure.h voTestConfigure.h)
+  CONFIGURE_FILE(
+    ${header}.in
+    ${CMAKE_CURRENT_BINARY_DIR}/${header}
+    )
+ENDFOREACH()
 
 #-----------------------------------------------------------------------------
 # Include directories
