@@ -98,7 +98,7 @@ bool voTTest::execute()
     }
 
   // Import data table locally
-  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->data());
+  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
   if (!extendedTable)
     {
     qWarning() << "Input is Null";

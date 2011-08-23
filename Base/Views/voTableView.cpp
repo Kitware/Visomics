@@ -72,7 +72,7 @@ void voTableView::setDataObject(voDataObject *dataObject)
     return;
     }
 
-  vtkTable * table = vtkTable::SafeDownCast(dataObject->data());
+  vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
   if (!table)
     {
     qCritical() << "voTableView - Failed to setDataObject - vtkTable data is expected !";

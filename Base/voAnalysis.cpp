@@ -545,13 +545,13 @@ void voAnalysis::writeOutputsToFiles(const QString& directory) const
   foreach(const QString& outputName, this->outputNames())
     {
     voDataObject * dataObject = this->output(outputName);
-    if (!dataObject || !dataObject->data())
+    if (!dataObject || !dataObject->dataAsVTKDataObject())
       {
       continue;
       }
     QString filename("%1/%2%3_%4.vtk"); // <directory>/(<inputHash>_)<analysisName>_<outputName>.vtk
     filename = filename.arg(directory).arg(inputHash).arg(this->metaObject()->className()).arg(outputName);
-    bool success = voIOManager::writeDataObjectToFile(dataObject->data(), filename);
+    bool success = voIOManager::writeDataObjectToFile(dataObject->dataAsVTKDataObject(), filename);
     if (!success)
       {
       qCritical() << this->metaObject()->className()

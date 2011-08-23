@@ -111,7 +111,7 @@ void voCorrelationGraphView::setDataObject(voDataObject* dataObject)
     return;
     }
 
-  vtkGraph * graph = vtkGraph::SafeDownCast(dataObject->data());
+  vtkGraph * graph = vtkGraph::SafeDownCast(dataObject->dataAsVTKDataObject());
   if (!graph)
     {
     qCritical() << "voCorrelationGraphView - Failed to setDataObject - vtkGraph data is expected !";

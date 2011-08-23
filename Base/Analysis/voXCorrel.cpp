@@ -85,7 +85,7 @@ bool voXCorrel::execute()
 {
   Q_D(voXCorrel);
 
-  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->data());
+  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
   if (!extendedTable)
     {
     qWarning() << "Input is Null";
