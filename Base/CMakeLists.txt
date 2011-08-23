@@ -61,6 +61,8 @@ SET(KIT_SRCS
   voDataObject.h
   voDelimitedTextImportSettings.cpp
   voDelimitedTextImportSettings.h
+  voDynView.cpp
+  voDynView.h
   voInputFileDataObject.cpp
   voInputFileDataObject.h
   voIOManager.cpp
@@ -109,6 +111,7 @@ SET(KIT_MOC_SRCS
   voDataModel.h
   voDataModel_p.h
   voDataObject.h
+  voDynView.h
   voInputFileDataObject.h
   voTableDataObject.h
   voView.h
@@ -131,7 +134,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/Views
   ${CMAKE_CURRENT_BINARY_DIR}/Views
   )
-  
+
 QT4_WRAP_UI(KIT_UI_CPP ${KIT_UI_FORMS})
 QT4_WRAP_CPP(KIT_MOC_CPP ${KIT_MOC_SRCS} )
 QT4_ADD_RESOURCES(KIT_QRC_SRCS ${KIT_resources})

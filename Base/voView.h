@@ -16,7 +16,7 @@ public:
   voView(QWidget* newParent = 0);
   virtual ~voView();
 
-  void initialize();
+  virtual void initialize();
 
   virtual void setDataObject(voDataObject* dataObject) = 0;
 
