@@ -1,6 +1,7 @@
 
 //Qt includes
 #include <QDebug>
+#include <QDir>
 #include <QMainWindow>
 
 // Visomics includes
@@ -27,7 +28,12 @@ class voApplicationPrivate
 {
 public:
   voApplicationPrivate();
-  
+
+  void init();
+
+  QString discoverHomeDirectory();
+
+  QString                HomeDirectory;
   bool                   Initialized;
   bool                   ExitWhenDone;
   voDataModel            DataModel;
@@ -50,6 +56,25 @@ voApplicationPrivate::voApplicationPrivate()
 }
 
 // --------------------------------------------------------------------------
+void voApplicationPrivate::init()
+{
+  this->HomeDirectory = this->discoverHomeDirectory();
+}
+
+//-----------------------------------------------------------------------------
+QString voApplicationPrivate::discoverHomeDirectory()
+{
+  QDir binDir(QApplication::instance()->applicationDirPath());
+  if (binDir.dirName() != QLatin1String("bin")
+      && binDir.dirName() != QLatin1String("lib"))
+    {
+    binDir.cdUp();
+    }
+  binDir.cdUp();
+  return binDir.canonicalPath();
+}
+
+// --------------------------------------------------------------------------
 // voApplication methods
 
 // --------------------------------------------------------------------------
@@ -57,6 +82,7 @@ voApplication::voApplication(int & argc, char ** argv):
     Superclass(argc, argv), d_ptr(new voApplicationPrivate)
 {
   Q_D(voApplication);
+  d->init();
   connect(&d->DataModel, SIGNAL(viewSelected(QString)),
           &d->ViewManager, SLOT(createView(const QString&)));
 
@@ -92,6 +118,27 @@ void voApplication::initialize(bool& exitWhenDone)
 
   d->Initialized = true;
   exitWhenDone = d->ExitWhenDone;
+}
+
+// --------------------------------------------------------------------------
+bool voApplication::initialized()const
+{
+  Q_D(const voApplication);
+  return d->Initialized;
+}
+
+//-----------------------------------------------------------------------------
+bool voApplication::isInstalled()const
+{
+  Q_D(const voApplication);
+  return !QFile::exists(d->HomeDirectory + "/CMakeCache.txt");
+}
+
+// --------------------------------------------------------------------------
+QString voApplication::homeDirectory()const
+{
+  Q_D(const voApplication);
+  return d->HomeDirectory;
 }
 
 // --------------------------------------------------------------------------
