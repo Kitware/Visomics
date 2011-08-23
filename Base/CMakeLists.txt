@@ -35,6 +35,8 @@ SET(KIT_SRCS
   Views/voInteractorStyleRubberBand2D.cpp
   Views/voPCABarView.cpp
   Views/voPCABarView.h
+  Views/voPCAProjectionDynView.cpp
+  Views/voPCAProjectionDynView.h
   Views/voPCAProjectionView.cpp
   Views/voPCAProjectionView.h
   Views/voTableView.cpp
@@ -100,6 +102,7 @@ SET(KIT_MOC_SRCS
   Views/voHeatMapView.h
   Views/voHorizontalBarView.h
   Views/voPCABarView.h
+  Views/voPCAProjectionDynView.h
   Views/voPCAProjectionView.h
   Views/voTableView.h
   Views/voTreeGraphView.h
