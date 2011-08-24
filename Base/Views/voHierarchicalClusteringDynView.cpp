@@ -10,6 +10,10 @@
 
 // VTK includes
 #include <vtkTree.h>
+#include <vtkGraph.h>
+#include <vtkTreeLevelsFilter.h>
+#include <vtkDataSetAttributes.h>
+#include <vtkAbstractArray.h>
 
 // --------------------------------------------------------------------------
 class voHierarchicalClusteringDynViewPrivate
@@ -49,7 +53,8 @@ QString voHierarchicalClusteringDynView::stringify(const voDataObject& dataObjec
     qCritical() << "voHierarchicalClusteringDynView - Failed to setDataObject - vtkTree data is expected !";
     return QString();
     }
-  // TODO
-  // return voUtils::stringify(this->viewName(), tree);
-  return QString();
+
+
+  return voUtils::stringifytree(this->viewName(), tree,  QList<vtkIdType>() << 1);
+
 }

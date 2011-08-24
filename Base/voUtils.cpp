@@ -22,6 +22,10 @@
 #include <vtkTable.h>
 #include <vtkTableToArray.h>
 #include <vtkVariantArray.h>
+#include <vtkTree.h>
+#include <vtkTreeLevelsFilter.h>
+#include <vtkDataSetAttributes.h>
+#include <vtkAbstractArray.h>
 
 namespace
 {
@@ -556,6 +560,7 @@ QString voUtils::stringify(QScriptEngine* scriptEngine, const QScriptValue& scri
     return QString();
     }
   QScriptValue stringify = scriptEngine->evaluate("(function(obj) { return JSON.stringify(obj); })");
+  std::cout << stringify.call(QScriptValue(), QScriptValueList() << scriptValue).toString().toStdString() << std::endl;
   return stringify.call(QScriptValue(), QScriptValueList() << scriptValue).toString();
 }
 
@@ -570,6 +575,72 @@ QString voUtils::stringify(const QString& name, vtkTable * table, const QList<vt
   QScriptValue object = scriptEngine.newObject();
   object.setProperty("name", QScriptValue(name));
   object.setProperty("data", voUtils::scriptValueFromTable(&scriptEngine, table, columnIdsToSkip));
+  return voUtils::stringify(&scriptEngine, object);
+}
+//*----------------------------------------------------------------------------
+QString voUtils::stringifytree(const QString& name, vtkTree * tree,const QList<vtkIdType>& columnIdsToSkip)
+{
+  if (!tree)
+    {
+    return QString();
+    }
+
+  vtkTreeLevelsFilter *levels = vtkTreeLevelsFilter::New();
+  levels->SetInput(tree);
+  vtkTree *temp = levels->GetOutput();
+  levels->Update();
+  
+  vtkDataSetAttributes *treedata = vtkDataSetAttributes::New();
+  treedata = temp->GetVertexData();
+
+  vtkAbstractArray *level;
+  vtkAbstractArray *leaf;
+  vtkAbstractArray *height;
+  vtkAbstractArray *id;
+
+
+  int depth=0;
+  vtkVariantArray *temparray= vtkVariantArray::New();
+  id= treedata->GetAbstractArray(0);
+  height = treedata->GetAbstractArray(1);
+  level= treedata->GetAbstractArray(2);
+  leaf = treedata->GetAbstractArray(3);
+  vtkTable *table= vtkTable::New();
+  bool flag=0;
+  bool found=0;
+
+  while(!flag)
+  {
+	for(int itr=0;itr<height->GetNumberOfTuples();itr++)
+	{
+		if(height->GetVariantValue(itr)==depth)
+		{
+			found=1;
+			const char * name = (const char *) id->GetVariantValue(itr).ToChar();
+			temparray->SetName(name);
+			temparray->SetValue(2,height->GetVariantValue(itr));
+			temparray->SetValue(3,leaf->GetVariantValue(itr));
+			table->AddColumn(temparray);
+			depth++;
+		}
+	}
+	if(found)
+	{
+		found=0;
+	}
+	else
+	{
+		flag=1;
+	}
+  }
+
+
+
+
+  QScriptEngine scriptEngine;
+  QScriptValue object = scriptEngine.newObject();
+  object.setProperty("name", QScriptValue(name));
+ object.setProperty("children", voUtils::scriptValueFromTable(&scriptEngine, table, columnIdsToSkip));
   return voUtils::stringify(&scriptEngine, object);
 }
 
@@ -608,6 +679,10 @@ QScriptValue voUtils::scriptValueFromTable(QScriptEngine* scriptEngine,
           {
           list << scriptValue;
           }
+		  else
+		  {
+	       scriptValue = voUtils::TreescriptValueFromArray(scriptEngine,table->GetColumn(cid));
+		  }
         }
       }
     }
@@ -636,12 +711,31 @@ QScriptValue voUtils::scriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstr
     }
   QVariantList list;
   for (vtkIdType i = 0; i < typedArray->GetNumberOfTuples() * typedArray->GetNumberOfComponents(); ++i)
-    {
+  {
     list << QVariant(typedArray->GetValue(i));
-    }
+  }
+ 
   QScriptValue object = scriptEngine->newObject();
   object.setProperty("name", array->GetName());
   object.setProperty("data", qScriptValueFromSequence<QVariantList>(scriptEngine, list));
+  return object;
+}
+QScriptValue voUtils::TreescriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstractArray * array)
+{
+  if (!scriptEngine || !array)
+    {
+    return QScriptValue();
+    }
+
+  QVariantList list;
+  for (vtkIdType i = 0; i < array->GetNumberOfTuples() * array->GetNumberOfComponents(); ++i)
+  {
+    list << QVariant(array->GetVariantValue(i).ToLongLong());
+  }
+ 
+  QScriptValue object = scriptEngine->newObject();
+  object.setProperty("name", array->GetName());
+  object.setProperty("children", qScriptValueFromSequence<QVariantList>(scriptEngine, list));
   return object;
 }
 

@@ -78,6 +78,11 @@ var json = {
   ]}
 ]};
 
+if (window.dataobject)
+  {
+  json = JSON.parse(window.dataobject.json);
+  
+
 var node = vis.data([json]).selectAll("g.node")
   .data(pack.nodes)
   .enter().append("svg:g")
