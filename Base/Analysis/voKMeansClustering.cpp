@@ -1,6 +1,7 @@
 
 // Qt includes
 #include <QDebug>
+#include <QList>
 
 // QtPropertyBrowser includes
 #include <QtVariantPropertyManager>
@@ -71,6 +72,56 @@ void voKMeansClustering::setParameterInformation()
 
   this->addParameterGroup("KMeans parameters", kmeans_parameters);
 }
+
+namespace
+{
+// --------------------------------------------------------------------------
+QList<int> collectColumnIds(vtkTable* table, int value)
+{
+  Q_ASSERT(table);
+  QList<int> ids;
+  for(vtkIdType cid = 1; cid < table->GetNumberOfColumns(); ++cid)
+    {
+    vtkIntArray * currentColumn = vtkIntArray::SafeDownCast(table->GetColumn(cid));
+    int currentValue = currentColumn->GetValue(0);
+    if (currentValue == value)
+      {
+      ids << cid;
+      }
+    }
+  return ids;
+}
+
+// --------------------------------------------------------------------------
+void swapClusterIds(vtkTable* table, const QList<int>& columndIds1, int value1,
+                    const QList<int>& columnIds2, int value2)
+{
+  Q_ASSERT(table);
+  Q_ASSERT(!columndIds1.isEmpty());
+  Q_ASSERT(!columnIds2.isEmpty());
+  foreach(int cid, columndIds1)
+    {
+    vtkIntArray::SafeDownCast(table->GetColumn(cid))->SetValue(0, value2);
+    }
+  foreach(int cid, columnIds2)
+    {
+    vtkIntArray::SafeDownCast(table->GetColumn(cid))->SetValue(0, value1);
+    }
+}
+
+// --------------------------------------------------------------------------
+void displayClustedIds(const char* description, vtkTable* table)
+{
+  Q_ASSERT(table);
+  QList<int> columndIdsToDisplay;
+  for(vtkIdType cid = 1; cid < table->GetNumberOfColumns(); ++cid)
+    {
+    columndIdsToDisplay << vtkIntArray::SafeDownCast(table->GetColumn(cid))->GetValue(0);
+    }
+  qDebug() << description << columndIdsToDisplay;
+}
+
+} // end of anonymous namespace
 
 // --------------------------------------------------------------------------
 bool voKMeansClustering::execute()
@@ -162,6 +213,28 @@ bool voKMeansClustering::execute()
     newCol->InsertNextValue(kmClusterData->GetArray(0)->GetVariantValue(i).ToInt());
     clusterTable->AddColumn(newCol.GetPointer());
     }
+
+  // Since the cluster id associated with each columns is arbitrary,
+  // let's make sure two successive execution of the analysis outputs
+  // the same result by re-labelling the cluster id of each column from left to right.
+  //displayClustedIds("initial", clusterTable.GetPointer());
+  int futureClusterId = 1;
+  QList<int> processedClusterIds;
+  for(vtkIdType cid = 1; cid < clusterTable->GetNumberOfColumns(); ++cid)
+    {
+    vtkIntArray * currentColumn = vtkIntArray::SafeDownCast(clusterTable->GetColumn(cid));
+    int currentClusterId = currentColumn->GetValue(0);
+    if (processedClusterIds.contains(currentClusterId))
+      {
+      continue;
+      }
+    QList<int> rightColumnIds = collectColumnIds(clusterTable.GetPointer(), currentClusterId);
+    QList<int> leftColumnIds = collectColumnIds(clusterTable.GetPointer(), futureClusterId);
+    swapClusterIds(clusterTable.GetPointer(), rightColumnIds, currentClusterId, leftColumnIds, futureClusterId);
+    processedClusterIds << futureClusterId;
+    ++futureClusterId;
+    }
+  //displayClustedIds("final", clusterTable.GetPointer());
 
   this->setOutput("cluster", new voTableDataObject("cluster", clusterTable.GetPointer()));
 
