@@ -52,6 +52,7 @@ public:
   QString outputType(const QString& outputName) const;
 
   QString viewPrettyName(const QString& outputName, const QString& viewType);
+  void setViewPrettyName(const QString& outputName, const QString& viewType, const QString& viewPrettyName);
 
   int numberOfOutput();
 
@@ -74,6 +75,7 @@ public:
   QString rawViewTypeForOutput(const QString& outputName)const;
 
   QString rawViewPrettyName(const QString& outputName, const QString& rawViewType);
+  void setRawViewPrettyName(const QString& outputName, const QString& rawViewType, const QString& rawViewPrettyName);
 
   void removeAllOutputs();
 
