@@ -1,0 +1,28 @@
+{
+"betaine": "cpd:C00719",
+"choline": "cpd:C00114",
+"o-phosphocholine": "cpd:C00588",
+"methionine": "cpd:C00073",
+"n,n-dimethylglycine": "cpd:C01026",
+"acetate": "cpd:C00033",
+"carnitine": "cpd:C00487",
+"citrate": "cpd:C00158",
+"glucose": "cpd:C00031",
+"lactate": "cpd:C01432",
+"trimethylamine": "cpd:C00565",
+"creatine": "cpd:C00300",
+"creatinine": "cpd:C00791",
+"alanine": "cpd:C01401",
+"glutamate": "cpd:C00025",
+"glutamine": "cpd:C00303",
+"glycine": "cpd:C00037",
+"lysine": "cpd:C16440",
+"threonine": "cpd:C00188",
+"valine": "cpd:C16436",
+"glyco-proteins": null,
+"glyceryl/choline of lipids": null,
+"ldl &vldl": null,
+"lipids": null,
+"lipids 1": null
+}
+
