@@ -9,7 +9,6 @@
 
 #include "voFoldChange.h"
 #include "voHierarchicalClustering.h"
-#include "voKEGG.h"
 #include "voKMeansClustering.h"
 #include "voPCAStatistics.h"
 #include "voTTest.h"
@@ -36,7 +35,6 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
 {
   this->registerAnalysis<voFoldChange>("Fold Change");
   this->registerAnalysis<voHierarchicalClustering>("Hierarchical Clustering");
-  this->registerAnalysis<voKEGG>("KEGG Pathways");
   this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
   this->registerAnalysis<voPCAStatistics>("PCA");
   this->registerAnalysis<voTTest>("T-Test");

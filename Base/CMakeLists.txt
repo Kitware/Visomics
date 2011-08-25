@@ -6,8 +6,6 @@ SET(KIT_SRCS
   Analysis/voFoldChange.h
   Analysis/voHierarchicalClustering.h
   Analysis/voHierarchicalClustering.cpp
-  Analysis/voKEGG.h
-  Analysis/voKEGG.cpp
   Analysis/voKMeansClustering.cpp
   Analysis/voKMeansClustering.h
   Analysis/voPCAStatistics.cpp
@@ -86,7 +84,6 @@ SET(KIT_SRCS
 SET(KIT_MOC_SRCS
   Analysis/voFoldChange.h
   Analysis/voHierarchicalClustering.h
-  Analysis/voKEGG.h
   Analysis/voKMeansClustering.h
   Analysis/voPCAStatistics.h
   Analysis/voTTest.h
