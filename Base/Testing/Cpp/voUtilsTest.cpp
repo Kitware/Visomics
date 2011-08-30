@@ -1,5 +1,6 @@
 
 // Qt includes
+#include <QCoreApplication>
 #include <QList>
 #include <QString>
 #include <QStringList>
@@ -266,8 +267,11 @@ bool transposeAndCheckResult(int line, const voUtils::TransposeOption& transpose
 } // end anonymous namespace
 
 //-----------------------------------------------------------------------------
-int voUtilsTest(int /*argc*/, char * /*argv*/ [])
+int voUtilsTest(int argc, char * argv [])
 {
+  QCoreApplication app(argc, argv);
+  Q_UNUSED(app);
+
   vtkNew<vtkTable> originalTable;
 
   //-----------------------------------------------------------------------------
@@ -1311,6 +1315,50 @@ int voUtilsTest(int /*argc*/, char * /*argv*/ [])
   if(baseIntList != generatedIntList)
     {
     std::cerr << "Line " << __LINE__ << " - Problem with range method !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
+  // Test stringify(const QString& name, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip);
+  //-----------------------------------------------------------------------------
+  vtkNew<vtkTable> stringifyTable;
+  stringifyTable->AddColumn(stringArray.GetPointer());
+  stringifyTable->AddColumn(intArray.GetPointer());
+  stringifyTable->AddColumn(doubleArray.GetPointer());
+  QString stringifyName("StringifyTest");
+
+  // case1: empty columnIdsToSkip
+  QString expectedStringifiedTable(
+        "{\"name\":\"StringifyTest\","
+        "\"data\":["
+        "{\"name\":\"stringArray\",\"data\":[\"zero\",\"one\",\"two\",\"three\",\"four\"]},"
+        "{\"name\":\"intArray\",\"data\":[0,1,2,3,4]},"
+        "{\"name\":\"doubleArray\",\"data\":[0.5,1.5,2.5,3.5,4.5]}]}");
+
+  QString currentStringifiedTable(voUtils::stringify(stringifyName, stringifyTable.GetPointer(), QList<vtkIdType>()));
+
+  if (expectedStringifiedTable != currentStringifiedTable)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with stringify()\n"
+              << "\tCurrent:" << qPrintable(currentStringifiedTable) << "\n"
+              << "\tExpected:" << qPrintable(expectedStringifiedTable) << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // case2: skip column 0
+  expectedStringifiedTable = QLatin1String(
+        "{\"name\":\"StringifyTest\","
+        "\"data\":["
+        "{\"name\":\"intArray\",\"data\":[0,1,2,3,4]},"
+        "{\"name\":\"doubleArray\",\"data\":[0.5,1.5,2.5,3.5,4.5]}]}");
+
+  currentStringifiedTable = voUtils::stringify(stringifyName, stringifyTable.GetPointer(), QList<vtkIdType>() << 0);
+
+  if (expectedStringifiedTable != currentStringifiedTable)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with stringify()\n"
+              << "\tCurrent:" << qPrintable(currentStringifiedTable) << "\n"
+              << "\tExpected:" << qPrintable(expectedStringifiedTable) << std::endl;
     return EXIT_FAILURE;
     }
 
