@@ -1,10 +1,15 @@
 #ifndef __voUtils_h
 #define __voUtils_h
 
+// VTK includes
+#include <vtkType.h>
+
 class vtkAbstractArray;
 class vtkStringArray;
 class vtkTable;
 template <class T> class QList;
+class QScriptEngine;
+class QScriptValue;
 class QString;
 class vtkArray;
 template <class T> class vtkSmartPointer;
@@ -53,6 +58,15 @@ bool tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray, cons
 void arrayToTable(vtkArray* srcArray, vtkTable* destTable);
 
 QList<int> range(int start, int stop, int step = 1);
+
+QString stringify(QScriptEngine* scriptEngine, const QScriptValue& scriptValue);
+
+QString stringify(const QString& name, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip);
+
+QScriptValue scriptValueFromTable(QScriptEngine* scriptEngine, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip);
+
+template<typename ArrayType>
+QScriptValue scriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstractArray * array);
 }
 
 #endif

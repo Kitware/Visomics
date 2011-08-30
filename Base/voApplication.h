@@ -35,6 +35,12 @@ public:
   /// \note initialize() should be called only one time.
   bool initialized() const;
 
+  /// Return true is this instance of the application is running from an installed directory
+  bool isInstalled()const;
+
+  /// Get application home directory
+  QString homeDirectory()const;
+
   voDataModel* dataModel()const;
 
   voAnalysisDriver* analysisDriver()const;
