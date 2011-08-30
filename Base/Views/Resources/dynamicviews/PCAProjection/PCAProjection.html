@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>PCA</title>
+    <script type="text/javascript" src="d3.js"></script> 
+  </head> 
+  <body>
+    <div class="body">
+      <div class="content">
+        <h3>Click on a data point to see the distance to its neighbors</h3>
+        <button class='first' id='clear'>Clear Distance Lines</button>
+        <p/>
+      </div>
+      <div class="gallery" id="chart"> </div>
+      <link href="pcatest.css" rel="stylesheet" type="text/css" />
+      <script src="d3.layout.js" type="text/javascript"> </script>
+
+      <script type="text/javascript">
+
+var json=
+{
+"name": "PCA", "data": [
+{"name": "jhw_98b_1rd",  "data":  [-171.976, 16.8569, -88.6813, 151.281, -17.6183, -14.6576, 15.6916, -33.239, -17.661, -12.2732, 2.40468, 0]},
+{"name": "jhw_98b_2rd",  "data":  [-142.294, -365.964, 41.9043, 47.0995, 80.7228, -17.7702, 10.4841, 6.73966, -12.3165, 7.72573, -1.1394, 0]},
+{"name": "jhw_98b_3rd",  "data":  [-167.854, -166.765 , 64.613, 120.433, -23.7242, -22.3468, -49.2372, -4.54491, 17.357, -5.41191, 1.42494, 0]},
+{"name": "jhw_98b_4rd",  "data":  [-68.7276, -20.7087, -287.404, -145.228, 25.0405, 37.8103, -13.6611, 7.48834, .258823, -16.0734, -5.6192, 0]},
+{"name": "jhw_98b_5rd",  "data":  [-401.321, -51.9493, -277.119, -100.816, -31.5338, -23.9281, 16.6212, 24.3947, 1.126, 9.23145, 4.71079, 0]},
+{"name": "jhw_98b_6rd",  "data":  [244.147, -242.484, -79.7209, -154.893, -2.63649, 13.6062, 7.49603, -38.2709, 10.3189, 15.056, -.392644, 0,]},
+{"name": "jhw_98b_7rd",  "data":  [659.329, 179.507, -125.296, 141.911, 26.5875, -25.7588, 21.2649, 10.7224, 12.5636, -5.50657, .3521, 0]},
+{"name": "jhw_98b_8rd",  "data":  [404.168, -290.715, 115.493, 78.1935, -30.4923, 44.9612, -4.81351, 17.9044, -10.2016, 1.0338, 5.58219, 0]},
+{"name": "jhw_98b_9rd",  "data":  [2.18878, 49.4085, 95.8057, 116.262, -44.1584, -7.946, 6.56856, 8.06924, -5.75945, 9.40689, -11.16, 0]},
+{"name": "jhw_98b_10rd", "data":  [-284.196, 630.649, 17.501, 128.635, 24.6405, 35.3694, -6.96103, -3.81731, 3.04241, 10.1618, 2.37409, 0]},
+{"name": "jhw_98b_11rd", "data":  [265.971, 374.977, 178.793, -294.875, -5.389, -27.766, -18.7056, .438329, -11.1949, -2.11421, 1.28097, 0]},
+{"name": "jhw_98b_12rd", "data":  [ -339.434, -112.813, 334.111, -88.0037, 9.56134, 8.42022, 35.9502, 4.11497, 12.4668, -10.2368, .0624229, 0]}
+    ]};
+
+if (window.dataobject)
+  {
+  json = JSON.parse(window.dataobject.json);
+  }
+
+var h = 800;
+var w = 800;
+var r = 13;
+format = d3.format(",d");
+
+var chart=d3.select("#chart")
+  .append("svg:svg")
+  .attr("width", w)
+  .attr("height", h)
+  .attr("class", "chart")
+
+
+chart.append("svg:line")  //Sets the axes for the chart
+  .attr("class","x")
+  .attr("x1", 0)
+  .attr("x2", 500)
+  .attr("y1", 266)
+  .attr("y2", 266)
+  .append("svg:title")
+  .text("PCA Vector 1");
+
+chart.append("svg:line")
+  .attr("class","y")
+  .attr("y1", 0 )
+  .attr("y2", 500)
+  .attr("x1", 266)
+  .attr("x2", 266)
+  .append("svg:title")
+  .text("PCA Vector 2");
+
+chart.selectAll("circle")
+  .data(json.data)
+  .enter().append("svg:circle")
+  .attr("cx", function(d,x) {return (json.data[x].data[0] + 800) / 3}) // Captures the value of the 1st PCA Vector for each test
+  .attr("cy", function(d,x) {return (-json.data[x].data[1] + 800) / 3}) // Captures the value of the 2nd PCA vector for each test
+  .attr("r", r)
+  .append("svg:title")
+  .text(function(d,x) { return ("Coordinates: " + json.data[x].data[0]+" " + json.data[x].data[1])}); //Sets the title text to "Testname: PC1Value PC2Value"
+
+chart.selectAll("circle")
+  .on("click", function(d,i) { distancelines(d,i)} );
+
+chart.selectAll("circle")
+  .on("mouseover", function(d,i) { highlight(d,i) });
+
+chart.selectAll("text")
+  .data(json.data)
+  .enter().append("svg:text")
+  .attr("text-anchor", "middle")
+  .attr("x", function(d,x) { return (json.data[x].data[0]+800)/3})
+  .attr("y", function(d,x) {return  (-json.data[x].data[1]+800)/3})
+  .attr("dy", -r)
+  .text(function(d,x) {return json.data[x].name})
+
+d3.select("#clear").on("click", function(){
+  chart.selectAll("line.distance").remove();
+  chart.selectAll("text.dischart").remove();
+  chart.selectAll("text.chartlabel").remove();
+  chart.selectAll("text.dischartnum").remove();
+  });  //Clears the distance lines and chart to make the chart neater
+
+function distancelines(d,i)
+{
+  chart.selectAll("line.distance").remove();
+  chart.selectAll("text.dischart").remove();
+  chart.selectAll("text.chartlabel").remove();
+  chart.selectAll("text.dischartnum").remove();
+
+  for(var testnum=0;testnum<12;testnum++)
+    {
+    var sumdistance=0;
+    for(var pcvector=0; pcvector<12; pcvector++)
+      {
+      sumdistance= sumdistance + Math.pow((json.data[i].data[pcvector]-json.data[testnum].data[pcvector]),2);	//Sums the value of each PCA vector for the reference test and each other test
+      }
+    var distance = Math.sqrt((sumdistance)); //negative total distances?  using the abs value of the sum until i hear differenly
+    chart.append("svg:line")
+      .attr("class","distance")
+      .attr("x1", (json.data[i].data[0]+800)/3) //Sets the origin of the line to the point that was clicked on in the chart
+      .attr("y1", (-json.data[i].data[1]+800)/3)
+      .attr("x2", (json.data[testnum].data[0]+800)/3) //Sets the termination of the line on each of the other points
+      .attr("y2", (-json.data[testnum].data[1]+800)/3)
+      .style("stroke-width",function(d) { if (((1/distance)*500) < .1){ return .5} else{ return (1/distance)*500} })
+      .append("svg:title")
+      .text("From " + json.data[i].name + " to " + json.data[testnum].name +" Distance: " + distance);
+
+    chart.append("svg:text")
+      .attr("class", "chartlabel")
+      .attr("x",500)
+      .attr("dy", 7)
+      .text("Distance From " + json.data[i].name + " to: ");
+
+    chart.append("svg:text")
+      .attr("class", "dischart")
+      .attr("x",500)
+      .attr("y", function(d) { return (9 * testnum) } )
+      .attr("dy", 16)
+      .text(json.data[testnum].name+ ":" );
+
+    chart.append("svg:text")
+      .attr("class", "dischartnum")
+      .attr("x",560)
+      .attr("y", function(d) { return (9 * testnum) } )
+      .attr("dy", 16)
+      .text(distance);
+    }
+};
+
+function highlight(d,i)
+{
+  var selection = chart.selectAll("text.dischart")
+  if (selection[0][0]) //Ensures that the text is actually in the chart
+    {
+    chart.selectAll("text.dischart").remove(); //If there, removes the old text
+
+    for (var testnum=0; testnum<12; testnum++) //runs through all of the tests in the data set
+      {
+      if (d.name == json.data[testnum].name) //if the mouseover name matches the testname, bolds the test name in the chart
+        {
+        chart.append("svg:text")
+          .attr("class", "dischart")
+          .attr("x",500)
+          .attr("y", function(d) { return (9 * testnum) } )
+          .attr("dy", 16)
+          .style("stroke", "#528550")
+          .style("stroke-width", ".5px")
+          .text(json.data[testnum].name+ ":" );
+        }
+      else
+        {
+        chart.append("svg:text")//otherwise, the text remains true to the stylesheet
+          .attr("class", "dischart")
+          .attr("x",500)
+          .attr("y", function(d) { return (9 * testnum) } )
+          .attr("dy", 16)
+          .text(json.data[testnum].name+ ":" );
+        }
+      }
+    }
+}
+      </script>
+    </div>
+  </body>
+</html>
