@@ -68,7 +68,7 @@ void voKEGGPathway::setParameterInformation()
 
   // KEGG host
   kegg_parameters << this->addStringParameter("host", tr("Server name"), "paraviewweb.kitware.com:8090");
-  kegg_parameters << this->addStringParameter("pathway_id", tr("Pathway ID"), "");
+  kegg_parameters << this->addStringParameter("pathway_id", tr("Pathway ID"), "path:ko00010"); // Default is "Glycolysis / Gluconeogenesis"
   this->addParameterGroup("KEGG parameters", kegg_parameters);
 }
 
