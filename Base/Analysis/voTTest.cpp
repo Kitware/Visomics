@@ -85,7 +85,7 @@ bool voTTest::execute()
   result = voUtils::parseRangeString(this->stringParameter("sample1_range"), sample1RangeList, true);
   if(!result || sample1RangeList.isEmpty())
     {
-    qWarning() << QObject::tr("Invalid paramater, could not parse range list: Initial Sample(s)");
+    qWarning() << QObject::tr("Invalid paramater, could not parse range list: Sample Group 1");
     return false;
     }
 
@@ -93,7 +93,7 @@ bool voTTest::execute()
   result= voUtils::parseRangeString(this->stringParameter("sample2_range"), sample2RangeList, true);
   if(!result || sample1RangeList.isEmpty())
     {
-    qWarning() << QObject::tr("Invalid paramater, could not parse range list: Final Sample(s)");
+    qWarning() << QObject::tr("Invalid paramater, could not parse range list: Sample Group 2");
     return false;
     }
 
