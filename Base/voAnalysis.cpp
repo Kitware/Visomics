@@ -591,7 +591,7 @@ void voAnalysis::writeOutputsToFiles(const QString& directory) const
   foreach(const QString& outputName, this->outputNames())
     {
     voDataObject * dataObject = this->output(outputName);
-    if (!dataObject || !dataObject->dataAsVTKDataObject())
+    if (!dataObject || !dataObject->isVTKDataObject() || !dataObject->dataAsVTKDataObject())
       {
       continue;
       }
