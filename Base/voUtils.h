@@ -69,7 +69,8 @@ QString stringifytree(const QString& name, vtkTree * tree, const QList<vtkIdType
 
 QScriptValue scriptValueFromTable(QScriptEngine* scriptEngine, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip);
 
-QScriptValue TreescriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstractArray * array);
+QScriptValue TreescriptValueFromArray(QScriptEngine* scriptEngine, vtkTable * table, int depth);
+
 
 template<typename ArrayType>
 QScriptValue scriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstractArray * array);

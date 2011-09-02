@@ -584,52 +584,68 @@ QString voUtils::stringifytree(const QString& name, vtkTree * tree,const QList<v
     {
     return QString();
     }
+  tree->GetEdgeData()->Print(std::cout);
 
-  vtkTreeLevelsFilter *levels = vtkTreeLevelsFilter::New();
-  levels->SetInput(tree);
-  vtkTree *temp = levels->GetOutput();
-  levels->Update();
+  vtkNew<vtkTreeLevelsFilter> treeLevelsFilter;
+  treeLevelsFilter->SetInput(tree);
+  treeLevelsFilter->Update();
+
+  vtkTree *filteredTree = treeLevelsFilter->GetOutput();
   
-  vtkDataSetAttributes *treedata = vtkDataSetAttributes::New();
-  treedata = temp->GetVertexData();
+  vtkDataSetAttributes * treedata = filteredTree->GetVertexData();
+  vtkAbstractArray *ids = treedata->GetAbstractArray(0);
+  //vtkAbstractArray *heights = treedata->GetAbstractArray(1);
+  vtkAbstractArray *levels= treedata->GetAbstractArray(2);
+  vtkAbstractArray *leafs = treedata->GetAbstractArray(3);
 
-  vtkAbstractArray *level;
-  vtkAbstractArray *leaf;
-  vtkAbstractArray *height;
-  vtkAbstractArray *id;
+  vtkNew<vtkTable> table;
 
+  int depth = 0;
+  vtkStdString spacer=" ";
+  //bool found = 0;
 
-  int depth=0;
-  vtkVariantArray *temparray= vtkVariantArray::New();
-  temparray->SetNumberOfValues(2);
-  id= treedata->GetAbstractArray(0);
-  height = treedata->GetAbstractArray(1);
-  level= treedata->GetAbstractArray(2);
-  leaf = treedata->GetAbstractArray(3);
-  vtkTable *table= vtkTable::New();
-  bool found=0;
+  for(int itr = 0; itr < levels->GetNumberOfTuples(); ++itr)
+    {
+    if(levels->GetVariantValue(itr) == depth)
+      {
+      //found=1;
+      vtkStdString name;
+      if(ids->GetVariantValue(itr).IsString())
+        {
+        name = ids->GetVariantValue(itr).ToString();
+        }
+      if(name=="")
+      {
+        spacer  += " ";
+        name=spacer;
+      }
 
-	for(int itr=0;itr<level->GetNumberOfTuples();itr++)
-	{
-		if(level->GetVariantValue(itr)==depth)
-		{
-			found=1;
-			const char * name = (const char *) id->GetVariantValue(itr).ToChar();
-			temparray->SetName(name);
-			temparray->SetValue(0,depth);
-			temparray->SetValue(1,leaf->GetVariantValue(itr));
-			table->AddColumn(temparray);
-			std::cout << table->GetColumn(depth)->GetVariantValue(0) << std::endl;
-			depth++;
-			itr=0;
-		}
-	}
+      vtkNew<vtkVariantArray> temparray;
+      temparray->SetNumberOfValues(2);
+      temparray->SetName(name.c_str());
+      temparray->SetValue(0, depth);
+      temparray->SetValue(1, leafs->GetVariantValue(itr));
+      table->AddColumn(temparray.GetPointer());
+      //std::cout << table->GetColumn(depth)->GetVariantValue(0) << std::endl;
+      }
+      if(itr==levels->GetNumberOfTuples()-1)
+      {
+      ++depth;
+      itr = 0;
+      }
+      if(depth>=11)
+      {
+          break;
+      }
+    }
+  table->Dump();
+  table->Print(std::cout);
 
   QScriptEngine scriptEngine;
   QScriptValue object = scriptEngine.newObject();
   object.setProperty("name", QScriptValue(name));
   object.setProperty("level", QScriptValue(0));
-  object.setProperty("children", voUtils::scriptValueFromTable(&scriptEngine, table, columnIdsToSkip));
+  object.setProperty("children", voUtils::scriptValueFromTable(&scriptEngine, table.GetPointer(), columnIdsToSkip));
   return voUtils::stringify(&scriptEngine, object);
 }
 
@@ -643,6 +659,13 @@ QScriptValue voUtils::scriptValueFromTable(QScriptEngine* scriptEngine,
     return QScriptValue();
     }
   QScriptValueList list;
+   
+ QScriptValue scriptValue = voUtils::TreescriptValueFromArray(scriptEngine,table,1);
+
+   if (scriptValue.isValid())
+      {
+          list << scriptValue;
+       }
 
   for(vtkIdType cid = 0; cid < table->GetNumberOfColumns(); ++cid)
     {
@@ -669,16 +692,6 @@ QScriptValue voUtils::scriptValueFromTable(QScriptEngine* scriptEngine,
           {
           list << scriptValue;
           }
-		  else
-		  {
-			std::cout << table->GetColumn(cid)->GetVariantValue(0) << std::endl;
-	       scriptValue = voUtils::TreescriptValueFromArray(scriptEngine,table->GetColumn(cid));
-
-		   if (scriptValue.isValid())
-              {
-                  list << scriptValue;
-              }
-		  }
         }
       }
     }
@@ -710,29 +723,44 @@ QScriptValue voUtils::scriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstr
   {
     list << QVariant(typedArray->GetValue(i));
   }
- 
+
   QScriptValue object = scriptEngine->newObject();
   object.setProperty("name", array->GetName());
   object.setProperty("data", qScriptValueFromSequence<QVariantList>(scriptEngine, list));
   return object;
 }
-QScriptValue voUtils::TreescriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstractArray * array)
+QScriptValue voUtils::TreescriptValueFromArray(QScriptEngine* scriptEngine, vtkTable * table, int depth)
 {
-  if (!scriptEngine || !array)
+  if (!scriptEngine || !table)
     {
     return QScriptValue();
     }
 
-  QVariantList list;
+ /* QVariantList list;
   for (vtkIdType i = 0; i < array->GetNumberOfTuples() * array->GetNumberOfComponents(); ++i)
   {
-	  list << QVariant(array->GetVariantValue(i).ToInt());
-  }
- 
-  QScriptValue object = scriptEngine->newObject();
-  object.setProperty("name", array->GetName());
-  object.setProperty("level", QScriptValue(array->GetVariantValue(0).ToFloat()));
-  object.setProperty("children", qScriptValueFromSequence<QVariantList>(scriptEngine, list));
-  return object;
-}
+    list << QVariant(array->GetVariantValue(i).ToInt());
+  }*/
 
+  for(vtkIdType cid = 0; cid < table->GetNumberOfColumns(); ++cid)
+    {
+          vtkAbstractArray * array = table->GetColumn(cid);
+          if(array->GetVariantValue(0).ToInt() == depth)
+              {
+                  QScriptValue object = scriptEngine->newObject();                                      
+                  object.setProperty("name", array->GetName());
+                  object.setProperty("level", QScriptValue(array->GetVariantValue(0).ToFloat()));
+                  if(array->GetVariantValue(1).ToInt()==1)
+                  {
+                    object.setProperty("size", "10");
+                    return object;
+                  }
+                  if(array->GetVariantValue(1).ToInt()==0)
+                  {
+                    object.setProperty("children", voUtils::TreescriptValueFromArray(scriptEngine, table , depth+1 ));
+                    return object;
+                  }
+              }
+  }
+
+}
