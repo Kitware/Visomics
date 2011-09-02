@@ -2,6 +2,7 @@ from SOAPpy import WSDL
 import json
 import xml.etree.cElementTree as ElementTree
 import urllib2
+import sys, os.path
 
 cache_nameToID = {}
 cache_IDToPathways = {None: []}
@@ -133,7 +134,7 @@ def handleQuery(queryType, queryList):
 
 # --------------------------------------------------------------------------
 def loadfileNameToID(filename):
-  rawDict = json.load(open(filename))
+  rawDict = json.load(open(os.path.join(sys.path[0], filename)))
   # convert all from unicode to python strings
   for key in rawDict:
     if rawDict[key] == None:
