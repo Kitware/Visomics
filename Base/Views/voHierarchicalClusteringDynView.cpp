@@ -55,6 +55,6 @@ QString voHierarchicalClusteringDynView::stringify(const voDataObject& dataObjec
     }
 
 
-  return voUtils::stringifytree(this->viewName(), tree,  QList<vtkIdType>() << 0);
+  return voUtils::stringify(this->viewName(), tree);
 
 }
