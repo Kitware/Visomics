@@ -587,13 +587,7 @@ QScriptValue scriptValueFromTreeTable(QScriptEngine* scriptEngine, vtkTable * ta
     {
     return QScriptValue();
     }
-
- /* QVariantList list;
-  for (vtkIdType i = 0; i < array->GetNumberOfTuples() * array->GetNumberOfComponents(); ++i)
-  {
-    list << QVariant(array->GetVariantValue(i).ToInt());
-  }*/
-
+  QScriptValueList list;
   for(vtkIdType cid = 0; cid < table->GetNumberOfColumns(); ++cid)
     {
           vtkAbstractArray * array = table->GetColumn(cid);
@@ -605,17 +599,23 @@ QScriptValue scriptValueFromTreeTable(QScriptEngine* scriptEngine, vtkTable * ta
                   if(array->GetVariantValue(1).ToInt()==1)
                   {
                     object.setProperty("size", "10");
-                    return object;
                   }
                   if(array->GetVariantValue(1).ToInt()==0)
                   {
                     object.setProperty("children", scriptValueFromTreeTable(scriptEngine, table , depth+1 ));
-                    return object;
                   }
+                  list << object;
               }
   }
-
-  // TODO This function should return an QScriptValue array.
+  
+  QScriptValue array = scriptEngine->newArray();
+  QScriptValueList::const_iterator it;
+  quint32 i;
+  for(it = list.constBegin(), i = 0; it != list.constEnd(); ++it, ++i)
+    {
+    array.setProperty(i, *it);
+    }
+  return array;
 
   return QScriptValue();
 }
@@ -628,31 +628,29 @@ QString voUtils::stringify(const QString& name, vtkTree * tree)
     {
     return QString();
     }
-  tree->GetEdgeData()->Print(std::cout);
+
 
   vtkNew<vtkTreeLevelsFilter> treeLevelsFilter;
+  tree->GetEdgeData()->Print(std::cout);
   treeLevelsFilter->SetInput(tree);
   treeLevelsFilter->Update();
 
   vtkTree *filteredTree = treeLevelsFilter->GetOutput();
-  
-  vtkDataSetAttributes * treedata = filteredTree->GetVertexData();
-  vtkAbstractArray *ids = treedata->GetAbstractArray(0);
-  //vtkAbstractArray *heights = treedata->GetAbstractArray(1);
-  vtkAbstractArray *levels= treedata->GetAbstractArray(2);
-  vtkAbstractArray *leafs = treedata->GetAbstractArray(3);
 
+  vtkAbstractArray *ids = filteredTree->GetVertexData()->GetAbstractArray(0);
+  vtkAbstractArray *levels= filteredTree->GetVertexData()->GetAbstractArray(2);
+  vtkAbstractArray *leafs = filteredTree->GetVertexData()->GetAbstractArray(3);
+  filteredTree->GetEdgeData()->Print(std::cout);
+ // std::cout << edge1->GetVariantValue(0) << std::endl;
   vtkNew<vtkTable> table;
 
   int depth = 0;
   vtkStdString spacer=" ";
-  //bool found = 0;
 
   for(int itr = 0; itr < levels->GetNumberOfTuples(); ++itr)
     {
     if(levels->GetVariantValue(itr) == depth)
       {
-      //found=1;
       vtkStdString name;
       if(ids->GetVariantValue(itr).IsString())
         {
@@ -670,7 +668,6 @@ QString voUtils::stringify(const QString& name, vtkTree * tree)
       temparray->SetValue(0, depth);
       temparray->SetValue(1, leafs->GetVariantValue(itr));
       table->AddColumn(temparray.GetPointer());
-      //std::cout << table->GetColumn(depth)->GetVariantValue(0) << std::endl;
       }
       if(itr==levels->GetNumberOfTuples()-1)
       {
@@ -682,8 +679,8 @@ QString voUtils::stringify(const QString& name, vtkTree * tree)
           break;
       }
     }
-  table->Dump();
-  table->Print(std::cout);
+ // table->Dump();
+  //table->Print(std::cout);
 
   QScriptEngine scriptEngine;
   QScriptValue object = scriptEngine.newObject();
