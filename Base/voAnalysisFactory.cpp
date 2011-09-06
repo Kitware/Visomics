@@ -7,14 +7,15 @@
 #include "voAnalysisFactory.h"
 #include "voQObjectFactory.h"
 
+#include "voANOVAStatistics.h"
 #include "voFoldChange.h"
 #include "voHierarchicalClustering.h"
 #include "voKEGG.h"
 #include "voKMeansClustering.h"
 #include "voPCAStatistics.h"
+#include "voPLSStatistics.h"
 #include "voTTest.h"
 #include "voXCorrel.h"
-#include "voPLSStatistics.h"
 
 //----------------------------------------------------------------------------
 class voAnalysisFactoryPrivate
@@ -34,14 +35,15 @@ public:
 //----------------------------------------------------------------------------
 voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
 {
+  this->registerAnalysis<voANOVAStatistics>("ANOVA");
   this->registerAnalysis<voFoldChange>("Fold Change");
   this->registerAnalysis<voHierarchicalClustering>("Hierarchical Clustering");
   this->registerAnalysis<voKEGG>("KEGG Pathways");
   this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
   this->registerAnalysis<voPCAStatistics>("PCA");
+  this->registerAnalysis<voPLSStatistics>("PLS");
   this->registerAnalysis<voTTest>("T-Test");
   this->registerAnalysis<voXCorrel>("Cross Correlation");
-  this->registerAnalysis<voPLSStatistics>("PLS");
 }
 
 
