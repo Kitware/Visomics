@@ -109,6 +109,8 @@ public:
 
   QtVariantPropertyManager * propertyManager()const;
 
+  virtual QString description()const;
+
 signals:
 
   void outputSet(const QString& outputName, voDataObject* dataObject, voAnalysis* analysis);

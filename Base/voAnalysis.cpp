@@ -635,6 +635,12 @@ QtVariantPropertyManager * voAnalysis::propertyManager()const
 }
 
 // --------------------------------------------------------------------------
+QString voAnalysis::description()const
+{
+  return QString();
+}
+
+// --------------------------------------------------------------------------
 void voAnalysis::addParameterGroup(const QString& label, const QList<QtProperty*> parameters)
 {
   Q_D(voAnalysis);
