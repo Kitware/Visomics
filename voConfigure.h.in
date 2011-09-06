@@ -4,5 +4,8 @@
 #define Visomics_INSTALL_BIN_DIR "@Visomics_INSTALL_BIN_DIR@"
 #define Visomics_INSTALL_LIB_DIR "@Visomics_INSTALL_LIB_DIR@"
 
+#define Visomics_KEGG_SERVER_HOSTNAME "@Visomics_KEGG_SERVER_HOSTNAME@"
+#define Visomics_KEGG_SERVER_PORT @Visomics_KEGG_SERVER_PORT@
+
 #endif
 
