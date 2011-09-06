@@ -70,7 +70,7 @@ void voHierarchicalClustering::setParameterInformation()
   hclust_methods << "complete" << "average" << "mcquitty" << "median" << "centroid";
   hclust_parameters << this->addEnumParameter("method", tr("Method"), hclust_methods, "average");
 
-  this->addParameterGroup("HClust parameters", hclust_parameters);
+  this->addParameterGroup("Hierarchical Clustering parameters", hclust_parameters);
 }
 
 // --------------------------------------------------------------------------
