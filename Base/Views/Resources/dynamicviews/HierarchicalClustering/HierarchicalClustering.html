@@ -10,7 +10,7 @@
   <body>
     <div class="body">
       <div class="content">
-        <h3> Slide to reveal more branches</h3>
+        <h3> Slide to reveal fewer branches</h3>
         <style>#demo-frame>div.demo { padding: 10px !important; };</style>
         <div id="slider" class="dragdealer">
           <div class="red-bar handle">Slide</div>
@@ -103,15 +103,15 @@ node.filter(function(d) { return !d.children; }).append("svg:text")
 var slider = new Dragdealer('slider',
   {
   steps: 7,
-  min: 0,
-  max: 8,
+  min: 8,
+  max: 0,
   snap: true,
   callback:function(value)
     {
     var root = vis.selectAll("g.node");
     var subtract = 0;
     root.transition()
-      .style("opacity",function(d) { return d.children ? (d.level <= value*6 ? 1 : 0) : (1) } );}
+      .style("opacity",function(d) { return d.children ? (d.level <= (1-value)*7 ? 1 : 0) : (1) } );}
     });
 slider.enable();
 
