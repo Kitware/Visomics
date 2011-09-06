@@ -161,12 +161,6 @@ FIND_PACKAGE(QtPropertyBrowser REQUIRED)
 INCLUDE(${QtPropertyBrowser_USE_FILE})
 
 #-----------------------------------------------------------------------------
-# QtSOAP
-
-FIND_PACKAGE(QtSOAP REQUIRED)
-INCLUDE(${QtSOAP_USE_FILE})
-
-#-----------------------------------------------------------------------------
 # Set C/CXX Flags
 #
 SET(CMAKE_CXX_FLAGS ${Visomics_CXX_FLAGS} CACHE STRING "CMake C Flags" FORCE)

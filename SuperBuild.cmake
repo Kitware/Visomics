@@ -46,7 +46,6 @@ endif()
 
 include(CMakeExternals/VTK.cmake)
 include(CMakeExternals/QtPropertyBrowser.cmake)
-include(CMakeExternals/QtSOAP.cmake)
 include(CMakeExternals/VisomicsData.cmake)
 #include(CMakeExternals/CTK.cmake)
 
@@ -104,8 +103,6 @@ ExternalProject_Add(${proj}
     -DVisomics_CXX_FLAGS:STRING=${Visomics_CXX_FLAGS}
     # QtPropertyBrowser
     -DQtPropertyBrowser_DIR:PATH=${QtPropertyBrowser_DIR}
-    # QtSOAP
-    -DQtSOAP_DIR:PATH=${QtSOAP_DIR}
     # VisomicsData
     -DVisomicsData_DIR:PATH=${VisomicsData_DIR}
     # VTK
@@ -120,7 +117,6 @@ ExternalProject_Add(${proj}
   DEPENDS 
     # Mandatory dependencies
     ${QtPropertyBrowser_DEPENDS}
-    ${QtSOAP_DEPENDS}
     ${VisomicsData_DEPENDS}
     #${CTK_DEPENDS}
     ${VTK_DEPENDS}
