@@ -57,9 +57,9 @@ void voHierarchicalClustering::setOutputInformation()
 
   this->addOutputType("clusterHeatMap", "vtkTable",
                       "voHeatMapView", "Clustered Data (HeatMap)",
-					  "voTableView", "Clustered Data (Table)");
+                      "voTableView", "Clustered Data (Table)");
 
-    this->addOutputType("x-dynview", "vtkTable",
+  this->addOutputType("x-dynview", "vtkTable",
                       "voHierarchicalClusteringDynView", "Interactive Hierarchical Clustering Plot (prototype)",
                       "", "");
 }

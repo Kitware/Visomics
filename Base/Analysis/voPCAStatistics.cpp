@@ -1,7 +1,6 @@
 
 // Qt includes
 #include <QDebug>
-#include <QLayout>
 
 // Visomics includes
 #include "voPCAStatistics.h"
@@ -160,7 +159,6 @@ bool voPCAStatistics::execute()
   for (vtkIdType c = 0; c < assess->GetNumberOfColumns(); ++c)
     {
     PCHeaderArr->InsertNextValue(QString("PC%1").arg(c + 1).toLatin1());
-	//std::cout << PCHeaderArr[1,c+1] << std::endl;
     }
   xtab->AddColumn(PCHeaderArr);
   for (vtkIdType r = 0; r < assess->GetNumberOfRows(); ++r)
@@ -170,7 +168,7 @@ bool voPCAStatistics::execute()
     arr->SetNumberOfTuples(assess->GetNumberOfColumns());
     for (vtkIdType c = 0; c < assess->GetNumberOfColumns(); ++c)
       {
-      arr->SetValue(c, assess->GetValue(r, c).ToDouble()); 
+      arr->SetValue(c, assess->GetValue(r, c).ToDouble());
       }
     xtab->AddColumn(arr);
     }
