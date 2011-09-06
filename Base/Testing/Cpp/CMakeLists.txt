@@ -4,7 +4,6 @@ SET(KIT ${PROJECT_NAME})
 CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voAnalysisTest.cpp
   voUtilsTest.cpp
-  voSoapClientTest.cpp
   vtkExtendedTableTest.cpp
   )
   
@@ -23,7 +22,6 @@ ENDMACRO()
 
 SIMPLE_TEST(voAnalysisTest)
 SIMPLE_TEST(voUtilsTest)
-SIMPLE_TEST(voSoapClientTest)
 SIMPLE_TEST(vtkExtendedTableTest)
 
 

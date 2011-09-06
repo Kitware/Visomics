@@ -63,8 +63,6 @@ SET(KIT_SRCS
   voQObjectFactory.h
   voRegistry.cpp
   voRegistry.h
-  voSoapClient.cpp
-  voSoapClient.h
   voTableDataObject.cpp
   voTableDataObject.h
   voUtils.cpp
@@ -108,7 +106,6 @@ SET(KIT_MOC_SRCS
   voDataModel_p.h
   voDataObject.h
   voInputFileDataObject.h
-  voSoapClient.h
   voTableDataObject.h
   voView.h
   voViewManager.h
