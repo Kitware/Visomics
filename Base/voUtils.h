@@ -66,11 +66,6 @@ QString stringify(QScriptEngine* scriptEngine, const QScriptValue& scriptValue);
 QString stringify(const QString& name, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip);
 
 QString stringify(const QString& name, vtkTree * tree);
-
-QScriptValue scriptValueFromTable(QScriptEngine* scriptEngine, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip);
-
-template<typename ArrayType>
-QScriptValue scriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstractArray * array);
 }
 
 #endif
