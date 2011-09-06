@@ -14,6 +14,7 @@
 // VTK includes
 #include <vtkArrayData.h>
 #include <vtkDoubleArray.h>
+#include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
@@ -135,7 +136,7 @@ bool voANOVAStatistics::execute()
     }
 
   // Combine sample 1 and 2 array groups
-  vtkSmartPointer<vtkArrayData> RInputArrayData = vtkSmartPointer<vtkArrayData>::New();
+  vtkNew<vtkArrayData> RInputArrayData;
   RInputArrayData->AddArray(sample1Array);
   RInputArrayData->AddArray(sample2Array);
 
@@ -172,24 +173,24 @@ bool voANOVAStatistics::execute()
     }
 
   // Extract and build table for p-values
-  vtkSmartPointer<vtkTable> pValueTable = vtkSmartPointer<vtkTable>::New();
+  vtkNew<vtkTable> pValueTable;
   voUtils::arrayToTable(outputArrayData->GetArrayByName("P-Value"), pValueTable.GetPointer());
 
   // Extract and build table for fold change
-  vtkSmartPointer<vtkTable> foldChangeTable = vtkSmartPointer<vtkTable>::New();
+  vtkNew<vtkTable> foldChangeTable;
   voUtils::arrayToTable(outputArrayData->GetArrayByName("Fold Change (Sample 1 -> Sample 2)"), foldChangeTable.GetPointer());
 
   // Combine tables
-  vtkSmartPointer<vtkTable> outputDataTable = vtkSmartPointer<vtkTable>::New();
+  vtkNew<vtkTable> outputDataTable;
   voUtils::insertColumnIntoTable(outputDataTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
   outputDataTable->AddColumn(pValueTable->GetColumn(0));
 
-  vtkSmartPointer<vtkTable> outputVolcanoTable = vtkSmartPointer<vtkTable>::New();
+  vtkNew<vtkTable> outputVolcanoTable;
   voUtils::insertColumnIntoTable(outputVolcanoTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
   outputVolcanoTable->AddColumn(foldChangeTable->GetColumn(0));
   outputVolcanoTable->AddColumn(pValueTable->GetColumn(0));
 
-  this->setOutput("ANOVA_table", new voTableDataObject("ANOVA_table", outputDataTable));
-  this->setOutput("ANOVA_volcano", new voTableDataObject("ANOVA_volcano", outputVolcanoTable));
+  this->setOutput("ANOVA_table", new voTableDataObject("ANOVA_table", outputDataTable.GetPointer()));
+  this->setOutput("ANOVA_volcano", new voTableDataObject("ANOVA_volcano", outputVolcanoTable.GetPointer()));
   return true;
 }
