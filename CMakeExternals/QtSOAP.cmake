@@ -25,7 +25,7 @@ IF(NOT DEFINED QtSOAP_DIR)
     DEPENDS
       ${proj_DEPENDENCIES}
     )
-  SET(QtSOAP_DIR "${CMAKE_BINARY_DIR}/${proj}-build")
+  SET(QtSOAP_DIR "${ep_build_dir}/${proj}")
 
 ELSE()
   ctkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
