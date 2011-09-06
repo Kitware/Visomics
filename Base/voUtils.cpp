@@ -559,7 +559,6 @@ QString voUtils::stringify(QScriptEngine* scriptEngine, const QScriptValue& scri
     return QString();
     }
   QScriptValue stringify = scriptEngine->evaluate("(function(obj) { return JSON.stringify(obj); })");
-  std::cout << stringify.call(QScriptValue(), QScriptValueList() << scriptValue).toString().toStdString() << std::endl;
   return stringify.call(QScriptValue(), QScriptValueList() << scriptValue).toString();
 }
 

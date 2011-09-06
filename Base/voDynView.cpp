@@ -134,8 +134,8 @@ void voDynView::setDataObject(voDataObject *dataObject)
   dataObject->setProperty("json", this->stringify(*dataObject));
 
   d->DataObject = QExplicitlySharedDataPointer<voDataObject>(dataObject);
-  this->loadDataObject();
   connect(d->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), SLOT(loadDataObject()));
+  d->Widget->reload();
 }
 
 // --------------------------------------------------------------------------
