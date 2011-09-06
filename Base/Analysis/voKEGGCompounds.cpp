@@ -8,6 +8,7 @@
 #include <QtVariantPropertyManager>
 
 // Visomics includes
+#include "voConfigure.h"
 #include "voKEGGCompounds.h"
 #include "voKEGGUtils.h"
 #include "voTableDataObject.h"
@@ -104,23 +105,13 @@ void voKEGGCompounds::setOutputInformation()
 }
 
 // --------------------------------------------------------------------------
-void voKEGGCompounds::setParameterInformation()
-{
-  QList<QtProperty*> kegg_parameters;
-
-  // KEGG host
-  kegg_parameters << this->addStringParameter("host", tr("Server name"), "paraviewweb.kitware.com:8090");
-  this->addParameterGroup("KEGG parameters", kegg_parameters);
-}
-
-// --------------------------------------------------------------------------
 bool voKEGGCompounds::execute()
 {
   Q_D(voKEGGCompounds);
 
   //-------------------------------------------------------
   // Get parameters
-  QString keggURL("http://" + this->stringParameter("host") + "/kegg/");
+  QString keggURL = QString("http://%1:%2/kegg/").arg(Visomics_KEGG_SERVER_HOSTNAME).arg(Visomics_KEGG_SERVER_PORT);
 
   // Import data table locally
   vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());

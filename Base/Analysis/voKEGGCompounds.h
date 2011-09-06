@@ -21,7 +21,6 @@ public:
 protected:
   virtual void setInputInformation();
   virtual void setOutputInformation();
-  virtual void setParameterInformation();
 
   virtual bool execute();
 

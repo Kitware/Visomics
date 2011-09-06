@@ -8,6 +8,7 @@
 #include <QtVariantPropertyManager>
 
 // Visomics includes
+#include "voConfigure.h"
 #include "voDataObject.h"
 #include "voKEGGPathway.h"
 #include "voKEGGUtils.h"
@@ -67,7 +68,6 @@ void voKEGGPathway::setParameterInformation()
   QList<QtProperty*> kegg_parameters;
 
   // KEGG host
-  kegg_parameters << this->addStringParameter("host", tr("Server name"), "paraviewweb.kitware.com:8090");
   kegg_parameters << this->addStringParameter("pathway_id", tr("Pathway ID"), "path:ko00010"); // Default is "Glycolysis / Gluconeogenesis"
   this->addParameterGroup("KEGG parameters", kegg_parameters);
 }
@@ -77,7 +77,7 @@ bool voKEGGPathway::execute()
 {
   //-------------------------------------------------------
   // Get and validate parameters
-  QString keggURL("http://" + this->stringParameter("host") + "/kegg/");
+  QString keggURL = QString("http://%1:%2/kegg/").arg(Visomics_KEGG_SERVER_HOSTNAME).arg(Visomics_KEGG_SERVER_PORT);
 
   QString pathwayID =  this->stringParameter("pathway_id");
   if (!pathwayID.startsWith("path:"))
