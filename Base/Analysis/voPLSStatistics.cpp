@@ -57,24 +57,36 @@ void voPLSStatistics::setInputInformation()
 void voPLSStatistics::setOutputInformation()
 {
   this->addOutputType("scores", "vtkTable" ,
-                      "", "",
+                      "voPCAProjectionView", "Plot (Scores)",
                       "voTableView", "Table (Scores)");
 
   this->addOutputType("yScores", "vtkTable" ,
-                      "", "",
+                      "voPCAProjectionView", "Plot (Y-Scores)",
                       "voTableView", "Table (Y-Scores)");
 
   this->addOutputType("loadings", "vtkTable" ,
                       "", "",
                       "voTableView", "Table (Loadings)");
 
+  this->addOutputType("loadings_transposed", "vtkTable" ,
+                      "voPCAProjectionView", "Plot (Loadings)",
+                      "", "");
+
   this->addOutputType("loadingWeights", "vtkTable" ,
                       "", "",
                       "voTableView", "Table (Loading Weights)");
 
+  this->addOutputType("loadingWeights_transposed", "vtkTable" ,
+                      "voPCAProjectionView", "Plot (Loading Weights)",
+                      "", "");
+
   this->addOutputType("yLoadings", "vtkTable" ,
                       "", "",
                       "voTableView", "Table (Y-Loadings)");
+
+  this->addOutputType("yLoadings_transposed", "vtkTable" ,
+                      "voPCAProjectionView", "Plot (Y-Loadings)",
+                      "", "");
 }
 
 // --------------------------------------------------------------------------
@@ -263,7 +275,14 @@ bool voPLSStatistics::execute()
     voUtils::insertColumnIntoTable(loadingWeightsTable.GetPointer(), 0, headerArr.GetPointer());
     }
   this->setOutput("loadings", new voTableDataObject("loadings", loadingsTable.GetPointer()));
+  vtkNew<vtkTable> loadingsTableTransposed;
+  voUtils::transposeTable(loadingsTable.GetPointer(), loadingsTableTransposed.GetPointer(), voUtils::Headers);
+  this->setOutput("loadings_transposed", new voTableDataObject("loadings_transposed", loadingsTableTransposed.GetPointer()));
+
   this->setOutput("loadingWeights", new voTableDataObject("loadingWeights", loadingWeightsTable.GetPointer()));
+  vtkNew<vtkTable> loadingWeightsTableTransposed;
+  voUtils::transposeTable(loadingWeightsTable.GetPointer(), loadingWeightsTableTransposed.GetPointer(), voUtils::Headers);
+  this->setOutput("loadingWeights_transposed", new voTableDataObject("loadingWeights_transposed", loadingWeightsTableTransposed.GetPointer()));
 
   // ------------------------------------------------
   // Extract table for Y-loadings
@@ -287,6 +306,9 @@ bool voPLSStatistics::execute()
     voUtils::insertColumnIntoTable(yLoadingsTable.GetPointer(), 0, headerArr.GetPointer());
     }
   this->setOutput("yLoadings", new voTableDataObject("yLoadings", yLoadingsTable.GetPointer()));
+  vtkNew<vtkTable> yLoadingsTableTransposed;
+  voUtils::transposeTable(yLoadingsTable.GetPointer(), yLoadingsTableTransposed.GetPointer(), voUtils::Headers);
+  this->setOutput("yLoadings_transposed", new voTableDataObject("yLoadings_transposed", yLoadingsTableTransposed.GetPointer()));
 
   return true;
 }
