@@ -167,10 +167,23 @@ bool voKEGGCompounds::execute()
          d->sValToStr(compoundSV, "compound_name")) // Sanity check
         {
         qWarning() << "Error: Server returned out of order results";
+        return false;
         }
       IDColumn->InsertNextValue(d->sValToStr(compoundSV, "compound_id").toStdString());
       titleColumn->InsertNextValue(d->sValToStrList(compoundSV, "compound_titles").join("; ").toStdString());
-      pathwaysList << d->sValToStrPairList(compoundSV, "compound_pathways");
+      QStringList compoundPathwayList = d->sValToStrPairList(compoundSV, "compound_pathways");
+      for(int i = 0; i < compoundPathwayList.length();)
+        {
+        if(!compoundPathwayList.at(i).startsWith("path:ko"))
+          {
+          compoundPathwayList.removeAt(i);
+          }
+        else
+          {
+          i++;
+          }
+        }
+      pathwaysList << compoundPathwayList;
       maxPathways = qMax(maxPathways, pathwaysList.last().length());
       }
 
