@@ -54,7 +54,7 @@ ENDFOREACH()
 #-----------------------------------------------------------------------------
 # Qt
 #
-FIND_PACKAGE(Qt4 4.7 COMPONENTS QtCore QtGui QtNetwork QtScript REQUIRED)
+FIND_PACKAGE(Qt4 4.7 COMPONENTS QtCore QtGui QtNetwork QtScript QtWebKit REQUIRED)
 INCLUDE(${QT_USE_FILE})
 
 #-----------------------------------------------------------------------------

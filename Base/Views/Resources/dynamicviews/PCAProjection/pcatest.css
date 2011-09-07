@@ -1,0 +1,43 @@
+ 
+body {
+  font:10px sans-serif;
+}
+circle {
+  fill: #010ab8;
+  fill-opacity: .75;
+}
+ 
+line {
+  stroke: grey;
+  stroke-width: 3px;
+} 
+line.distance {
+  stroke: black;
+}
+ 
+button {
+  font: 10px Helvetica Neue;
+  background-color: #222;
+  color: #fff;
+  text-rendering: optimizeLegibility;
+  text-shadow: 0 -1px 1px #222;
+  padding: 5px 7px 5px 7px;
+  border: 0;
+  border-radius: 0;
+  border-bottom: 1px solid #222;
+}
+text{
+font:  8px sans-serif;
+}
+text.dischart{
+font: 9px sans-serif;
+fill: #528550;
+}
+text.chartlabel{
+font: 10px sans-serif;
+
+}
+text.dischartnum{
+font: 9px sans-serif;
+fill: #1500ff;
+}

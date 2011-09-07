@@ -27,16 +27,18 @@ SET(KIT_SRCS
   
   Views/voCorrelationGraphView.cpp
   Views/voCorrelationGraphView.h
-  Views/voHeatMapView.cpp
-  Views/voHeatMapView.h
   Views/voExtendedTableView.cpp
   Views/voExtendedTableView.h
+  Views/voHeatMapView.cpp
+  Views/voHeatMapView.h
   Views/voHorizontalBarView.h
   Views/voHorizontalBarView.cpp
   Views/voInteractorStyleRubberBand2D.h
   Views/voInteractorStyleRubberBand2D.cpp
   Views/voPCABarView.cpp
   Views/voPCABarView.h
+  Views/voPCAProjectionDynView.cpp
+  Views/voPCAProjectionDynView.h
   Views/voPCAProjectionView.cpp
   Views/voPCAProjectionView.h
   Views/voTableView.cpp
@@ -63,6 +65,8 @@ SET(KIT_SRCS
   voDataObject.h
   voDelimitedTextImportSettings.cpp
   voDelimitedTextImportSettings.h
+  voDynView.cpp
+  voDynView.h
   voInputFileDataObject.cpp
   voInputFileDataObject.h
   voIOManager.cpp
@@ -97,10 +101,11 @@ SET(KIT_MOC_SRCS
   Analysis/voXCorrel.h
   
   Views/voCorrelationGraphView.h
-  Views/voHeatMapView.h
   Views/voExtendedTableView.h
+  Views/voHeatMapView.h
   Views/voHorizontalBarView.h
   Views/voPCABarView.h
+  Views/voPCAProjectionDynView.h
   Views/voPCAProjectionView.h
   Views/voTableView.h
   Views/voTreeGraphView.h
@@ -112,6 +117,7 @@ SET(KIT_MOC_SRCS
   voDataModel.h
   voDataModel_p.h
   voDataObject.h
+  voDynView.h
   voInputFileDataObject.h
   voTableDataObject.h
   voView.h
@@ -134,7 +140,7 @@ INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}/Views
   ${CMAKE_CURRENT_BINARY_DIR}/Views
   )
-  
+
 QT4_WRAP_UI(KIT_UI_CPP ${KIT_UI_FORMS})
 QT4_WRAP_CPP(KIT_MOC_CPP ${KIT_MOC_SRCS} )
 QT4_ADD_RESOURCES(KIT_QRC_SRCS ${KIT_resources})
@@ -178,7 +184,10 @@ TARGET_LINK_LIBRARIES(
   ${libname}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
   )
-  
+
+# Install rules
+INSTALL(DIRECTORY Views/Resources/dynamicviews DESTINATION share COMPONENT Runtime)
+
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)
   ADD_SUBDIRECTORY(Analysis/Testing)

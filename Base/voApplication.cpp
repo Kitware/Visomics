@@ -3,6 +3,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QMainWindow>
+#include <QWebSettings>
 
 // Visomics includes
 #include "voAnalysisDriver.h"
@@ -114,6 +115,8 @@ void voApplication::initialize(bool& exitWhenDone)
   this->normalizerRegistry()->registerMethod("Log2", Normalization::applyLog2);
   this->normalizerRegistry()->registerMethod("Quantile", Normalization::applyQuantile);
   
+  QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+
   // TODO Parse command line arguments
   //d->parseArguments();
 
