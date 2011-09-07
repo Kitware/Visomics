@@ -109,7 +109,7 @@ public:
 
   QtVariantPropertyManager * propertyManager()const;
 
-  virtual QString description()const;
+  virtual QString parameterDescription()const;
 
 signals:
 

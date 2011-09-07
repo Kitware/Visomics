@@ -635,7 +635,7 @@ QtVariantPropertyManager * voAnalysis::propertyManager()const
 }
 
 // --------------------------------------------------------------------------
-QString voAnalysis::description()const
+QString voAnalysis::parameterDescription()const
 {
   return QString();
 }
