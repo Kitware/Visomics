@@ -74,7 +74,7 @@ voAnalysisParameterDialog::voAnalysisParameterDialog(voAnalysis * analysis, QWid
   Q_D(voAnalysisParameterDialog);
   d->init();
 
-  d->AnalysisDescriptionLabel->setText(analysis->description());
+  d->AnalysisDescriptionLabel->setText(analysis->parameterDescription());
 
   QtVariantEditorFactory *variantFactory = new QtVariantEditorFactory(this);
 
