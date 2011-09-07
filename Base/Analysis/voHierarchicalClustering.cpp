@@ -249,8 +249,8 @@ bool voHierarchicalClustering::execute()
       }
     reverseBFSLabels = levelLabels + reverseBFSLabels;
     }
+  this->setOutput("x-dynview", new voTableDataObject("x-dynview", tree.GetPointer()));
 
-this->setOutput("x-dynview", new voTableDataObject("x-dynview", tree.GetPointer()));
   // Generate table for heatmap
   vtkNew<vtkTable> clusterTable;
   clusterTable->AddColumn(extendedTable->GetRowMetaDataOfInterestAsString());

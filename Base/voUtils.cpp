@@ -659,36 +659,36 @@ namespace //helpers for QString voUtils::stringify(const QString&, vtkTree*)
 //----------------------------------------------------------------------------
 QScriptValue scriptValueFromTree(QScriptEngine* scriptEngine, vtkTree* tree, vtkIdType currVertex, int depth)
 {
-  QScriptValue currSV = scriptEngine->newObject();
+  QScriptValue object = scriptEngine->newObject();
 
   QString name(tree->GetVertexData()->GetAbstractArray("id")->GetVariantValue(currVertex).ToString());
   if(name.isEmpty())
     {
     name = " ";
     }
-  currSV.setProperty("name", QScriptValue(name));
-
-  currSV.setProperty("level", QScriptValue(depth));
+  object.setProperty("name", QScriptValue(name));
+  object.setProperty("level", QScriptValue(depth));
 
   vtkIdType numChildren = tree->GetNumberOfChildren(currVertex);
   if(numChildren > 0)
     {
-    QScriptValue childrenSV = scriptEngine->newArray(numChildren);
+    QScriptValue childrenArray = scriptEngine->newArray(numChildren);
     vtkNew<vtkAdjacentVertexIterator> childItr;
     tree->GetChildren(currVertex, childItr.GetPointer());
     for(int childCount = 0; childItr->HasNext(); childCount++)
       {
       vtkIdType childVertex = childItr->Next();
-      childrenSV.setProperty(childCount, scriptValueFromTree(scriptEngine, tree, childVertex, depth+1));
+      childrenArray.setProperty(
+            childCount, scriptValueFromTree(scriptEngine, tree, childVertex, depth+1));
       }
-    currSV.setProperty("children", childrenSV);
+    object.setProperty("children", childrenArray);
     }
   else
     {
-    currSV.setProperty("size", "10");
+    object.setProperty("size", "10");
     }
 
-  return currSV;
+  return object;
 }
 } // end of anonymous namespace
 
@@ -701,7 +701,7 @@ QString voUtils::stringify(const QString& name, vtkTree* tree)
     }
 
   QScriptEngine scriptEngine;
-  QScriptValue rootSV = scriptValueFromTree(&scriptEngine, tree, tree->GetRoot(), 0);
-  rootSV.setProperty("name", name);
-  return voUtils::stringify(&scriptEngine, rootSV);
+  QScriptValue rootScriptValue = scriptValueFromTree(&scriptEngine, tree, tree->GetRoot(), 0);
+  rootScriptValue.setProperty("name", name);
+  return voUtils::stringify(&scriptEngine, rootScriptValue);
 }
