@@ -59,6 +59,22 @@ void voPLSStatistics::setOutputInformation()
   this->addOutputType("scores", "vtkTable" ,
                       "", "",
                       "voTableView", "Table (Scores)");
+
+  this->addOutputType("yScores", "vtkTable" ,
+                      "", "",
+                      "voTableView", "Table (Y-Scores)");
+
+  this->addOutputType("loadings", "vtkTable" ,
+                      "", "",
+                      "voTableView", "Table (Loadings)");
+
+  this->addOutputType("loadingWeights", "vtkTable" ,
+                      "", "",
+                      "voTableView", "Table (Loading Weights)");
+
+  this->addOutputType("yLoadings", "vtkTable" ,
+                      "", "",
+                      "voTableView", "Table (Y-Loadings)");
 }
 
 // --------------------------------------------------------------------------
@@ -164,6 +180,10 @@ bool voPLSStatistics::execute()
   d->RCalc->PutArray("0", "predictorArray");
   d->RCalc->PutArray("1", "responseArray");
   d->RCalc->GetArray("scoresArray","scoresArray");
+  d->RCalc->GetArray("yScoresArray","yScoresArray");
+  d->RCalc->GetArray("loadingsArray","loadingsArray");
+  d->RCalc->GetArray("loadingWeightsArray","loadingWeightsArray");
+  d->RCalc->GetArray("yLoadingsArray","yLoadingsArray");
   d->RCalc->GetArray("RerrValue","RerrValue");
   d->RCalc->SetRscript(QString(
   "library(\"pls\", warn.conflicts=FALSE)\n"
@@ -175,6 +195,10 @@ bool voPLSStatistics::execute()
     "RerrValue<-0"
   "}\n"
   "scoresArray <- t(PLSresult$scores)\n"
+  "yScoresArray <- t(PLSresult$Yscores)\n"
+  "loadingsArray <- PLSresult$loadings[,]\n"
+  "loadingWeightsArray <- PLSresult$loading.weights[,]\n"
+  "yLoadingsArray <- PLSresult$Yloadings[,]\n"
   ).arg(algorithmString).toLatin1());
   d->RCalc->Update();
 
@@ -187,21 +211,82 @@ bool voPLSStatistics::execute()
     return false;
     }
 
-  // Extract table for scores
+  // ------------------------------------------------
+  // Extract table for scores and Y-scores
   // No need to transpose scoresArray, it was done within the R code
   vtkNew<vtkTable> scoresTable;
-  voUtils::arrayToTable(outputArrayData->GetArrayByName("scoresArray"), scoresTable.GetPointer());
-  // Add column labels (experiment names)
-  voUtils::setTableColumnNames(scoresTable.GetPointer(), extendedTable->GetColumnMetaDataOfInterestAsString());
-  // Add row labels (components)
-  vtkNew<vtkStringArray> scoresHeaderArr;
-  for (vtkIdType r = 0;r < scoresTable->GetNumberOfRows(); ++r)
+  vtkNew<vtkTable> yScoresTable;
     {
-    scoresHeaderArr->InsertNextValue(QString("Comp %1").arg(r + 1).toLatin1());
-    }
-  voUtils::insertColumnIntoTable(scoresTable.GetPointer(), 0, scoresHeaderArr.GetPointer());
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("scoresArray"), scoresTable.GetPointer());
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("yScoresArray"), yScoresTable.GetPointer());
 
+    // Add column labels (experiment names)
+    voUtils::setTableColumnNames(scoresTable.GetPointer(), extendedTable->GetColumnMetaDataOfInterestAsString());
+    voUtils::setTableColumnNames(yScoresTable.GetPointer(), extendedTable->GetColumnMetaDataOfInterestAsString());
+
+    // Add row labels (components)
+    vtkNew<vtkStringArray> headerArr;
+    for (vtkIdType r = 0;r < scoresTable->GetNumberOfRows(); ++r)
+      {
+      headerArr->InsertNextValue(QString("Comp %1").arg(r + 1).toLatin1());
+      }
+    voUtils::insertColumnIntoTable(scoresTable.GetPointer(), 0, headerArr.GetPointer());
+    voUtils::insertColumnIntoTable(yScoresTable.GetPointer(), 0, headerArr.GetPointer());
+    }
   this->setOutput("scores", new voTableDataObject("scores", scoresTable.GetPointer()));
+  this->setOutput("yScores", new voTableDataObject("yScores", yScoresTable.GetPointer()));
+
+  // ------------------------------------------------
+  // Extract table for loadings and loading weights
+  vtkNew<vtkTable> loadingsTable;
+  vtkNew<vtkTable> loadingWeightsTable;
+    {
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("loadingsArray"), loadingsTable.GetPointer());
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("loadingWeightsArray"), loadingWeightsTable.GetPointer());
+
+    // Add column labels (components)
+    for(vtkIdType c = 0; c < loadingsTable->GetNumberOfColumns(); ++c)
+      {
+      QByteArray colName = QString("Comp %1").arg(c + 1).toLatin1();
+      loadingsTable->GetColumn(c)->SetName(colName);
+      loadingWeightsTable->GetColumn(c)->SetName(colName);
+      }
+
+    // Add row labels (predictor analytes)
+    vtkNew<vtkStringArray> headerArr;
+    vtkStringArray* analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
+    foreach(int r, predictorRangeList)
+      {
+      headerArr->InsertNextValue(analyteNames->GetValue(r));
+      }
+    voUtils::insertColumnIntoTable(loadingsTable.GetPointer(), 0, headerArr.GetPointer());
+    voUtils::insertColumnIntoTable(loadingWeightsTable.GetPointer(), 0, headerArr.GetPointer());
+    }
+  this->setOutput("loadings", new voTableDataObject("loadings", loadingsTable.GetPointer()));
+  this->setOutput("loadingWeights", new voTableDataObject("loadingWeights", loadingWeightsTable.GetPointer()));
+
+  // ------------------------------------------------
+  // Extract table for Y-loadings
+  vtkNew<vtkTable> yLoadingsTable;
+    {
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("yLoadingsArray"), yLoadingsTable.GetPointer());
+
+    // Add column labels (components)
+    for(vtkIdType c = 0; c < yLoadingsTable->GetNumberOfColumns(); ++c)
+      {
+      yLoadingsTable->GetColumn(c)->SetName(QString("Comp %1").arg(c + 1).toLatin1());
+      }
+
+    // Add row labels (response analytes)
+    vtkNew<vtkStringArray> headerArr;
+    vtkStringArray* analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
+    foreach(int r, responseRangeList)
+      {
+      headerArr->InsertNextValue(analyteNames->GetValue(r));
+      }
+    voUtils::insertColumnIntoTable(yLoadingsTable.GetPointer(), 0, headerArr.GetPointer());
+    }
+  this->setOutput("yLoadings", new voTableDataObject("yLoadings", yLoadingsTable.GetPointer()));
 
   return true;
 }
