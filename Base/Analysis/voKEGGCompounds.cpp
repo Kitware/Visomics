@@ -120,7 +120,7 @@ bool voKEGGCompounds::execute()
     qWarning() << "Input is Null";
     return false;
     }
-  vtkSmartPointer<vtkTable> inputTable = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
+  vtkStringArray* analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
 
   QList<QStringList> pathwaysList;
   int maxPathways = 0;
@@ -130,9 +130,9 @@ bool voKEGGCompounds::execute()
   vtkNew<vtkTable> analyteIDTable;
     {
     QUrl compoundURL(keggURL + "compound");
-    for (vtkIdType rowCtr = 0; rowCtr < inputTable->GetNumberOfRows(); ++rowCtr)
+    for (vtkIdType ctr = 0; ctr < analyteNames->GetNumberOfValues(); ++ctr)
       {
-      compoundURL.addQueryItem("all", QString(inputTable->GetValue(rowCtr, 0).ToString()));
+      compoundURL.addQueryItem("all", QString(analyteNames->GetValue(ctr)));
       }
 
     QByteArray responseData;
@@ -154,27 +154,27 @@ bool voKEGGCompounds::execute()
     vtkNew<vtkStringArray> titleColumn;
     titleColumn->SetName("KEGG Names");
 
-    if(responseSV.property("length").toInt32() != inputTable->GetNumberOfRows()) // Sanity check
+    if(responseSV.property("length").toInt32() != analyteNames->GetNumberOfValues()) // Sanity check
       {
       qWarning() << "Error: Server returned" << responseSV.property("length").toInt32()
-          << "results for" << inputTable->GetNumberOfRows() << "queries";
+          << "results for" << analyteNames->GetNumberOfValues() << "queries";
       return false;
       }
-    for (vtkIdType rowCtr = 0; rowCtr < inputTable->GetNumberOfRows(); ++rowCtr)
+    for (vtkIdType ctr = 0; ctr < analyteNames->GetNumberOfValues(); ++ctr)
       {
-      if(QString::fromStdString(inputTable->GetValue(rowCtr, 0).ToString()) !=
-         d->sValToStr(responseSV.property(rowCtr), "compound_name")) // Sanity check
+      QScriptValue compoundSV = responseSV.property(ctr);
+      if(QString::fromStdString(analyteNames->GetValue(ctr)) !=
+         d->sValToStr(compoundSV, "compound_name")) // Sanity check
         {
         qWarning() << "Error: Server returned out of order results";
         }
-      QScriptValue compoundSV = responseSV.property(rowCtr);
       IDColumn->InsertNextValue(d->sValToStr(compoundSV, "compound_id").toStdString());
       titleColumn->InsertNextValue(d->sValToStrList(compoundSV, "compound_titles").join("; ").toStdString());
       pathwaysList << d->sValToStrPairList(compoundSV, "compound_pathways");
       maxPathways = qMax(maxPathways, pathwaysList.last().length());
       }
 
-      analyteIDTable->AddColumn(inputTable->GetColumn(0));
+      analyteIDTable->AddColumn(analyteNames);
       analyteIDTable->AddColumn(IDColumn.GetPointer());
       analyteIDTable->AddColumn(titleColumn.GetPointer());
     }
@@ -184,15 +184,15 @@ bool voKEGGCompounds::execute()
   // Build Analyte Pathways Table
   vtkNew<vtkTable> analytePathwaysTable;
     {
-    analytePathwaysTable->AddColumn(inputTable->GetColumn(0));
+    analytePathwaysTable->AddColumn(analyteNames);
     //analytePathwaysTable->AddColumn(IDColumn.GetPointer());
     for(int pathCtr = 0; pathCtr < maxPathways; pathCtr++)
       {
       vtkNew<vtkStringArray> pathwayColumn;
       pathwayColumn->SetName(QString("Pathway %1").arg(pathCtr + 1).toStdString().c_str());
-      for (vtkIdType rowCtr = 0; rowCtr < inputTable->GetNumberOfRows(); ++rowCtr)
+      for (vtkIdType ctr = 0; ctr < analyteNames->GetNumberOfValues(); ++ctr)
         {
-        pathwayColumn->InsertNextValue(pathwaysList[rowCtr].value(pathCtr, "").toStdString());
+        pathwayColumn->InsertNextValue(pathwaysList[ctr].value(pathCtr, "").toStdString());
         }
       analytePathwaysTable->AddColumn(pathwayColumn.GetPointer());
       }
@@ -204,10 +204,10 @@ bool voKEGGCompounds::execute()
   vtkNew<vtkTable> pathwayRankingTable;
     {
     QMap<QString, QStringList> pathwayMap;
-    for (vtkIdType rowCtr = 0; rowCtr < inputTable->GetNumberOfRows(); ++rowCtr)
+    for (vtkIdType ctr = 0; ctr < analyteNames->GetNumberOfValues(); ++ctr)
       {
-      QString analyteName = QString(inputTable->GetValue(rowCtr, 0).ToString());
-      foreach(QString pathwayID, pathwaysList[rowCtr])
+      QString analyteName(analyteNames->GetValue(ctr));
+      foreach(QString pathwayID, pathwaysList[ctr])
         {
         pathwayMap[pathwayID].append(analyteName);
         }
@@ -252,11 +252,11 @@ bool voKEGGCompounds::execute()
           }
         }
       QStringList rawTexts = maxLoc.key().split("#");
-      pathwayRankingTable->SetValue(rowCtr, 1, rawTexts.at(0).toLatin1().data());
-      pathwayRankingTable->SetValue(rowCtr, 0, rawTexts.value(1, "").toLatin1().data());
+      pathwayRankingTable->SetValue(rowCtr, 1, vtkVariant(rawTexts.at(0).toStdString()));
+      pathwayRankingTable->SetValue(rowCtr, 0, vtkVariant(rawTexts.value(1, "").toStdString()));
       for(int colCtr = 0; colCtr < maxCount; colCtr++)
         {
-        pathwayRankingTable->SetValue(rowCtr, colCtr+2, vtkVariant(maxLoc.value().at(colCtr).toLatin1().data()));
+        pathwayRankingTable->SetValue(rowCtr, colCtr+2, vtkVariant(maxLoc.value().at(colCtr).toStdString()));
         }
       pathwayMap.erase(maxLoc);
       }
