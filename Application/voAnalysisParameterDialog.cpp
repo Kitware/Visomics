@@ -1,6 +1,7 @@
 
 // Qt includes
 #include <QDialogButtonBox>
+#include <QLabel>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -23,6 +24,7 @@ public:
   voAnalysisParameterDialogPrivate(voAnalysisParameterDialog& object);
   void init();
 
+  QLabel* AnalysisDescriptionLabel;
   QtGroupBoxPropertyBrowser * AnalysisParameterEditor;
 };
 
@@ -44,6 +46,9 @@ void voAnalysisParameterDialogPrivate::init()
 
   QVBoxLayout * verticalLayout = new QVBoxLayout();
   q->setLayout(verticalLayout);
+
+  this->AnalysisDescriptionLabel = new QLabel();
+  verticalLayout->addWidget(this->AnalysisDescriptionLabel);
 
   this->AnalysisParameterEditor = new QtGroupBoxPropertyBrowser(q);
   verticalLayout->addWidget(this->AnalysisParameterEditor);
@@ -68,6 +73,8 @@ voAnalysisParameterDialog::voAnalysisParameterDialog(voAnalysis * analysis, QWid
 
   Q_D(voAnalysisParameterDialog);
   d->init();
+
+  d->AnalysisDescriptionLabel->setText(analysis->parameterDescription());
 
   QtVariantEditorFactory *variantFactory = new QtVariantEditorFactory(this);
 
