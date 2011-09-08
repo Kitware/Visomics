@@ -15,6 +15,7 @@
 #include "voKEGGImageView.h"
 #include "voKEGGPathwayView.h"
 #include "voKEGGTableView.h"
+#include "voKMeansClusteringDynView.h"
 #include "voPCAProjectionDynView.h"
 #include "voPCAProjectionView.h"
 #include "voPCABarView.h"
@@ -47,6 +48,7 @@ voViewFactory::voViewFactory():d_ptr(new voViewFactoryPrivate)
   this->registerView<voKEGGImageView>();
   this->registerView<voKEGGPathwayView>();
   this->registerView<voKEGGTableView>();
+  this->registerView<voKMeansClusteringDynView>();
   this->registerView<voPCABarView>();
   this->registerView<voPCAProjectionDynView>();
   this->registerView<voPCAProjectionView>();
