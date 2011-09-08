@@ -13,15 +13,14 @@ REMOVE(TestsToRun ${KIT}CppTests.cpp)
 ADD_EXECUTABLE(${KIT}CppTests ${Tests})
 TARGET_LINK_LIBRARIES(${KIT}CppTests ${PROJECT_NAME}Lib)
 
-SET(KIT_TESTS ${CPP_TEST_PATH}/${KIT}CppTests)
-
 MACRO(SIMPLE_TEST TESTNAME)
-  ADD_TEST(${TESTNAME} ${KIT_TESTS} ${TESTNAME} ${ARGN})
+  ADD_TEST(NAME ${TESTNAME}
+    COMMAND ${Visomics_LAUNCH_COMMAND} $<TARGET_FILE:${KIT}CppTests> ${TESTNAME} ${ARGN})
   #SET_PROPERTY(TEST ${TESTNAME} PROPERTY LABELS ${PROJECT_NAME})
 ENDMACRO()
 
 SIMPLE_TEST(voDataBrowserWidgetTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
-SIMPLE_TEST(voDataBrowserWidgetTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
+#SIMPLE_TEST(voDelimitedTextImportDialogTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
 SIMPLE_TEST(voDelimitedTextImportWidgetTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
 
 

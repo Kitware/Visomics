@@ -71,7 +71,9 @@ IF(BUILD_TESTING)
   ENABLE_TESTING()
   INCLUDE(CTest)
   MARK_AS_ADVANCED(TCL_TCLSH DART_ROOT)
-  SET(CPP_TEST_PATH ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+  set(Visomics_LAUNCHER_EXECUTABLE ${Visomics_BINARY_DIR}/bin/visomics)
+  set(Visomics_LAUNCH_COMMAND ${Visomics_LAUNCHER_EXECUTABLE} --command)
 
   # Setup file for setting custom ctest vars
   CONFIGURE_FILE(
