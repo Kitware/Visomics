@@ -55,7 +55,8 @@ void voTTest::setOutputInformation()
 {
   this->addOutputType("TTest_table", "vtkTable" ,
                       "", "",
-                      "voTableView", "Table");
+                      "voTableView", "Significance (Table)");
+
   this->addOutputType("TTest_volcano", "vtkTable" ,
                       "voVolcanoView", "Volcano Plot",
                       "voTableView", "Volcano Table");

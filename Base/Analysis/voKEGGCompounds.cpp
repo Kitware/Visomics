@@ -93,15 +93,15 @@ void voKEGGCompounds::setOutputInformation()
 {
   this->addOutputType("analyte_IDs", "vtkTable",
                       "", "",
-                      "voTableView", "Table (IDs)");
+                      "voTableView", "KEGG IDs");
 
   this->addOutputType("analyte_pathways", "vtkTable",
                       "", "",
-                      "voKEGGTableView", "Table (Pathways)");
+                      "voKEGGTableView", "Pathway List");
 
   this->addOutputType("pathway_ranking", "vtkTable",
                       "", "",
-                      "voKEGGTableView", "Pathway Ranking");
+                      "voKEGGTableView", "Ranking - Pathways");
 }
 
 // --------------------------------------------------------------------------

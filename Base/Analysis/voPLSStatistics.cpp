@@ -57,35 +57,35 @@ void voPLSStatistics::setInputInformation()
 void voPLSStatistics::setOutputInformation()
 {
   this->addOutputType("scores", "vtkTable" ,
-                      "voPCAProjectionView", "Plot (Scores)",
-                      "voTableView", "Table (Scores)");
+                      "voPCAProjectionView", "Scores (Plot)",
+                      "voTableView", "Scores (Table)");
 
   this->addOutputType("yScores", "vtkTable" ,
-                      "voPCAProjectionView", "Plot (Y-Scores)",
-                      "voTableView", "Table (Y-Scores)");
+                      "voPCAProjectionView", "Y-Scores (Plot)",
+                      "voTableView", "Y-Scores (Plot)");
 
   this->addOutputType("loadings", "vtkTable" ,
                       "", "",
-                      "voTableView", "Table (Loadings)");
+                      "voTableView", "Loadings (Table)");
 
   this->addOutputType("loadings_transposed", "vtkTable" ,
-                      "voPCAProjectionView", "Plot (Loadings)",
+                      "voPCAProjectionView", "Loadings (Plot)",
                       "", "");
 
   this->addOutputType("loadingWeights", "vtkTable" ,
                       "", "",
-                      "voTableView", "Table (Loading Weights)");
+                      "voTableView", "Loading Weights (Table)");
 
   this->addOutputType("loadingWeights_transposed", "vtkTable" ,
-                      "voPCAProjectionView", "Plot (Loading Weights)",
+                      "voPCAProjectionView", "Loading Weights (Plot)",
                       "", "");
 
   this->addOutputType("yLoadings", "vtkTable" ,
                       "", "",
-                      "voTableView", "Table (Y-Loadings)");
+                      "voTableView", "Y-Loadings (Table)");
 
   this->addOutputType("yLoadings_transposed", "vtkTable" ,
-                      "voPCAProjectionView", "Plot (Y-Loadings)",
+                      "voPCAProjectionView", "Y-Loadings (Plot)",
                       "", "");
 }
 

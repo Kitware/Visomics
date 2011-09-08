@@ -55,9 +55,10 @@ void voFoldChange::setOutputInformation()
 {    
   this->addOutputType("foldChange", "vtkTable" ,
                       "", "",
-                      "voTableView", "Table");
+                      "voTableView", "Change (Table)");
+
   this->addOutputType("foldChangePlot", "vtkTable" ,
-                      "voHorizontalBarView", "Horizontal Plot",
+                      "voHorizontalBarView", "Change (Plot)",
                       "", "");
 }
 

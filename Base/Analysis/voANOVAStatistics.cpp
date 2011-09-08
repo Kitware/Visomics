@@ -58,11 +58,11 @@ void voANOVAStatistics::setOutputInformation()
 {    
   this->addOutputType("ANOVA_table", "vtkTable" ,
                       "", "",
-                      "voTableView", "Table");
+                      "voTableView", "Significance (Table)");
+
   this->addOutputType("ANOVA_volcano", "vtkTable" ,
                       "voVolcanoView", "Volcano Plot",
                       "voTableView", "Volcano Table");
-
 }
 
 // --------------------------------------------------------------------------

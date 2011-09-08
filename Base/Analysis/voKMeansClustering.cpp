@@ -48,7 +48,7 @@ void voKMeansClustering::setOutputInformation()
 {
   this->addOutputType("cluster", "vtkTable",
                       "", "",
-                      "voTableView", "cluster");
+                      "voTableView", "Clusters (Table)");
 }
 
 // --------------------------------------------------------------------------

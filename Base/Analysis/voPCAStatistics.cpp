@@ -53,27 +53,27 @@ void voPCAStatistics::setInputInformation()
 void voPCAStatistics::setOutputInformation()
 {
   this->addOutputType("x", "vtkTable",
-                      "voPCAProjectionView", "Projection Plot",
-                      "voTableView", "Table (Projection Plot)");
+                      "voPCAProjectionView", "Projection (Plot)",
+                      "voTableView", "Projection (Table)");
 
   this->addOutputType("rot", "vtkTable",
                       "",  "",
-                      "voTableView", "Table (Rotation)");
+                      "voTableView", "Rotation (Table)");
 
   this->addOutputType("sdev", "vtkTable",
                       "", "",
-                      "voTableView", "Table (Std. Deviation)");
+                      "voTableView", "Std. Deviation (Table)");
     
   this->addOutputType("loading", "vtkTable" ,
-                      "voPCABarView", "Percent Loading Plot",
-                      "voTableView", "Table (Percent Loading Plot)");
+                      "voPCABarView", "Percent Loading (Plot)",
+                      "voTableView", "Percent Loading (Table)");
    
   this->addOutputType("sumloading", "vtkTable" ,
-                      "voPCABarView", "Cumulative Percent Loading Plot",
-                      "voTableView", "Table (Cumulative Percent Loading Plot)");
+                      "voPCABarView", "Cumulative Percent Loading (Plot)",
+                      "voTableView", "Cumulative Percent Loading (Table)");
 
   this->addOutputType("x-dynview", "vtkTable",
-                      "voPCAProjectionDynView", "Interactive Projection Plot (prototype)",
+                      "voPCAProjectionDynView", "Projection (Interactive Plot)",
                       "", "");
 }
 

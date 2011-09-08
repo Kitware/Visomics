@@ -61,10 +61,10 @@ void voXCorrel::setOutputInformation()
 {
   this->addOutputType("corr", "vtkTable",
                       "voHeatMapView", "Correlation Heat Map",
-                      "voTableView", "Table (Correlation)");
-  
+                      "voTableView", "Correlation (Table)");
+
   this->addOutputType("correlation_graph", "vtkGraph",
-                      "voCorrelationGraphView", "Correlation Graph");
+                      "voCorrelationGraphView", "Correlation (Graph)");
 }
 
 // --------------------------------------------------------------------------

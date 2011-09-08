@@ -53,14 +53,14 @@ void voHierarchicalClustering::setInputInformation()
 void voHierarchicalClustering::setOutputInformation()
 {
   this->addOutputType("clusterTree", "vtkTree",
-                      "voTreeGraphView", "Cluster Tree");
+                      "voTreeGraphView", "Clusters (Tree)");
 
   this->addOutputType("clusterHeatMap", "vtkTable",
-                      "voHeatMapView", "Clustered Data (HeatMap)",
+                      "voHeatMapView", "Clustered Data (Heat Map)",
                       "voTableView", "Clustered Data (Table)");
 
   this->addOutputType("clusterTree-dynview", "vtkTable",
-                      "voHierarchicalClusteringDynView", "Interactive Hierarchical Clustering Plot (prototype)",
+                      "voHierarchicalClusteringDynView", "Clusters (Interactive Plot)",
                       "", "");
 }
 
