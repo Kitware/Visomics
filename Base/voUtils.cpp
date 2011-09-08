@@ -661,7 +661,13 @@ QScriptValue scriptValueFromTree(QScriptEngine* scriptEngine, vtkTree* tree, vtk
 {
   QScriptValue object = scriptEngine->newObject();
 
-  QString name(tree->GetVertexData()->GetAbstractArray("id")->GetVariantValue(currVertex).ToString());
+  vtkAbstractArray * idArray = tree->GetVertexData()->GetAbstractArray("id");
+  if(!idArray)
+    {
+//    qWarning() << "voUtils::scriptValueFromTree - Failed to retrieve \"id\" vertexData !";
+    return object;
+    }
+  QString name(idArray->GetVariantValue(currVertex).ToString());
   if(name.isEmpty())
     {
     name = " ";
