@@ -57,35 +57,35 @@ void voPLSStatistics::setInputInformation()
 void voPLSStatistics::setOutputInformation()
 {
   this->addOutputType("scores", "vtkTable" ,
-                      "voPCAProjectionView", "Plot (Scores)",
-                      "voTableView", "Table (Scores)");
+                      "voPCAProjectionView", "Scores (Plot)",
+                      "voTableView", "Scores (Table)");
 
   this->addOutputType("yScores", "vtkTable" ,
-                      "voPCAProjectionView", "Plot (Y-Scores)",
-                      "voTableView", "Table (Y-Scores)");
+                      "voPCAProjectionView", "Y-Scores (Plot)",
+                      "voTableView", "Y-Scores (Plot)");
 
   this->addOutputType("loadings", "vtkTable" ,
                       "", "",
-                      "voTableView", "Table (Loadings)");
+                      "voTableView", "Loadings (Table)");
 
   this->addOutputType("loadings_transposed", "vtkTable" ,
-                      "voPCAProjectionView", "Plot (Loadings)",
+                      "voPCAProjectionView", "Loadings (Plot)",
                       "", "");
 
   this->addOutputType("loadingWeights", "vtkTable" ,
                       "", "",
-                      "voTableView", "Table (Loading Weights)");
+                      "voTableView", "Loading Weights (Table)");
 
   this->addOutputType("loadingWeights_transposed", "vtkTable" ,
-                      "voPCAProjectionView", "Plot (Loading Weights)",
+                      "voPCAProjectionView", "Loading Weights (Plot)",
                       "", "");
 
   this->addOutputType("yLoadings", "vtkTable" ,
                       "", "",
-                      "voTableView", "Table (Y-Loadings)");
+                      "voTableView", "Y-Loadings (Table)");
 
   this->addOutputType("yLoadings_transposed", "vtkTable" ,
-                      "voPCAProjectionView", "Plot (Y-Loadings)",
+                      "voPCAProjectionView", "Y-Loadings (Plot)",
                       "", "");
 }
 
@@ -101,7 +101,17 @@ void voPLSStatistics::setParameterInformation()
                             "Kernel");
 
   this->addParameterGroup("PLS parameters", pls_parameters);
+}
 
+// --------------------------------------------------------------------------
+QString voPLSStatistics::parameterDescription()const
+{
+  return QString("<dl>"
+                 "<dt><b>Predictor / Response Analyte(s)</b>:</dt>"
+                 "<dd>A group of Analytes, specified by a range and/or list of row numbers.</dd>"
+                 "<dt><b>Algorithm</b>:</dt>"
+                 "<dd>The multivariante regression method.</dd>"
+                 "</dl>");
 }
 
 // --------------------------------------------------------------------------

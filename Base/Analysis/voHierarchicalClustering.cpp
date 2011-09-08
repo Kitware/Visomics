@@ -53,14 +53,14 @@ void voHierarchicalClustering::setInputInformation()
 void voHierarchicalClustering::setOutputInformation()
 {
   this->addOutputType("clusterTree", "vtkTree",
-                      "voTreeGraphView", "Cluster Tree");
+                      "voTreeGraphView", "Clusters (Tree)");
 
   this->addOutputType("clusterHeatMap", "vtkTable",
-                      "voHeatMapView", "Clustered Data (HeatMap)",
+                      "voHeatMapView", "Clustered Data (Heat Map)",
                       "voTableView", "Clustered Data (Table)");
 
   this->addOutputType("clusterTree-dynview", "vtkTable",
-                      "voHierarchicalClusteringDynView", "Interactive Hierarchical Clustering Plot (prototype)",
+                      "voHierarchicalClusteringDynView", "Clusters (Interactive Plot)",
                       "", "");
 }
 
@@ -71,10 +71,20 @@ void voHierarchicalClustering::setParameterInformation()
 
   // HClust / Method
   QStringList hclust_methods;
+  // Note: R supports additional methods not provided here
   hclust_methods << "complete" << "average" << "mcquitty" << "median" << "centroid";
   hclust_parameters << this->addEnumParameter("method", tr("Method"), hclust_methods, "average");
 
   this->addParameterGroup("Hierarchical Clustering parameters", hclust_parameters);
+}
+
+// --------------------------------------------------------------------------
+QString voHierarchicalClustering::parameterDescription()const
+{
+  return QString("<dl>"
+                 "<dt><b>Method</b>:</dt>"
+                 "<dd>The agglomeration method to be used.</dd>"
+                 "</dl>");
 }
 
 // --------------------------------------------------------------------------

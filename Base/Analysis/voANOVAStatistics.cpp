@@ -58,11 +58,11 @@ void voANOVAStatistics::setOutputInformation()
 {    
   this->addOutputType("ANOVA_table", "vtkTable" ,
                       "", "",
-                      "voTableView", "Table");
+                      "voTableView", "Significance (Table)");
+
   this->addOutputType("ANOVA_volcano", "vtkTable" ,
                       "voVolcanoView", "Volcano Plot",
                       "voTableView", "Volcano Table");
-
 }
 
 // --------------------------------------------------------------------------
@@ -74,7 +74,16 @@ void voANOVAStatistics::setParameterInformation()
   ANOVA_parameters << this->addStringParameter("sample2_range", QObject::tr("Sample Group 2"), "D,G-I");
 
   this->addParameterGroup("ANOVA parameters", ANOVA_parameters);
+}
 
+// --------------------------------------------------------------------------
+QString voANOVAStatistics::parameterDescription()const
+{
+  return QString("<dl>"
+                 "<dt><b>Sample Group 1 / 2</b>:</dt>"
+                 "<dd>A group of Experiments, specified by a range and/or list of column letters.<br>"
+                 "<u>The groups MUST both be the same size</u>, as only a balanced test is performed</dd>"
+                 "</dl>");
 }
 
 // --------------------------------------------------------------------------

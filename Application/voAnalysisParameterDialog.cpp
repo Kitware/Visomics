@@ -48,6 +48,7 @@ void voAnalysisParameterDialogPrivate::init()
   q->setLayout(verticalLayout);
 
   this->AnalysisDescriptionLabel = new QLabel();
+  this->AnalysisDescriptionLabel->setWordWrap(true);
   verticalLayout->addWidget(this->AnalysisDescriptionLabel);
 
   this->AnalysisParameterEditor = new QtGroupBoxPropertyBrowser(q);

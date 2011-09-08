@@ -61,10 +61,10 @@ void voXCorrel::setOutputInformation()
 {
   this->addOutputType("corr", "vtkTable",
                       "voHeatMapView", "Correlation Heat Map",
-                      "voTableView", "Table (Correlation)");
-  
+                      "voTableView", "Correlation (Table)");
+
   this->addOutputType("correlation_graph", "vtkGraph",
-                      "voCorrelationGraphView", "Correlation Graph");
+                      "voCorrelationGraphView", "Correlation (Graph)");
 }
 
 // --------------------------------------------------------------------------
@@ -78,6 +78,18 @@ void voXCorrel::setParameterInformation()
   cor_parameters << this->addEnumParameter("method", tr("Method"), cor_methods);
 
   this->addParameterGroup("Correlation parameters", cor_parameters);
+}
+
+// --------------------------------------------------------------------------
+QString voXCorrel::parameterDescription()const
+{
+  return QString("<dl>"
+                 "<dt><b>Method</b>:</dt>"
+                 "<dd>The correlation coefficient used:<br>"
+                 "- <i>Pearson's r</i><br>"
+                 "- <i>Kendall's %1</i><br>"
+                 "- <i>Spearman's %2</i></dd>"
+                 "</dl>").arg(QChar(964)).arg(QChar(961));
 }
 
 // --------------------------------------------------------------------------
