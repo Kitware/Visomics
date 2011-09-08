@@ -23,7 +23,7 @@ FOREACH(qtlib ${QTLIBLIST})
         FILES_MATCHING PATTERN "${QT_LIB_NAME_tmp}*"
         PATTERN "${QT_LIB_NAME_tmp}*.debug" EXCLUDE)
     ELSEIF(WIN32)
-      INSTALL(FILES ${QT_LIBRARY_DIR}/${qtlib}4.dll
+      INSTALL(FILES ${QT_BINARY_DIR}/${qtlib}4.dll
         DESTINATION ${QT_INSTALL_LIB_DIR} COMPONENT Runtime)
     ENDIF()
   ENDIF()
