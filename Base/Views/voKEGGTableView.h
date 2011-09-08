@@ -22,6 +22,8 @@ public:
   voKEGGTableView(QWidget* newParent = 0);
   virtual ~voKEGGTableView();
 
+  virtual QString hints()const;
+
   virtual void setDataObject(voDataObject* dataObject);
 
 protected:

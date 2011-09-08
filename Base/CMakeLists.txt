@@ -133,6 +133,7 @@ SET(KIT_UI_FORMS
   )
   
 SET(KIT_resources
+  Resources/VisomicsBase.qrc
   )
   
 INCLUDE_DIRECTORIES(

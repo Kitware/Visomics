@@ -63,6 +63,13 @@ void voKEGGTableView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
+QString voKEGGTableView::hints()const
+{
+  return "<img src=\":/Icons/Bulb.png\">&nbsp;If you <b>double-click</b> on a pathway cell, a "
+      "<b>KEGG Pathway</b> analysis will be run.";
+}
+
+// --------------------------------------------------------------------------
 void voKEGGTableView::setDataObject(voDataObject *dataObject)
 {
   Q_D(voKEGGTableView);
@@ -104,6 +111,7 @@ void voKEGGTableView::setDataObject(voDataObject *dataObject)
   d->TableWidget->resizeColumnsToContents();
 }
 
+// --------------------------------------------------------------------------
 void voKEGGTableView::onItemDoubleClicked(QTableWidgetItem* item)
 {
   if (item->text().startsWith("path:"))
