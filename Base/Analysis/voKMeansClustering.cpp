@@ -73,6 +73,25 @@ void voKMeansClustering::setParameterInformation()
   this->addParameterGroup("KMeans parameters", kmeans_parameters);
 }
 
+// --------------------------------------------------------------------------
+QString voKMeansClustering::parameterDescription()const
+{
+  return QString("<dl>"
+                 "<dt><b>Number of clusters</b>:</dt>"
+                 "<dd>The value of <i>k</i>: the number of clusters.</dd>"
+                 "<dt><b>Max. iteration</b>:</dt>"
+                 "<dd>A larger number of iterations will take longer, "
+                 "but be more likely to converge on a better solution.</dd>"
+                 "<dt><b>Algorithm</b>:</dt>"
+                 "<dd>The specific algorithm for the k-means method.</dd>"
+                 "<dt><b>Number of random start</b>:</dt>"
+                 "<dd>Number of initially random cluster sets that the "
+                 "algorithm will attempt to refine. "
+                 "A larger number will take longer, "
+                 "but be more likely to converge on a better solution.</dd>"
+                 "</dl>");
+}
+
 namespace
 {
 // --------------------------------------------------------------------------

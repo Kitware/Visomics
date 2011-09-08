@@ -83,6 +83,17 @@ void voKEGGPathway::setParameterInformation()
 }
 
 // --------------------------------------------------------------------------
+QString voKEGGPathway::parameterDescription()const
+{
+  return QString("<dl>"
+                 "<dt><b>Pathway ID</b>:</dt>"
+                 "<dd>A KEGG Orthology (KO) pathway ID.<br>"
+                 "The <i>KEGG Compounds</i> analysis can provide pathway IDs and "
+                 "launch a <i>KEGG Pathway</i> analysis directly.</dd>"
+                 "</dl>");
+}
+
+// --------------------------------------------------------------------------
 bool voKEGGPathway::execute()
 {
   //-------------------------------------------------------
