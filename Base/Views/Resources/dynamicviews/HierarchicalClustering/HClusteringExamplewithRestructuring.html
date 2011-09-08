@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>KitwareBubbleTest ~ Bubble Chart</title>
+    <script type="text/javascript" src="d3.js"></script>
+    <script type="text/javascript" src="dragdealer.js"></script>
+    <link href="dragdealer.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <div class="body">
+      <div class="content">
+        <h3> Slide to reveal more branches</h3>
+        <style>#demo-frame>div.demo { padding: 10px !important; };</style>
+        <div id="slider" class="dragdealer">
+          <div class="red-bar handle">Slide</div>
+        </div>
+      </div>
+    </div>
+    <h1 id="bubble_chart">Bubble Chart</h1>
+    <div class="gallery" id="chart"> </div>
+    <link href="bubbletest.css" rel="stylesheet" type="text/css" />
+    <script src="d3.layout.js" type="text/javascript"> </script>
+    <script type="text/javascript">
+
+var depth=0;
+
+var w = 800, h = 800, format = d3.format(",d");
+
+ var pack = d3.layout.pack()
+  .size([w - 4, h - 4])
+  .value(function(d) { return d.size; });
+
+ var vis = d3.select("#chart").append("svg:svg")
+     .attr("width", w)
+     .attr("height", h)
+     .attr("class", "pack")
+   .append("svg:g")
+     .attr("transform", "translate(2, 2)");
+
+var json = {
+  "name": "Hierarchical Clustering","level":0,
+  "children": [
+  {"name": "jhw_98b_10rd","level":1, "size": 4400},
+  {"name": "jhw_98b_7rd","level":3, "size": 4400},
+  {"name": "jhw_98b_11rd","level":3, "size": 4400},
+      {"name": "jhw_98b_6rd","level":4, "size": 4400},
+  {"name": "jhw_98b_8rd","level":4, "size": 4400},
+  {"name": "jhw_98b_4rd","level":5, "size": 4400},
+  {"name": "jhw_98b_5rd","level":5, "size": 4400},
+  {"name": "jhw_98b_12rd","level":6, "size": 4400},
+  {"name": "jhw_98b_2rd","level":8, "size": 4400},
+  {"name": "jhw_98b_3rd","level":8, "size": 4400},
+  {"name": "jhw_98b_1rd","level":8, "size": 4400},
+  {"name": "jhw_98b_9rd","level":8, "size": 4400},
+
+  ]
+};
+console.log(json)
+
+  var node = vis.data([json]).selectAll("g.node")
+    .data(pack.nodes)
+        .enter().append("svg:g")
+          .attr("class", function(d) { return d.children ? "node" : "leaf node"; })
+          .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+console.log(vis.selectAll("g.node"));
+
+   node.append("svg:title")
+       .text(function(d) { return d.name + (d.children ? "" : ": " + format(d.size)); });
+
+   node.append("svg:circle")
+       .attr("r", function(d) { return d.r; });
+
+   node.filter(function(d) { return !d.children; }).append("svg:text")
+       .attr("text-anchor", "middle")
+       .attr("dy", ".3em")
+       .text(function(d) { return d.name.substring(0, d.r / 3); });
+
+       var slider = new Dragdealer('slider',
+    {
+    steps: 7,
+    snap: true,
+    callback:function(value)
+    {
+    vis.selectAll("g.node").remove();
+switch(value*6)
+{
+case 0:
+
+var json = {
+  "name": "Hierarchical Clustering","level":0,
+  "children": [
+  {"name": "jhw_98b_10rd","level":1, "size": 4400},
+  {"name": "jhw_98b_7rd","level":3, "size": 4400},
+  {"name": "jhw_98b_11rd","level":3, "size": 4400},
+      {"name": "jhw_98b_6rd","level":4, "size": 4400},
+  {"name": "jhw_98b_8rd","level":4, "size": 4400},
+  {"name": "jhw_98b_4rd","level":5, "size": 4400},
+  {"name": "jhw_98b_5rd","level":5, "size": 4400},
+  {"name": "jhw_98b_12rd","level":6, "size": 4400},
+  {"name": "jhw_98b_2rd","level":8, "size": 4400},
+  {"name": "jhw_98b_3rd","level":8, "size": 4400},
+  {"name": "jhw_98b_1rd","level":8, "size": 4400},
+  {"name": "jhw_98b_9rd","level":8, "size": 4400},
+
+   ]};
+break;
+
+case 1:
+var json = {
+  "name": "Hierarchical Clustering","level":0,
+  "children": [
+  {"name": "jhw_98b_10rd","level":1, "size": 4400},
+  {"name": " ","level":1,
+  "children": [
+  {"name": "jhw_98b_7rd","level":3, "size": 4400},
+  {"name": "jhw_98b_11rd","level":3, "size": 4400},
+      {"name": "jhw_98b_6rd","level":4, "size": 4400},
+  {"name": "jhw_98b_8rd","level":4, "size": 4400},
+  {"name": "jhw_98b_4rd","level":5, "size": 4400},
+  {"name": "jhw_98b_5rd","level":5, "size": 4400},
+  {"name": "jhw_98b_12rd","level":6, "size": 4400},
+  {"name": "jhw_98b_2rd","level":8, "size": 4400},
+  {"name": "jhw_98b_3rd","level":8, "size": 4400},
+  {"name": "jhw_98b_1rd","level":8, "size": 4400},
+  {"name": "jhw_98b_9rd","level":8, "size": 4400},
+        ]}
+  ]};
+  break;
+
+case 2:
+var json = {
+  "name": "Hierarchical Clustering","level":0,
+  "children": [
+  {"name": "jhw_98b_10rd","level":1, "size": 4400},
+  {"name": " ","level":1,
+    "children": [
+  {"name": " ", "level": 2,
+    "children":[
+      {"name": "jhw_98b_7rd","level":3, "size": 4400},
+    {"name": "jhw_98b_11rd","level":3, "size": 4400} ]},
+  {"name": " ", "level" :2, "children":[
+    {"name": "jhw_98b_6rd","level":4, "size": 4400},
+    {"name": "jhw_98b_8rd","level":4, "size": 4400},
+    {"name": "jhw_98b_4rd","level":5, "size": 4400},
+    {"name": "jhw_98b_5rd","level":5, "size": 4400},
+    {"name": "jhw_98b_12rd","level":6, "size": 4400},
+    {"name": "jhw_98b_2rd","level":8, "size": 4400},
+    {"name": "jhw_98b_3rd","level":8, "size": 4400},
+    {"name": "jhw_98b_1rd","level":8, "size": 4400},
+    {"name": "jhw_98b_9rd","level":8, "size": 4400},
+        ]}
+  ]}
+  ]};
+  break;
+
+case 3:
+var json = {
+"name": "Hierarchical Clustering","level":0,
+"children":[
+  {"name": " ", "level":1,"children":[
+    {"name": "jhw_98b_10rd","level":2, "size": 4400}
+    ]},
+  {"name": " ", "level":1,"children":[
+    {"name": " ", "level":2,"children":[
+      {"name": "jhw_98b_7rd","level":3, "size": 4400},
+      {"name": "jhw_98b_11rd","level":3, "size": 4400},
+      ]},
+    {"name": " ", "level":2,"children":[
+      {"name": " ", "level":3,"children":[
+        {"name": "jhw_98b_6rd","level":4, "size": 4400},
+        {"name": "jhw_98b_8rd","level":4, "size": 4400}]},
+      {"name": " ", "level":3,"children":[
+      {"name": " ", "level":4,"children":[
+          {"name": "jhw_98b_4rd","level":5, "size": 4400},
+          {"name": "jhw_98b_5rd","level":5, "size": 4400},
+          {"name": "jhw_98b_12rd","level":5, "size": 4400},
+          {"name": "jhw_98b_2rd","level":7, "size": 4400},
+          {"name": "jhw_98b_3rd","level":7, "size": 4400},
+          {"name": "jhw_98b_1rd","level":7, "size": 4400},
+          {"name": "jhw_98b_9rd","level":7, "size": 4400}
+            ]}
+          ]}
+        ]}
+        ]}
+        ]};
+break;
+    case 4:
+var json = {
+"name": "Hierarchical Clustering","level":0,
+"children":[
+  {"name": " ", "level":1,"children":[
+    {"name": "jhw_98b_10rd","level":2, "size": 4400}
+    ]},
+  {"name": " ", "level":1,"children":[
+    {"name": " ", "level":2,"children":[
+      {"name": "jhw_98b_7rd","level":3, "size": 4400},
+      {"name": "jhw_98b_11rd","level":3, "size": 4400},
+      ]},
+    {"name": " ", "level":2,"children":[
+      {"name": " ", "level":3,"children":[
+        {"name": "jhw_98b_6rd","level":4, "size": 4400},
+        {"name": "jhw_98b_8rd","level":4, "size": 4400},
+        ]},
+      {"name": " ", "level":3,"children":[
+        {"name": " ", "level":4,"children":[
+          {"name": "jhw_98b_4rd","level":5, "size": 4400},
+          {"name": "jhw_98b_5rd","level":5, "size": 4400}]},
+        {"name": " ", "level":4,"children":[
+          {"name": "jhw_98b_12rd","level":5, "size": 4400},
+          {"name": "jhw_98b_2rd","level":7, "size": 4400},
+          {"name": "jhw_98b_3rd","level":7, "size": 4400},
+          {"name": "jhw_98b_1rd","level":7, "size": 4400},
+          {"name": "jhw_98b_9rd","level":7, "size": 4400}
+            ]}
+          ]}
+        ]}
+        ]}
+    ]};
+break;
+  case 5:
+var json = {
+"name": "Hierarchical Clustering","level":0,
+"children":[
+  {"name": " ", "level":1,"children":[
+    {"name": "jhw_98b_10rd","level":2, "size": 4400}
+    ]},
+  {"name": " ", "level":1,"children":[
+    {"name": " ", "level":2,"children":[
+      {"name": "jhw_98b_7rd","level":3, "size": 4400},
+      {"name": "jhw_98b_11rd","level":3, "size": 4400},
+      ]},
+    {"name": " ", "level":2,"children":[
+      {"name": " ", "level":3,"children":[
+        {"name": "jhw_98b_6rd","level":4, "size": 4400},
+        {"name": "jhw_98b_8rd","level":4, "size": 4400},
+        ]},
+      {"name": " ", "level":3,"children":[
+        {"name": " ", "level":4,"children":[
+          {"name": "jhw_98b_4rd","level":5, "size": 4400},
+          {"name": "jhw_98b_5rd","level":5, "size": 4400}]},
+        {"name": " ", "level":4,"children":[
+          {"name": "jhw_98b_12rd","level":5, "size": 4400},
+          {"name": " ", "level":5,"children":[
+              {"name": "jhw_98b_2rd","level":7, "size": 4400},
+              {"name": "jhw_98b_3rd","level":7, "size": 4400},
+              {"name": "jhw_98b_1rd","level":7, "size": 4400},
+              {"name": "jhw_98b_9rd","level":7, "size": 4400}
+            ]}
+          ]}
+        ]}
+        ]}
+    ]}
+  ]};
+break;
+case 6:
+var json = {
+"name": "Hierarchical Clustering","level":0,
+"children":[
+  {"name": " ", "level":1,"children":[
+    {"name": "jhw_98b_10rd","level":2, "size": 4400}
+    ]},
+  {"name": " ", "level":1,"children":[
+    {"name": " ", "level":2,"children":[
+      {"name": "jhw_98b_7rd","level":3, "size": 4400},
+      {"name": "jhw_98b_11rd","level":3, "size": 4400},
+      ]},
+    {"name": " ", "level":2,"children":[
+      {"name": " ", "level":3,"children":[
+        {"name": "jhw_98b_6rd","level":4, "size": 4400},
+        {"name": "jhw_98b_8rd","level":4, "size": 4400},
+        ]},
+      {"name": " ", "level":3,"children":[
+        {"name": " ", "level":4,"children":[
+          {"name": "jhw_98b_4rd","level":5, "size": 4400},
+          {"name": "jhw_98b_5rd","level":5, "size": 4400}]},
+        {"name": " ", "level":4,"children":[
+          {"name": "jhw_98b_12rd","level":5, "size": 4400},
+          {"name": " ", "level":5,"children":[
+              {"name": " ", "level":6,"children":[
+                {"name": "jhw_98b_2rd","level":7, "size": 4400},
+                {"name": "jhw_98b_3rd","level":7, "size": 4400}
+              ]},
+              {"name": " ","level":6, "children":[
+                {"name": "jhw_98b_1rd","level":7, "size": 4400},
+                {"name": "jhw_98b_9rd","level":7, "size": 4400}
+            ]}
+          ]}
+        ]}
+        ]}
+    ]}
+  ]}
+  ]};
+break;
+}
+  var node = vis.data([json]).selectAll("g.node")
+  .data(pack.nodes)
+      .enter().append("svg:g")
+        .attr("class", function(d) { return d.children ? "node" : "leaf node"; })
+  .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+
+
+   node.append("svg:title")
+       .text(function(d) { return d.name + (d.children ? "" : ": " + format(d.size)); });
+
+   node.append("svg:circle")
+       .attr("r", function(d) { return d.r; });
+
+   node.filter(function(d) { return !d.children; }).append("svg:text")
+       .attr("text-anchor", "middle")
+       .attr("dy", ".3em")
+       .text(function(d) { return d.name.substring(0, d.r / 3); });
+
+    }
+    }
+    );
+slider.enable();
+</script>
+</div>
+</body>
+</html>

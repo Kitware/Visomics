@@ -12,8 +12,10 @@
 #include "voUtils.h"
 
 // VTK includes
+#include <vtkAdjacentVertexIterator.h>
 #include <vtkArray.h>
 #include <vtkArrayToTable.h>
+#include <vtkDataSetAttributes.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include <vtkNew.h>
@@ -22,8 +24,9 @@
 #include <vtkTable.h>
 #include <vtkTableToArray.h>
 #include <vtkVariantArray.h>
+#include <vtkTree.h>
 
-namespace
+namespace // helpers for bool voUtils::transposeTable(vtkTable*, vtkTable*, const TransposeOption&)
 {
 //----------------------------------------------------------------------------
 template<typename ArrayType, typename ValueType>
@@ -559,51 +562,65 @@ QString voUtils::stringify(QScriptEngine* scriptEngine, const QScriptValue& scri
   return stringify.call(QScriptValue(), QScriptValueList() << scriptValue).toString();
 }
 
-//----------------------------------------------------------------------------
-QString voUtils::stringify(const QString& name, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip)
+namespace // helpers for QString voUtils::stringify(const QString&, vtkTable *, const QList<vtkIdType>&)
 {
-  if (!table)
+//----------------------------------------------------------------------------
+template<typename ArrayType>
+QScriptValue scriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstractArray * array)
+{
+  if (!scriptEngine || !array)
     {
-    return QString();
+    return QScriptValue();
     }
-  QScriptEngine scriptEngine;
-  QScriptValue object = scriptEngine.newObject();
-  object.setProperty("name", QScriptValue(name));
-  object.setProperty("data", voUtils::scriptValueFromTable(&scriptEngine, table, columnIdsToSkip));
-  return voUtils::stringify(&scriptEngine, object);
+  ArrayType * typedArray = ArrayType::SafeDownCast(array);
+  if (!typedArray)
+    {
+    return QScriptValue();
+    }
+  QVariantList list;
+  for (vtkIdType i = 0; i < typedArray->GetNumberOfTuples() * typedArray->GetNumberOfComponents(); ++i)
+  {
+    list << QVariant(typedArray->GetValue(i));
+  }
+
+  QScriptValue object = scriptEngine->newObject();
+  object.setProperty("name", array->GetName());
+  object.setProperty("data", qScriptValueFromSequence<QVariantList>(scriptEngine, list));
+  return object;
 }
 
 //----------------------------------------------------------------------------
-QScriptValue voUtils::scriptValueFromTable(QScriptEngine* scriptEngine,
-                                           vtkTable * table,
-                                           const QList<vtkIdType>& columnIdsToSkip)
+QScriptValue scriptValueFromTable(QScriptEngine* scriptEngine,
+                                  vtkTable * table,
+                                  const QList<vtkIdType>& columnIdsToSkip)
 {
   if (!scriptEngine || !table)
     {
     return QScriptValue();
     }
   QScriptValueList list;
+
   for(vtkIdType cid = 0; cid < table->GetNumberOfColumns(); ++cid)
     {
     if (columnIdsToSkip.contains(cid))
       {
       continue;
       }
-    QScriptValue scriptValue = voUtils::scriptValueFromArray<vtkDoubleArray>(scriptEngine, table->GetColumn(cid));
+    QScriptValue scriptValue = scriptValueFromArray<vtkDoubleArray>(scriptEngine, table->GetColumn(cid));
     if (scriptValue.isValid())
       {
       list << scriptValue;
       }
     else
       {
-      scriptValue = voUtils::scriptValueFromArray<vtkIntArray>(scriptEngine, table->GetColumn(cid));
+      scriptValue = scriptValueFromArray<vtkIntArray>(scriptEngine, table->GetColumn(cid));
       if (scriptValue.isValid())
         {
         list << scriptValue;
         }
       else
         {
-        scriptValue = voUtils::scriptValueFromArray<vtkStringArray>(scriptEngine, table->GetColumn(cid));
+        scriptValue = scriptValueFromArray<vtkStringArray>(scriptEngine, table->GetColumn(cid));
         if (scriptValue.isValid())
           {
           list << scriptValue;
@@ -620,28 +637,77 @@ QScriptValue voUtils::scriptValueFromTable(QScriptEngine* scriptEngine,
     }
   return array;
 }
+} // end of anonymous namespace
+
 
 //----------------------------------------------------------------------------
-template<typename ArrayType>
-QScriptValue voUtils::scriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstractArray * array)
+QString voUtils::stringify(const QString& name, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip)
 {
-  if (!scriptEngine || !array)
+  if (!table)
     {
-    return QScriptValue();
+    return QString();
     }
-  ArrayType * typedArray = ArrayType::SafeDownCast(array);
-  if (!typedArray)
-    {
-    return QScriptValue();
-    }
-  QVariantList list;
-  for (vtkIdType i = 0; i < typedArray->GetNumberOfTuples() * typedArray->GetNumberOfComponents(); ++i)
-    {
-    list << QVariant(typedArray->GetValue(i));
-    }
-  QScriptValue object = scriptEngine->newObject();
-  object.setProperty("name", array->GetName());
-  object.setProperty("data", qScriptValueFromSequence<QVariantList>(scriptEngine, list));
-  return object;
+  QScriptEngine scriptEngine;
+  QScriptValue object = scriptEngine.newObject();
+  object.setProperty("name", QScriptValue(name));
+  object.setProperty("data", scriptValueFromTable(&scriptEngine, table, columnIdsToSkip));
+  return voUtils::stringify(&scriptEngine, object);
 }
 
+namespace //helpers for QString voUtils::stringify(const QString&, vtkTree*)
+{
+//----------------------------------------------------------------------------
+QScriptValue scriptValueFromTree(QScriptEngine* scriptEngine, vtkTree* tree, vtkIdType currVertex, int depth)
+{
+  QScriptValue object = scriptEngine->newObject();
+
+  vtkAbstractArray * idArray = tree->GetVertexData()->GetAbstractArray("id");
+  if(!idArray)
+    {
+//    qWarning() << "voUtils::scriptValueFromTree - Failed to retrieve \"id\" vertexData !";
+    return object;
+    }
+  QString name(idArray->GetVariantValue(currVertex).ToString());
+  if(name.isEmpty())
+    {
+    name = " ";
+    }
+  object.setProperty("name", QScriptValue(name));
+  object.setProperty("level", QScriptValue(depth));
+
+  vtkIdType numChildren = tree->GetNumberOfChildren(currVertex);
+  if(numChildren > 0)
+    {
+    QScriptValue childrenArray = scriptEngine->newArray(numChildren);
+    vtkNew<vtkAdjacentVertexIterator> childItr;
+    tree->GetChildren(currVertex, childItr.GetPointer());
+    for(int childCount = 0; childItr->HasNext(); childCount++)
+      {
+      vtkIdType childVertex = childItr->Next();
+      childrenArray.setProperty(
+            childCount, scriptValueFromTree(scriptEngine, tree, childVertex, depth+1));
+      }
+    object.setProperty("children", childrenArray);
+    }
+  else
+    {
+    object.setProperty("size", "10");
+    }
+
+  return object;
+}
+} // end of anonymous namespace
+
+//----------------------------------------------------------------------------
+QString voUtils::stringify(const QString& name, vtkTree* tree)
+{
+  if (!tree)
+    {
+    return QString();
+    }
+
+  QScriptEngine scriptEngine;
+  QScriptValue rootScriptValue = scriptValueFromTree(&scriptEngine, tree, tree->GetRoot(), 0);
+  rootScriptValue.setProperty("name", name);
+  return voUtils::stringify(&scriptEngine, rootScriptValue);
+}
