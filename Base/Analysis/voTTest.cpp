@@ -71,7 +71,15 @@ void voTTest::setParameterInformation()
   ttest_parameters << this->addStringParameter("sample2_range", QObject::tr("Sample Group 2"), "D,E,G-J");
 
   this->addParameterGroup("T-Test parameters", ttest_parameters);
+}
 
+// --------------------------------------------------------------------------
+QString voTTest::parameterDescription()const
+{
+  return QString("<dl>"
+                 "<dt><b>Sample Group 1 / 2</b>:</dt>"
+                 "<dd>A group of Experiments, specified by a range and/or list of column letters.</dd>"
+                 "</dl>");
 }
 
 // --------------------------------------------------------------------------

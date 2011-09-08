@@ -20,6 +20,7 @@ protected:
   virtual void setInputInformation();
   virtual void setOutputInformation();
   virtual void setParameterInformation();
+  virtual QString parameterDescription()const;
 
   virtual bool execute();
 

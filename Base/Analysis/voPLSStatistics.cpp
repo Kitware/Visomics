@@ -101,7 +101,17 @@ void voPLSStatistics::setParameterInformation()
                             "Kernel");
 
   this->addParameterGroup("PLS parameters", pls_parameters);
+}
 
+// --------------------------------------------------------------------------
+QString voPLSStatistics::parameterDescription()const
+{
+  return QString("<dl>"
+                 "<dt><b>Predictor / Response Analyte(s)</b>:</dt>"
+                 "<dd>A group of Analytes, specified by a range and/or list of row numbers.</dd>"
+                 "<dt><b>Algorithm</b>:</dt>"
+                 "<dd>The multivariante regression method.</dd>"
+                 "</dl>");
 }
 
 // --------------------------------------------------------------------------

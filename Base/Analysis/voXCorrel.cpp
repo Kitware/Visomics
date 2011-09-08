@@ -81,6 +81,18 @@ void voXCorrel::setParameterInformation()
 }
 
 // --------------------------------------------------------------------------
+QString voXCorrel::parameterDescription()const
+{
+  return QString("<dl>"
+                 "<dt><b>Method</b>:</dt>"
+                 "<dd>The correlation coefficient used:<br>"
+                 "- <i>Pearson's r</i><br>"
+                 "- <i>Kendall's %1</i><br>"
+                 "- <i>Spearman's %2</i></dd>"
+                 "</dl>").arg(QChar(964)).arg(QChar(961));
+}
+
+// --------------------------------------------------------------------------
 bool voXCorrel::execute()
 {
   Q_D(voXCorrel);

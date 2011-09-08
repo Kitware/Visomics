@@ -73,7 +73,15 @@ void voFoldChange::setParameterInformation()
   fold_change_parameters << this->addStringParameter("sample2_range", QObject::tr("Final Sample(s)"), "D,E,G-J");
 
   this->addParameterGroup("Fold Change parameters", fold_change_parameters);
+}
 
+// --------------------------------------------------------------------------
+QString voFoldChange::parameterDescription()const
+{
+  return QString("<dl>"
+                 "<dt><b>Initial / Final Sample(s)</b>:</dt>"
+                 "<dd>A group of Experiments, specified by a range and/or list of column letters.</dd>"
+                 "</dl>");
 }
 
 // --------------------------------------------------------------------------
