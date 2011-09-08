@@ -10,13 +10,16 @@
 
 // VTK includes
 #include <vtkArray.h>
+#include <vtkDataSetAttributes.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include <vtkMath.h>
+#include <vtkMutableDirectedGraph.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
+#include <vtkTree.h>
 #include <vtkVariantArray.h>
 
 // STD includes
@@ -1359,6 +1362,88 @@ int voUtilsTest(int argc, char * argv [])
     std::cerr << "Line " << __LINE__ << " - Problem with stringify()\n"
               << "\tCurrent:" << qPrintable(currentStringifiedTable) << "\n"
               << "\tExpected:" << qPrintable(expectedStringifiedTable) << std::endl;
+    return EXIT_FAILURE;
+    }
+
+
+  //-----------------------------------------------------------------------------
+  // Test stringify(const QString& name, vtkTree * tree);
+  //-----------------------------------------------------------------------------
+
+  stringifyName = "StringifyTest";
+
+  // case1: empty tree
+  vtkNew<vtkTree> stringifyTreeCase1;
+
+  QString expectedStringifiedTreeCase1("{\"name\":\"StringifyTest\"}");
+  QString currentStringifiedTreeCase1(voUtils::stringify(stringifyName, stringifyTreeCase1.GetPointer()));
+  if (expectedStringifiedTreeCase1 != currentStringifiedTreeCase1)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with stringify()\n"
+              << "\tCurrent:" << qPrintable(currentStringifiedTreeCase1) << "\n"
+              << "\tExpected:" << qPrintable(expectedStringifiedTreeCase1) << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // case2: tree without "id" vertexData
+  vtkNew<vtkMutableDirectedGraph> graph;
+
+  vtkIdType v1 = graph->AddVertex();
+  vtkIdType v2 = graph->AddChild(v1);
+  graph->AddChild(v1);
+  graph->AddChild(v2);
+
+  vtkNew<vtkTree> stringifyTreeCase2;
+  success = stringifyTreeCase2->CheckedShallowCopy(graph.GetPointer());
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with creating tree !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  QString expectedStringifiedTreeCase2("{\"name\":\"StringifyTest\"}");
+  QString currentStringifiedTreeCase2(voUtils::stringify(stringifyName, stringifyTreeCase2.GetPointer()));
+
+  if (expectedStringifiedTreeCase2 != currentStringifiedTreeCase2)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with stringify()\n"
+              << "\tCurrent:" << qPrintable(currentStringifiedTreeCase2) << "\n"
+              << "\tExpected:" << qPrintable(expectedStringifiedTreeCase2) << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  // case3: tree with "id" vertexData
+  vtkNew<vtkTree> stringifyTreeCase3;
+  success = stringifyTreeCase3->CheckedShallowCopy(graph.GetPointer());
+  if (!success)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with creating tree !" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  vtkNew<vtkStringArray> vertexIDs; // Array to label the vertices
+  vertexIDs->SetName("id");
+  vertexIDs->InsertNextValue("A");
+  vertexIDs->InsertNextValue("B");
+  vertexIDs->InsertNextValue("C");
+  vertexIDs->InsertNextValue("D");
+  stringifyTreeCase3->GetVertexData()->AddArray(vertexIDs.GetPointer());
+
+  QString expectedStringifiedTreeCase3(
+    "{\"name\":\"StringifyTest\",\"level\":0,\"children\":["
+      "{\"name\":\"B\",\"level\":1,\"children\":["
+        "{\"name\":\"D\",\"level\":2,\"size\":\"10\"}"
+      "]},"
+      "{\"name\":\"C\",\"level\":1,\"size\":\"10\"}"
+    "]}");
+
+  QString currentStringifiedTreeCase3(voUtils::stringify(stringifyName, stringifyTreeCase3.GetPointer()));
+
+  if (expectedStringifiedTreeCase3 != currentStringifiedTreeCase3)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with stringify()\n"
+              << "\tCurrent:" << qPrintable(currentStringifiedTreeCase3) << "\n"
+              << "\tExpected:" << qPrintable(expectedStringifiedTreeCase3) << std::endl;
     return EXIT_FAILURE;
     }
 

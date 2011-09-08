@@ -7,6 +7,8 @@
 class vtkAbstractArray;
 class vtkStringArray;
 class vtkTable;
+class vtkTree;
+class vtkDataSetAttributes;
 template <class T> class QList;
 class QScriptEngine;
 class QScriptValue;
@@ -63,10 +65,7 @@ QString stringify(QScriptEngine* scriptEngine, const QScriptValue& scriptValue);
 
 QString stringify(const QString& name, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip);
 
-QScriptValue scriptValueFromTable(QScriptEngine* scriptEngine, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip);
-
-template<typename ArrayType>
-QScriptValue scriptValueFromArray(QScriptEngine* scriptEngine, vtkAbstractArray * array);
+QString stringify(const QString& name, vtkTree * tree);
 }
 
 #endif
