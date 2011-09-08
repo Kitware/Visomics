@@ -59,7 +59,7 @@ void voHierarchicalClustering::setOutputInformation()
                       "voHeatMapView", "Clustered Data (HeatMap)",
                       "voTableView", "Clustered Data (Table)");
 
-  this->addOutputType("x-dynview", "vtkTable",
+  this->addOutputType("clusterTree-dynview", "vtkTable",
                       "voHierarchicalClusteringDynView", "Interactive Hierarchical Clustering Plot (prototype)",
                       "", "");
 }
@@ -249,7 +249,7 @@ bool voHierarchicalClustering::execute()
       }
     reverseBFSLabels = levelLabels + reverseBFSLabels;
     }
-  this->setOutput("x-dynview", new voTableDataObject("x-dynview", tree.GetPointer()));
+  this->setOutput("clusterTree-dynview", new voTableDataObject("clusterTree-dynview", tree.GetPointer()));
 
   // Generate table for heatmap
   vtkNew<vtkTable> clusterTable;
