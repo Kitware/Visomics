@@ -1,0 +1,120 @@
+All requests to the Visomics server are defined by their URL only.
+
+VALID_URL := 'http://' SERVERHOST '/' DATABASE '/' OPERATION
+
+SERVERHOST := 'paraviewweb.kitware.com:8090'
+
+DATABASE := 'kegg'
+
+OPERATION := COMPOUND | GRAPH | MAP
+
+-------------------------------------------------------------------------------
+
+COMPOUND := 'compound' '?' COMPOUND_QUERY_LIST
+
+COMPOUND_QUERY_LIST := COMPOUND_QUERY | COMPOUND_QUERY '&' COMPOUND_QUERY_LIST
+
+COMPOUND_QUERY := COMPOUND_QUERY_TYPE '=' COMPOUND_NAME
+
+COMPOUND_QUERY_TYPE := 'tit' | 'path' | 'all'
+
+COMPOUND_NAME := [any English name of a compound]
+
+
+The 'compound' operation returns a JSON Array, with each element being a JSON Object: one for each COMPOUND_QUERY in the request.
+For a given COMPOUND_QUERY, the fields of the corresponding JSON Object will depend on the COMPOUND_QUERY_TYPE.
+
+All COMPOUND_QUERY_TYPE return the fields:
+  'compound_name' : the COMPOUND_NAME used in the request
+  'compound_id' : the KEGG database ID of the compound, or 'null' if the compound could not be found
+For COMPOUND_QUERY_TYPE 'tit' or 'all', the fields:
+  'compound_titles' : a JSON Array of KEGG database English titles for the compound
+For COMPOUND_QUERY_TYPE 'path' or 'all', the fields:
+  'compound_pathways' : a JSON Array of all the KEGG database pathways that contain the compound;
+                        each element is itself an Array of size 2, with the KEGG pathway ID as the first element, and the KEGG pathway English title as the second element
+
+
+Example Request:
+  http://localhost:8090/kegg/compound?tit=sucrose&path=maltose&all=glucose
+Example Response (formatted for clarity and abridged):
+[
+  {
+    "compound_name": "sucrose",
+    "compound_titles": ["Sucrose", "Cane sugar", "Saccharose", "1-alpha-D-Glucopyranosyl-2-beta-D-fructofuranoside"],
+    "compound_id": "cpd:C00089"
+  },
+  {
+    "compound_name": "maltose",
+    "compound_id": "cpd:C00208",
+    "compound_pathways": [
+                           ["path:ko00500", "Starch and sucrose metabolism"],
+                           ["path:ko01100", "Metabolic pathways"],
+                           ["path:ko02010", "ABC transporters"],
+                           ["path:ko02030", "Bacterial chemotaxis"]
+                         ]
+  },
+  {"compound_name": "glucose",
+   "compound_titles": ["D-Glucose", "Grape sugar", "Dextrose", "Glucose"],
+   "compound_id": "cpd:C00031",
+   "compound_pathways": [
+                          ["path:ko00010", "Glycolysis / Gluconeogenesis"],
+                          ["path:ko00030", "Pentose phosphate pathway"],
+                          ["path:ko00052", "Galactose metabolism"],
+                          ["path:ko00500", "Starch and sucrose metabolism"],
+                          ["path:ko00520", "Amino sugar and nucleotide sugar metabolism"],
+                          ["path:ko00521", "Streptomycin biosynthesis"]
+                        ]
+  }
+]
+
+-------------------------------------------------------------------------------
+
+GRAPH := 'graph' '?' 'GRAPH_QUERY_LIST
+
+GRAPH_QUERY_LIST := GRAPH_QUERY | GRAPH_QUERY '&' GRAPH_QUERY_LIST
+
+GRAPH_QUERY := 'path' '=' GRAPH_QUERY_ID
+
+PATHWAY_ID := 'path:' 'ko' [5 digit pathway ID]
+
+
+The 'graph' operation returns a JSON Array, with each element being a JSON Object: one for each GRAPH_QUERY in the request.
+For a given GRAPH_QUERY, the following fields are returned:
+  'pathway_id' : the PATHWAY_ID used in the request
+  'pathway_graph' : a JSON Array of directed edges in a graph of the pathway;
+                    each element is itself an Array of size 2, with both elements being a KEGG ID of a compound or reaction,
+                      the first element being the origin of the edge, the second element being the destination
+
+
+Example Request:
+  http://amber11:8090/kegg/graph?path=path:ko00010
+Example Response (formatted for clarity and abridged):
+[
+  {
+    "pathway_id": "path:ko00010",
+    "pathway_graph": [
+                       ["cpd:C00084", "rn:R00710"],
+                       ["rn:R00710", "cpd:C00033"],
+                       ["cpd:C00024", "rn:R00229"],
+                       ["rn:R00229", "cpd:C00033"],
+                       ["cpd:C00084", "rn:R00711"],
+                       ["rn:R00711", "cpd:C00033"],
+                       ["cpd:C05125", "rn:R00755"]
+                     ]
+  }
+]
+
+-------------------------------------------------------------------------------
+
+MAP := 'map' '?' 'path' '=' PATHWAY_ID
+
+
+The 'map' operation returns a PNG image, of the KEGG database map of the pathway.
+
+
+Example Request:
+  http://amber11:8090/kegg/map?path=path:ko00010
+Example Response:
+  (PNG image)
+
+
