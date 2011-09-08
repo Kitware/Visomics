@@ -271,7 +271,7 @@ void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
   foreach(const QString& outputName, analysis->outputNames())
     {
     voDataObject * dataObject = analysis->output(outputName);
-    if (!dataObject->dataAsVTKDataObject())
+    if (!dataObject || dataObject->data().isNull())
       {
       qCritical() << QObject::tr("Analysis ran, but output [%1] is missing.").arg(outputName);
       continue;

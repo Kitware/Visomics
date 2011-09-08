@@ -10,7 +10,8 @@
 #include "voANOVAStatistics.h"
 #include "voFoldChange.h"
 #include "voHierarchicalClustering.h"
-#include "voKEGG.h"
+#include "voKEGGCompounds.h"
+#include "voKEGGPathway.h"
 #include "voKMeansClustering.h"
 #include "voPCAStatistics.h"
 #include "voPLSStatistics.h"
@@ -38,7 +39,8 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voANOVAStatistics>("ANOVA");
   this->registerAnalysis<voFoldChange>("Fold Change");
   this->registerAnalysis<voHierarchicalClustering>("Hierarchical Clustering");
-  this->registerAnalysis<voKEGG>("KEGG Pathways");
+  this->registerAnalysis<voKEGGCompounds>("KEGG Compounds");
+  this->registerAnalysis<voKEGGPathway>("KEGG Pathway");
   this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
   this->registerAnalysis<voPCAStatistics>("PCA");
   this->registerAnalysis<voPLSStatistics>("PLS");

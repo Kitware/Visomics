@@ -8,8 +8,10 @@ SET(KIT_SRCS
   Analysis/voANOVAStatistics.h
   Analysis/voHierarchicalClustering.h
   Analysis/voHierarchicalClustering.cpp
-  Analysis/voKEGG.h
-  Analysis/voKEGG.cpp
+  Analysis/voKEGGCompounds.h
+  Analysis/voKEGGCompounds.cpp
+  Analysis/voKEGGPathway.h
+  Analysis/voKEGGPathway.cpp
   Analysis/voKMeansClustering.cpp
   Analysis/voKMeansClustering.h
   Analysis/voPCAStatistics.cpp
@@ -37,6 +39,12 @@ SET(KIT_SRCS
   Views/voHorizontalBarView.cpp
   Views/voInteractorStyleRubberBand2D.h
   Views/voInteractorStyleRubberBand2D.cpp
+  Views/voKEGGImageView.cpp
+  Views/voKEGGImageView.h
+  Views/voKEGGPathwayView.cpp
+  Views/voKEGGPathwayView.h
+  Views/voKEGGTableView.cpp
+  Views/voKEGGTableView.h
   Views/voPCABarView.cpp
   Views/voPCABarView.h
   Views/voPCAProjectionDynView.cpp
@@ -73,6 +81,8 @@ SET(KIT_SRCS
   voInputFileDataObject.h
   voIOManager.cpp
   voIOManager.h
+  voKEGGUtils.cpp
+  voKEGGUtils.h
   voQObjectFactory.h
   voRegistry.cpp
   voRegistry.h
@@ -95,7 +105,8 @@ SET(KIT_MOC_SRCS
   Analysis/voFoldChange.h
   Analysis/voANOVAStatistics.h
   Analysis/voHierarchicalClustering.h
-  Analysis/voKEGG.h
+  Analysis/voKEGGCompounds.h
+  Analysis/voKEGGPathway.h
   Analysis/voKMeansClustering.h
   Analysis/voPCAStatistics.h
   Analysis/voTTest.h
@@ -107,6 +118,9 @@ SET(KIT_MOC_SRCS
   Views/voHeatMapView.h
   Views/voHierarchicalClusteringDynView.h
   Views/voHorizontalBarView.h
+  Views/voKEGGImageView.h
+  Views/voKEGGPathwayView.h
+  Views/voKEGGTableView.h
   Views/voPCABarView.h
   Views/voPCAProjectionDynView.h
   Views/voPCAProjectionView.h
@@ -131,6 +145,7 @@ SET(KIT_UI_FORMS
   )
   
 SET(KIT_resources
+  Resources/VisomicsBase.qrc
   )
   
 INCLUDE_DIRECTORIES(

@@ -140,7 +140,7 @@ void checkForLeadingOrTrailingSpaces(const char* className, const char* funcName
 {
   // Check for heading and trailing spaces
   QString msg =
-      QObject::tr("voAnalysis::%1 [%2] - Parameter %2 shouldn't contain heading or trailing spaces !");
+      QObject::tr("voAnalysis::%1 [%2] - Parameter %2 shouldn't contain leading or trailing spaces !");
   if (value.trimmed() != value){ qCritical() << msg.arg(funcName, className, varName); return; }
 }
 }
@@ -303,6 +303,29 @@ QString voAnalysis::viewPrettyName(const QString& outputName, const QString& vie
 }
 
 // --------------------------------------------------------------------------
+void voAnalysis::setViewPrettyName(const QString& outputName, const QString& viewType, const QString& viewPrettyName)
+{
+  Q_D(voAnalysis);
+
+  if (!this->hasOutputWithViewType(outputName, viewType))
+    {
+    return;
+    }
+
+  const char* className = this->metaObject()->className();
+  checkForLeadingOrTrailingSpaces(className, "setViewPrettyName", "viewPrettyName", viewPrettyName);
+
+  if (viewPrettyName.isEmpty())
+    {
+    d->OutputViewPrettyName.remove(outputName + viewType);
+    }
+  else
+    {
+    d->OutputViewPrettyName.insert(outputName + viewType, viewPrettyName);
+    }
+}
+
+// --------------------------------------------------------------------------
 int voAnalysis::numberOfOutput()
 {
   Q_D(const voAnalysis);
@@ -429,6 +452,29 @@ QString voAnalysis::rawViewPrettyName(const QString& outputName, const QString& 
 }
 
 // --------------------------------------------------------------------------
+void voAnalysis::setRawViewPrettyName(const QString& outputName, const QString& rawViewType, const QString& rawViewPrettyName)
+{
+  Q_D(voAnalysis);
+
+  if (!this->hasOutputWithRawViewType(outputName, rawViewType))
+    {
+    return;
+    }
+
+  const char* className = this->metaObject()->className();
+  checkForLeadingOrTrailingSpaces(className, "setRawViewPrettyName", "rawViewPrettyName", rawViewPrettyName);
+
+  if (rawViewPrettyName.isEmpty())
+    {
+    d->OutputRawViewPrettyName.remove(outputName + rawViewType);
+    }
+  else
+    {
+    d->OutputRawViewPrettyName.insert(outputName + rawViewType, rawViewPrettyName);
+    }
+}
+
+// --------------------------------------------------------------------------
 void voAnalysis::removeAllOutputs()
 {
   Q_D(voAnalysis);
@@ -545,7 +591,7 @@ void voAnalysis::writeOutputsToFiles(const QString& directory) const
   foreach(const QString& outputName, this->outputNames())
     {
     voDataObject * dataObject = this->output(outputName);
-    if (!dataObject || !dataObject->dataAsVTKDataObject())
+    if (!dataObject || !dataObject->isVTKDataObject() || !dataObject->dataAsVTKDataObject())
       {
       continue;
       }

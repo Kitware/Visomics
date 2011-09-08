@@ -1,0 +1,6 @@
+<RCC>
+  <qresource prefix="/">
+    <file>Icons/Bulb.png</file>
+  </qresource>
+</RCC>
+

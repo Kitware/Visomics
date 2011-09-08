@@ -1,5 +1,6 @@
 
 // Qt includes
+#include <QLabel>
 #include <QVBoxLayout>
 
 // Visomics includes
@@ -8,11 +9,20 @@
 // VTK includes
 #include <vtkDataObject.h>
 
+//----------------------------------------------------------------------------
+class voViewPrivate
+{
+public:
+};
+
+// --------------------------------------------------------------------------
+// voViewPrivate methods
+
 // --------------------------------------------------------------------------
 // voView methods
 
 // --------------------------------------------------------------------------
-voView::voView(QWidget* newParent) : Superclass(newParent)
+voView::voView(QWidget* newParent) : Superclass(newParent), d_ptr(new voViewPrivate)
 {
 }
 
@@ -28,5 +38,14 @@ void voView::initialize()
   verticalLayout->setSpacing(0);
   verticalLayout->setContentsMargins(0, 0, 0, 0);
   this->setupUi(verticalLayout);
+  QLabel * hintsLabel = new QLabel(this->hints());
+  hintsLabel->setWordWrap(true);
+  verticalLayout->addWidget(hintsLabel);
+}
+
+// --------------------------------------------------------------------------
+QString voView::hints()const
+{
+  return QString();
 }
 

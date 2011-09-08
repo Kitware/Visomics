@@ -119,6 +119,12 @@ int voAnalysisRunTest(int argc, char * argv [])
   // Compare analysis outputs with baselines
   foreach(const QString& outputName, analysis->outputNames())
     {
+    // Special case: ignore non-VTK outputs
+    if(!analysis->output(outputName)->isVTKDataObject())
+      {
+      continue;
+      }
+
     // Baseline file
     QString fileName = inputMD5 + "_" + analysisName + "_" + outputName + ".vtk";
     fileName.prepend(dataDirectory);
