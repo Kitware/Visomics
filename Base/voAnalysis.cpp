@@ -336,7 +336,9 @@ int voAnalysis::numberOfOutput()
 QStringList voAnalysis::outputNames()const
 {
   Q_D(const voAnalysis);
-  return d->OutputInformation.keys();
+  QStringList names = d->OutputInformation.keys();
+  names.sort();
+  return names;
 }
 
 // --------------------------------------------------------------------------
