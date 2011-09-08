@@ -77,11 +77,14 @@ TARGET_LINK_LIBRARIES(
   )
 
 
-# Configure forward executable
-SET(Visomics_LIBRARY_DIRS
-  ${VTK_DIR}/bin
-  ${R_LIBRARY_DIR}
-  )
+# Set Visomics_FORWARD_PATH_BUILD
+set(tmp "\".\" CONFIG_DIR_POST")
+if(WIN32)
+  set(tmp "${tmp}, \"${QT_BINARY_DIR}\"")
+else()
+  set(tmp "${tmp}, \"${QT_LIBRARY_DIR}\"")
+endif()
+set(Visomics_FORWARD_PATH_BUILD ${tmp})
 
 CONFIGURE_FILE(
   ${Visomics_SOURCE_DIR}/CMake/visomics-forward.c.in
