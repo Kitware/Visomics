@@ -47,8 +47,8 @@ void voKMeansClustering::setInputInformation()
 void voKMeansClustering::setOutputInformation()
 {
   this->addOutputType("cluster", "vtkTable",
-                      "voKMeansClusteringDynView", "KMeans Clustering (Dendogram)",
-                      "voTableView", "cluster");
+                      "voKMeansClusteringDynView", "Clusters (Dendogram)",
+                      "voTableView", "Clusters (Table)");
 }
 
 // --------------------------------------------------------------------------
