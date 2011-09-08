@@ -47,7 +47,7 @@ void voKMeansClustering::setInputInformation()
 void voKMeansClustering::setOutputInformation()
 {
   this->addOutputType("cluster", "vtkTable",
-                      "", "",
+                      "voKMeansClusteringDynView", "KMeans Clustering (Dendogram)",
                       "voTableView", "cluster");
 }
 
@@ -236,7 +236,9 @@ bool voKMeansClustering::execute()
     }
   //displayClustedIds("final", clusterTable.GetPointer());
 
-  this->setOutput("cluster", new voTableDataObject("cluster", clusterTable.GetPointer()));
+  voTableDataObject * dataObject = new voTableDataObject("cluster", clusterTable.GetPointer());
+  dataObject->setProperty("kmeans_centers", kmeans_centers);
+  this->setOutput("cluster", dataObject);
 
   return true;
 }

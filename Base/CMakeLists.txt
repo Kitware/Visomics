@@ -45,6 +45,8 @@ SET(KIT_SRCS
   Views/voKEGGPathwayView.h
   Views/voKEGGTableView.cpp
   Views/voKEGGTableView.h
+  Views/voKMeansClusteringDynView.cpp
+  Views/voKMeansClusteringDynView.h
   Views/voPCABarView.cpp
   Views/voPCABarView.h
   Views/voPCAProjectionDynView.cpp
@@ -121,6 +123,7 @@ SET(KIT_MOC_SRCS
   Views/voKEGGImageView.h
   Views/voKEGGPathwayView.h
   Views/voKEGGTableView.h
+  Views/voKMeansClusteringDynView.h
   Views/voPCABarView.h
   Views/voPCAProjectionDynView.h
   Views/voPCAProjectionView.h

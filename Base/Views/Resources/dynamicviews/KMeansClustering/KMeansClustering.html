@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <title>KMeans Clustering</title>
+    <script type="text/javascript" src="d3.js"></script>
+    <script type="text/javascript" src="d3.layout.js"></script>
+    <link href="KMeansClustering.css" rel="stylesheet" type="text/css"/>
+  </head>
+  <body>
+    <div id="chart"></div>
+    <script type="text/javascript">
+
+var w = 800, h = 800, format = d3.format(",d");
+
+var cluster = d3.layout.cluster()
+  .size([h, w - 230]).value(function(d) { return d.size; });
+  
+var diagonal = d3.svg.diagonal()
+  .projection(function(d) { return [d.y, d.x]; });
+
+var vis = d3.select("#chart")
+  .append("svg:svg")
+  .attr("width", w)
+  .attr("height", h)
+  .attr("class", "cluster")
+  .append("svg:g")
+  .attr("transform", "translate(80, 0)");
+
+var json = {
+"name": "Clusters",
+"children":[
+  {"name": "Cluster 1", "children":[
+    {"name": "apple"}, 
+    {"name": "banana"}
+    ]},
+  {"name": "Cluster 2", "children":[
+    {"name": "chard"}, 
+    {"name": "broccoli"},
+    {"name": "collard"}
+    ]},
+  {"name": "Cluster 3", "children":[
+    {"name": "pumpkin"}, 
+    {"name": "sweet potato"},
+    {"name": "carrot"}
+    ]},
+]};
+
+
+if (window.dataobject)
+  {
+  json = JSON.parse(window.dataobject.json);
+  }
+
+var nodes = cluster.nodes(json);
+
+var link = vis.selectAll("path.link")
+    .data(cluster.links(nodes))
+  .enter().append("svg:path")
+    .attr("class", "link" )
+    .attr("d", diagonal);
+
+var node = vis.selectAll("g.node")
+    .data(nodes)
+  .enter().append("svg:g")
+    .attr("class", "node")
+    .attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+
+node.append("svg:circle")
+    .attr("r", 4.5);
+
+node.append("svg:text")
+    .attr("dx", function(d) { return d.children ? -8 : 12; })
+    .attr("dy", function(d) { 
+      if (d.name.indexOf("Cluster ") == 0) { return -15 }
+      return d.children ? -8 : 8;
+      } )
+    .attr("text-anchor", function(d) { return d.children ? "end" : "start"; })
+    .text(function(d) { return d.name; });
+
+    </script>
+  </body>
+</html>
+
