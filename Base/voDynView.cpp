@@ -85,7 +85,7 @@ QString voDynView::htmlFilePath()const
     dynamicViewSubDirectory = QLatin1String(Visomics_SOURCE_DIR)
         + QLatin1String("/Base/Views/Resources/dynamicviews/");
     }
-  return QLatin1String("file://") + dynamicViewSubDirectory + d->ViewName
+  return dynamicViewSubDirectory + d->ViewName
       + QLatin1String("/") + d->ViewName + QLatin1String(".html");
 }
 
