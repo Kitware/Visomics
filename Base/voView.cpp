@@ -40,6 +40,7 @@ void voView::initialize()
   this->setupUi(verticalLayout);
   QLabel * hintsLabel = new QLabel(this->hints());
   hintsLabel->setWordWrap(true);
+  hintsLabel->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Maximum);
   verticalLayout->addWidget(hintsLabel);
 }
 
