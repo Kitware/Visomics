@@ -175,9 +175,9 @@ bool voANOVAStatistics::execute()
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
 
   // Check for errors "thrown" by R script
-  if(outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
+  if(!outputArrayData || outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
     {
-    qWarning() << QObject::tr("Fatal error in ANOVA R script");
+    qCritical() << QObject::tr("Fatal error in ANOVA R script");
     return false;
     }
 

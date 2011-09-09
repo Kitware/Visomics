@@ -227,7 +227,7 @@ bool voPLSStatistics::execute()
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
 
   // Check for errors "thrown" by R script
-  if(outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
+  if(outputArrayData && outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
     {
     qWarning() << QObject::tr("Error: R could not calculate PLS");
     return false;
