@@ -23,7 +23,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   ${CTEST_CUSTOM_WARNING_EXCEPTION}
   # Git warning
   "You are in 'detached HEAD' state."
-  "HEAD is now at "
   # VTK
   "VTK/Utilities/vtktiff/"
   )  
