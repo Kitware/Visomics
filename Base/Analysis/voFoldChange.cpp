@@ -170,10 +170,11 @@ bool voFoldChange::execute()
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
 
   // Check for errors "thrown" by R script
-  if(outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
+  if(!outputArrayData /*|| outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1*/)
     {
-    qWarning() << QObject::tr("Fold change warning: cannot calculate from zero or negative input");
-    //return false;
+    qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
+    //qWarning() << QObject::tr("Fold change warning: cannot calculate from zero or negative input");
+    return false;
     }
 
   // Extract and build table for average initial value

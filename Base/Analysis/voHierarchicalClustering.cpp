@@ -161,6 +161,12 @@ bool voHierarchicalClustering::execute()
   // Get R output
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(RCalc->GetOutput());
 
+  if(!outputArrayData /* || outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1*/)
+    {
+    qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
+    return false;
+    }
+
   vtkSmartPointer< vtkDenseArray<double> > heightArray;
   heightArray = vtkDenseArray<double>::SafeDownCast(outputArrayData->GetArrayByName("height"));
 
