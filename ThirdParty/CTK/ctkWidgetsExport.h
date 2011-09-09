@@ -11,7 +11,7 @@
 #include <QtCore/qglobal.h>
 
 #if defined(Q_OS_WIN) || defined(Q_OS_SYMBIAN)
-#  if defined(CTKWidgets_EXPORTS)
+#  if defined(CTKLib_EXPORTS)
 #    define CTK_WIDGETS_EXPORT Q_DECL_EXPORT
 #  else
 #    define CTK_WIDGETS_EXPORT Q_DECL_IMPORT
