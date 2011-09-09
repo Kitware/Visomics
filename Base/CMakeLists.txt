@@ -208,7 +208,8 @@ TARGET_LINK_LIBRARIES(
   )
 
 # Install rules
-INSTALL(DIRECTORY Views/Resources/dynamicviews DESTINATION share COMPONENT Runtime)
+INSTALL(DIRECTORY Views/Resources/dynamicviews
+  DESTINATION ${Visomics_INSTALL_SHARE_DIR} COMPONENT Runtime)
 
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)
