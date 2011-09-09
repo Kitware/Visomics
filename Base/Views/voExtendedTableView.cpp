@@ -62,15 +62,9 @@ void voExtendedTableView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voExtendedTableView::setDataObject(voDataObject *dataObject)
+void voExtendedTableView::setDataObjectInternal(voDataObject *dataObject)
 {
   Q_D(voExtendedTableView);
-
-  if (!dataObject)
-    {
-    qCritical() << "voExtendedTableView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
 
   vtkExtendedTable * extendedTable = vtkExtendedTable::SafeDownCast(dataObject->dataAsVTKDataObject());
   if (!extendedTable)

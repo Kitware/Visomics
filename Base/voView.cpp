@@ -1,7 +1,9 @@
 
 // Qt includes
+#include <QDebug>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QSharedDataPointer>
 
 // Visomics includes
 #include "voView.h"
@@ -13,6 +15,7 @@
 class voViewPrivate
 {
 public:
+  voDataObject * DataObject;
 };
 
 // --------------------------------------------------------------------------
@@ -50,3 +53,23 @@ QString voView::hints()const
   return QString();
 }
 
+// --------------------------------------------------------------------------
+voDataObject* voView::dataObject()const
+{
+  Q_D(const voView);
+  return d->DataObject;
+}
+
+// --------------------------------------------------------------------------
+void voView::setDataObject(voDataObject* dataObject)
+{
+  Q_D(voView);
+  if (!dataObject)
+    {
+    qCritical() << qPrintable(this->objectName())
+                << "- Failed to setDataObject - dataObject is NULL";
+    return;
+    }
+  d->DataObject = dataObject;
+  this->setDataObjectInternal(dataObject);
+}

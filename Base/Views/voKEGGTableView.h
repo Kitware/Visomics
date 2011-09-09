@@ -24,10 +24,10 @@ public:
 
   virtual QString hints()const;
 
-  virtual void setDataObject(voDataObject* dataObject);
-
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(voDataObject* dataObject);
 
 public slots:
   void onItemDoubleClicked(QTableWidgetItem* item);

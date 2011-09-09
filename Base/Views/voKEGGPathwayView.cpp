@@ -110,15 +110,9 @@ void voKEGGPathwayView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voKEGGPathwayView::setDataObject(voDataObject* dataObject)
+void voKEGGPathwayView::setDataObjectInternal(voDataObject* dataObject)
 {
   Q_D(voKEGGPathwayView);
-
-  if (!dataObject)
-    {
-    qCritical() << "voKEGGPathwayView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
 
   vtkGraph * graph = vtkGraph::SafeDownCast(dataObject->dataAsVTKDataObject());
   if (!graph)

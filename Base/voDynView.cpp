@@ -1,7 +1,6 @@
 
 // Qt includes
 #include <QDebug>
-#include <QExplicitlySharedDataPointer>
 #include <QLayout>
 #include <QWebFrame>
 #include <QWebPage>
@@ -27,7 +26,6 @@ public:
 
   QString                       ViewName;
   QWebView*                     Widget;
-  QExplicitlySharedDataPointer<voDataObject>  DataObject;
 };
 
 // --------------------------------------------------------------------------
@@ -113,27 +111,14 @@ QString voDynView::stringify(const voDataObject& dataObject)
 void voDynView::loadDataObject()
 {
   Q_D(voDynView);
-  if (!d->DataObject)
-    {
-    qCritical() << "voDynView - Failed to loadDataObject - DataObject is NULL";
-    return;
-    }
-  d->mainFrame()->addToJavaScriptWindowObject(QLatin1String("dataobject"), d->DataObject.data());
+  d->mainFrame()->addToJavaScriptWindowObject(QLatin1String("dataobject"), this->dataObject());
 }
 
 // --------------------------------------------------------------------------
-void voDynView::setDataObject(voDataObject *dataObject)
+void voDynView::setDataObjectInternal(voDataObject *dataObject)
 {
   Q_D(voDynView);
-
-  if (!dataObject)
-    {
-    qCritical() << "voDynView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
   dataObject->setProperty("json", this->stringify(*dataObject));
-
-  d->DataObject = QExplicitlySharedDataPointer<voDataObject>(dataObject);
   connect(d->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), SLOT(loadDataObject()));
   d->Widget->reload();
 }

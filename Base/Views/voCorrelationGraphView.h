@@ -19,10 +19,10 @@ public:
   voCorrelationGraphView(QWidget * newParent = 0);
   virtual ~voCorrelationGraphView();
 
-  virtual void setDataObject(voDataObject* dataObject);
-
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(voDataObject* dataObject);
 
 protected:
   QScopedPointer<voCorrelationGraphViewPrivate> d_ptr;

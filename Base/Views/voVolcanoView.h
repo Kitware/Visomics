@@ -19,10 +19,10 @@ public:
   voVolcanoView(QWidget * newParent = 0);
   virtual ~voVolcanoView();
 
-  virtual void setDataObject(voDataObject* dataObject);
-
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(voDataObject* dataObject);
 
 protected:
   QScopedPointer<voVolcanoViewPrivate> d_ptr;

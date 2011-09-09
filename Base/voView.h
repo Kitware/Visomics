@@ -22,11 +22,14 @@ public:
 
   virtual QString hints()const;
 
-  virtual void setDataObject(voDataObject* dataObject) = 0;
+  voDataObject* dataObject()const;
+
+  void setDataObject(voDataObject* dataObject);
 
 protected:
-
   virtual void setupUi(QLayout * layout) = 0;
+
+  virtual void setDataObjectInternal(voDataObject* dataObject) = 0;
 
 protected:
   QScopedPointer<voViewPrivate> d_ptr;

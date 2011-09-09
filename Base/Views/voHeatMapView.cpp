@@ -75,15 +75,9 @@ void voHeatMapView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voHeatMapView::setDataObject(voDataObject* dataObject)
+void voHeatMapView::setDataObjectInternal(voDataObject* dataObject)
 {
   Q_D(voHeatMapView);
-
-  if (!dataObject)
-    {
-    qCritical() << "voHeatMapView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
 
   vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
   if (!table)

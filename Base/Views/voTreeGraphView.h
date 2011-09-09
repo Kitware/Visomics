@@ -19,10 +19,10 @@ public:
   voTreeGraphView(QWidget * newParent = 0);
   virtual ~voTreeGraphView();
 
-  virtual void setDataObject(voDataObject* dataObject);
-
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(voDataObject* dataObject);
 
 protected:
   QScopedPointer<voTreeGraphViewPrivate> d_ptr;

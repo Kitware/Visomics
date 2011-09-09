@@ -19,10 +19,10 @@ public:
   voKEGGPathwayView(QWidget * newParent = 0);
   virtual ~voKEGGPathwayView();
 
-  virtual void setDataObject(voDataObject* dataObject);
-
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(voDataObject* dataObject);
 
 protected:
   QScopedPointer<voKEGGPathwayViewPrivate> d_ptr;

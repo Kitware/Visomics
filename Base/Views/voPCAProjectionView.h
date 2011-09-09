@@ -19,10 +19,10 @@ public:
   voPCAProjectionView(QWidget * newParent = 0);
   virtual ~voPCAProjectionView();
 
-  virtual void setDataObject(voDataObject* dataObject);
-
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(voDataObject* dataObject);
 
 protected:
   QScopedPointer<voPCAProjectionViewPrivate> d_ptr;

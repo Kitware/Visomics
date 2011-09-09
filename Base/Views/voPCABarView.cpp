@@ -76,15 +76,9 @@ void voPCABarView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voPCABarView::setDataObject(voDataObject *dataObject)
+void voPCABarView::setDataObjectInternal(voDataObject *dataObject)
 {
   Q_D(voPCABarView);
-
-  if (!dataObject)
-    {
-    qCritical() << "voPCABarView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
 
   vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
   if (!table)

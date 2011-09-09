@@ -19,10 +19,10 @@ public:
   voHeatMapView(QWidget * newParent = 0);
   virtual ~voHeatMapView();
 
-  virtual void setDataObject(voDataObject* dataObject);
-
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(voDataObject* dataObject);
 
 protected:
   QScopedPointer<voHeatMapViewPrivate> d_ptr;

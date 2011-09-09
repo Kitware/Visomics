@@ -62,15 +62,9 @@ void voTableView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voTableView::setDataObject(voDataObject *dataObject)
+void voTableView::setDataObjectInternal(voDataObject *dataObject)
 {
   Q_D(voTableView);
-
-  if (!dataObject)
-    {
-    qCritical() << "voTableView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
 
   vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
   if (!table)
