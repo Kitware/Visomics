@@ -18,9 +18,25 @@
 # define vtksys_SHARED_FORWARD_CONFIG_NAME CMAKE_INTDIR
 #endif
 
+// VTK includes
+#include <vtkConfigure.h>
+
+// VTKSYS includes
 #include <vtksys/SharedForward.h>
+
+// STD includes
+#include <string.h>
 
 int main(int argc, char** argv)
 {
+  static char newPath[256];
+  const char* path = getenv("R_HOME");
+  if (!path)
+    {
+    strcpy(newPath, "R_HOME=");
+    strcat(newPath, VTK_R_HOME);
+    putenv(newPath);
+    }
+
   return vtksys_shared_forward_to_real(argc, argv);
 }

@@ -32,6 +32,8 @@ SET(Visomics_INSTALL_BIN_DIR "bin")
 SET(Visomics_INSTALL_LIB_DIR "lib")
 SET(Visomics_INSTALL_INCLUDE_DIR "include/visomics-${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}")
 SET(Visomics_INSTALL_DATA_DIR "data")
+SET(Visomics_INSTALL_RSCRIPTS_DIR "share/R")
+SET(Visomics_INSTALL_SHARE_DIR "share")
 SET(Visomics_INSTALL_DOC_DIR "doc")
 
 #-----------------------------------------------------------------------------
@@ -197,6 +199,14 @@ INCLUDE_DIRECTORIES(ThirdParty/CTK)
 #-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(Base)
 ADD_SUBDIRECTORY(Application)
+
+#-----------------------------------------------------------------------------
+# R scripts
+#
+set(r_scripts
+  Utilities/GetRExternalPackages.R
+  )
+INSTALL(FILES ${r_scripts} DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR} COMPONENT Runtime)
 
 #-----------------------------------------------------------------------------
 # Install sample dataset(s)
