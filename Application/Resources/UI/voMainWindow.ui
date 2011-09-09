@@ -47,7 +47,6 @@
     </property>
     <addaction name="actionViewDataBrowser"/>
     <addaction name="actionViewAnalysisParameters"/>
-    <addaction name="actionToolBars"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAnalysis"/>
@@ -195,11 +194,6 @@
    </property>
    <property name="toolTip">
     <string>Load UW dataset</string>
-   </property>
-  </action>
-  <action name="actionToolBars">
-   <property name="text">
-    <string>ToolBars</string>
    </property>
   </action>
  </widget>
