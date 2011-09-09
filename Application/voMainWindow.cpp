@@ -18,11 +18,14 @@
 #include "voAnalysisDriver.h"
 #include "voAnalysisFactory.h"
 #include "voApplication.h"
-#include "voConfigure.h" // For Visomics_VERSION
+#include "voConfigure.h" // For Visomics_INSTALL_DATA_DIR, Visomics_VERSION, Visomics_BUILD_TESTING
 #include "voDataModel.h"
 #include "voDelimitedTextImportDialog.h"
 #include "voIOManager.h"
 #include "voMainWindow.h"
+#ifdef Visomics_BUILD_TESTING
+# include "voTestConfigure.h"
+#endif
 #include "voViewManager.h"
 #include "voViewStackedWidget.h"
 
@@ -74,6 +77,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionFileOpen, SIGNAL(triggered()), this, SLOT(onFileOpenActionTriggered()));
   connect(d->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
   connect(d->actionHelpAbout, SIGNAL(triggered()), this, SLOT(about()));
+  connect(d->actionLoadUNCDataset, SIGNAL(triggered()), this, SLOT(loadUNCDataset()));
+  connect(d->actionLoadUWDataset, SIGNAL(triggered()), this, SLOT(loadUWDataset()));
 
   // Populate Analysis menu
   voAnalysisFactory* analysisFactory = voApplication::application()->analysisFactory();
@@ -169,6 +174,50 @@ void voMainWindow::about()
           tr("<h2>Visomics %1</h2>"
              "<p>Copyright &copy; 2010 Kitware Inc."
              "<p>Visomics is a platform for visualization and analysis of 'omics data.").arg(Visomics_VERSION));
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::loadUNCDataset()
+{
+#ifdef Visomics_BUILD_TESTING
+  voApplication * app = voApplication::application();
+  QString file = app->homeDirectory() + "/" + Visomics_INSTALL_DATA_DIR + "/All_conc_kitware_transposed.csv";
+  if (!app->isInstalled())
+    {
+    file = QString(VISOMICS_DATA_DIR) + "/Data/UNC/All_conc_kitware_transposed.csv";
+    }
+  voDelimitedTextImportDialog dialog(this);
+  dialog.setFileName(file);
+  int status = dialog.exec();
+  if (status == voDelimitedTextImportDialog::Accepted)
+    {
+    voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
+    }
+#else
+  qWarning() << "UNC dataset not available !";
+#endif
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::loadUWDataset()
+{
+#ifdef Visomics_BUILD_TESTING
+  voApplication * app = voApplication::application();
+  QString file = app->homeDirectory() + "/" + Visomics_INSTALL_DATA_DIR + "/PE_Microarray_dataset.csv";
+  if (!app->isInstalled())
+    {
+    file = QString(VISOMICS_DATA_DIR) + "/Data/UniversityOfWashington/PE_Microarray_dataset.csv";
+    }
+  voDelimitedTextImportDialog dialog(this);
+  dialog.setFileName(file);
+  int status = dialog.exec();
+  if (status == voDelimitedTextImportDialog::Accepted)
+    {
+    voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
+    }
+#else
+  qWarning() << "UW dataset not available !";
+#endif
 }
 
 // --------------------------------------------------------------------------

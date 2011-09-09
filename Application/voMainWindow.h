@@ -28,6 +28,9 @@ public slots:
 
   void about();
 
+  void loadUNCDataset();
+  void loadUWDataset();
+
 protected slots:
   void onAnalysisSelected(voAnalysis* analysis);
   void onActiveAnalysisChanged(voAnalysis* analysis);
