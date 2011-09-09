@@ -47,6 +47,8 @@
     </property>
     <addaction name="actionViewDataBrowser"/>
     <addaction name="actionViewAnalysisParameters"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewErrorLog"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAnalysis"/>
@@ -178,6 +180,14 @@
    </property>
    <property name="text">
     <string>Analysis Parameters</string>
+   </property>
+  </action>
+  <action name="actionViewErrorLog">
+   <property name="text">
+    <string>&amp;Error log</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+E</string>
    </property>
   </action>
   <action name="actionLoadUNCDataset">

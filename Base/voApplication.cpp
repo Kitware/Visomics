@@ -5,6 +5,12 @@
 #include <QMainWindow>
 #include <QWebSettings>
 
+// CTK includes
+#include <ctkErrorLogModel.h>
+#include <ctkErrorLogQtMessageHandler.h>
+#include <ctkErrorLogStreamMessageHandler.h>
+#include <ctkVTKErrorLogMessageHandler.h>
+
 // Visomics includes
 #include "voAnalysisDriver.h"
 #include "voApplication.h"
@@ -45,6 +51,8 @@ public:
   voAnalysisFactory      AnalysisFactory;
   voRegistry             NormalizerRegistry;
   voViewFactory          ViewFactory;
+
+  QSharedPointer<ctkErrorLogModel> ErrorLogModel;
 };
 
 // --------------------------------------------------------------------------
@@ -60,6 +68,17 @@ voApplicationPrivate::voApplicationPrivate()
 // --------------------------------------------------------------------------
 void voApplicationPrivate::init()
 {
+  // Instantiate ErrorLogModel
+  this->ErrorLogModel = QSharedPointer<ctkErrorLogModel>(new ctkErrorLogModel);
+  this->ErrorLogModel->setLogEntryGrouping(true);
+  this->ErrorLogModel->setTerminalOutputEnabled(true);
+
+  this->ErrorLogModel->registerMsgHandler(new ctkErrorLogQtMessageHandler);
+  this->ErrorLogModel->registerMsgHandler(new ctkErrorLogStreamMessageHandler);
+  this->ErrorLogModel->registerMsgHandler(new ctkVTKErrorLogMessageHandler);
+
+  this->ErrorLogModel->setAllMsgHandlerEnabled(true);
+
   this->HomeDirectory = this->discoverHomeDirectory();
 }
 
@@ -150,6 +169,13 @@ voDataModel* voApplication::dataModel()const
 {
   Q_D(const voApplication);
   return const_cast<voDataModel*>(&d->DataModel);
+}
+
+//-----------------------------------------------------------------------------
+ctkErrorLogModel* voApplication::errorLogModel()const
+{
+  Q_D(const voApplication);
+  return d->ErrorLogModel.data();
 }
 
 // --------------------------------------------------------------------------

@@ -191,6 +191,10 @@ ENDFOREACH()
 INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 
 #-----------------------------------------------------------------------------
+ADD_SUBDIRECTORY(ThirdParty/CTK)
+INCLUDE_DIRECTORIES(ThirdParty/CTK)
+
+#-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(Base)
 ADD_SUBDIRECTORY(Application)
 
