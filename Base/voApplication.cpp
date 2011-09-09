@@ -1,5 +1,5 @@
 
-//Qt includes
+// Qt includes
 #include <QDebug>
 #include <QDir>
 #include <QMainWindow>
@@ -26,6 +26,9 @@
 // VTK includes
 #include <vtkSmartPointer.h>
 #include <vtkTable.h>
+
+// VTKSYS includes
+#include <vtksys/SystemTools.hxx>
 
 // Convenient macro
 #define VTK_CREATE(type, name) \
@@ -162,6 +165,12 @@ QString voApplication::homeDirectory()const
 {
   Q_D(const voApplication);
   return d->HomeDirectory;
+}
+
+// --------------------------------------------------------------------------
+QString voApplication::rHome()const
+{
+  return vtksys::SystemTools::GetEnv("R_HOME");
 }
 
 // --------------------------------------------------------------------------

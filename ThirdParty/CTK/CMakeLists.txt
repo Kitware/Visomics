@@ -4,6 +4,8 @@ PROJECT(CTK)
 # Source files
 SET(KIT_SRCS
   # Core
+  ctkCallback.cpp
+  ctkCallback.h
   ctkErrorLogModel.cpp
   ctkErrorLogModel.h
   ctkErrorLogQtMessageHandler.cpp
@@ -22,6 +24,7 @@ SET(KIT_SRCS
 # Headers that should run through moc
 SET(KIT_MOC_SRCS
   # Core
+  ctkCallback.h
   ctkErrorLogModel.h
   # Widgets
   ctkErrorLogWidget.h
