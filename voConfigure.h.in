@@ -1,6 +1,11 @@
 #ifndef __voConfigure_h
 #define __voConfigure_h
 
+#define Visomics_MAJOR_VERSION @Visomics_MAJOR_VERSION@
+#define Visomics_MINOR_VERSION @Visomics_MINOR_VERSION@
+#define Visomics_BUILD_VERSION @Visomics_BUILD_VERSION@
+#define Visomics_VERSION "@Visomics_VERSION@"
+
 #define Visomics_INSTALL_BIN_DIR "@Visomics_INSTALL_BIN_DIR@"
 #define Visomics_INSTALL_LIB_DIR "@Visomics_INSTALL_LIB_DIR@"
 #define Visomics_SOURCE_DIR "@Visomics_SOURCE_DIR@"
