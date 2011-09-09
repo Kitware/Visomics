@@ -86,8 +86,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionFileOpen, SIGNAL(triggered()), this, SLOT(onFileOpenActionTriggered()));
   connect(d->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
   connect(d->actionHelpAbout, SIGNAL(triggered()), this, SLOT(about()));
-  connect(d->actionLoadUNCDataset, SIGNAL(triggered()), this, SLOT(loadUNCDataset()));
-  connect(d->actionLoadUWDataset, SIGNAL(triggered()), this, SLOT(loadUWDataset()));
+  connect(d->actionLoadSampleDataset, SIGNAL(triggered()), this, SLOT(loadSampleDataset()));
   connect(d->actionViewErrorLog, SIGNAL(triggered()), this, SLOT(onViewErrorLogActionTriggered()));
 
   // Populate Analysis menu
@@ -206,7 +205,7 @@ void voMainWindow::about()
 }
 
 // --------------------------------------------------------------------------
-void voMainWindow::loadUNCDataset()
+void voMainWindow::loadSampleDataset()
 {
 #ifdef Visomics_BUILD_TESTING
   voApplication * app = voApplication::application();
@@ -223,29 +222,7 @@ void voMainWindow::loadUNCDataset()
     voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
     }
 #else
-  qWarning() << "UNC dataset not available !";
-#endif
-}
-
-// --------------------------------------------------------------------------
-void voMainWindow::loadUWDataset()
-{
-#ifdef Visomics_BUILD_TESTING
-  voApplication * app = voApplication::application();
-  QString file = app->homeDirectory() + "/" + Visomics_INSTALL_DATA_DIR + "/PE_Microarray_dataset.csv";
-  if (!app->isInstalled())
-    {
-    file = QString(VISOMICS_DATA_DIR) + "/Data/UniversityOfWashington/PE_Microarray_dataset.csv";
-    }
-  voDelimitedTextImportDialog dialog(this);
-  dialog.setFileName(file);
-  int status = dialog.exec();
-  if (status == voDelimitedTextImportDialog::Accepted)
-    {
-    voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
-    }
-#else
-  qWarning() << "UW dataset not available !";
+  qWarning() << "Sample dataset not available !";
 #endif
 }
 
