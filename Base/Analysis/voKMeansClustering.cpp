@@ -173,15 +173,15 @@ bool voKMeansClustering::execute()
     }
   tableToArray->Update();
 
-  vtkNew<vtkRCalculatorFilter> calc;
-  calc->SetRoutput(0);
-  calc->SetInput(tableToArray->GetOutput());
-  calc->PutArray("0", "metabData");
-  calc->GetArray("kmCenters", "kmCenters");
-  calc->GetArray("kmCluster", "kmCluster");
-  calc->GetArray("kmWithinss", "kmWithinss");
-  calc->GetArray("kmSize", "kmSize");
-  calc->SetRscript(QString(
+  vtkNew<vtkRCalculatorFilter> RCalc;
+  RCalc->SetRoutput(0);
+  RCalc->SetInput(tableToArray->GetOutput());
+  RCalc->PutArray("0", "metabData");
+  RCalc->GetArray("kmCenters", "kmCenters");
+  RCalc->GetArray("kmCluster", "kmCluster");
+  RCalc->GetArray("kmWithinss", "kmWithinss");
+  RCalc->GetArray("kmSize", "kmSize");
+  RCalc->SetRscript(QString(
                      "metabDatat <- t(metabData)\n"
                      "km<-kmeans(metabDatat, %1, iter.max = %2, nstart = %3, algorithm = \"%4\")\n"
                      "kmCenters<-km$centers \n"
@@ -194,20 +194,17 @@ bool voKMeansClustering::execute()
                      "kmSize"
                      ).arg(kmeans_centers).arg(kmeans_iter_max).arg(kmeans_number_of_random_start).arg(kmeans_algorithm).toLatin1());
 
-  calc->Update();
+  RCalc->Update();
 
-  vtkArrayData *temp = vtkArrayData::SafeDownCast(calc->GetOutput());
-  if (!temp)
+  vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(RCalc->GetOutput());
+  if(!outputArrayData /* || outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1*/)
     {
-    std::cout << "Downcast DID NOT work." << std::endl;
-    return 1;
+    qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
+    return false;
     }
 
-  vtkNew<vtkArrayData> kmReturn;
-  kmReturn->DeepCopy(temp);
-
   vtkNew<vtkArrayData> kmClusterData;
-  kmClusterData->AddArray(kmReturn->GetArrayByName("kmCluster"));
+  kmClusterData->AddArray(outputArrayData->GetArrayByName("kmCluster"));
 
   vtkNew<vtkArrayToTable> kmCluster;
   kmCluster->SetInputConnection(kmClusterData->GetProducerPort());
