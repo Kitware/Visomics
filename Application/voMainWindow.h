@@ -25,6 +25,7 @@ public:
   
 public slots:
   void onFileOpenActionTriggered();
+  void onViewErrorLogActionTriggered();
 
   void about();
 

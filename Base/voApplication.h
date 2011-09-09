@@ -5,6 +5,7 @@
 #include <QApplication>
 #include <QScopedPointer>
 
+class ctkErrorLogModel;
 class QMainWindow;
 class voAnalysisDriver;
 class voAnalysisFactory;
@@ -42,6 +43,9 @@ public:
   QString homeDirectory()const;
 
   voDataModel* dataModel()const;
+
+  /// Get errorLogModel
+  ctkErrorLogModel* errorLogModel()const;
 
   voAnalysisDriver* analysisDriver()const;
 

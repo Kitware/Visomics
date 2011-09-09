@@ -1,14 +1,18 @@
 
 // Qt includes
 #include <QAction>
+#include <QDebug>
+#include <QDesktopWidget>
 #include <QFileDialog>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QStatusBar>
-#include <QToolBar>
-#include <QDebug>
 #include <QSignalMapper>
+#include <QToolBar>
+
+// CTK includes
+#include <ctkErrorLogWidget.h>
 
 // Visomics includes
 #include "ui_voMainWindow.h"
@@ -26,6 +30,7 @@
 #include "voViewManager.h"
 #include "voViewStackedWidget.h"
 
+
 // --------------------------------------------------------------------------
 class voMainWindowPrivate: public Ui_voMainWindow
 {
@@ -38,6 +43,8 @@ public:
   voViewStackedWidget* ViewStackedWidget;
   QSignalMapper      AnalysisActionMapper;
   bool AnalysisParametersPrevShown; // Remembers previous user-selected state of widget
+
+  ctkErrorLogWidget  ErrorLogWidget;
 };
 
 // --------------------------------------------------------------------------
@@ -61,6 +68,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
   d->setupUi(this);
   this->setWindowTitle(QString("Visomics %1").arg(Visomics_VERSION));
 
+  d->ErrorLogWidget.setErrorLogModel(voApplication::application()->errorLogModel());
+
   d->ViewStackedWidget = new voViewStackedWidget(this);
   this->setCentralWidget(d->ViewStackedWidget);
 
@@ -74,6 +83,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionFileOpen, SIGNAL(triggered()), this, SLOT(onFileOpenActionTriggered()));
   connect(d->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
   connect(d->actionHelpAbout, SIGNAL(triggered()), this, SLOT(about()));
+  connect(d->actionViewErrorLog, SIGNAL(triggered()), this, SLOT(onViewErrorLogActionTriggered()));
 
   // Populate Analysis menu
   voAnalysisFactory* analysisFactory = voApplication::application()->analysisFactory();
@@ -160,6 +170,25 @@ void voMainWindow::onFileOpenActionTriggered()
       voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void voMainWindow::onViewErrorLogActionTriggered()
+{
+  Q_D(voMainWindow);
+
+  bool wasVisible = d->ErrorLogWidget.isVisible();
+  d->ErrorLogWidget.show();
+
+  // Center dialog if wasn't visible
+  if (!wasVisible)
+    {
+    QRect screen = QApplication::desktop()->screenGeometry(this);
+    d->ErrorLogWidget.move(screen.center() - d->ErrorLogWidget.rect().center());
+    }
+
+  d->ErrorLogWidget.activateWindow();
+  d->ErrorLogWidget.raise();
 }
 
 // --------------------------------------------------------------------------

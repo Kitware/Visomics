@@ -20,7 +20,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>27</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -47,6 +47,8 @@
     </property>
     <addaction name="actionViewDataBrowser"/>
     <addaction name="actionViewAnalysisParameters"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewErrorLog"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuAnalysis"/>
@@ -192,6 +194,14 @@
    </property>
    <property name="text">
     <string>Analysis Parameters</string>
+   </property>
+  </action>
+  <action name="actionViewErrorLog">
+   <property name="text">
+    <string>&amp;Error log</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+E</string>
    </property>
   </action>
  </widget>
