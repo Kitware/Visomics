@@ -122,8 +122,7 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLoadUNCDataset"/>
-   <addaction name="actionLoadUWDataset"/>
+   <addaction name="actionLoadSampleDataset"/>
   </widget>
   <action name="actionFileOpen">
    <property name="icon">
@@ -190,20 +189,12 @@
     <string>Ctrl+Alt+E</string>
    </property>
   </action>
-  <action name="actionLoadUNCDataset">
+  <action name="actionLoadSampleDataset">
    <property name="text">
-    <string>Load UNC data</string>
+    <string>Load Sample Dataset</string>
    </property>
    <property name="toolTip">
-    <string>Load UNC dataset</string>
-   </property>
-  </action>
-  <action name="actionLoadUWDataset">
-   <property name="text">
-    <string>Load UW data</string>
-   </property>
-   <property name="toolTip">
-    <string>Load UW dataset</string>
+    <string>Load Sample dataset (4Kb)</string>
    </property>
   </action>
  </widget>

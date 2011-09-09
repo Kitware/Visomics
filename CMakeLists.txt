@@ -214,7 +214,7 @@ INSTALL(FILES ${r_scripts} DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR} COMPONEN
 IF(BUILD_TESTING)
   SET(datasets
     ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv
-    ${VisomicsData_DIR}/Data/UniversityOfWashington/PE_Microarray_dataset.csv
+    #${VisomicsData_DIR}/Data/UniversityOfWashington/PE_Microarray_dataset.csv
     )
   INSTALL(FILES ${datasets} DESTINATION ${Visomics_INSTALL_DATA_DIR} COMPONENT Runtime)
 ENDIF()
