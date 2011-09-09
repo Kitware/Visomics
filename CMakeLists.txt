@@ -31,6 +31,7 @@ SET(Visomics_VERSION
 SET(Visomics_INSTALL_BIN_DIR "bin")
 SET(Visomics_INSTALL_LIB_DIR "lib")
 SET(Visomics_INSTALL_INCLUDE_DIR "include/visomics-${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}")
+SET(Visomics_INSTALL_DATA_DIR "data")
 SET(Visomics_INSTALL_DOC_DIR "doc")
 
 #-----------------------------------------------------------------------------
@@ -176,6 +177,7 @@ SET(CMAKE_C_FLAGS ${Visomics_C_FLAGS} CACHE STRING "CMake CXX Flags" FORCE)
 #-----------------------------------------------------------------------------
 # Configure headers
 #
+SET(Visomics_BUILD_TESTING ${BUILD_TESTING}) # Used in voConfigure.h.in
 FOREACH(header voConfigure.h voTestConfigure.h)
   CONFIGURE_FILE(
     ${header}.in
@@ -191,6 +193,17 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 #-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(Base)
 ADD_SUBDIRECTORY(Application)
+
+#-----------------------------------------------------------------------------
+# Install sample dataset(s)
+#
+IF(BUILD_TESTING)
+  SET(datasets
+    ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv
+    ${VisomicsData_DIR}/Data/UniversityOfWashington/PE_Microarray_dataset.csv
+    )
+  INSTALL(FILES ${datasets} DESTINATION ${Visomics_INSTALL_DATA_DIR} COMPONENT Runtime)
+ENDIF()
 
 #-----------------------------------------------------------------------------
 # Setup CPack
