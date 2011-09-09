@@ -21,9 +21,5 @@ SET(CTEST_CUSTOM_MEMCHECK_IGNORE
   
 SET(CTEST_CUSTOM_WARNING_EXCEPTION
   ${CTEST_CUSTOM_WARNING_EXCEPTION}
-  # Git warning
-  "You are in 'detached HEAD' state."
-  # VTK
-  "VTK/Utilities/vtktiff/"
   )  
 
