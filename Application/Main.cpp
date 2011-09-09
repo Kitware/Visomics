@@ -57,59 +57,59 @@ void checkRPrerequisites(void * data)
     return;
     }
 
-  QString rscriptFilePath = QLatin1String(Visomics_SOURCE_DIR) + "/Utilities/GetRExternalPackages.R";
-  if(app->isInstalled())
-    {
-    rscriptFilePath = app->homeDirectory() + "/" + Visomics_INSTALL_RSCRIPTS_DIR + "/GetRExternalPackages.R";
-    }
-  qDebug() << "Evaluating R script:" << rscriptFilePath;
-  QFile rscriptFile(rscriptFilePath);
-  if (!rscriptFile.exists())
-    {
-    popupMessage(mainWindow, QString("<big>Script doesn't exist</big><br><br>%1").arg(rscriptFilePath));
-    return;
-    }
-  if (!rscriptFile.open(QFile::ReadOnly))
-    {
-    popupMessage(mainWindow, QString("<big>Failed to read script</big><br><br>%1").arg(rscriptFilePath));
-    return;
-    }
-  QTextStream in(&rscriptFile);
-  QString rscript = in.readAll();
-  vtkNew<vtkRInterface> rInterface;
-  char outputBuffer[2048];
-  rInterface->OutputBuffer(outputBuffer, 2048);
-  rInterface->EvalRscript(rscript.toLatin1(), /* showRoutput= */ false);
-  qDebug() << outputBuffer;
+//  QString rscriptFilePath = QLatin1String(Visomics_SOURCE_DIR) + "/Utilities/GetRExternalPackages.R";
+//  if(app->isInstalled())
+//    {
+//    rscriptFilePath = app->homeDirectory() + "/" + Visomics_INSTALL_RSCRIPTS_DIR + "/GetRExternalPackages.R";
+//    }
+//  qDebug() << "Evaluating R script:" << rscriptFilePath;
+//  QFile rscriptFile(rscriptFilePath);
+//  if (!rscriptFile.exists())
+//    {
+//    popupMessage(mainWindow, QString("<big>Script doesn't exist</big><br><br>%1").arg(rscriptFilePath));
+//    return;
+//    }
+//  if (!rscriptFile.open(QFile::ReadOnly))
+//    {
+//    popupMessage(mainWindow, QString("<big>Failed to read script</big><br><br>%1").arg(rscriptFilePath));
+//    return;
+//    }
+//  QTextStream in(&rscriptFile);
+//  QString rscript = in.readAll();
+//  vtkNew<vtkRInterface> rInterface;
+//  char outputBuffer[2048];
+//  rInterface->OutputBuffer(outputBuffer, 2048);
+//  rInterface->EvalRscript(rscript.toLatin1(), /* showRoutput= */ false);
+//  qDebug() << outputBuffer;
 
-  message = "<big>Problem running R script</big><br><br>";
-  message.append(rscriptFilePath).append("<br>");
-  message.append("<ul>");
+//  message = "<big>Problem running R script</big><br><br>";
+//  message.append(rscriptFilePath).append("<br>");
+//  message.append("<ul>");
 
-  bool installationFailed = false;
-  QString package = "pls";
-  QString requiredBy = "<b>PLSStatistics</b> analysis";
-  if (!QString(outputBuffer).contains(QString("Package '%1' found").arg(package)))
-    {
-    message.append(QString("<li>R package <b>%1</b> required by %2 is not installed</li><br>")
-                   .arg(package).arg(requiredBy));
-    installationFailed = true;
-    }
-  package = "preprocessCore";
-  requiredBy = "<b>Quantile</b> normalization";
-  if (!QString(outputBuffer).contains(QString("Package '%1' found").arg(package)))
-    {
-    message.append(QString("<li>R package <b>%1</b> required by %2 is not installed</li><br>")
-                   .arg(package).arg(requiredBy));
-    installationFailed = true;
-    }
-  message.append("</ul>");
-  if(installationFailed)
-    {
-    message.append("<br><big><img src=\":/Icons/Bulb.png\">&nbsp;The application will start but not all"
-                   " functionalities will be available</big>");
-    popupMessage(mainWindow, message);
-    }
+//  bool installationFailed = false;
+//  QString package = "pls";
+//  QString requiredBy = "<b>PLSStatistics</b> analysis";
+//  if (!QString(outputBuffer).contains(QString("Package '%1' found").arg(package)))
+//    {
+//    message.append(QString("<li>R package <b>%1</b> required by %2 is not installed</li><br>")
+//                   .arg(package).arg(requiredBy));
+//    installationFailed = true;
+//    }
+//  package = "preprocessCore";
+//  requiredBy = "<b>Quantile</b> normalization";
+//  if (!QString(outputBuffer).contains(QString("Package '%1' found").arg(package)))
+//    {
+//    message.append(QString("<li>R package <b>%1</b> required by %2 is not installed</li><br>")
+//                   .arg(package).arg(requiredBy));
+//    installationFailed = true;
+//    }
+//  message.append("</ul>");
+//  if(installationFailed)
+//    {
+//    message.append("<br><big><img src=\":/Icons/Bulb.png\">&nbsp;The application will start but not all"
+//                   " functionalities will be available</big>");
+//    popupMessage(mainWindow, message);
+//    }
 }
 
 } // end of anonymous namespace
