@@ -71,5 +71,5 @@ void voView::setDataObject(voDataObject* dataObject)
     return;
     }
   d->DataObject = dataObject;
-  this->setDataObjectInternal(dataObject);
+  this->setDataObjectInternal(*dataObject);
 }

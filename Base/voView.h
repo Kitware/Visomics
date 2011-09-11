@@ -29,7 +29,7 @@ public:
 protected:
   virtual void setupUi(QLayout * layout) = 0;
 
-  virtual void setDataObjectInternal(voDataObject* dataObject) = 0;
+  virtual void setDataObjectInternal(const voDataObject& dataObject) = 0;
 
 protected:
   QScopedPointer<voViewPrivate> d_ptr;

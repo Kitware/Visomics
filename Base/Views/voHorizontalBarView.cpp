@@ -76,11 +76,11 @@ void voHorizontalBarView::setupUi(QLayout * layout)
 }
 
 // --------------------------------------------------------------------------
-void voHorizontalBarView::setDataObjectInternal(voDataObject *dataObject)
+void voHorizontalBarView::setDataObjectInternal(const voDataObject& dataObject)
 {
    Q_D(voHorizontalBarView);
 
-  vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
+  vtkTable * table = vtkTable::SafeDownCast(dataObject.dataAsVTKDataObject());
   if (!table)
     {
     qCritical() << "voHorizontalBarView - Failed to setDataObject - vtkTable data is expected !";

@@ -115,10 +115,10 @@ void voDynView::loadDataObject()
 }
 
 // --------------------------------------------------------------------------
-void voDynView::setDataObjectInternal(voDataObject *dataObject)
+void voDynView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voDynView);
-  dataObject->setProperty("json", this->stringify(*dataObject));
+  const_cast<voDataObject*>(&dataObject)->setProperty("json", this->stringify(dataObject));
   connect(d->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), SLOT(loadDataObject()));
   d->Widget->reload();
 }

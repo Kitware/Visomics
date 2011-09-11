@@ -70,11 +70,11 @@ QString voKEGGTableView::hints()const
 }
 
 // --------------------------------------------------------------------------
-void voKEGGTableView::setDataObjectInternal(voDataObject *dataObject)
+void voKEGGTableView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voKEGGTableView);
 
-  vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
+  vtkTable * table = vtkTable::SafeDownCast(dataObject.dataAsVTKDataObject());
   if (!table)
     {
     qCritical() << "voKEGGTableView - Failed to setDataObject - vtkTable data is expected !";

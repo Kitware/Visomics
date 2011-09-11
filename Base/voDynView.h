@@ -33,7 +33,7 @@ protected slots:
 protected:
   virtual void setupUi(QLayout * layout);
 
-  virtual void setDataObjectInternal(voDataObject* dataObject);
+  virtual void setDataObjectInternal(const voDataObject& dataObject);
 
   virtual QString stringify(const voDataObject& dataObject);
 

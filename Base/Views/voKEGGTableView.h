@@ -27,7 +27,7 @@ public:
 protected:
   void setupUi(QLayout * layout);
 
-  virtual void setDataObjectInternal(voDataObject* dataObject);
+  virtual void setDataObjectInternal(const voDataObject& dataObject);
 
 public slots:
   void onItemDoubleClicked(QTableWidgetItem* item);

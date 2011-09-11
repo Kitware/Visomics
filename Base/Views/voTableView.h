@@ -27,7 +27,7 @@ public:
 protected:
   void setupUi(QLayout * layout);
 
-  virtual void setDataObjectInternal(voDataObject* dataObject);
+  virtual void setDataObjectInternal(const voDataObject& dataObject);
 
 protected:
   QScopedPointer<voTableViewPrivate> d_ptr;
