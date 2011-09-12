@@ -30,6 +30,8 @@ class voTableDataObjectPrivate
 {
 public:
   voTableDataObjectPrivate();
+
+  bool Sortable;
 };
 
 // --------------------------------------------------------------------------
@@ -50,14 +52,28 @@ voTableDataObject::voTableDataObject(QObject* newParent) :
 }
 
 // --------------------------------------------------------------------------
-voTableDataObject::voTableDataObject(const QString& newName, vtkDataObject * newData, QObject* newParent):
+voTableDataObject::voTableDataObject(const QString& newName, vtkDataObject * newData, bool newSortable, QObject* newParent):
     Superclass(newName, newData, newParent), d_ptr(new voTableDataObjectPrivate)
 {
+  Q_D(voTableDataObject);
+  d->Sortable = newSortable;
 }
 
 // --------------------------------------------------------------------------
 voTableDataObject::~voTableDataObject()
 {
-
 }
 
+// --------------------------------------------------------------------------
+bool voTableDataObject::sortable()const
+{
+  Q_D(const voTableDataObject);
+  return d->Sortable;
+}
+
+// --------------------------------------------------------------------------
+void voTableDataObject::setSortable(const bool& newSortable)
+{
+  Q_D(voTableDataObject);
+  d->Sortable = newSortable;
+}

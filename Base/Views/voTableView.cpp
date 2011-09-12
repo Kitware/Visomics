@@ -32,6 +32,7 @@
 // Visomics includes
 #include "voDataObject.h"
 #include "voIOManager.h"
+#include "voTableDataObject.h"
 #include "voTableView.h"
 #include "voUtils.h"
 
@@ -40,6 +41,7 @@
 #include <vtkQtTableRepresentation.h>
 #include <vtkQtTableView.h>
 #include <vtkTable.h>
+#include <vtkTypeTemplate.h> // for std::bad_cast
 
 // --------------------------------------------------------------------------
 class voTableViewPrivate
@@ -120,6 +122,19 @@ void voTableView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voTableView);
 
+  bool sortable;
+  // dataObject should actually be a voTableDataObject, which has the sortable() property
+  try
+    {
+    voTableDataObject& tableDataObject = dynamic_cast<voTableDataObject&>(const_cast<voDataObject&>(dataObject));
+    sortable = tableDataObject.sortable();
+    }
+  catch (std::bad_cast&)
+    {
+    qCritical() << "voTableView - Failed to setDataObject - dataObject is not voTableDataObject";
+    return;
+    }
+
   vtkTable * table = vtkTable::SafeDownCast(dataObject.dataAsVTKDataObject());
   if (!table)
     {
@@ -129,25 +144,38 @@ void voTableView::setDataObjectInternal(const voDataObject& dataObject)
 
   vtkIdType num_rows = table->GetNumberOfRows();
   vtkIdType num_cols = table->GetNumberOfColumns();
+  vtkIdType colOffset = sortable ? 0 : 1;
+
   d->Model.setRowCount(static_cast<int>(num_rows));
-  d->Model.setColumnCount(static_cast<int>(num_cols - 1));
-  for (vtkIdType c = 1; c < num_cols; ++c)
+  d->Model.setColumnCount(static_cast<int>(num_cols - colOffset));
+  for (vtkIdType dataCol = colOffset; dataCol < num_cols; ++dataCol)
     {
-    d->Model.setHeaderData(static_cast<int>(c-1), Qt::Horizontal, QString(table->GetColumnName(c)));
+    int modelCol = static_cast<int>(dataCol - colOffset);
+    d->Model.setHeaderData(modelCol, Qt::Horizontal, QString(table->GetColumnName(dataCol)));
     for (vtkIdType r = 0; r < num_rows; ++r)
       {
-      QStandardItem* item = new QStandardItem(QString(table->GetValue(r, c).ToString()));
+      QStandardItem* item = new QStandardItem(QString(table->GetValue(r, dataCol).ToString()));
       item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable); // Item is view-only
-      d->Model.setItem(static_cast<int>(r), static_cast<int>(c-1), item);
+      d->Model.setItem(static_cast<int>(r), modelCol, item);
       }
     }
   for (vtkIdType r = 0; r < num_rows; ++r)
     {
-    d->Model.setHeaderData(static_cast<int>(r), Qt::Vertical, QString(table->GetValue(r, 0).ToString()));
+    if(sortable)
+      {
+      d->Model.item(r, 0)->setBackground(QPalette().color(QPalette::Window));
+      d->Model.setHeaderData(static_cast<int>(r), Qt::Vertical, QString());
+      }
+    else
+      {
+      d->Model.setHeaderData(static_cast<int>(r), Qt::Vertical, QString(table->GetValue(r, 0).ToString()));
+      }
     }
 
-  d->TableView->horizontalHeader()->setMinimumSectionSize(100);
+  d->TableView->horizontalHeader()->setMinimumSectionSize(120);
   d->TableView->resizeColumnsToContents();
+
+  d->TableView->setSortingEnabled(sortable);
 
   // Retrieve the selected subtable
   //vtkSmartPointer<vtkTable> ot = vtkSmartPointer<vtkTable>::New();
