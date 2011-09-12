@@ -24,6 +24,11 @@ public:
   voExtendedTableView(QWidget* newParent = 0);
   virtual ~voExtendedTableView();
 
+  virtual QList<QAction*> actions();
+
+protected slots:
+  void onExportToCsvActionTriggered();
+
 protected:
   void setupUi(QLayout * layout);
 

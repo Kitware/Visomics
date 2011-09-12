@@ -24,6 +24,11 @@ public:
 
   virtual QString hints()const;
 
+  virtual QList<QAction*> actions();
+
+protected slots:
+  void onExportToCsvActionTriggered();
+
 protected:
   void setupUi(QLayout * layout);
 

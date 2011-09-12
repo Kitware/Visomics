@@ -1,6 +1,9 @@
 
 // Qt includes
+#include <QAction>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QFileDialog>
 #include <QTableView>
 #include <QLayout>
 #include <QStandardItemModel>
@@ -8,8 +11,10 @@
 #include <QHeaderView>
 
 // Visomics includes
-#include "voTableView.h"
 #include "voDataObject.h"
+#include "voIOManager.h"
+#include "voTableView.h"
+#include "voUtils.h"
 
 // VTK includes
 #include <vtkIdTypeArray.h>
@@ -48,6 +53,36 @@ voTableView::voTableView(QWidget* newParent):
 // --------------------------------------------------------------------------
 voTableView::~voTableView()
 {
+}
+
+// --------------------------------------------------------------------------
+QList<QAction*> voTableView::actions()
+{
+  QList<QAction*> actionList = this->Superclass::actions();
+
+  QAction * exportToCsvAction = new QAction(QIcon(":/Icons/csv_text.png"), "Export as CSV", this);
+  exportToCsvAction->setToolTip("Export current table view as CSV text file.");
+  connect(exportToCsvAction, SIGNAL(triggered()), this, SLOT(onExportToCsvActionTriggered()));
+  actionList << exportToCsvAction;
+
+  return actionList;
+}
+
+// --------------------------------------------------------------------------
+void voTableView::onExportToCsvActionTriggered()
+{
+  QString defaultFileName = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation)
+      + "/" + voUtils::cleanString(this->objectName()) + ".csv";
+
+  QString fileName = QFileDialog::getSaveFileName(
+        0, tr("Save table data..."), defaultFileName, "Comma Separated Value (*.csv)");
+  if(fileName.isEmpty())
+    {
+    return;
+    }
+  vtkTable * table = vtkTable::SafeDownCast(this->dataObject()->dataAsVTKDataObject());
+  Q_ASSERT(table);
+  voIOManager::writeTableToCVSFile(table, fileName);
 }
 
 // --------------------------------------------------------------------------

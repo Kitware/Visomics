@@ -61,10 +61,6 @@ bool voIOManager::writeTableToCVSFile(vtkTable* table, const QString& fileName)
     {
     return false;
     }
-  if (!QFile::exists(fileName))
-    {
-    return false;
-    }
 
   vtkNew<vtkDelimitedTextWriter> writer;
 

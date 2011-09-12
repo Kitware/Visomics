@@ -24,6 +24,11 @@ public:
   voTableView(QWidget* newParent = 0);
   virtual ~voTableView();
 
+  virtual QList<QAction*> actions();
+
+protected slots:
+  void onExportToCsvActionTriggered();
+
 protected:
   void setupUi(QLayout * layout);
 
