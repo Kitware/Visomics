@@ -1447,5 +1447,20 @@ int voUtilsTest(int argc, char * argv [])
     return EXIT_FAILURE;
     }
 
+
+  //-----------------------------------------------------------------------------
+  // Test cleanString(const QString& text);
+  //-----------------------------------------------------------------------------
+  QString cleanStringInput = " / Foo *& $$ Bar..baz";
+  QString currentCleanStringOutput = voUtils::cleanString(cleanStringInput);
+  QString expectedCleanStringOutput = "Foo_Bar_baz";
+  if (currentCleanStringOutput != expectedCleanStringOutput)
+    {
+    std::cerr << "Line " << __LINE__ << " - Problem with cleanString()\n"
+              << "\tCurrent:" << qPrintable(currentCleanStringOutput) << "\n"
+              << "\tExpected:" << qPrintable(expectedCleanStringOutput) << std::endl;
+    return EXIT_FAILURE;
+    }
+
   return EXIT_SUCCESS;
 }

@@ -65,20 +65,16 @@ void voKEGGImageView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voKEGGImageView::setDataObject(voDataObject* dataObject)
+void voKEGGImageView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voKEGGImageView);
-  if (!dataObject)
-    {
-    qCritical() << "voKEGGImageView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
-  if (!dataObject->data().canConvert<QPixmap>())
+
+  if (!dataObject.data().canConvert<QPixmap>())
     {
     qCritical() << "voKEGGImageView - Failed to setDataObject - dataObject does not contain a QPixmap";
     return;
     }
-  QPixmap pixmap = dataObject->data().value<QPixmap>();
+  QPixmap pixmap = dataObject.data().value<QPixmap>();
 
   d->Label->setPixmap(pixmap);
 

@@ -75,17 +75,11 @@ void voHeatMapView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voHeatMapView::setDataObject(voDataObject* dataObject)
+void voHeatMapView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voHeatMapView);
 
-  if (!dataObject)
-    {
-    qCritical() << "voHeatMapView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
-
-  vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
+  vtkTable * table = vtkTable::SafeDownCast(dataObject.dataAsVTKDataObject());
   if (!table)
     {
     qCritical() << "voHeatMapView - Failed to setDataObject - vtkTable data is expected !";
@@ -177,7 +171,7 @@ void voHeatMapView::setDataObject(voDataObject* dataObject)
   plotHistogram->SetTooltipLabelFormat("%j / %i : %v");
 
   double hsvScalars[3] = {-1.0, 0.0, 1.0};
-  if (dataObject->name() == QString("clusterHeatMap"))
+  if (dataObject.name() == QString("clusterHeatMap"))
     {
     hsvScalars[0] = minVal;
     hsvScalars[1] = (maxVal-minVal)/2.0;

@@ -24,10 +24,15 @@ public:
   voExtendedTableView(QWidget* newParent = 0);
   virtual ~voExtendedTableView();
 
-  virtual void setDataObject(voDataObject* dataObject);
+  virtual QList<QAction*> actions();
+
+protected slots:
+  void onExportToCsvActionTriggered();
 
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(const voDataObject& dataObject);
 
 protected:
   QScopedPointer<voExtendedTableViewPrivate> d_ptr;

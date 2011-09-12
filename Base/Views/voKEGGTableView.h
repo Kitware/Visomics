@@ -24,10 +24,15 @@ public:
 
   virtual QString hints()const;
 
-  virtual void setDataObject(voDataObject* dataObject);
+  virtual QList<QAction*> actions();
+
+protected slots:
+  void onExportToCsvActionTriggered();
 
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(const voDataObject& dataObject);
 
 public slots:
   void onItemDoubleClicked(QTableWidgetItem* item);

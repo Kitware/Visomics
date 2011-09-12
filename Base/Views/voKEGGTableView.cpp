@@ -1,6 +1,9 @@
 
 // Qt includes
+#include <QAction>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QFileDialog>
 #include <QLayout>
 #include <QTableWidget>
 //#include <QHeaderView>
@@ -9,7 +12,9 @@
 #include "voApplication.h"
 #include "voAnalysisDriver.h"
 #include "voDataObject.h"
+#include "voIOManager.h"
 #include "voKEGGTableView.h"
+#include "voUtils.h"
 
 // VTK includes
 #include <vtkTable.h>
@@ -51,6 +56,36 @@ voKEGGTableView::~voKEGGTableView()
 }
 
 // --------------------------------------------------------------------------
+QList<QAction*> voKEGGTableView::actions()
+{
+  QList<QAction*> actionList = this->Superclass::actions();
+
+  QAction * exportToCsvAction = new QAction(QIcon(":/Icons/csv_text.png"), "Export as CSV", this);
+  exportToCsvAction->setToolTip("Export current table view as CSV text file.");
+  connect(exportToCsvAction, SIGNAL(triggered()), this, SLOT(onExportToCsvActionTriggered()));
+  actionList << exportToCsvAction;
+
+  return actionList;
+}
+
+// --------------------------------------------------------------------------
+void voKEGGTableView::onExportToCsvActionTriggered()
+{
+  QString defaultFileName = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation)
+      + "/" + voUtils::cleanString(this->objectName()) + ".csv";
+
+  QString fileName = QFileDialog::getSaveFileName(
+        0, tr("Save table data..."), defaultFileName, "Comma Separated Value (*.csv)");
+  if(fileName.isEmpty())
+    {
+    return;
+    }
+  vtkTable * table = vtkTable::SafeDownCast(this->dataObject()->dataAsVTKDataObject());
+  Q_ASSERT(table);
+  voIOManager::writeTableToCVSFile(table, fileName);
+}
+
+// --------------------------------------------------------------------------
 void voKEGGTableView::setupUi(QLayout *layout)
 {
   Q_D(voKEGGTableView);
@@ -70,17 +105,11 @@ QString voKEGGTableView::hints()const
 }
 
 // --------------------------------------------------------------------------
-void voKEGGTableView::setDataObject(voDataObject *dataObject)
+void voKEGGTableView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voKEGGTableView);
 
-  if (!dataObject)
-    {
-    qCritical() << "voKEGGTableView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
-
-  vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
+  vtkTable * table = vtkTable::SafeDownCast(dataObject.dataAsVTKDataObject());
   if (!table)
     {
     qCritical() << "voKEGGTableView - Failed to setDataObject - vtkTable data is expected !";

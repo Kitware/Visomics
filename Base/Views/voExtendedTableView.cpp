@@ -1,16 +1,20 @@
 
 // Qt includes
+#include <QAction>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QFileDialog>
 #include <QLayout>
 #include <QTableView>
 #include <QStandardItemModel>
 #include <QHeaderView>
 
 // Visomics includes
-#include "voExtendedTableView.h"
 #include "voDataObject.h"
-#include "vtkExtendedTable.h"
+#include "voExtendedTableView.h"
+#include "voIOManager.h"
 #include "voUtils.h"
+#include "vtkExtendedTable.h"
 
 // VTK includes
 #include <vtkDoubleArray.h>
@@ -51,6 +55,37 @@ voExtendedTableView::~voExtendedTableView()
 }
 
 // --------------------------------------------------------------------------
+QList<QAction*> voExtendedTableView::actions()
+{
+  QList<QAction*> actionList = this->Superclass::actions();
+
+  QAction * exportToCsvAction = new QAction(QIcon(":/Icons/csv_text.png"), "Export as CSV", this);
+  exportToCsvAction->setToolTip("Export current table view as CSV text file.");
+  connect(exportToCsvAction, SIGNAL(triggered()), this, SLOT(onExportToCsvActionTriggered()));
+  actionList << exportToCsvAction;
+
+  return actionList;
+}
+
+// --------------------------------------------------------------------------
+void voExtendedTableView::onExportToCsvActionTriggered()
+{
+  QString defaultFileName = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation)
+      + "/" + voUtils::cleanString(this->objectName()) + ".csv";
+
+  QString fileName = QFileDialog::getSaveFileName(
+        0, tr("Save table data..."), defaultFileName, "Comma Separated Value (*.csv)");
+  if(fileName.isEmpty())
+    {
+    return;
+    }
+  vtkExtendedTable * extendedTable =
+      vtkExtendedTable::SafeDownCast(this->dataObject()->dataAsVTKDataObject());
+  Q_ASSERT(extendedTable);
+  voIOManager::writeTableToCVSFile(extendedTable->GetDataWithRowHeader(), fileName);
+}
+
+// --------------------------------------------------------------------------
 void voExtendedTableView::setupUi(QLayout *layout)
 {
   Q_D(voExtendedTableView);
@@ -62,17 +97,11 @@ void voExtendedTableView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voExtendedTableView::setDataObject(voDataObject *dataObject)
+void voExtendedTableView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voExtendedTableView);
 
-  if (!dataObject)
-    {
-    qCritical() << "voExtendedTableView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
-
-  vtkExtendedTable * extendedTable = vtkExtendedTable::SafeDownCast(dataObject->dataAsVTKDataObject());
+  vtkExtendedTable * extendedTable = vtkExtendedTable::SafeDownCast(dataObject.dataAsVTKDataObject());
   if (!extendedTable)
     {
     qCritical() << "voExtendedTableView - Failed to setDataObject - vtkExtendedTable data is expected !";

@@ -66,6 +66,10 @@ QString stringify(QScriptEngine* scriptEngine, const QScriptValue& scriptValue);
 QString stringify(const QString& name, vtkTable * table, const QList<vtkIdType>& columnIdsToSkip);
 
 QString stringify(const QString& name, vtkTree * tree);
+
+/// Convert characters different from letters, number or hyphen into an underscore
+/// The function will also make sure there are no more that one underscore in a row.
+QString cleanString(const QString& text);
 }
 
 #endif
