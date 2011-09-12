@@ -73,17 +73,11 @@ void voVolcanoView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voVolcanoView::setDataObject(voDataObject *dataObject)
+void voVolcanoView::setDataObjectInternal(const voDataObject& dataObject)
 {
    Q_D(voVolcanoView);
 
-  if (!dataObject)
-    {
-    qCritical() << "voVolcanoView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
-
-  vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
+  vtkTable * table = vtkTable::SafeDownCast(dataObject.dataAsVTKDataObject());
   if (!table)
     {
     qCritical() << "voVolcanoView - Failed to setDataObject - vtkTable data is expected !";

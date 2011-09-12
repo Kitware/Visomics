@@ -30,6 +30,7 @@
 #ifdef Visomics_BUILD_TESTING
 # include "voTestConfigure.h"
 #endif
+#include "voView.h"
 #include "voViewManager.h"
 #include "voViewStackedWidget.h"
 
@@ -80,6 +81,10 @@ voMainWindow::voMainWindow(QWidget * newParent)
           SIGNAL(viewCreated(const QString&, voView*)),
           d->ViewStackedWidget,
           SLOT(addView(const QString&, voView*)));
+
+  connect(voApplication::application()->viewManager(),
+          SIGNAL(viewCreated(const QString&, voView*)),
+          SLOT(setViewActions(const QString&, voView*)));
 
   // Setup actions
   d->actionFileOpen->setShortcut(QKeySequence::Open);
@@ -267,4 +272,13 @@ void voMainWindow::onAboutToRunAnalysis(voAnalysis* analysis)
       return;
       }
     }
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::setViewActions(const QString& objectUuid, voView* newView)
+{
+  Q_D(voMainWindow);
+  Q_UNUSED(objectUuid);
+  d->ViewActionsToolBar->clear();
+  d->ViewActionsToolBar->addActions(newView->actions());
 }

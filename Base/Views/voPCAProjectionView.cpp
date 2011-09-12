@@ -76,17 +76,11 @@ void voPCAProjectionView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voPCAProjectionView::setDataObject(voDataObject *dataObject)
+void voPCAProjectionView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voPCAProjectionView);
 
-  if (!dataObject)
-    {
-    qCritical() << "voPCAProjectionView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
-
-  vtkTable * table = vtkTable::SafeDownCast(dataObject->dataAsVTKDataObject());
+  vtkTable * table = vtkTable::SafeDownCast(dataObject.dataAsVTKDataObject());
   if (!table)
     {
     qCritical() << "voPCAProjectionView - Failed to setDataObject - vtkTable data is expected !";

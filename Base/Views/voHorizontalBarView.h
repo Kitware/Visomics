@@ -17,10 +17,10 @@ public:
   voHorizontalBarView(QWidget * newParent = 0);
   virtual ~voHorizontalBarView();
 
-  virtual void setDataObject(voDataObject* dataObject);
-
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(const voDataObject& dataObject);
 
 protected:
   QScopedPointer<voHorizontalBarViewPrivate> d_ptr;

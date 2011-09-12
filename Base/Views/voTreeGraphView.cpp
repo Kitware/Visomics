@@ -77,17 +77,11 @@ void voTreeGraphView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voTreeGraphView::setDataObject(voDataObject* dataObject)
+void voTreeGraphView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voTreeGraphView);
 
-  if (!dataObject)
-    {
-    qCritical() << "voTreeGraphView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
-
-  vtkTree * tree = vtkTree::SafeDownCast(dataObject->dataAsVTKDataObject());
+  vtkTree * tree = vtkTree::SafeDownCast(dataObject.dataAsVTKDataObject());
   if (!tree)
     {
     qCritical() << "voTreeGraphView - Failed to setDataObject - vtkTree data is expected !";

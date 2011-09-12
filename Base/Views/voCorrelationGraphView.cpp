@@ -101,17 +101,11 @@ void voCorrelationGraphView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
-void voCorrelationGraphView::setDataObject(voDataObject* dataObject)
+void voCorrelationGraphView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voCorrelationGraphView);
 
-  if (!dataObject)
-    {
-    qCritical() << "voCorrelationGraphView - Failed to setDataObject - dataObject is NULL";
-    return;
-    }
-
-  vtkGraph * graph = vtkGraph::SafeDownCast(dataObject->dataAsVTKDataObject());
+  vtkGraph * graph = vtkGraph::SafeDownCast(dataObject.dataAsVTKDataObject());
   if (!graph)
     {
     qCritical() << "voCorrelationGraphView - Failed to setDataObject - vtkGraph data is expected !";

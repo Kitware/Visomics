@@ -25,15 +25,15 @@ public:
 
   virtual void initialize();
 
-  virtual void setDataObject(voDataObject* dataObject);
-
   QString viewName()const;
 
-public slots:
+protected slots:
   void loadDataObject();
 
 protected:
   virtual void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(const voDataObject& dataObject);
 
   virtual QString stringify(const voDataObject& dataObject);
 

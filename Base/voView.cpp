@@ -1,9 +1,15 @@
 
 // Qt includes
+#include <QAction>
+#include <QDebug>
+#include <QDesktopServices>
+#include <QFileDialog>
 #include <QLabel>
 #include <QVBoxLayout>
+#include <QSharedDataPointer>
 
 // Visomics includes
+#include "voUtils.h"
 #include "voView.h"
 
 // VTK includes
@@ -13,6 +19,7 @@
 class voViewPrivate
 {
 public:
+  voDataObject * DataObject;
 };
 
 // --------------------------------------------------------------------------
@@ -50,3 +57,90 @@ QString voView::hints()const
   return QString();
 }
 
+// --------------------------------------------------------------------------
+voDataObject* voView::dataObject()const
+{
+  Q_D(const voView);
+  return d->DataObject;
+}
+
+// --------------------------------------------------------------------------
+void voView::setDataObject(voDataObject* dataObject)
+{
+  Q_D(voView);
+  if (!dataObject)
+    {
+    qCritical() << qPrintable(this->objectName())
+                << "- Failed to setDataObject - dataObject is NULL";
+    return;
+    }
+  d->DataObject = dataObject;
+  this->setDataObjectInternal(*dataObject);
+}
+
+// --------------------------------------------------------------------------
+QList<QAction*> voView::actions()
+{
+  QList<QAction*> actionList;
+
+  QAction * saveScreenshotAction =
+      new QAction(QIcon(":/Icons/saveScreenshot.png"), "Save screenshot", this);
+  saveScreenshotAction->setToolTip("Save the current view as PNG image.");
+  connect(saveScreenshotAction, SIGNAL(triggered()), this, SLOT(onSaveScreenshotActionTriggered()));
+  actionList << saveScreenshotAction;
+
+  return actionList;
+}
+
+// --------------------------------------------------------------------------
+void voView::onSaveScreenshotActionTriggered()
+{
+  QString defaultFileName = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation)
+      + "/" + voUtils::cleanString(this->objectName()) + ".png";
+
+  QString fileName = QFileDialog::getSaveFileName(
+        0, tr("Save screenshot..."), defaultFileName, "Image (*.png)");
+  if(fileName.isEmpty())
+    {
+    return;
+    }
+  this->saveScreenshot(fileName);
+}
+
+// --------------------------------------------------------------------------
+void voView::saveScreenshot(const QString& fileName)
+{
+  this->saveScreenshot(fileName, this->mainWidget()->size());
+}
+
+// --------------------------------------------------------------------------
+void voView::saveScreenshot(const QString& fileName, const QSize& size)
+{
+  QSize savedSize = this->mainWidget()->size();
+  if (size != savedSize)
+    {
+    this->mainWidget()->resize(size);
+    }
+
+  QString tmpFileName = fileName;
+  if (!tmpFileName.endsWith(".jpg", Qt::CaseInsensitive)
+      && !tmpFileName.endsWith(".png", Qt::CaseInsensitive))
+    {
+    tmpFileName.append( ".png" );
+    }
+
+  QPixmap::grabWidget(this->mainWidget()).save(tmpFileName);
+
+  if (size != savedSize)
+    {
+    this->mainWidget()->resize(savedSize);
+    }
+}
+
+// --------------------------------------------------------------------------
+QWidget* voView::mainWidget()
+{
+  QWidget* mainWidget = this->layout()->itemAt(0)->widget();
+  Q_ASSERT(mainWidget);
+  return mainWidget;
+}

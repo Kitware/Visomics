@@ -1,6 +1,7 @@
 <RCC>
-  <qresource prefix="/">
-    <file>Icons/Bulb.png</file>
-  </qresource>
+    <qresource prefix="/">
+        <file>Icons/Bulb.png</file>
+        <file alias="Icons/saveScreenshot.png">Icons/nuvola/32x32/devices/camera.png</file>
+        <file>Icons/csv_text.png</file>
+    </qresource>
 </RCC>
-

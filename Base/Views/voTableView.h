@@ -24,10 +24,15 @@ public:
   voTableView(QWidget* newParent = 0);
   virtual ~voTableView();
 
-  virtual void setDataObject(voDataObject* dataObject);
+  virtual QList<QAction*> actions();
+
+protected slots:
+  void onExportToCsvActionTriggered();
 
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(const voDataObject& dataObject);
 
 protected:
   QScopedPointer<voTableViewPrivate> d_ptr;

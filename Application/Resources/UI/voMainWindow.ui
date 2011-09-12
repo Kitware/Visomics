@@ -124,6 +124,17 @@
    </attribute>
    <addaction name="actionLoadSampleDataset"/>
   </widget>
+  <widget class="QToolBar" name="ViewActionsToolBar">
+   <property name="windowTitle">
+    <string>View actions</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
   <action name="actionFileOpen">
    <property name="icon">
     <iconset resource="../VisomicsApp.qrc">

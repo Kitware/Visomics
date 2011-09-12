@@ -19,10 +19,10 @@ public:
   voKEGGImageView(QWidget * newParent = 0);
   virtual ~voKEGGImageView();
 
-  virtual void setDataObject(voDataObject* dataObject);
-
 protected:
   void setupUi(QLayout * layout);
+
+  virtual void setDataObjectInternal(const voDataObject& dataObject);
 
 protected:
   QScopedPointer<voKEGGImageViewPrivate> d_ptr;
