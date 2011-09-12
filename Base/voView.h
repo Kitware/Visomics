@@ -26,6 +26,8 @@ public:
 
   void setDataObject(voDataObject* dataObject);
 
+  QList<QAction*> actions();
+
 protected:
   virtual void setupUi(QLayout * layout) = 0;
 

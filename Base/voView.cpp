@@ -1,5 +1,6 @@
 
 // Qt includes
+#include <QAction>
 #include <QDebug>
 #include <QLabel>
 #include <QVBoxLayout>
@@ -73,3 +74,11 @@ void voView::setDataObject(voDataObject* dataObject)
   d->DataObject = dataObject;
   this->setDataObjectInternal(*dataObject);
 }
+
+// --------------------------------------------------------------------------
+QList<QAction*> voView::actions()
+{
+  QList<QAction*> actionList;
+  return actionList;
+}
+
