@@ -2,11 +2,14 @@
 // Qt includes
 #include <QAction>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QFileDialog>
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QSharedDataPointer>
 
 // Visomics includes
+#include "voUtils.h"
 #include "voView.h"
 
 // VTK includes
@@ -79,6 +82,65 @@ void voView::setDataObject(voDataObject* dataObject)
 QList<QAction*> voView::actions()
 {
   QList<QAction*> actionList;
+
+  QAction * saveScreenshotAction =
+      new QAction(QIcon(":/Icons/saveScreenshot.png"), "Save screenshot", this);
+  saveScreenshotAction->setToolTip("Save the current view as PNG image.");
+  connect(saveScreenshotAction, SIGNAL(triggered()), this, SLOT(onSaveScreenshotActionTriggered()));
+  actionList << saveScreenshotAction;
+
   return actionList;
 }
 
+// --------------------------------------------------------------------------
+void voView::onSaveScreenshotActionTriggered()
+{
+  QString defaultFileName = QDesktopServices::storageLocation(QDesktopServices::DesktopLocation)
+      + "/" + voUtils::cleanString(this->objectName()) + ".png";
+
+  QString fileName = QFileDialog::getSaveFileName(
+        0, tr("Save screenshot..."), defaultFileName, "Image (*.png)");
+  if(fileName.isEmpty())
+    {
+    return;
+    }
+  this->saveScreenshot(fileName);
+}
+
+// --------------------------------------------------------------------------
+void voView::saveScreenshot(const QString& fileName)
+{
+  this->saveScreenshot(fileName, this->mainWidget()->size());
+}
+
+// --------------------------------------------------------------------------
+void voView::saveScreenshot(const QString& fileName, const QSize& size)
+{
+  QSize savedSize = this->mainWidget()->size();
+  if (size != savedSize)
+    {
+    this->mainWidget()->resize(size);
+    }
+
+  QString tmpFileName = fileName;
+  if (!tmpFileName.endsWith(".jpg", Qt::CaseInsensitive)
+      && !tmpFileName.endsWith(".png", Qt::CaseInsensitive))
+    {
+    tmpFileName.append( ".png" );
+    }
+
+  QPixmap::grabWidget(this->mainWidget()).save(tmpFileName);
+
+  if (size != savedSize)
+    {
+    this->mainWidget()->resize(savedSize);
+    }
+}
+
+// --------------------------------------------------------------------------
+QWidget* voView::mainWidget()
+{
+  QWidget* mainWidget = this->layout()->itemAt(0)->widget();
+  Q_ASSERT(mainWidget);
+  return mainWidget;
+}

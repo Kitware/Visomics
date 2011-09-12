@@ -26,10 +26,18 @@ public:
 
   void setDataObject(voDataObject* dataObject);
 
-  QList<QAction*> actions();
+  virtual QList<QAction*> actions();
+
+  void saveScreenshot(const QString& fileName);
+  void saveScreenshot(const QString& fileName, const QSize& size);
+
+protected slots:
+  void onSaveScreenshotActionTriggered();
 
 protected:
   virtual void setupUi(QLayout * layout) = 0;
+
+  virtual QWidget* mainWidget();
 
   virtual void setDataObjectInternal(const voDataObject& dataObject) = 0;
 
