@@ -127,33 +127,27 @@ void voTableView::setDataObjectInternal(const voDataObject& dataObject)
     return;
     }
 
-  // Update the model if necessary
-  //if (t->GetMTime() > this->LastModelMTime)
-  //  {
-    // Note: this will clear the current selection.
-    vtkIdType num_rows = table->GetNumberOfRows();
-    vtkIdType num_cols = table->GetNumberOfColumns();
-    d->Model.setRowCount(static_cast<int>(num_rows));
-    d->Model.setColumnCount(static_cast<int>(num_cols - 1));
-    for (vtkIdType c = 1; c < num_cols; ++c)
-      {
-      d->Model.setHeaderData(static_cast<int>(c-1), Qt::Horizontal, QString(table->GetColumnName(c)));
-      for (vtkIdType r = 0; r < num_rows; ++r)
-        {
-        QStandardItem* item = new QStandardItem(QString(table->GetValue(r, c).ToString()));
-        item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable); // Item is view-only
-        d->Model.setItem(static_cast<int>(r), static_cast<int>(c-1), item);
-        }
-      }
+  vtkIdType num_rows = table->GetNumberOfRows();
+  vtkIdType num_cols = table->GetNumberOfColumns();
+  d->Model.setRowCount(static_cast<int>(num_rows));
+  d->Model.setColumnCount(static_cast<int>(num_cols - 1));
+  for (vtkIdType c = 1; c < num_cols; ++c)
+    {
+    d->Model.setHeaderData(static_cast<int>(c-1), Qt::Horizontal, QString(table->GetColumnName(c)));
     for (vtkIdType r = 0; r < num_rows; ++r)
       {
-      d->Model.setHeaderData(static_cast<int>(r), Qt::Vertical, QString(table->GetValue(r, 0).ToString()));
+      QStandardItem* item = new QStandardItem(QString(table->GetValue(r, c).ToString()));
+      item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable); // Item is view-only
+      d->Model.setItem(static_cast<int>(r), static_cast<int>(c-1), item);
       }
-  //  this->LastModelMTime = table->GetMTime();
-  //  }
+    }
+  for (vtkIdType r = 0; r < num_rows; ++r)
+    {
+    d->Model.setHeaderData(static_cast<int>(r), Qt::Vertical, QString(table->GetValue(r, 0).ToString()));
+    }
 
-    d->TableView->horizontalHeader()->setMinimumSectionSize(100);
-    d->TableView->resizeColumnsToContents();
+  d->TableView->horizontalHeader()->setMinimumSectionSize(100);
+  d->TableView->resizeColumnsToContents();
 
   // Retrieve the selected subtable
   //vtkSmartPointer<vtkTable> ot = vtkSmartPointer<vtkTable>::New();
