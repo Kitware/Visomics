@@ -711,3 +711,14 @@ QString voUtils::stringify(const QString& name, vtkTree* tree)
   rootScriptValue.setProperty("name", name);
   return voUtils::stringify(&scriptEngine, rootScriptValue);
 }
+
+// --------------------------------------------------------------------------
+QString voUtils::cleanString(const QString& text)
+{
+  QString cleanedText = text.trimmed();
+  cleanedText.replace(QRegExp("[^A-Za-z0-9\\-]"), "_");
+  cleanedText.replace(QRegExp("(_+)"), "_"); // Remove redundant '_' if any
+  cleanedText.remove(QRegExp("^_|_$"));
+  return cleanedText;
+}
+
