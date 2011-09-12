@@ -32,7 +32,6 @@
 
 // VTK includes
 #include <vtkArrayData.h>
-#include <vtkDoubleArray.h>
 #include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
@@ -139,7 +138,7 @@ bool voANOVAStatistics::execute()
   vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
   if (!extendedTable)
     {
-    qWarning() << "Input is Null";
+    qCritical() << "Input is Null";
     return false;
     }
 
@@ -177,46 +176,49 @@ bool voANOVAStatistics::execute()
   d->RCalc->GetArray("Fold Change (Sample 1 -> Sample 2)","foldChange");
   d->RCalc->GetArray("RerrValue","RerrValue");
   d->RCalc->SetRscript(
-  "genErrFlag <- 0\n"
+  "RerrValue<-0\n"
   "pValue <- sapply( seq(length=nrow(sample1Array)), "
                     "function(x) {summary(aov(sample1Array[x,] ~ sample2Array[x,]))[[1]][[1,\"Pr(>F)\"]] })\n"
   "log2FC<-log2(rowMeans(sample1Array))-log2(rowMeans(sample2Array))\n"
   "FCFun <- function(x){"
-    "if(is.na(x)){genErrFlag <<- 1; return(0)}\n"
+    "if(!is.finite(x)){RerrValue <<- 2; return(-NaN)}\n"
     "if (x<0) {return(-1/(2^x))} else {return(2^x)}}\n"
   "foldChange<-sapply(log2FC, FCFun)\n"
-  "if(genErrFlag){"
-    "RerrValue <- 2"
-  "}else{"
-    "RerrValue <- 0}\n");
+  );
   d->RCalc->Update();
 
+  // Get R output
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
-
-  // Check for errors "thrown" by R script
-  if(!outputArrayData || outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
+  if(!outputArrayData)
     {
-    qCritical() << QObject::tr("Fatal error in ANOVA R script");
+    qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
     return false;
     }
+  // Check for errors "thrown" by R script
+  if(outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
+    {
+    qWarning() << QObject::tr("ANOVA warning: cannot calculate fold change from zero or negative input");
+    }
 
-  // Extract and build table for p-values
-  vtkNew<vtkTable> pValueTable;
-  voUtils::arrayToTable(outputArrayData->GetArrayByName("P-Value"), pValueTable.GetPointer());
+  // Get analyte names
+  vtkSmartPointer<vtkStringArray> analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
 
-  // Extract and build table for fold change
-  vtkNew<vtkTable> foldChangeTable;
-  voUtils::arrayToTable(outputArrayData->GetArrayByName("Fold Change (Sample 1 -> Sample 2)"), foldChangeTable.GetPointer());
-
-  // Combine tables
+  // Build table for p-values
   vtkNew<vtkTable> outputDataTable;
-  voUtils::insertColumnIntoTable(outputDataTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
-  outputDataTable->AddColumn(pValueTable->GetColumn(0));
+    {
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("P-Value"), outputDataTable.GetPointer());
+    voUtils::insertColumnIntoTable(outputDataTable.GetPointer(), 0, analyteNames.GetPointer());
+    }
 
+  // Build table with additional fold change column for volcano
   vtkNew<vtkTable> outputVolcanoTable;
-  voUtils::insertColumnIntoTable(outputVolcanoTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
-  outputVolcanoTable->AddColumn(foldChangeTable->GetColumn(0));
-  outputVolcanoTable->AddColumn(pValueTable->GetColumn(0));
+    {
+    outputVolcanoTable->DeepCopy(outputDataTable.GetPointer());
+    vtkNew<vtkTable> tempFoldChangeTable;
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("Fold Change (Sample 1 -> Sample 2)"),
+                          tempFoldChangeTable.GetPointer());
+    voUtils::insertColumnIntoTable(outputVolcanoTable.GetPointer(), 1, tempFoldChangeTable->GetColumn(0));
+    }
 
   this->setOutput("ANOVA_table", new voTableDataObject("ANOVA_table", outputDataTable.GetPointer()));
   this->setOutput("ANOVA_volcano", new voTableDataObject("ANOVA_volcano", outputVolcanoTable.GetPointer()));

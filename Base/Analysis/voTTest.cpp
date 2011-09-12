@@ -27,13 +27,15 @@
 // Visomics includes
 #include "voTTest.h"
 #include "voTableDataObject.h"
-#include "vtkExtendedTable.h"
 #include "voUtils.h"
+#include "vtkExtendedTable.h"
 
 // VTK includes
 #include <vtkArrayData.h>
+#include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
+#include <vtkStringArray.h>
 #include <vtkTable.h>
 
 // --------------------------------------------------------------------------
@@ -129,7 +131,7 @@ bool voTTest::execute()
   vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
   if (!extendedTable)
     {
-    qWarning() << "Input is Null";
+    qCritical() << "Input is Null";
     return false;
     }
 
@@ -154,7 +156,7 @@ bool voTTest::execute()
     }
 
   // Combine sample 1 and 2 array groups
-  vtkSmartPointer<vtkArrayData> RInputArrayData = vtkSmartPointer<vtkArrayData>::New();
+  vtkNew<vtkArrayData> RInputArrayData;
   RInputArrayData->AddArray(sample1Array);
   RInputArrayData->AddArray(sample2Array);
 
@@ -167,24 +169,27 @@ bool voTTest::execute()
   d->RCalc->GetArray("Fold Change (Sample 1 -> Sample 2)","foldChange");
   d->RCalc->GetArray("RerrValue","RerrValue");
   d->RCalc->SetRscript(
-  "constErrFlag <- 0; genErrFlag <- 0\n"
+  "constErrFlag <- 0; genErrFlag <- 0; FCErrFlag <- 0\n"
   "my.t.test<-function(...){"
     "obj<-try(t.test(...), silent=TRUE) \n"
     "if( ! is(obj, \"try-error\") ){"
       "return(obj$p.value)"
     "}else if ( length(grep(\"data are essentially constant\", geterrmessage(), fixed=TRUE)) > 0 ){"
       "constErrFlag <<- 1\n"
+      "return(1.0)\n"
     "}else{"
       "genErrFlag <<- 1}\n"
-      "return(NA)}\n"
+      "return(-NaN)}\n"
   "pValue <- sapply( seq(length=nrow(sample1Array)), "
                     "function(x) {my.t.test(sample1Array[x,], sample2Array[x,], \"two.sided\")})\n"
   "log2FC<-log2(rowMeans(sample1Array))-log2(rowMeans(sample2Array))\n"
   "FCFun <- function(x){"
-    "if(is.na(x)){genErrFlag <<- 1; return(0)}\n"
+    "if(!is.finite(x)){FCErrFlag <<- 1; return(-NaN)}\n"
     "if (x<0) {return(-1/(2^x))} else {return(2^x)}}\n"
   "foldChange<-sapply(log2FC, FCFun)\n"
   "if(genErrFlag){"
+    "RerrValue <- 3"
+  "}else if(FCErrFlag){"
     "RerrValue <- 2"
   "}else if(constErrFlag){"
     "RerrValue <- 1"
@@ -192,38 +197,50 @@ bool voTTest::execute()
     "RerrValue <- 0}\n");
   d->RCalc->Update();
 
+  // Get R output
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
+  if(!outputArrayData)
+    {
+    qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
+    return false;
+    }
 
   // Check for errors "thrown" by R script
   if(outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() == 1)
     {
     qWarning() << QObject::tr("T-Test warning: data are essentially constant");
     }
-  else if(outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
+  else if(outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() == 2)
     {
-    qWarning() << QObject::tr("Fatal error in T-Test R script");
+    qWarning() << QObject::tr("T-Test warning: cannot calculate fold change from zero or negative input");
+    }
+  else if(outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 2)
+    {
+    qCritical() << QObject::tr("Fatal error in T-Test R script");
     return false;
     }
 
-  // Extract and build table for p-values
-  vtkSmartPointer<vtkTable> pValueTable = vtkSmartPointer<vtkTable>::New();
-  voUtils::arrayToTable(outputArrayData->GetArrayByName("P-Value"), pValueTable.GetPointer());
+  // Get analyte names
+  vtkSmartPointer<vtkStringArray> analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
 
-  // Extract and build table for fold change
-  vtkSmartPointer<vtkTable> foldChangeTable = vtkSmartPointer<vtkTable>::New();
-  voUtils::arrayToTable(outputArrayData->GetArrayByName("Fold Change (Sample 1 -> Sample 2)"), foldChangeTable.GetPointer());
+  // Build table for p-values
+  vtkNew<vtkTable> outputDataTable;
+    {
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("P-Value"), outputDataTable.GetPointer());
+    voUtils::insertColumnIntoTable(outputDataTable.GetPointer(), 0, analyteNames.GetPointer());
+    }
 
-  // Combine tables
-  vtkSmartPointer<vtkTable> outputDataTable = vtkSmartPointer<vtkTable>::New();
-  voUtils::insertColumnIntoTable(outputDataTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
-  outputDataTable->AddColumn(pValueTable->GetColumn(0));
+  // Build table with additional fold change column for volcano
+  vtkNew<vtkTable> outputVolcanoTable;
+    {
+    outputVolcanoTable->DeepCopy(outputDataTable.GetPointer());
+    vtkNew<vtkTable> tempFoldChangeTable;
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("Fold Change (Sample 1 -> Sample 2)"),
+                          tempFoldChangeTable.GetPointer());
+    voUtils::insertColumnIntoTable(outputVolcanoTable.GetPointer(), 1, tempFoldChangeTable->GetColumn(0));
+    }
 
-  vtkSmartPointer<vtkTable> outputVolcanoTable = vtkSmartPointer<vtkTable>::New();
-  voUtils::insertColumnIntoTable(outputVolcanoTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
-  outputVolcanoTable->AddColumn(foldChangeTable->GetColumn(0));
-  outputVolcanoTable->AddColumn(pValueTable->GetColumn(0));
-
-  this->setOutput("TTest_table", new voTableDataObject("TTest_table", outputDataTable));
-  this->setOutput("TTest_volcano", new voTableDataObject("TTest_volcano", outputVolcanoTable));
+  this->setOutput("TTest_table", new voTableDataObject("TTest_table", outputDataTable.GetPointer()));
+  this->setOutput("TTest_volcano", new voTableDataObject("TTest_volcano", outputVolcanoTable.GetPointer()));
   return true;
 }
