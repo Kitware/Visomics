@@ -127,6 +127,8 @@ void voVolcanoView::setDataObjectInternal(const voDataObject& dataObject)
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetBehavior(vtkAxis::FIXED);
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetRange(-1 * maxBound, maxBound);
 
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetRange(0.0, 1.0);
+
   d->ChartView->GetRenderWindow()->SetMultiSamples(4);
   d->ChartView->Render();
 }
