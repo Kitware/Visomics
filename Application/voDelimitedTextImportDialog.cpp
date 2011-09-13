@@ -36,7 +36,7 @@ class voDelimitedTextImportDialogPrivate : public Ui_voDelimitedTextImportDialog
 public:
   typedef Ui_voDelimitedTextImportDialog Superclass;
 
-  voDelimitedTextImportDialogPrivate();
+  voDelimitedTextImportDialogPrivate(const voDelimitedTextImportSettings& defaultSettings);
 
   QString preProcessingAndFilteringGroupBoxText(const QString& normalizationMethodName);
 
@@ -51,7 +51,9 @@ public:
 // voDelimitedTextImportDialogPrivate methods
 
 // --------------------------------------------------------------------------
-voDelimitedTextImportDialogPrivate::voDelimitedTextImportDialogPrivate()
+voDelimitedTextImportDialogPrivate::voDelimitedTextImportDialogPrivate(
+    const voDelimitedTextImportSettings& defaultSettings) :
+    DelimitedTextPreviewModel(defaultSettings)
 {
   this->NormalizationMethodLabel = 0;
 }
@@ -90,21 +92,22 @@ void voDelimitedTextImportDialogPrivate::setupUi(QDialog *widget)
 // voDelimitedTextImportDialog methods
 
 // --------------------------------------------------------------------------
-voDelimitedTextImportDialog::voDelimitedTextImportDialog(QWidget* newParent) :
-  Superclass(newParent), d_ptr(new voDelimitedTextImportDialogPrivate())
+voDelimitedTextImportDialog::voDelimitedTextImportDialog(
+    QWidget* newParent,const voDelimitedTextImportSettings& defaultSettings) :
+  Superclass(newParent), d_ptr(new voDelimitedTextImportDialogPrivate(defaultSettings))
 {
   Q_D(voDelimitedTextImportDialog);
   d->setupUi(this);
 
   d->DocumentPreviewWidget->setModel(&d->DelimitedTextPreviewModel);
 
-  this->setNormalizationMethod("No");
+  d->NormalizationWidget->setSelectedNormalizationMethod(
+      defaultSettings.value(voDelimitedTextImportSettings::NormalizationMethod).toString());
 }
 
 // --------------------------------------------------------------------------
 voDelimitedTextImportDialog::~voDelimitedTextImportDialog()
 {
-
 }
 
 // --------------------------------------------------------------------------
@@ -113,6 +116,9 @@ void voDelimitedTextImportDialog::setFileName(const QString& fileName)
   Q_D(voDelimitedTextImportDialog);
   this->setWindowTitle(QString("Import Data - ") + fileName);
   d->DelimitedTextPreviewModel.setFileName(fileName);
+
+  // Apply default normalization to data
+  d->NormalizationWidget->setSelectedNormalizationMethod(d->NormalizationWidget->selectedNormalizationMethod());
 }
 
 // --------------------------------------------------------------------------
