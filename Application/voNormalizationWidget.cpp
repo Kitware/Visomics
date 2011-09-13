@@ -110,10 +110,8 @@ voNormalizationWidget::voNormalizationWidget(QWidget* newParent) :
   d->registerNormalizationWidget("Log2");
   d->registerNormalizationWidget("Quantile");
 
-  // Set default
-  QRadioButton * button = this->findChild<QRadioButton*>("No");
-  Q_ASSERT(button);
-  button->setChecked(true);
+  // Set default - should be re-set by voDelimitedTextImportDialogPrivate
+  setSelectedNormalizationMethod("No");
 }
 
 // --------------------------------------------------------------------------
@@ -136,4 +134,15 @@ QString voNormalizationWidget::selectedNormalizationMethod()const
 {
   Q_D(const voNormalizationWidget);
   return d->SelectedMethod;
+}
+
+// --------------------------------------------------------------------------
+void voNormalizationWidget::setSelectedNormalizationMethod(const QString& methodName)
+{
+  // Set default
+  QRadioButton * button = this->findChild<QRadioButton*>(methodName);
+  Q_ASSERT(button);
+  button->setChecked(true);
+
+  selectNormalizationMethod(methodName);
 }

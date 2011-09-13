@@ -58,4 +58,5 @@ void voDelimitedTextImportSettings::setDefaultSettings()
   this->insert(Self::ColumnMetaDataTypeOfInterest, 0);
   this->insert(Self::NumberOfRowMetaDataTypes, 1);
   this->insert(Self::RowMetaDataTypeOfInterest, 0);
+  this->insert(Self::NormalizationMethod, "No");
 }

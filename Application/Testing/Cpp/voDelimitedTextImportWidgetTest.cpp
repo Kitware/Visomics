@@ -26,6 +26,7 @@
 // Visomics includes
 #include <voDelimitedTextPreview.h>
 #include <voDelimitedTextImportWidget.h>
+#include <voDelimitedTextImportSettings.h>
 
 // STD includes
 #include <cstdlib>
@@ -50,7 +51,8 @@ int voDelimitedTextImportWidgetTest(int argc, char * argv [])
   // Read file
   QString filename(argv[1]);
 
-  voDelimitedTextPreviewModel model;
+  voDelimitedTextImportSettings defaultSettings;
+  voDelimitedTextPreviewModel model(defaultSettings);
   model.setFileName(filename);
 
   voDelimitedTextPreview * documentPreviewWidget = new voDelimitedTextPreview;

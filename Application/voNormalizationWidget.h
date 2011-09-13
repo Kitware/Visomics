@@ -37,6 +37,7 @@ public:
   virtual ~voNormalizationWidget();
 
   QString selectedNormalizationMethod()const;
+  void setSelectedNormalizationMethod(const QString& methodName);
 
 signals:
   void normalizationMethodSelected(const QString& methodName);

@@ -34,7 +34,9 @@ class voDelimitedTextImportDialog : public QDialog
 public:
   typedef QDialog Superclass;
 
-  voDelimitedTextImportDialog(QWidget* newParent = 0);
+  voDelimitedTextImportDialog(QWidget* newParent = 0,
+                              const voDelimitedTextImportSettings& defaultSettings =
+                                voDelimitedTextImportSettings());
   virtual ~voDelimitedTextImportDialog();
 
   void setFileName(const QString& fileName);

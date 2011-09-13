@@ -23,6 +23,7 @@
 // Qt includes
 #include <QHash>
 #include <QString>
+#include <QVariant>
 
 class voDelimitedTextImportSettings : public QHash<int, QVariant>
 {
