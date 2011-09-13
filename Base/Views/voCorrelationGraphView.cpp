@@ -33,6 +33,7 @@
 #include <vtkGraph.h>
 #include <vtkGraphLayoutView.h>
 #include <vtkLookupTable.h>
+#include <vtkNew.h>
 #include <vtkRenderedGraphRepresentation.h>
 #include <vtkSmartPointer.h>
 #include <vtkTextProperty.h>
@@ -90,26 +91,23 @@ void voCorrelationGraphView::setupUi(QLayout *layout)
   d->GraphView->SetEdgeLabelArrayName("Correlation");
   d->GraphView->EdgeLabelVisibilityOn();
 
-  vtkSmartPointer<vtkArcParallelEdgeStrategy> arc =
-    vtkSmartPointer<vtkArcParallelEdgeStrategy>::New();
+  vtkNew<vtkArcParallelEdgeStrategy> arc;
   arc->SetNumberOfSubdivisions(50);
-  d->GraphView->SetEdgeLayoutStrategy(arc);
+  d->GraphView->SetEdgeLayoutStrategy(arc.GetPointer());
 
-  vtkSmartPointer<vtkViewTheme> theme =
-    vtkSmartPointer<vtkViewTheme>::New();
+  vtkNew<vtkViewTheme> theme;
   theme->SetBackgroundColor(1.0, 1.0, 1.0);
   theme->SetBackgroundColor2(1.0, 1.0, 1.0);
   theme->SetLineWidth(2);
-  vtkSmartPointer<vtkLookupTable> lut =
-    vtkSmartPointer<vtkLookupTable>::New();
+  vtkNew<vtkLookupTable> lut;
   lut->SetHueRange(0.65, 0.65);
   lut->SetSaturationRange(1.0, 1.0);
   lut->SetValueRange(0.8, 0.8);
   lut->SetAlphaRange(0.0, 1.0);
   lut->Build();
-  theme->SetCellLookupTable(lut);
+  theme->SetCellLookupTable(lut.GetPointer());
   theme->GetPointTextProperty()->SetColor(0.0, 0.0, 0.0);
-  d->GraphView->ApplyViewTheme(theme);
+  d->GraphView->ApplyViewTheme(theme.GetPointer());
 
   vtkRenderedGraphRepresentation* rep =
     vtkRenderedGraphRepresentation::SafeDownCast(d->GraphView->GetRepresentation());

@@ -200,8 +200,8 @@ void voHeatMapView::setDataObjectInternal(const voDataObject& dataObject)
   double hsvSats[3] = {1.0, 0.3, 1.0};
   double hsvValues[3] = {1.0, 0.3, 1.0};
 
-  vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-  for(int i = 0; i < 3 - 1; i++)
+  vtkNew<vtkColorTransferFunction> transferFunction;
+  for(int i = 0; i < 3 - 1; ++i)
     {
     transferFunction->AddHSVSegment(hsvScalars[i], hsvHues[i], hsvSats[i], hsvValues[i],
                                     hsvScalars[i+1], hsvHues[i+1], hsvSats[i+1], hsvValues[i+1]);

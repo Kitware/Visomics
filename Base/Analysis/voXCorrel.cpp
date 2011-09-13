@@ -129,7 +129,7 @@ bool voXCorrel::execute()
   QString cor_method = this->enumParameter("method");
 
   //table->Print(std::cout);
-  vtkSmartPointer<vtkTableToArray> tab = vtkSmartPointer<vtkTableToArray>::New();
+  vtkNew<vtkTableToArray> tab;
   tab->SetInput(table);
   //table->Print(std::cout);
 
@@ -174,15 +174,15 @@ bool voXCorrel::execute()
     return false;
     }
 
-  vtkSmartPointer<vtkArrayData> XCorProjData = vtkSmartPointer<vtkArrayData>::New();
+  vtkNew<vtkArrayData> XCorProjData;
   XCorProjData->AddArray(XCorReturn->GetArrayByName("correl"));
 
-  vtkSmartPointer<vtkArrayToTable> XCorProj = vtkSmartPointer<vtkArrayToTable>::New();
+  vtkNew<vtkArrayToTable> XCorProj;
   XCorProj->SetInputConnection(XCorProjData->GetProducerPort());
   XCorProj->Update();  
   
   vtkTable* assess = XCorProj->GetOutput();
-  vtkSmartPointer<vtkTable> corr = vtkSmartPointer<vtkTable>::New();
+  vtkNew<vtkTable> corr;
   corr->AddColumn(header);
 
   for (vtkIdType c = 0;c < assess->GetNumberOfColumns(); ++c)
@@ -202,12 +202,12 @@ bool voXCorrel::execute()
   //this->setOutput("correlation_heatmap", new voDataObject("correlation_heatmap", imageData));
  
   // Find high correlations to put in graph
-  vtkSmartPointer<vtkTable> sparseCorr = vtkSmartPointer<vtkTable>::New();
-  vtkSmartPointer<vtkStringArray> col1 = vtkSmartPointer<vtkStringArray>::New();
+  vtkNew<vtkTable> sparseCorr;
+  vtkNew<vtkStringArray> col1;
   col1->SetName("Column 1");
-  vtkSmartPointer<vtkStringArray> col2 = vtkSmartPointer<vtkStringArray>::New();
+  vtkNew<vtkStringArray> col2;
   col2->SetName("Column 2");
-  vtkSmartPointer<vtkDoubleArray> valueArr = vtkSmartPointer<vtkDoubleArray>::New();
+  vtkNew<vtkDoubleArray> valueArr;
   valueArr->SetName("Correlation");
   for (vtkIdType r = 0; r < corrMatrixNumberOfRows; ++r)
     {
@@ -222,14 +222,13 @@ bool voXCorrel::execute()
         }
       }
     }
-  sparseCorr->AddColumn(col1);
-  sparseCorr->AddColumn(col2);
-  sparseCorr->AddColumn(valueArr);
+  sparseCorr->AddColumn(col1.GetPointer());
+  sparseCorr->AddColumn(col2.GetPointer());
+  sparseCorr->AddColumn(valueArr.GetPointer());
 
   // Build the graph
-  vtkSmartPointer<vtkTableToGraph> correlGraphAlg =
-    vtkSmartPointer<vtkTableToGraph>::New();
-  correlGraphAlg->SetInput(sparseCorr);
+  vtkNew<vtkTableToGraph> correlGraphAlg;
+  correlGraphAlg->SetInput(sparseCorr.GetPointer());
   correlGraphAlg->AddLinkVertex("Column 1");
   correlGraphAlg->AddLinkVertex("Column 2");
   correlGraphAlg->AddLinkEdge("Column 1", "Column 2");
