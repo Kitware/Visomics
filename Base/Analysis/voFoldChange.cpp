@@ -20,6 +20,7 @@
 
 // Qt includes
 #include <QDebug>
+#include <QList>
 
 // QtPropertyBrowser includes
 #include <QtVariantPropertyManager>
@@ -27,13 +28,15 @@
 // Visomics includes
 #include "voFoldChange.h"
 #include "voTableDataObject.h"
-#include "vtkExtendedTable.h"
 #include "voUtils.h"
+#include "vtkExtendedTable.h"
 
 // VTK includes
 #include <vtkArrayData.h>
+#include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
+#include <vtkStringArray.h>
 #include <vtkTable.h>
 
 // --------------------------------------------------------------------------
@@ -132,7 +135,7 @@ bool voFoldChange::execute()
   vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
   if (!extendedTable)
     {
-    qWarning() << "Input is Null";
+    qCritical() << "Input is Null";
     return false;
     }
 
@@ -157,7 +160,7 @@ bool voFoldChange::execute()
     }
 
   // Combine sample 1 and 2 array groups
-  vtkSmartPointer<vtkArrayData> RInputArrayData = vtkSmartPointer<vtkArrayData>::New();
+  vtkNew<vtkArrayData> RInputArrayData;
   RInputArrayData->AddArray(sample1Array);
   RInputArrayData->AddArray(sample2Array);
 
@@ -180,46 +183,53 @@ bool voFoldChange::execute()
     "avgFinal<-rowMeans(sample2Array) }\n"
   "log2FC<-(log2(avgFinal)-log2(avgInit))\n"
   "FCFun <- function(x){"
-    "if(is.na(x)){RerrValue <<- 2; return(0)}\n"
+    "if(!is.finite(x)){RerrValue <<- 2; return(-NaN)}\n"
     "if (x<0) {return(-1/(2^x))} else {return(2^x)}}\n"
   "foldChange<-sapply(log2FC, FCFun)"
   ).arg(meanMethod).toLatin1());
   d->RCalc->Update();
 
+  // Get R output
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
-
-  // Check for errors "thrown" by R script
-  if(!outputArrayData /*|| outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1*/)
+  if(!outputArrayData)
     {
     qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
-    //qWarning() << QObject::tr("Fold change warning: cannot calculate from zero or negative input");
     return false;
     }
+  // Check for errors "thrown" by R script
+  if(outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
+    {
+    qWarning() << QObject::tr("Fold change warning: cannot calculate fold change from zero or negative input");
+    }
 
-  // Extract and build table for average initial value
-  vtkSmartPointer<vtkTable> avgInitTable= vtkSmartPointer<vtkTable>::New();
-  voUtils::arrayToTable(outputArrayData->GetArrayByName("Average Initial"), avgInitTable.GetPointer());
+  // Get analyte names with row labels
+  vtkNew<vtkStringArray> analyteNames;
+  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+                            analyteNames.GetPointer(), false);
 
-  // Extract and build table for average final value
-  vtkSmartPointer<vtkTable> avgFinalTable= vtkSmartPointer<vtkTable>::New();
-  voUtils::arrayToTable(outputArrayData->GetArrayByName("Average Final"), avgFinalTable.GetPointer());
+  // Build table with names and fold change only
+  vtkNew<vtkTable> outputPlotTable;
+    {
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("Fold Change"), outputPlotTable.GetPointer());
+    voUtils::insertColumnIntoTable(outputPlotTable.GetPointer(), 0, analyteNames.GetPointer());
+    }
 
-  // Extract and build table for fold change
-  vtkSmartPointer<vtkTable> foldChangeTable= vtkSmartPointer<vtkTable>::New();
-  voUtils::arrayToTable(outputArrayData->GetArrayByName("Fold Change"), foldChangeTable.GetPointer());
+  vtkNew<vtkTable> outputDataTable;
+    {
+    outputDataTable->DeepCopy(outputPlotTable.GetPointer());
 
-  // Combine tables
-  vtkSmartPointer<vtkTable> outputDataTable = vtkSmartPointer<vtkTable>::New();
-  voUtils::insertColumnIntoTable(outputDataTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
-  outputDataTable->AddColumn(avgInitTable->GetColumn(0));
-  outputDataTable->AddColumn(avgFinalTable->GetColumn(0));
-  outputDataTable->AddColumn(foldChangeTable->GetColumn(0));
+    vtkNew<vtkTable> tempAvgInitTable;
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("Average Initial"), tempAvgInitTable.GetPointer());
+    voUtils::insertColumnIntoTable(outputDataTable.GetPointer(), 1, tempAvgInitTable->GetColumn(0));
 
-  vtkSmartPointer<vtkTable> outputPlotTable = vtkSmartPointer<vtkTable>::New();
-  voUtils::insertColumnIntoTable(outputPlotTable.GetPointer(), 0, extendedTable->GetRowMetaDataOfInterest());
-  outputPlotTable->AddColumn(foldChangeTable->GetColumn(0));
+    vtkNew<vtkTable> tempAvgFinalTable;
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("Average Final"), tempAvgFinalTable.GetPointer());
+    voUtils::insertColumnIntoTable(outputDataTable.GetPointer(), 2, tempAvgFinalTable->GetColumn(0));
+    }
 
-  this->setOutput("foldChange", new voTableDataObject("foldChange", outputDataTable));
-  this->setOutput("foldChangePlot", new voTableDataObject("foldChangePlot", outputPlotTable));
+  this->setOutput("foldChange",
+                  new voTableDataObject("foldChange", outputDataTable.GetPointer(), /* sortable= */ true));
+  this->setOutput("foldChangePlot",
+                  new voTableDataObject("foldChangePlot", outputPlotTable.GetPointer(), /* sortable= */ true));
   return true;
 }

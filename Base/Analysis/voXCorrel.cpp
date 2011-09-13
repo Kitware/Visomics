@@ -26,21 +26,20 @@
 
 // Visomics includes
 #include "voXCorrel.h"
+#include "voDataObject.h"
 #include "voTableDataObject.h"
 #include "voUtils.h"
 #include "vtkExtendedTable.h"
 
 // VTK includes
-#include <vtkArrayToTable.h>
+#include <vtkArrayData.h>
 #include <vtkDoubleArray.h>
 #include <vtkGraph.h>
-#include <vtkImageData.h>
 #include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
-#include <vtkTableToArray.h>
 #include <vtkTableToGraph.h>
 
 // --------------------------------------------------------------------------
@@ -50,7 +49,7 @@
 class voXCorrelPrivate
 {
 public:
-  vtkSmartPointer<vtkRCalculatorFilter> XCor;
+  vtkSmartPointer<vtkRCalculatorFilter> RCalc;
 };
 
 // --------------------------------------------------------------------------
@@ -61,7 +60,7 @@ voXCorrel::voXCorrel():
     Superclass(), d_ptr(new voXCorrelPrivate)
 {
   Q_D(voXCorrel);
-  d->XCor = vtkSmartPointer<vtkRCalculatorFilter>::New();
+  d->RCalc = vtkSmartPointer<vtkRCalculatorFilter>::New();
 }
 
 // --------------------------------------------------------------------------
@@ -116,115 +115,92 @@ bool voXCorrel::execute()
 {
   Q_D(voXCorrel);
 
-  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
-  if (!extendedTable)
-    {
-    qWarning() << "Input is Null";
-    return false;
-    }
-
-  vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
-
   // Parameters
   QString cor_method = this->enumParameter("method");
 
-  //table->Print(std::cout);
-  vtkNew<vtkTableToArray> tab;
-  tab->SetInput(table);
-  //table->Print(std::cout);
-
-  for (int ctr=1; ctr<table->GetNumberOfColumns(); ctr++)
+  // Import data table locally
+  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  if (!extendedTable)
     {
-    tab->AddColumn(table->GetColumnName(ctr));
-    }
-  tab->Update();
-  
- // tab->GetOutput()->Print(std::cout);
-
-  d->XCor->SetRoutput(0);
-  d->XCor->SetInputConnection(tab->GetOutputPort());
-  d->XCor->PutArray("0", "metabData");
-  d->XCor->SetRscript(
-        QString("correl<-cor(t(metabData), method=\"%1\")").arg(cor_method).toLatin1());
-  d->XCor->GetArray("correl","correl");
- 
-  // Do Cross Correlation
-  d->XCor->Update();
-
-  vtkArrayData *XCorReturn = vtkArrayData::SafeDownCast(d->XCor->GetOutput());
-  if (!XCorReturn)
-    {
-    std::cout << "Downcast DID NOT work." << std::endl;
-    return 1;
-    }
-
-  // Set up headers for the rows.
-  vtkSmartPointer<vtkStringArray> header = vtkStringArray::SafeDownCast(table->GetColumn(0));
-  if (!header)
-    {
-    std::cout << "Downcast DID NOT work." << std::endl;
-    return 1;
-    }
-
-  // Extract rotated coordinates
-  if (!XCorReturn->GetArrayByName("correl"))
-    {
-    // We should pop up an error message modal window here and return.  For now, cerr will do
-    std::cerr << "R did not return a valid reponse probably due to memory issues.  Cannot display cross correlation result." << std::endl;
+    qCritical() << "Input is Null";
     return false;
     }
 
-  vtkNew<vtkArrayData> XCorProjData;
-  XCorProjData->AddArray(XCorReturn->GetArrayByName("correl"));
+  vtkSmartPointer<vtkTable> inputDataTable = extendedTable->GetData();
 
-  vtkNew<vtkArrayToTable> XCorProj;
-  XCorProj->SetInputConnection(XCorProjData->GetProducerPort());
-  XCorProj->Update();  
-  
-  vtkTable* assess = XCorProj->GetOutput();
-  vtkNew<vtkTable> corr;
-  corr->AddColumn(header);
-
-  for (vtkIdType c = 0;c < assess->GetNumberOfColumns(); ++c)
+  // Build ArrayData for input to R
+  vtkNew<vtkArrayData> RInputArrayData;
     {
-    vtkAbstractArray* col = assess->GetColumn(c);
-    col->SetName(header->GetValue(c));
-    corr->AddColumn(col);
+    vtkSmartPointer<vtkArray> RInputArray;
+    voUtils::tableToArray(inputDataTable.GetPointer(), RInputArray);
+    RInputArrayData->AddArray(RInputArray.GetPointer());
+    }
+
+  d->RCalc->SetRoutput(0);
+  d->RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
+  d->RCalc->PutArray("0", "metabData");
+  d->RCalc->GetArray("correl","correl");
+  d->RCalc->SetRscript(
+        QString("correl<-cor(t(metabData), method=\"%1\")").arg(cor_method).toLatin1());
+  d->RCalc->Update();
+
+  // Get R output
+  vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
+  if (!outputArrayData || !outputArrayData->GetArrayByName("correl"))
+    {
+    qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
+    return false;
+    }
+
+  // Get analyte names with row labels
+  vtkNew<vtkStringArray> analyteNames;
+  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+                            analyteNames.GetPointer(), false);
+
+  // Extract correlation table
+  vtkNew<vtkTable> corrTable;
+    {
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("correl"), corrTable.GetPointer());
+    for (vtkIdType c = 0;c < corrTable->GetNumberOfColumns(); ++c)
+      {
+      corrTable->GetColumn(c)->SetName(analyteNames->GetValue(c));
+      }
+    voUtils::insertColumnIntoTable(corrTable.GetPointer(), 0, analyteNames.GetPointer());
     }
 
   vtkNew<vtkTable> flippedCorrTable;
-  voUtils::flipTable(corr.GetPointer(), flippedCorrTable.GetPointer(), voUtils::FlipHorizontalAxis, 1, 0);
-  this->setOutput("corr", new voTableDataObject("corr", flippedCorrTable.GetPointer()));
-
-  // Generate image of the correlation table 
-  //  vtkIdType corrMatrixNumberOfCols = corr->GetNumberOfColumns();
-    vtkIdType corrMatrixNumberOfRows = corr->GetNumberOfRows();
-  //this->setOutput("correlation_heatmap", new voDataObject("correlation_heatmap", imageData));
+  voUtils::flipTable(corrTable.GetPointer(), flippedCorrTable.GetPointer(), voUtils::FlipHorizontalAxis, 1, 0);
+  this->setOutput("corr",
+                  new voTableDataObject("corr", flippedCorrTable.GetPointer(), /* sortable= */ true));
  
   // Find high correlations to put in graph
   vtkNew<vtkTable> sparseCorr;
-  vtkNew<vtkStringArray> col1;
-  col1->SetName("Column 1");
-  vtkNew<vtkStringArray> col2;
-  col2->SetName("Column 2");
-  vtkNew<vtkDoubleArray> valueArr;
-  valueArr->SetName("Correlation");
-  for (vtkIdType r = 0; r < corrMatrixNumberOfRows; ++r)
     {
-    for (vtkIdType c = r+1; c < corrMatrixNumberOfRows; ++c)
+    vtkNew<vtkStringArray> col1;
+    col1->SetName("Column 1");
+    vtkNew<vtkStringArray> col2;
+    col2->SetName("Column 2");
+    vtkNew<vtkDoubleArray> valueArr;
+    valueArr->SetName("Correlation");
+
+    vtkIdType corrMatrixNumberOfRows = corrTable->GetNumberOfRows();
+    for (vtkIdType r = 0; r < corrMatrixNumberOfRows; ++r)
       {
-      double val = corr->GetValue(r, c + 1).ToDouble();
-      if (val > 0.1)
+      for (vtkIdType c = r+1; c < corrMatrixNumberOfRows; ++c)
         {
-        col1->InsertNextValue(header->GetValue(r));
-        col2->InsertNextValue(header->GetValue(c));
-        valueArr->InsertNextValue(val);
+        double val = corrTable->GetValue(r, c + 1).ToDouble();
+        if (val > 0.1)
+          {
+          col1->InsertNextValue(analyteNames->GetValue(r));
+          col2->InsertNextValue(analyteNames->GetValue(c));
+          valueArr->InsertNextValue(val);
+          }
         }
       }
+    sparseCorr->AddColumn(col1.GetPointer());
+    sparseCorr->AddColumn(col2.GetPointer());
+    sparseCorr->AddColumn(valueArr.GetPointer());
     }
-  sparseCorr->AddColumn(col1.GetPointer());
-  sparseCorr->AddColumn(col2.GetPointer());
-  sparseCorr->AddColumn(valueArr.GetPointer());
 
   // Build the graph
   vtkNew<vtkTableToGraph> correlGraphAlg;
@@ -234,7 +210,6 @@ bool voXCorrel::execute()
   correlGraphAlg->AddLinkEdge("Column 1", "Column 2");
   correlGraphAlg->Update();
 
-  this->setOutput(
-      "correlation_graph", new voDataObject("correlation_graph", correlGraphAlg->GetOutput()));
+  this->setOutput("correlation_graph", new voDataObject("correlation_graph", correlGraphAlg->GetOutput()));
   return true;
 }

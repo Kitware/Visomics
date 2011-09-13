@@ -72,6 +72,10 @@ QString counterIntToAlpha(int intVal);
 
 int counterAlphaToInt(const QString& alphaVal);
 
+void addCounterLabels(vtkStringArray* srcArray, vtkStringArray* destArray, bool alpha);
+
+void addCounterLabels(vtkStringArray* array, bool alpha);
+
 bool tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray);
 
 bool tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray, const QList<int>& columnList);

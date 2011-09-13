@@ -28,18 +28,17 @@
 // Visomics includes
 #include "voKMeansClustering.h"
 #include "voTableDataObject.h"
+#include "voUtils.h"
 #include "vtkExtendedTable.h"
 
 // VTK includes
-#include <vtkArrayToTable.h>
-#include <vtkDataSetAttributes.h>
+#include <vtkArrayData.h>
+#include <vtkIntArray.h>
 #include <vtkNew.h>
+#include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
-#include <vtkTableToArray.h>
-#include <vtkRCalculatorFilter.h>
-#include <vtkIntArray.h>
 
 // --------------------------------------------------------------------------
 // voKMeansClustering methods
@@ -164,37 +163,34 @@ void displayClustedIds(const char* description, vtkTable* table)
 // --------------------------------------------------------------------------
 bool voKMeansClustering::execute()
 {
-  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
-  if (!extendedTable)
-    {
-    qWarning() << "Input is Null";
-    return false;
-    }
-
-  vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
-
   // Parameters
   int kmeans_centers = this->integerParameter("centers");
   int kmeans_iter_max = this->integerParameter("iter.max");
   int kmeans_number_of_random_start = this->integerParameter("nstart");
   QString kmeans_algorithm = this->enumParameter("algorithm");
 
-  vtkNew<vtkTableToArray> tableToArray;
-  tableToArray->SetInput(table);
-
-  vtkNew<vtkStringArray> names;
-
-  names->SetName("Samples");
-  for (int ctr = 1; ctr < table->GetNumberOfColumns(); ctr++)
+  // Import data table
+  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  if (!extendedTable)
     {
-    tableToArray->AddColumn(table->GetColumnName(ctr));
-    names->InsertNextValue(table->GetColumnName(ctr));
+    qCritical() << "Input is Null";
+    return false;
     }
-  tableToArray->Update();
 
+  vtkSmartPointer<vtkTable> inputDataTable = extendedTable->GetData();
+
+  // Build ArrayData for input to R
+  vtkNew<vtkArrayData> RInputArrayData;
+    {
+    vtkSmartPointer<vtkArray> RInputArray;
+    voUtils::tableToArray(inputDataTable.GetPointer(), RInputArray);
+    RInputArrayData->AddArray(RInputArray.GetPointer());
+    }
+
+  // Run R
   vtkNew<vtkRCalculatorFilter> RCalc;
   RCalc->SetRoutput(0);
-  RCalc->SetInput(tableToArray->GetOutput());
+  RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
   RCalc->PutArray("0", "metabData");
   RCalc->GetArray("kmCenters", "kmCenters");
   RCalc->GetArray("kmCluster", "kmCluster");
@@ -207,48 +203,42 @@ bool voKMeansClustering::execute()
                      "kmCluster<-km$cluster\n"
                      "kmWithinss<-km$withinss\n"
                      "kmSize<-km$size\n"
-                     "kmCenters\n"
-                     "kmCluster\n"
-                     "kmWithinss\n"
-                     "kmSize"
                      ).arg(kmeans_centers).arg(kmeans_iter_max).arg(kmeans_number_of_random_start).arg(kmeans_algorithm).toLatin1());
-
   RCalc->Update();
 
+  // Get R output
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(RCalc->GetOutput());
-  if(!outputArrayData /* || outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1*/)
+  if(!outputArrayData || !outputArrayData->GetArrayByName("kmCluster"))
     {
     qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
     return false;
     }
 
-  vtkNew<vtkArrayData> kmClusterData;
-  kmClusterData->AddArray(outputArrayData->GetArrayByName("kmCluster"));
+  // Get experiment names with column labels
+  vtkNew<vtkStringArray> columnNames;
+  voUtils::addCounterLabels(extendedTable->GetColumnMetaDataOfInterestAsString(),
+                            columnNames.GetPointer(), true);
 
-  vtkNew<vtkArrayToTable> kmCluster;
-  kmCluster->SetInputConnection(kmClusterData->GetProducerPort());
-  kmCluster->Update();
-
-  // Create a table with sample name and cluster number
-  // NOTE: This transpose is necessary because the one-dimensional vtkArray returned by R is
-  //       oriented vertically. Attempting to transpose the array within R causes it to become
-  //       a two-dimensional vtkArray when returned.
-  //       To keep the orientation of experiments consistant between input and output, a
-  //       transpose and manually building the table is necessary. If a vertially-oriented
-  //       table is acceptable, simply output kmCluster->GetOutput()
+  // Get base cluster table
   vtkNew<vtkTable> clusterTable;
-
-  vtkNew<vtkStringArray> headerCol;
-  headerCol->InsertNextValue(QObject::tr("Cluster number").toLatin1());
-  clusterTable->AddColumn(headerCol.GetPointer());
-  for(unsigned int i = 0; i < kmClusterData->GetArray(0)->GetSize(); ++i)
     {
-    vtkNew<vtkIntArray> newCol;
-    newCol->SetName(table->GetColumnName(i+1)); // "table" contains a name column that must be offset from
-    newCol->InsertNextValue(kmClusterData->GetArray(0)->GetVariantValue(i).ToInt());
-    clusterTable->AddColumn(newCol.GetPointer());
-    }
+    vtkSmartPointer<vtkArray> rawClusterArray = outputArrayData->GetArrayByName("kmCluster");
 
+    vtkNew<vtkStringArray> tempHeaderCol;
+    tempHeaderCol->InsertNextValue(QObject::tr("Cluster number").toLatin1());
+    clusterTable->AddColumn(tempHeaderCol.GetPointer());
+
+    for(unsigned int i = 0; i < rawClusterArray->GetSize(); ++i)
+      {
+      vtkNew<vtkIntArray> newCol;
+      newCol->SetName(columnNames->GetValue(i));
+      newCol->InsertNextValue(rawClusterArray->GetVariantValue(i).ToInt());
+      clusterTable->AddColumn(newCol.GetPointer());
+      }
+    }
+  clusterTable->Dump();
+
+  // Renumber cluster table to be consistent
   // Since the cluster id associated with each columns is arbitrary,
   // let's make sure two successive execution of the analysis outputs
   // the same result by re-labelling the cluster id of each column from left to right.

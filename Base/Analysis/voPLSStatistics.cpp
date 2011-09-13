@@ -33,10 +33,10 @@
 // VTK includes
 #include <vtkArrayData.h>
 #include <vtkDoubleArray.h>
+#include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
-#include <vtkNew.h>
 #include <vtkTable.h>
 
 // --------------------------------------------------------------------------
@@ -179,7 +179,7 @@ bool voPLSStatistics::execute()
   vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
   if (!extendedTable)
     {
-    qWarning() << "Input is Null";
+    qCritical() << "Input is Null";
     return false;
     }
   vtkSmartPointer<vtkTable> inputDataTable = extendedTable->GetData();
@@ -245,12 +245,22 @@ bool voPLSStatistics::execute()
 
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
 
-  // Check for errors "thrown" by R script
-  if(outputArrayData && outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
+  // Get R output and check for errors "thrown" by R script
+  if(!outputArrayData || outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1)
     {
-    qWarning() << QObject::tr("Error: R could not calculate PLS");
+    qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
     return false;
     }
+
+  // Get analyte names with row labels
+  vtkNew<vtkStringArray> analyteNames;
+  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+                            analyteNames.GetPointer(), false);
+
+  // Get experiment names with column labels
+  vtkNew<vtkStringArray> experimentNames;
+  voUtils::addCounterLabels(extendedTable->GetColumnMetaDataOfInterestAsString(),
+                            experimentNames.GetPointer(), true);
 
   // ------------------------------------------------
   // Extract table for scores and Y-scores
@@ -262,8 +272,8 @@ bool voPLSStatistics::execute()
     voUtils::arrayToTable(outputArrayData->GetArrayByName("yScoresArray"), yScoresTable.GetPointer());
 
     // Add column labels (experiment names)
-    voUtils::setTableColumnNames(scoresTable.GetPointer(), extendedTable->GetColumnMetaDataOfInterestAsString());
-    voUtils::setTableColumnNames(yScoresTable.GetPointer(), extendedTable->GetColumnMetaDataOfInterestAsString());
+    voUtils::setTableColumnNames(scoresTable.GetPointer(), experimentNames.GetPointer());
+    voUtils::setTableColumnNames(yScoresTable.GetPointer(), experimentNames.GetPointer());
 
     // Add row labels (components)
     vtkNew<vtkStringArray> headerArr;
@@ -295,7 +305,6 @@ bool voPLSStatistics::execute()
 
     // Add row labels (predictor analytes)
     vtkNew<vtkStringArray> headerArr;
-    vtkStringArray* analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
     foreach(int r, predictorRangeList)
       {
       headerArr->InsertNextValue(analyteNames->GetValue(r));
@@ -327,7 +336,6 @@ bool voPLSStatistics::execute()
 
     // Add row labels (response analytes)
     vtkNew<vtkStringArray> headerArr;
-    vtkStringArray* analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
     foreach(int r, responseRangeList)
       {
       headerArr->InsertNextValue(analyteNames->GetValue(r));

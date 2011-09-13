@@ -1161,6 +1161,51 @@ int voUtilsTest(int argc, char * argv [])
   // counterAlphaToInt and know its consistant with counterIntToAlpha
 
   //-----------------------------------------------------------------------------
+  // Test addCounterLabels(vtkStringArray* srcArray, vtkStringArray* destArray, bool alpha)
+  //-----------------------------------------------------------------------------
+
+  vtkNew<vtkStringArray> addCounterLabelsBase;
+  addCounterLabelsBase->InsertNextValue("First");
+  addCounterLabelsBase->InsertNextValue("Second");
+  addCounterLabelsBase->InsertNextValue("Third");
+  addCounterLabelsBase->InsertNextValue("Fourth");
+
+  vtkNew<vtkStringArray> addCounterLabelsNumberExpected;
+  addCounterLabelsNumberExpected->InsertNextValue("1: First");
+  addCounterLabelsNumberExpected->InsertNextValue("2: Second");
+  addCounterLabelsNumberExpected->InsertNextValue("3: Third");
+  addCounterLabelsNumberExpected->InsertNextValue("4: Fourth");
+
+  vtkNew<vtkStringArray> addCounterLabelsAlphaExpected;
+  addCounterLabelsAlphaExpected->InsertNextValue("A: First");
+  addCounterLabelsAlphaExpected->InsertNextValue("B: Second");
+  addCounterLabelsAlphaExpected->InsertNextValue("C: Third");
+  addCounterLabelsAlphaExpected->InsertNextValue("D: Fourth");
+
+  vtkNew<vtkStringArray> addCounterLabelsNumberTest;
+  vtkNew<vtkStringArray> addCounterLabelsAlphaTest;
+
+  voUtils::addCounterLabels(addCounterLabelsBase.GetPointer(),
+                            addCounterLabelsNumberTest.GetPointer(), false);
+  if(!compareArray(addCounterLabelsNumberTest.GetPointer(),
+               addCounterLabelsNumberExpected.GetPointer()))
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with addCounterLabels(.., false)" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  voUtils::addCounterLabels(addCounterLabelsBase.GetPointer(),
+                            addCounterLabelsAlphaTest.GetPointer(), true);
+  if (!compareArray(addCounterLabelsAlphaTest.GetPointer(),
+               addCounterLabelsAlphaExpected.GetPointer()))
+    {
+    std::cerr << "Line " << __LINE__ << " - "
+              << "Problem with addCounterLabels(.., true)" << std::endl;
+    return EXIT_FAILURE;
+    }
+
+  //-----------------------------------------------------------------------------
   // Test parseRangeString(const QString& rangeString, QList<int>& rangeList, bool alpha)
   //-----------------------------------------------------------------------------
 

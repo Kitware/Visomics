@@ -35,8 +35,11 @@ class voTableDataObject : public voDataObject
 public:
   typedef voDataObject Superclass;
   voTableDataObject(QObject* newParent = 0);
-  voTableDataObject(const QString& newName, vtkDataObject * newData, QObject* newParent = 0);
+  voTableDataObject(const QString& newName, vtkDataObject * newData, bool newSortable = false, QObject* newParent = 0);
   virtual ~voTableDataObject();
+
+  bool sortable()const;
+  void setSortable(const bool& newSortable);
   
 protected:
   QScopedPointer<voTableDataObjectPrivate> d_ptr;
