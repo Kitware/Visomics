@@ -33,6 +33,7 @@
 #include <vtkChartXY.h>
 #include <vtkContextScene.h>
 #include <vtkContextView.h>
+#include <vtkDoubleArray.h>
 #include <vtkNew.h>
 #include <vtkPlot.h>
 #include <vtkRenderer.h>
@@ -119,6 +120,14 @@ void voPCABarView::setDataObjectInternal(const voDataObject& dataObject)
     return;
     }
 
+  vtkNew<vtkStringArray> horizontalLabels;
+  vtkNew<vtkDoubleArray> horizontalLocations;
+  for(vtkIdType i = 0; i < transpose->GetNumberOfRows(); ++i)
+    {
+    horizontalLabels->InsertNextValue(QString::number(i+1).toStdString());
+    horizontalLocations->InsertNextValue(static_cast<double>(i));
+    }
+
   // See http://www.colorjack.com/?swatch=A6CEE3
   unsigned char color[3] = {166, 206, 227};
 
@@ -127,7 +136,13 @@ void voPCABarView::setDataObjectInternal(const voDataObject& dataObject)
   d->Plot->SetIndexedLabels(labels);
   d->Plot->SetTooltipLabelFormat("%i: %y");
 
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetBehavior(vtkAxis::FIXED);
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTickPositions(horizontalLocations.GetPointer());
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTickLabels(horizontalLabels.GetPointer());
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetRange(-0.5, static_cast<double>(horizontalLocations->GetNumberOfTuples()) - 0.5);
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetGridVisible(false);
+
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(transpose->GetColumnName(2)); // y
 
   d->ChartView->GetRenderWindow()->SetMultiSamples(4);
