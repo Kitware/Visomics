@@ -25,16 +25,16 @@
 #include <QtVariantPropertyManager>
 
 // Visomics includes
-#include "voDataObject.h"
 #include "voHierarchicalClustering.h"
+#include "voDataObject.h"
 #include "voTableDataObject.h"
 #include "voUtils.h"
 #include "vtkExtendedTable.h"
 
 // VTK includes
-#include <vtkDataSetAttributes.h>
 #include <vtkArrayData.h>
 #include <vtkDenseArray.h>
+#include <vtkDataSetAttributes.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
 #include <vtkMutableDirectedGraph.h>
@@ -44,8 +44,6 @@
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkTree.h>
-#include <vtkAdjacentVertexIterator.h>
-#include <vtkTreeDFSIterator.h>
 #include <vtkTreeBFSIterator.h>
 
 // --------------------------------------------------------------------------
@@ -109,27 +107,26 @@ QString voHierarchicalClustering::parameterDescription()const
 // --------------------------------------------------------------------------
 bool voHierarchicalClustering::execute()
 {
+  // Parameters
+  QString hclust_method = this->enumParameter("method");
+
   // Import data table
   vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
   if (!extendedTable)
     {
-    qWarning() << "Input is Null";
+    qCritical() << "Input is Null";
     return false;
     }
 
   vtkSmartPointer<vtkTable> inputDataTable = extendedTable->GetData();
 
-  vtkSmartPointer<vtkStringArray> columnNames = extendedTable->GetColumnMetaDataOfInterestAsString();
-
-  // Parameters
-  QString hclust_method = this->enumParameter("method");
-
-  // R input
-  vtkSmartPointer<vtkArray> RInputArray;
-  voUtils::tableToArray(inputDataTable.GetPointer(), RInputArray);
-
+  // Build ArrayData for input to R
   vtkNew<vtkArrayData> RInputArrayData;
-  RInputArrayData->AddArray(RInputArray.GetPointer());
+    {
+    vtkSmartPointer<vtkArray> RInputArray;
+    voUtils::tableToArray(inputDataTable.GetPointer(), RInputArray);
+    RInputArrayData->AddArray(RInputArray.GetPointer());
+    }
 
   // Run R
   vtkNew <vtkRCalculatorFilter> RCalc;
@@ -179,8 +176,7 @@ bool voHierarchicalClustering::execute()
 
   // Get R output
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(RCalc->GetOutput());
-
-  if(!outputArrayData /* || outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1*/)
+  if(!outputArrayData || !outputArrayData->GetArrayByName("merge"))
     {
     qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
     return false;
@@ -191,6 +187,11 @@ bool voHierarchicalClustering::execute()
 
   vtkSmartPointer< vtkDenseArray<double> > mergeArray;
   mergeArray = vtkDenseArray<double>::SafeDownCast(outputArrayData->GetArrayByName("merge"));
+
+  // Get experiment names with column labels
+  vtkNew<vtkStringArray> columnNames;
+  voUtils::addCounterLabels(extendedTable->GetColumnMetaDataOfInterestAsString(),
+                            columnNames.GetPointer(), true);
 
   // Analysis outputs
   vtkNew<vtkMutableDirectedGraph> graph;
@@ -288,10 +289,17 @@ bool voHierarchicalClustering::execute()
 
   // Generate table for heatmap
   vtkNew<vtkTable> clusterTable;
-  clusterTable->AddColumn(extendedTable->GetRowMetaDataOfInterestAsString());
-  foreach(QString colLabel, reverseBFSLabels)
+  // Get analyte names with row labels
+  vtkNew<vtkStringArray> rowNames;
+  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+                            rowNames.GetPointer(), false);
+  clusterTable->AddColumn(rowNames.GetPointer());
+  foreach(const QString& colLabel, reverseBFSLabels)
     {
-    clusterTable->AddColumn(inputDataTable->GetColumnByName(colLabel.toLatin1()));
+    QString rawColLabel = colLabel.mid(colLabel.indexOf(": ") + 2);
+    clusterTable->AddColumn(inputDataTable->GetColumnByName(rawColLabel.toLatin1().data()));
+    // Can't rename column until it's been copied by AddColumn()
+    clusterTable->GetColumn(clusterTable->GetNumberOfColumns() - 1)->SetName(colLabel.toLatin1());
     }
 
   // Compute min/max

@@ -505,6 +505,34 @@ int voUtils::counterAlphaToInt(const QString& alphaVal)
 }
 
 //----------------------------------------------------------------------------
+void voUtils::addCounterLabels(vtkStringArray* srcArray, vtkStringArray* destArray, bool alpha)
+{
+  if (!srcArray || !destArray)
+    {
+    return;
+    }
+
+  vtkIdType arraySize = srcArray->GetNumberOfValues();
+  int padding = QString::number(arraySize+1).size(); // Padding makes sorting work properly
+
+  destArray->SetNumberOfValues(arraySize);
+  for(vtkIdType i = 0; i < arraySize; ++i)
+    {
+    QString label = alpha ?
+                    voUtils::counterIntToAlpha(i) :
+                    QString::number(i+1);
+    QString labeledString = QString(srcArray->GetValue(i)).prepend(QString("%1: ").arg(label, padding, ' '));
+    destArray->SetValue(i, labeledString.toStdString());
+    }
+}
+
+//----------------------------------------------------------------------------
+void voUtils::addCounterLabels(vtkStringArray* array, bool alpha)
+{
+  addCounterLabels(array, array, alpha);
+}
+
+//----------------------------------------------------------------------------
 bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destArray)
 {
   if (!srcTable)

@@ -24,17 +24,17 @@
 // Visomics includes
 #include "voPCAStatistics.h"
 #include "voTableDataObject.h"
+#include "voUtils.h"
 #include "vtkExtendedTable.h"
 
 // VTK includes
-#include <vtkArrayToTable.h>
+#include <vtkArrayData.h>
 #include <vtkDoubleArray.h>
 #include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
-#include <vtkTableToArray.h>
 
 // --------------------------------------------------------------------------
 // voPCAStatisticsPrivate methods
@@ -76,6 +76,10 @@ void voPCAStatistics::setOutputInformation()
                       "voPCAProjectionView", "Projection (Plot)",
                       "voTableView", "Projection (Table)");
 
+  this->addOutputType("x-dynview", "vtkTable",
+                      "voPCAProjectionDynView", "Projection (Interactive Plot)",
+                      "", "");
+
   this->addOutputType("rot", "vtkTable",
                       "",  "",
                       "voTableView", "Rotation (Table)");
@@ -83,18 +87,14 @@ void voPCAStatistics::setOutputInformation()
   this->addOutputType("sdev", "vtkTable",
                       "", "",
                       "voTableView", "Std. Deviation (Table)");
-    
+
   this->addOutputType("loading", "vtkTable" ,
                       "voPCABarView", "Percent Loading (Plot)",
                       "voTableView", "Percent Loading (Table)");
-   
+
   this->addOutputType("sumloading", "vtkTable" ,
                       "voPCABarView", "Cumulative Percent Loading (Plot)",
                       "voTableView", "Cumulative Percent Loading (Table)");
-
-  this->addOutputType("x-dynview", "vtkTable",
-                      "voPCAProjectionDynView", "Projection (Interactive Plot)",
-                      "", "");
 }
 
 // --------------------------------------------------------------------------
@@ -102,28 +102,34 @@ bool voPCAStatistics::execute()
 {
   Q_D(voPCAStatistics);
 
+  // Import data table locally
   vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
   if (!extendedTable)
     {
-    qWarning() << "Input is Null";
+    qCritical() << "Input is Null";
     return false;
     }
 
-  vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
+  //vtkSmartPointer<vtkTable> table = vtkSmartPointer<vtkTable>::Take(extendedTable->GetDataWithRowHeader());
+  vtkSmartPointer<vtkTable> inputDataTable = extendedTable->GetData();
 
-  vtkNew<vtkTableToArray> tab;
-  tab->SetInput(table);
-
-  for (int ctr=1; ctr<table->GetNumberOfColumns(); ctr++)
+  // Build ArrayData for input to R
+  vtkNew<vtkArrayData> RInputArrayData;
     {
-    tab->AddColumn(table->GetColumnName(ctr));
+    vtkSmartPointer<vtkArray> RInputArray;
+    voUtils::tableToArray(inputDataTable.GetPointer(), RInputArray);
+    RInputArrayData->AddArray(RInputArray.GetPointer());
     }
-  
-  tab->Update();
 
   d->RCalc->SetRoutput(0);
-  d->RCalc->SetInputConnection(tab->GetOutputPort());
+  d->RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
   d->RCalc->PutArray("0", "PCAData");
+  d->RCalc->GetArray("pcaRot", "pcaRot");
+  d->RCalc->GetArray("pcaSdev", "pcaSdev");
+  d->RCalc->GetArray("sumperload", "sumperload");
+  d->RCalc->GetArray("perload", "perload");
+  d->RCalc->GetArray("stddev", "stddev");
+  d->RCalc->GetArray("projection", "projection");
   d->RCalc->SetRscript("pc1<-prcomp(t(PCAData), scale.=F, center=T, retx=T)\n"
                      "pcaRot<-pc1$rot\n"
                      "pcaSdev<-pc1$sdev\n"
@@ -134,166 +140,147 @@ bool voPCAStatistics::execute()
                      "perload=OutputData[((1:numcol)*3)-1]\n"
                      "sumperload=OutputData[((1:numcol)*3)] \n"
                      "projection<-pc1$x");
-  d->RCalc->GetArray("pcaRot", "pcaRot");
-  d->RCalc->GetArray("pcaSdev", "pcaSdev");
-  d->RCalc->GetArray("sumperload", "sumperload");
-  d->RCalc->GetArray("perload", "perload");
-  d->RCalc->GetArray("stddev", "stddev");
-  d->RCalc->GetArray("projection", "projection");
-
-  // Do PCA
   d->RCalc->Update();
 
+  // Get R output
   vtkSmartPointer<vtkArrayData> outputArrayData = vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
-  if(!outputArrayData /* || outputArrayData->GetArrayByName("RerrValue")->GetVariantValue(0).ToInt() > 1*/)
+  if(!outputArrayData || !outputArrayData->GetArrayByName("stddev"))
     {
     qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
     return false;
     }
 
-  // Set up headers for the rows.
-  vtkSmartPointer<vtkStringArray> rowHeader = vtkStringArray::SafeDownCast(table->GetColumn(0));
-  if (!rowHeader)
-    {
-    std::cout << "Downcast DID NOT work." << std::endl;
-    return 1;
-    }
-  vtkNew<vtkStringArray> colHeader;
-  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
-    {
-    colHeader->InsertNextValue(table->GetColumnName(c));
-    }
+  // Get analyte names with row labels
+  vtkNew<vtkStringArray> rowNames;
+  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+                            rowNames.GetPointer(), false);
 
-  // Extract rotated coordinates (for projection plot)
-  vtkNew<vtkArrayData> pcaProjData;
-  pcaProjData->AddArray(outputArrayData->GetArrayByName("projection"));
+  // Get experiment names with column labels
+  vtkNew<vtkStringArray> columnNames;
+  voUtils::addCounterLabels(extendedTable->GetColumnMetaDataOfInterestAsString(),
+                            columnNames.GetPointer(), true);
 
-  vtkNew<vtkArrayToTable> pcaProj;
-  pcaProj->SetInputConnection(pcaProjData->GetProducerPort());
-  pcaProj->Update();  
-  
-  vtkTable* assess = vtkTable::SafeDownCast(pcaProj->GetOutput());
+  // ------------------------------------------------
+  // Extract projection table
+  vtkNew<vtkTable> projectionTable;
+    {
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("projection"), projectionTable.GetPointer());
+    voUtils::transposeTable(projectionTable.GetPointer());
 
-  vtkNew<vtkTable> xtab;
-  vtkNew<vtkStringArray> PCHeaderArr;
-  for (vtkIdType c = 0; c < assess->GetNumberOfColumns(); ++c)
-    {
-    PCHeaderArr->InsertNextValue(QString("PC%1").arg(c + 1).toLatin1());
-    }
-  xtab->AddColumn(PCHeaderArr.GetPointer());
-  for (vtkIdType r = 0; r < assess->GetNumberOfRows(); ++r)
-    {
-    vtkNew<vtkDoubleArray> arr;
-    arr->SetName(colHeader->GetValue(r));
-    arr->SetNumberOfTuples(assess->GetNumberOfColumns());
-    for (vtkIdType c = 0; c < assess->GetNumberOfColumns(); ++c)
+    // Add column labels (experiment names)
+    voUtils::setTableColumnNames(projectionTable.GetPointer(), columnNames.GetPointer());
+
+    // Add row labels (components)
+    vtkNew<vtkStringArray> headerArr;
+    for (vtkIdType r = 0;r < projectionTable->GetNumberOfRows(); ++r)
       {
-      arr->SetValue(c, assess->GetValue(r, c).ToDouble());
+      headerArr->InsertNextValue(QString("PC%1").arg(r + 1).toLatin1());
       }
-    xtab->AddColumn(arr.GetPointer());
+    voUtils::insertColumnIntoTable(projectionTable.GetPointer(), 0, headerArr.GetPointer());
     }
+  this->setOutput("x", new voTableDataObject("x", projectionTable.GetPointer()));
+  this->setOutput("x-dynview", new voTableDataObject("x-dynview", projectionTable.GetPointer()));
 
-  this->setOutput("x", new voTableDataObject("x", xtab.GetPointer()));
-  this->setOutput("x-dynview", new voTableDataObject("x-dynview", xtab.GetPointer()));
-
-
-  // Extract rotation matrix (each column is an eigenvector)
-  vtkNew<vtkArrayData> pcaRotData;
-  pcaRotData->AddArray(outputArrayData->GetArrayByName("pcaRot"));
-
-  vtkNew<vtkArrayToTable> pcaRot;
-  pcaRot->SetInputConnection(pcaRotData->GetProducerPort());
-  pcaRot->Update();
-  
-  vtkTable* compressed = vtkTable::SafeDownCast(pcaRot->GetOutput());
-
-  vtkNew<vtkTable> rot;
-  rot->AddColumn(rowHeader);
-  for (vtkIdType c = 0;c < compressed->GetNumberOfColumns(); ++c)
+  // ------------------------------------------------
+  // Extract rotation table (each column is an eigenvector)
+  vtkNew<vtkTable> rotationTable;
     {
-    vtkAbstractArray* col = compressed->GetColumn(c);
-    col->SetName(QString("PC%1").arg(c + 1).toLatin1());
-    rot->AddColumn(col);
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("pcaRot"), rotationTable.GetPointer());
+
+    // Add column labels (components)
+    for(vtkIdType c = 0; c < rotationTable->GetNumberOfColumns(); ++c)
+      {
+      QByteArray colName = QString("PC%1").arg(c + 1).toLatin1();
+      rotationTable->GetColumn(c)->SetName(colName);
+      }
+
+    // Add row labels (analyte names)
+    voUtils::insertColumnIntoTable(rotationTable.GetPointer(), 0, rowNames.GetPointer());
     }
-  this->setOutput("rot", new voTableDataObject("rot", rot.GetPointer()));
+  this->setOutput("rot", new voTableDataObject("rot", rotationTable.GetPointer()));
 
-
-  // Extract standard deviations for each principal component (eigenvalues)
-  vtkNew<vtkArrayData> pcaStDevData;
-  pcaStDevData->AddArray(outputArrayData->GetArrayByName("stddev"));
-  
-  vtkNew<vtkArrayToTable> pcastdev;
-  pcastdev->SetInputConnection(pcaStDevData->GetProducerPort());
-  pcastdev->Update();
-
-  vtkTable* marks = vtkTable::SafeDownCast(pcastdev->GetOutput());
-
-  vtkNew<vtkTable> sdev;
-  vtkNew<vtkStringArray> sdevHeaderArray;
-  sdevHeaderArray->InsertNextValue("Std Dev");
-  sdev->AddColumn(sdevHeaderArray.GetPointer());
-  for (vtkIdType r = 0;r < marks->GetNumberOfRows(); ++r)
+  // ------------------------------------------------
+  // Extract standard deviation table
+  vtkNew<vtkTable> stdDevTable;
     {
-    vtkNew<vtkDoubleArray> sdevArr;
-    sdevArr->SetName(QString("PC%1").arg(r + 1).toLatin1());
-    sdevArr->InsertNextValue(marks->GetValue(r,0).ToDouble());
-    sdev->AddColumn(sdevArr.GetPointer());
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("stddev"), stdDevTable.GetPointer());
+    voUtils::transposeTable(stdDevTable.GetPointer());
+
+    // Add column labels (components)
+    for(vtkIdType c = 0; c < stdDevTable->GetNumberOfColumns(); ++c)
+      {
+      QByteArray colName = QString("PC%1").arg(c + 1).toLatin1();
+      stdDevTable->GetColumn(c)->SetName(colName);
+      }
+
+    // Add row label
+    vtkNew<vtkStringArray> headerArr;
+    headerArr->InsertNextValue("Std Dev");
+    voUtils::insertColumnIntoTable(stdDevTable.GetPointer(), 0, headerArr.GetPointer());
     }
-  this->setOutput("sdev", new voTableDataObject("sdev", sdev.GetPointer()));
+  this->setOutput("sdev", new voTableDataObject("sdev", stdDevTable.GetPointer()));
 
-
-  //Extract the Variation values for percent loading (proportion of variance) analysis
-  vtkNew<vtkArrayData> pcaLoadingData;
-  pcaLoadingData->AddArray(outputArrayData->GetArrayByName("perload"));
-
-  vtkNew<vtkArrayToTable> pcaLoad;
-  pcaLoad->SetInputConnection(pcaLoadingData->GetProducerPort());
-  pcaLoad->Update();
-
-  vtkTable* permarks =vtkTable::SafeDownCast(pcaLoad->GetOutput());
-
-  vtkNew<vtkTable> loading;
-  vtkNew<vtkStringArray> loadingHeaderArray;
-  loadingHeaderArray->InsertNextValue("Loading Vector");
-  loadingHeaderArray->InsertNextValue("Percent Loading");
-  loading->AddColumn(loadingHeaderArray.GetPointer());
-
-  for (vtkIdType r = 0;r < permarks->GetNumberOfRows(); ++r)
+  // ------------------------------------------------
+  // Extract percent loading (proportion of variance) table
+  vtkNew<vtkTable> pctLoadingTable;
     {
-    vtkNew<vtkDoubleArray> loadingArr;
-    loadingArr->SetName(QString("PC%1").arg(r + 1).toLatin1());
-    loadingArr->InsertNextValue(r);
-    loadingArr->InsertNextValue(permarks->GetValue(r,0).ToDouble());
-    loading->AddColumn(loadingArr.GetPointer());
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("perload"), pctLoadingTable.GetPointer());
+
+    // Add loading vector number column (will be transposed to be first row)
+    vtkNew<vtkDoubleArray> cardinalArray;
+    for(vtkIdType r = 0; r < pctLoadingTable->GetNumberOfRows(); ++r)
+      {
+      cardinalArray->InsertNextValue(static_cast<double>(r));
+      }
+    voUtils::insertColumnIntoTable(pctLoadingTable.GetPointer(), 0, cardinalArray.GetPointer());
+
+    voUtils::transposeTable(pctLoadingTable.GetPointer());
+
+    // Add column labels (components)
+    for(vtkIdType c = 0; c < pctLoadingTable->GetNumberOfColumns(); ++c)
+      {
+      QByteArray colName = QString("PC%1").arg(c + 1).toLatin1();
+      pctLoadingTable->GetColumn(c)->SetName(colName);
+      }
+
+    // Add row labels
+    vtkNew<vtkStringArray> headerArr;
+    headerArr->InsertNextValue("Loading Vector");
+    headerArr->InsertNextValue("Percent Loading");
+    voUtils::insertColumnIntoTable(pctLoadingTable.GetPointer(), 0, headerArr.GetPointer());
     }
-  this->setOutput("loading", new voTableDataObject("loading", loading.GetPointer()));
+  this->setOutput("loading", new voTableDataObject("loading", pctLoadingTable.GetPointer()));
 
-
-  //Calculate the cumulative percent loading for the standard deviation.
-  vtkNew<vtkArrayData> pcaSumLoadingData;
-  pcaSumLoadingData->AddArray(outputArrayData->GetArrayByName("sumperload"));
-
-  vtkNew<vtkArrayToTable> pcaSumLoad;
-  pcaSumLoad->SetInputConnection(pcaSumLoadingData->GetProducerPort());
-  pcaSumLoad->Update();
-
-  vtkTable* sumpermarks = vtkTable::SafeDownCast(pcaSumLoad->GetOutput());
-
-  vtkNew<vtkTable> sumloading;
-  vtkNew<vtkStringArray> sumloadingHeaderArray;
-  sumloadingHeaderArray->InsertNextValue("Loading Vector");
-  sumloadingHeaderArray->InsertNextValue("Cumulative Percent Loading");
-  sumloading->AddColumn(sumloadingHeaderArray.GetPointer());
-
-  for (vtkIdType r = 0;r < sumpermarks->GetNumberOfRows(); ++r)
+  // ------------------------------------------------
+  // Extract percent loading (proportion of variance) table
+  vtkNew<vtkTable> sumLoadingTable;
     {
-    vtkSmartPointer<vtkDoubleArray> sumloadingArr = vtkSmartPointer<vtkDoubleArray>::New();
-    sumloadingArr->SetName(QString("PC%1").arg(r + 1).toLatin1());
-    sumloadingArr->InsertNextValue(r);
-    sumloadingArr->InsertNextValue(sumpermarks->GetValue(r,0).ToDouble());
-    sumloading->AddColumn(sumloadingArr.GetPointer());
+    voUtils::arrayToTable(outputArrayData->GetArrayByName("sumperload"), sumLoadingTable.GetPointer());
+
+    // Add loading vector number column (will be transposed to be first row)
+    vtkNew<vtkDoubleArray> cardinalArray;
+    for(vtkIdType r = 0; r < sumLoadingTable->GetNumberOfRows(); ++r)
+      {
+      cardinalArray->InsertNextValue(static_cast<double>(r));
+      }
+    voUtils::insertColumnIntoTable(sumLoadingTable.GetPointer(), 0, cardinalArray.GetPointer());
+
+    voUtils::transposeTable(sumLoadingTable.GetPointer());
+
+    // Add column labels (components)
+    for(vtkIdType c = 0; c < sumLoadingTable->GetNumberOfColumns(); ++c)
+      {
+      QByteArray colName = QString("PC%1").arg(c + 1).toLatin1();
+      sumLoadingTable->GetColumn(c)->SetName(colName);
+      }
+
+    // Add row labels
+    vtkNew<vtkStringArray> headerArr;
+    headerArr->InsertNextValue("Loading Vector");
+    headerArr->InsertNextValue("Cumulative Percent Loading");
+    voUtils::insertColumnIntoTable(sumLoadingTable.GetPointer(), 0, headerArr.GetPointer());
     }
-  this->setOutput("sumloading", new voTableDataObject("sumloading", sumloading.GetPointer()));
+  this->setOutput("sumloading", new voTableDataObject("sumloading", sumLoadingTable.GetPointer()));
 
   return true;
 }
