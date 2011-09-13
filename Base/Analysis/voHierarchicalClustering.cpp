@@ -293,7 +293,24 @@ bool voHierarchicalClustering::execute()
     {
     clusterTable->AddColumn(inputDataTable->GetColumnByName(colLabel.toLatin1()));
     }
-  this->setOutput("clusterHeatMap", new voTableDataObject("clusterHeatMap", clusterTable.GetPointer()));
+
+  // Compute min/max
+  double minVal = clusterTable->GetValue(0,1).ToDouble();
+  double maxVal = clusterTable->GetValue(0,1).ToDouble();
+  for (vtkIdType i = 0; i < clusterTable->GetNumberOfRows(); ++i)
+    {
+    for (vtkIdType j = 1 ; j < clusterTable->GetNumberOfColumns(); ++j) // Skip first column (header labels)
+      {
+      double cellValue = clusterTable->GetValue(i,j).ToDouble();
+      minVal = qMin(minVal, cellValue);
+      maxVal = qMax(maxVal, cellValue);
+      }
+    }
+  voTableDataObject * clusterHeapMapDataObject =
+      new voTableDataObject("clusterHeatMap", clusterTable.GetPointer());
+  clusterHeapMapDataObject->setProperty("min_value", minVal);
+  clusterHeapMapDataObject->setProperty("max_value", maxVal);
+  this->setOutput("clusterHeatMap", clusterHeapMapDataObject);
 
   return true;
 }

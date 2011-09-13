@@ -19,8 +19,9 @@
 =========================================================================*/
 
 // Qt includes
-#include <QLayout>
 #include <QDebug>
+#include <QLayout>
+#include <QVariant>
 
 // Visomics includes
 #include "voHeatMapView.h"
@@ -153,8 +154,6 @@ void voHeatMapView::setDataObjectInternal(const voDataObject& dataObject)
 
   double *dPtr = static_cast<double *>(imageData->GetScalarPointer(0, 0, 0));
   //double *dPtr = static_cast<double *>(imageData->GetScalarPointer());
-  double minVal = table->GetValue(0,1).ToDouble();
-  double maxVal = table->GetValue(0,1).ToDouble();
   for (vtkIdType i = 0; i < corrMatrixNumberOfRows; ++i)
     {
     for (vtkIdType j = 1 ; j < corrMatrixNumberOfCols; ++j) // Skip first column (header labels)
@@ -162,8 +161,6 @@ void voHeatMapView::setDataObjectInternal(const voDataObject& dataObject)
       double cellValue = table->GetValue(i,j).ToDouble();
       // Flip vertically for table -> image mapping
       dPtr[((corrMatrixNumberOfRows - i -1) * (corrMatrixNumberOfCols - 1)) + (j - 1) ] = cellValue;
-      minVal = qMin(minVal, cellValue);
-      maxVal = qMax(maxVal, cellValue);
       }
     }
 
@@ -189,19 +186,28 @@ void voHeatMapView::setDataObjectInternal(const voDataObject& dataObject)
   plotHistogram->SetTooltipNotation(vtkAxis::FIXED_NOTATION);
   plotHistogram->SetTooltipLabelFormat("%j / %i : %v");
 
-  double hsvScalars[3] = {-1.0, 0.0, 1.0};
-  if (dataObject.name() == QString("clusterHeatMap"))
+  double minValue = -1.0;
+  if (dataObject.property("min_value").isValid())
     {
-    hsvScalars[0] = minVal;
-    hsvScalars[1] = (maxVal-minVal)/2.0;
-    hsvScalars[2] = maxVal;
+    minValue = dataObject.property("min_value").toDouble();
     }
+  double maxValue = 1.0;
+  if (dataObject.property("max_value").isValid())
+    {
+    maxValue = dataObject.property("max_value").toDouble();
+    }
+  double midValue = 0.0;
+  if (minValue != -1.0 && maxValue != 1.0)
+    {
+    midValue = (maxValue-minValue)/2.0;
+    }
+  double hsvScalars[3] = {minValue, midValue, maxValue};
   double hsvHues[3] = {0.3, 0.15, 0.0}; // green - red
   double hsvSats[3] = {1.0, 0.3, 1.0};
   double hsvValues[3] = {1.0, 0.3, 1.0};
 
-  vtkSmartPointer<vtkColorTransferFunction> transferFunction = vtkSmartPointer<vtkColorTransferFunction>::New();
-  for(int i = 0; i < 3 - 1; i++)
+  vtkNew<vtkColorTransferFunction> transferFunction;
+  for(int i = 0; i < 3 - 1; ++i)
     {
     transferFunction->AddHSVSegment(hsvScalars[i], hsvHues[i], hsvSats[i], hsvValues[i],
                                     hsvScalars[i+1], hsvHues[i+1], hsvSats[i+1], hsvValues[i+1]);
