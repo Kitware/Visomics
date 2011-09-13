@@ -219,7 +219,9 @@ void voMainWindow::loadSampleDataset()
     {
     file = QString(VISOMICS_DATA_DIR) + "/Data/UNC/All_conc_kitware_transposed.csv";
     }
-  voDelimitedTextImportDialog dialog(this);
+  voDelimitedTextImportSettings defaultSettings;
+  defaultSettings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes, 4);
+  voDelimitedTextImportDialog dialog(this, defaultSettings);
   dialog.setFileName(file);
   int status = dialog.exec();
   if (status == voDelimitedTextImportDialog::Accepted)
