@@ -188,8 +188,10 @@ bool voHierarchicalClustering::execute()
   vtkSmartPointer< vtkDenseArray<double> > mergeArray;
   mergeArray = vtkDenseArray<double>::SafeDownCast(outputArrayData->GetArrayByName("merge"));
 
-  // Get experiment names
-  vtkSmartPointer<vtkStringArray> columnNames = extendedTable->GetColumnMetaDataOfInterestAsString();
+  // Get experiment names with column labels
+  vtkNew<vtkStringArray> columnNames;
+  voUtils::addCounterLabels(extendedTable->GetColumnMetaDataOfInterestAsString(),
+                            columnNames.GetPointer(), true);
 
   // Analysis outputs
   vtkNew<vtkMutableDirectedGraph> graph;
@@ -287,12 +289,17 @@ bool voHierarchicalClustering::execute()
 
   // Generate table for heatmap
   vtkNew<vtkTable> clusterTable;
-  // Get analyte names
-  vtkSmartPointer<vtkStringArray> rowNames = extendedTable->GetRowMetaDataOfInterestAsString();
+  // Get analyte names with row labels
+  vtkNew<vtkStringArray> rowNames;
+  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+                            rowNames.GetPointer(), false);
   clusterTable->AddColumn(rowNames.GetPointer());
   foreach(QString colLabel, reverseBFSLabels)
     {
-    clusterTable->AddColumn(inputDataTable->GetColumnByName(colLabel.toLatin1().data()));
+    QString rawColLabel = colLabel.mid(colLabel.indexOf(": ") + 2);
+    clusterTable->AddColumn(inputDataTable->GetColumnByName(rawColLabel.toLatin1().data()));
+    // Can't rename column until it's been copied by AddColumn()
+    clusterTable->GetColumn(clusterTable->GetNumberOfColumns()-1)->SetName(colLabel.toLatin1().data());
     }
   this->setOutput("clusterHeatMap", new voTableDataObject("clusterHeatMap", clusterTable.GetPointer()));
 

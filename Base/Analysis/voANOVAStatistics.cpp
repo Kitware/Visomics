@@ -200,8 +200,10 @@ bool voANOVAStatistics::execute()
     qWarning() << QObject::tr("ANOVA warning: cannot calculate fold change from zero or negative input");
     }
 
-  // Get analyte names
-  vtkSmartPointer<vtkStringArray> analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
+  // Get analyte names with row labels
+  vtkNew<vtkStringArray> analyteNames;
+  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+                            analyteNames.GetPointer(), false);
 
   // Build table for p-values
   vtkNew<vtkTable> outputDataTable;

@@ -252,11 +252,15 @@ bool voPLSStatistics::execute()
     return false;
     }
 
-  // Get analyte names
-  vtkSmartPointer<vtkStringArray> analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
+  // Get analyte names with row labels
+  vtkNew<vtkStringArray> analyteNames;
+  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+                            analyteNames.GetPointer(), false);
 
-  // Get experiment names
-  vtkSmartPointer<vtkStringArray> experimentNames = extendedTable->GetColumnMetaDataOfInterestAsString();
+  // Get experiment names with column labels
+  vtkNew<vtkStringArray> experimentNames;
+  voUtils::addCounterLabels(extendedTable->GetColumnMetaDataOfInterestAsString(),
+                            experimentNames.GetPointer(), true);
 
   // ------------------------------------------------
   // Extract table for scores and Y-scores

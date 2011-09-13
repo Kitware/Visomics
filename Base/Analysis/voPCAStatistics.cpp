@@ -150,11 +150,15 @@ bool voPCAStatistics::execute()
     return false;
     }
 
-  // Get analyte names
-  vtkSmartPointer<vtkStringArray> rowNames = extendedTable->GetRowMetaDataOfInterestAsString();
+  // Get analyte names with row labels
+  vtkNew<vtkStringArray> rowNames;
+  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+                            rowNames.GetPointer(), false);
 
-  // Get experiment names
-  vtkSmartPointer<vtkStringArray> columnNames = extendedTable->GetColumnMetaDataOfInterestAsString();
+  // Get experiment names with column labels
+  vtkNew<vtkStringArray> columnNames;
+  voUtils::addCounterLabels(extendedTable->GetColumnMetaDataOfInterestAsString(),
+                            columnNames.GetPointer(), true);
 
   // ------------------------------------------------
   // Extract projection table

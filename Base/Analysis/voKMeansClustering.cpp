@@ -214,8 +214,10 @@ bool voKMeansClustering::execute()
     return false;
     }
 
-  // Get experiment names
-  vtkSmartPointer<vtkStringArray> columnNames = extendedTable->GetColumnMetaDataOfInterestAsString();
+  // Get experiment names with column labels
+  vtkNew<vtkStringArray> columnNames;
+  voUtils::addCounterLabels(extendedTable->GetColumnMetaDataOfInterestAsString(),
+                            columnNames.GetPointer(), true);
 
   // Get base cluster table
   vtkNew<vtkTable> clusterTable;

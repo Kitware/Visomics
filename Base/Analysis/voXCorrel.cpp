@@ -152,8 +152,10 @@ bool voXCorrel::execute()
     return false;
     }
 
-  // Get analyte names
-  vtkSmartPointer<vtkStringArray> analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
+  // Get analyte names with row labels
+  vtkNew<vtkStringArray> analyteNames;
+  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+                            analyteNames.GetPointer(), false);
 
   // Extract correlation table
   vtkNew<vtkTable> corrTable;
