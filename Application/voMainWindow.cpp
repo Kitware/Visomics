@@ -16,6 +16,7 @@
 
 // Visomics includes
 #include "ui_voMainWindow.h"
+#include "voAboutDialog.h"
 #include "voAnalysisParameterDialog.h"
 #include "voApplication.h"
 #include "voAnalysis.h"
@@ -203,10 +204,8 @@ void voMainWindow::onViewErrorLogActionTriggered()
 // --------------------------------------------------------------------------
 void voMainWindow::about()
 {
-  QMessageBox::about(this, tr("About Visomics"),
-          tr("<h2>Visomics %1</h2>"
-             "<p>Copyright &copy; 2010 Kitware Inc."
-             "<p>Visomics is a platform for visualization and analysis of 'omics data.").arg(Visomics_VERSION));
+  voAboutDialog aboutDialog(this);
+  aboutDialog.exec();
 }
 
 // --------------------------------------------------------------------------
