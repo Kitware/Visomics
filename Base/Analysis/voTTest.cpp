@@ -242,7 +242,9 @@ bool voTTest::execute()
     voUtils::insertColumnIntoTable(outputVolcanoTable.GetPointer(), 1, tempFoldChangeTable->GetColumn(0));
     }
 
-  this->setOutput("TTest_table", new voTableDataObject("TTest_table", outputDataTable.GetPointer(), true));
-  this->setOutput("TTest_volcano", new voTableDataObject("TTest_volcano", outputVolcanoTable.GetPointer(), true));
+  this->setOutput("TTest_table",
+                  new voTableDataObject("TTest_table", outputDataTable.GetPointer(), /* sortable= */ true));
+  this->setOutput("TTest_volcano",
+                  new voTableDataObject("TTest_volcano", outputVolcanoTable.GetPointer(), /* sortable= */ true));
   return true;
 }

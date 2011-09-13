@@ -222,7 +222,9 @@ bool voANOVAStatistics::execute()
     voUtils::insertColumnIntoTable(outputVolcanoTable.GetPointer(), 1, tempFoldChangeTable->GetColumn(0));
     }
 
-  this->setOutput("ANOVA_table", new voTableDataObject("ANOVA_table", outputDataTable.GetPointer(), true));
-  this->setOutput("ANOVA_volcano", new voTableDataObject("ANOVA_volcano", outputVolcanoTable.GetPointer(), true));
+  this->setOutput("ANOVA_table",
+                  new voTableDataObject("ANOVA_table", outputDataTable.GetPointer(), /* sortable= */ true));
+  this->setOutput("ANOVA_volcano",
+                  new voTableDataObject("ANOVA_volcano", outputVolcanoTable.GetPointer(), /* sortable= */ true));
   return true;
 }

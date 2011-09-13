@@ -227,7 +227,9 @@ bool voFoldChange::execute()
     voUtils::insertColumnIntoTable(outputDataTable.GetPointer(), 2, tempAvgFinalTable->GetColumn(0));
     }
 
-  this->setOutput("foldChange", new voTableDataObject("foldChange", outputDataTable.GetPointer(), true));
-  this->setOutput("foldChangePlot", new voTableDataObject("foldChangePlot", outputPlotTable.GetPointer(), true));
+  this->setOutput("foldChange",
+                  new voTableDataObject("foldChange", outputDataTable.GetPointer(), /* sortable= */ true));
+  this->setOutput("foldChangePlot",
+                  new voTableDataObject("foldChangePlot", outputPlotTable.GetPointer(), /* sortable= */ true));
   return true;
 }

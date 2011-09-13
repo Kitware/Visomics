@@ -294,12 +294,12 @@ bool voHierarchicalClustering::execute()
   voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
                             rowNames.GetPointer(), false);
   clusterTable->AddColumn(rowNames.GetPointer());
-  foreach(QString colLabel, reverseBFSLabels)
+  foreach(const QString& colLabel, reverseBFSLabels)
     {
     QString rawColLabel = colLabel.mid(colLabel.indexOf(": ") + 2);
     clusterTable->AddColumn(inputDataTable->GetColumnByName(rawColLabel.toLatin1().data()));
     // Can't rename column until it's been copied by AddColumn()
-    clusterTable->GetColumn(clusterTable->GetNumberOfColumns()-1)->SetName(colLabel.toLatin1().data());
+    clusterTable->GetColumn(clusterTable->GetNumberOfColumns() - 1)->SetName(colLabel.toLatin1());
     }
   this->setOutput("clusterHeatMap", new voTableDataObject("clusterHeatMap", clusterTable.GetPointer()));
 
