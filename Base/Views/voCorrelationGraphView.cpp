@@ -19,8 +19,9 @@
 =========================================================================*/
 
 // Qt includes
-#include <QLayout>
 #include <QDebug>
+#include <QLayout>
+#include <QVariant>
 
 // Visomics includes
 #include "voCorrelationGraphView.h"
@@ -30,6 +31,7 @@
 // VTK includes
 #include <QVTKWidget.h>
 #include <vtkArcParallelEdgeStrategy.h>
+#include <vtkColorTransferFunction.h>
 #include <vtkGraph.h>
 #include <vtkGraphLayoutView.h>
 #include <vtkLookupTable.h>
@@ -38,6 +40,8 @@
 #include <vtkSmartPointer.h>
 #include <vtkTextProperty.h>
 #include <vtkViewTheme.h>
+
+#include <vtkDataSetAttributes.h>
 
 // --------------------------------------------------------------------------
 class voCorrelationGraphViewPrivate
@@ -95,20 +99,6 @@ void voCorrelationGraphView::setupUi(QLayout *layout)
   arc->SetNumberOfSubdivisions(50);
   d->GraphView->SetEdgeLayoutStrategy(arc.GetPointer());
 
-  vtkNew<vtkViewTheme> theme;
-  theme->SetBackgroundColor(1.0, 1.0, 1.0);
-  theme->SetBackgroundColor2(1.0, 1.0, 1.0);
-  theme->SetLineWidth(2);
-  vtkNew<vtkLookupTable> lut;
-  lut->SetHueRange(0.65, 0.65);
-  lut->SetSaturationRange(1.0, 1.0);
-  lut->SetValueRange(0.8, 0.8);
-  lut->SetAlphaRange(0.0, 1.0);
-  lut->Build();
-  theme->SetCellLookupTable(lut.GetPointer());
-  theme->GetPointTextProperty()->SetColor(0.0, 0.0, 0.0);
-  d->GraphView->ApplyViewTheme(theme.GetPointer());
-
   vtkRenderedGraphRepresentation* rep =
     vtkRenderedGraphRepresentation::SafeDownCast(d->GraphView->GetRepresentation());
   rep->SetVertexHoverArrayName("name");
@@ -128,6 +118,49 @@ void voCorrelationGraphView::setDataObjectInternal(const voDataObject& dataObjec
     qCritical() << "voCorrelationGraphView - Failed to setDataObject - vtkGraph data is expected !";
     return;
     }
+
+  //  vtkNew<vtkLookupTable> lut;
+  //  lut->SetHueRange(0.65, 0.65);
+  //  lut->SetSaturationRange(1.0, 1.0);
+  //  lut->SetValueRange(0.8, 0.8);
+  //  lut->SetAlphaRange(0.0, 1.0);
+  //  lut->Build();
+
+  double minValue = -1.0;
+  if (dataObject.property("min_value").isValid())
+    {
+    minValue = dataObject.property("min_value").toDouble();
+    }
+  double maxValue = 1.0;
+  if (dataObject.property("max_value").isValid())
+    {
+    maxValue = dataObject.property("max_value").toDouble();
+    }
+  double midValue = 0.0;
+  if (minValue != -1.0 && maxValue != 1.0)
+    {
+    midValue = (maxValue-minValue)/2.0;
+    }
+  double hsvScalars[3] = {minValue, midValue, maxValue};
+  double hsvHues[3] = {0.3, 0.15, 0.0}; // green - red
+  double hsvSats[3] = {1.0, 0.3, 1.0};
+  double hsvValues[3] = {1.0, 0.3, 1.0};
+
+  vtkNew<vtkColorTransferFunction> transferFunction;
+  for(int i = 0; i < 3 - 1; ++i)
+    {
+    transferFunction->AddHSVSegment(hsvScalars[i], hsvHues[i], hsvSats[i], hsvValues[i],
+                                    hsvScalars[i+1], hsvHues[i+1], hsvSats[i+1], hsvValues[i+1]);
+    }
+  transferFunction->Build();
+
+  vtkNew<vtkViewTheme> theme;
+  theme->SetBackgroundColor(1.0, 1.0, 1.0);
+  theme->SetBackgroundColor2(1.0, 1.0, 1.0);
+  theme->SetLineWidth(2);
+  theme->SetCellLookupTable(transferFunction.GetPointer());
+  theme->GetPointTextProperty()->SetColor(0.0, 0.0, 0.0);
+  d->GraphView->ApplyViewTheme(theme.GetPointer());
 
   d->GraphView->SetRepresentationFromInput(graph);
   d->GraphView->ResetCamera();
