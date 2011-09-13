@@ -20,10 +20,10 @@
 
 // Qt includes
 #include <QDebug>
-#include <QLabel>
+#include <QGraphicsScene>
+#include <QGraphicsView>
 #include <QLayout>
 #include <QPixmap>
-#include <QScrollArea>
 #include <QVariant>
 
 // Visomics includes
@@ -40,8 +40,8 @@ class voKEGGImageViewPrivate
 public:
   voKEGGImageViewPrivate();
 
-  QLabel* Label;
-  QScrollArea* ScrollArea;
+  QGraphicsScene* Scene;
+  QGraphicsView* View;
 };
 
 // --------------------------------------------------------------------------
@@ -50,8 +50,8 @@ public:
 // --------------------------------------------------------------------------
 voKEGGImageViewPrivate::voKEGGImageViewPrivate()
 {
-  this->Label = 0;
-  this->ScrollArea = 0;
+  this->Scene = 0;
+  this->View = 0;
 }
 
 // --------------------------------------------------------------------------
@@ -68,8 +68,8 @@ voKEGGImageView::~voKEGGImageView()
 {
   Q_D(voKEGGImageView);
 
-  delete d->Label;
-  delete d->ScrollArea;
+  delete d->Scene;
+  delete d->View;
 }
 
 // --------------------------------------------------------------------------
@@ -77,10 +77,12 @@ void voKEGGImageView::setupUi(QLayout *layout)
 {
   Q_D(voKEGGImageView);
 
-  d->ScrollArea = new QScrollArea();
-  layout->addWidget(d->ScrollArea);
+  d->Scene = new QGraphicsScene();
 
-  d->Label = new QLabel();
+  d->View = new QGraphicsView();
+  d->View->setScene(d->Scene);
+  d->View->setDragMode(QGraphicsView::ScrollHandDrag);
+  layout->addWidget(d->View);
 }
 
 // --------------------------------------------------------------------------
@@ -95,7 +97,5 @@ void voKEGGImageView::setDataObjectInternal(const voDataObject& dataObject)
     }
   QPixmap pixmap = dataObject.data().value<QPixmap>();
 
-  d->Label->setPixmap(pixmap);
-
-  d->ScrollArea->setWidget(d->Label); // Must be done last
+  d->Scene->addPixmap(pixmap);
 }
