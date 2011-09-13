@@ -27,6 +27,7 @@
 
 // Macros - TODO: find a way to import and include ctkPimpl.h
 
+class voDelimitedTextImportSettings;
 class voDelimitedTextPreviewModelPrivate;
 class vtkTable;
 
@@ -36,7 +37,8 @@ class voDelimitedTextPreviewModel : public QStandardItemModel
 
 public:
   typedef QStandardItemModel Superclass;
-  voDelimitedTextPreviewModel(QObject* newParent = 0);
+  voDelimitedTextPreviewModel(const voDelimitedTextImportSettings& defaultSettings,
+                              QObject* newParent = 0);
   virtual ~voDelimitedTextPreviewModel();
 
 

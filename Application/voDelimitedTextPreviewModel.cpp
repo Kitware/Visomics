@@ -40,6 +40,7 @@
 
 // Visomics includes
 #include "voDelimitedTextPreviewModel.h"
+#include "voDelimitedTextImportSettings.h"
 #include "voUtils.h"
 
 class voDelimitedTextPreviewModelPrivate
@@ -48,7 +49,8 @@ class voDelimitedTextPreviewModelPrivate
 
 public:
   typedef voDelimitedTextPreviewModelPrivate Self;
-  voDelimitedTextPreviewModelPrivate(voDelimitedTextPreviewModel& object);
+  voDelimitedTextPreviewModelPrivate(const voDelimitedTextImportSettings& defaultSettings,
+                                     voDelimitedTextPreviewModel& object);
 
   void loadFile();
 
@@ -89,19 +91,20 @@ private:
 // voDelimitedTextPreviewModelPrivate methods
 
 // --------------------------------------------------------------------------
-voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(voDelimitedTextPreviewModel& object)
+voDelimitedTextPreviewModelPrivate::voDelimitedTextPreviewModelPrivate(
+    const voDelimitedTextImportSettings& defaultSettings, voDelimitedTextPreviewModel& object)
   : q_ptr(&object)
 {
-  this->FieldDelimiter = ',';
-  this->StringDelimiter = '\"';
-  this->MergeConsecutiveDelimiters = false;
-  this->Transpose = false;
+  this->FieldDelimiter = defaultSettings.value(voDelimitedTextImportSettings::FieldDelimiterCharacters).toString().at(0).toLatin1();
+  this->StringDelimiter = defaultSettings.value(voDelimitedTextImportSettings::StringDelimiter).toChar().toLatin1();
+  this->MergeConsecutiveDelimiters = defaultSettings.value(voDelimitedTextImportSettings::MergeConsecutiveDelimiters).toBool();
+  this->Transpose = defaultSettings.value(voDelimitedTextImportSettings::Transpose).toBool();
 
-  this->ColumnMetaDataTypeOfInterest = 0;
-  this->NumberOfColumnMetaDataTypes = 1;
+  this->ColumnMetaDataTypeOfInterest = defaultSettings.value(voDelimitedTextImportSettings::ColumnMetaDataTypeOfInterest).toInt();
+  this->NumberOfColumnMetaDataTypes = defaultSettings.value(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes).toInt();
 
-  this->RowMetaDataTypeOfInterest = 0;
-  this->NumberOfRowMetaDataTypes = 1;
+  this->RowMetaDataTypeOfInterest = defaultSettings.value(voDelimitedTextImportSettings::RowMetaDataTypeOfInterest).toInt();
+  this->NumberOfRowMetaDataTypes = defaultSettings.value(voDelimitedTextImportSettings::NumberOfRowMetaDataTypes).toInt();
 
   this->NumberOfRowsToPreview = 100;
   this->InlineUpdate = true;
@@ -236,8 +239,9 @@ void voDelimitedTextPreviewModelPrivate::updateDataPreviewCallback(vtkObject *ca
 // voDelimitedTextPreviewModel methods
 
 // --------------------------------------------------------------------------
-voDelimitedTextPreviewModel::voDelimitedTextPreviewModel(QObject* newParent) :
-  Superclass(newParent), d_ptr(new voDelimitedTextPreviewModelPrivate(*this))
+voDelimitedTextPreviewModel::voDelimitedTextPreviewModel(
+    const voDelimitedTextImportSettings& defaultSettings, QObject* newParent) :
+  Superclass(newParent), d_ptr(new voDelimitedTextPreviewModelPrivate(defaultSettings, *this))
 {
   //Q_D(voDelimitedTextPreviewModel);
 }
