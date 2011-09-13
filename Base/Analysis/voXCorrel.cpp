@@ -170,7 +170,7 @@ bool voXCorrel::execute()
 
   vtkNew<vtkTable> flippedCorrTable;
   voUtils::flipTable(corrTable.GetPointer(), flippedCorrTable.GetPointer(), voUtils::FlipHorizontalAxis, 1, 0);
-  this->setOutput("corr", new voTableDataObject("corr", flippedCorrTable.GetPointer()));
+  this->setOutput("corr", new voTableDataObject("corr", flippedCorrTable.GetPointer(), true));
  
   // Find high correlations to put in graph
   vtkNew<vtkTable> sparseCorr;
