@@ -18,6 +18,8 @@
 
 =========================================================================*/
 
+// Qt includes
+#include <QVariant>
 
 // Visomics includes
 #include "voTableDataObject.h"
@@ -30,8 +32,6 @@ class voTableDataObjectPrivate
 {
 public:
   voTableDataObjectPrivate();
-
-  bool Sortable;
 };
 
 // --------------------------------------------------------------------------
@@ -49,14 +49,14 @@ voTableDataObjectPrivate::voTableDataObjectPrivate()
 voTableDataObject::voTableDataObject(QObject* newParent) :
     Superclass(newParent), d_ptr(new voTableDataObjectPrivate)
 {
+  this->setSortable(false);
 }
 
 // --------------------------------------------------------------------------
 voTableDataObject::voTableDataObject(const QString& newName, vtkDataObject * newData, bool newSortable, QObject* newParent):
     Superclass(newName, newData, newParent), d_ptr(new voTableDataObjectPrivate)
 {
-  Q_D(voTableDataObject);
-  d->Sortable = newSortable;
+  this->setSortable(newSortable);
 }
 
 // --------------------------------------------------------------------------
@@ -67,13 +67,11 @@ voTableDataObject::~voTableDataObject()
 // --------------------------------------------------------------------------
 bool voTableDataObject::sortable()const
 {
-  Q_D(const voTableDataObject);
-  return d->Sortable;
+  return this->property("sortable").toBool();
 }
 
 // --------------------------------------------------------------------------
 void voTableDataObject::setSortable(const bool& newSortable)
 {
-  Q_D(voTableDataObject);
-  d->Sortable = newSortable;
+  this->setProperty("sortable", newSortable);
 }
