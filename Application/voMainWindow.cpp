@@ -28,6 +28,7 @@
 #include "voDelimitedTextImportDialog.h"
 #include "voIOManager.h"
 #include "voMainWindow.h"
+#include "voStartupView.h"
 #ifdef Visomics_BUILD_TESTING
 # include "voTestConfigure.h"
 #endif
@@ -77,6 +78,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
 
   d->ViewStackedWidget = new voViewStackedWidget(this);
   this->setCentralWidget(d->ViewStackedWidget);
+
+  d->ViewStackedWidget->addWidget(new voStartupView(this));
 
   connect(voApplication::application()->viewManager(),
           SIGNAL(viewCreated(const QString&, voView*)),

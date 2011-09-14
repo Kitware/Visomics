@@ -22,6 +22,8 @@ SET(KIT_SRCS
   voMainWindow.h
   voNormalizationWidget.cpp
   voNormalizationWidget.h
+  voStartupView.cpp
+  voStartupView.h
   voViewTabWidget.cpp
   voViewTabWidget.h
   voViewStackedWidget.cpp
@@ -39,6 +41,7 @@ SET(KIT_MOC_SRCS
   voDelimitedTextPreviewModel.h
   voMainWindow.h
   voNormalizationWidget.h
+  voStartupView.h
   voViewStackedWidget.h
   voViewTabWidget.h
   )
