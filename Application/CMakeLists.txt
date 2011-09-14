@@ -1,7 +1,9 @@
 
 PROJECT(VisomicsApp)
 
-SET(KIT_SRCS  
+SET(KIT_SRCS
+  voAboutDialog.cpp
+  voAboutDialog.h
   voAnalysisParameterDialog.cpp
   voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.cpp
@@ -20,13 +22,16 @@ SET(KIT_SRCS
   voMainWindow.h
   voNormalizationWidget.cpp
   voNormalizationWidget.h
+  voStartupView.cpp
+  voStartupView.h
   voViewTabWidget.cpp
   voViewTabWidget.h
   voViewStackedWidget.cpp
   voViewStackedWidget.h
   )
-  
+
 SET(KIT_MOC_SRCS
+  voAboutDialog.h
   voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.h
   voDataBrowserWidget.h
@@ -36,10 +41,11 @@ SET(KIT_MOC_SRCS
   voDelimitedTextPreviewModel.h
   voMainWindow.h
   voNormalizationWidget.h
+  voStartupView.h
   voViewStackedWidget.h
   voViewTabWidget.h
   )
-  
+
 SET(KIT_UI_FORMS
   Resources/UI/voMainWindow.ui
   Resources/UI/voDelimitedTextImportDialog.ui
@@ -49,13 +55,13 @@ SET(KIT_UI_FORMS
 SET(KIT_resources
   Resources/VisomicsApp.qrc
   )
-  
+
 INCLUDE_DIRECTORIES(
   ${Visomics_SOURCE_DIR}/Base
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
   )
-  
+
 QT4_WRAP_UI(KIT_UI_CPP ${KIT_UI_FORMS})
 QT4_WRAP_CPP(KIT_MOC_CPP ${KIT_MOC_SRCS} )
 QT4_ADD_RESOURCES(KIT_QRC_SRCS ${KIT_resources})
@@ -92,8 +98,11 @@ CONFIGURE_FILE(
   @ONLY IMMEDIATE)
 
 # Add forward executable
-ADD_EXECUTABLE(${PROJECT_NAME}
-  ${CMAKE_CURRENT_BINARY_DIR}/visomics-forward.c)
+SET(FORWARD_SRCS ${CMAKE_CURRENT_BINARY_DIR}/visomics-forward.c)
+IF(Q_WS_WIN)
+  LIST(APPEND FORWARD_SRCS Resources/VisomicsApp.rc)
+ENDIF()
+ADD_EXECUTABLE(${PROJECT_NAME} ${FORWARD_SRCS})
 ADD_DEPENDENCIES(${PROJECT_NAME} ${PROJECT_NAME}-real)
 SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES OUTPUT_NAME visomics)
 
@@ -115,7 +124,7 @@ INSTALL(TARGETS ${PROJECT_NAME}-real DESTINATION ${Visomics_INSTALL_LIB_DIR} COM
 #  RUNTIME DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime
 #  LIBRARY DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime
 #  ARCHIVE DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Development)
-  
+
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)
 ENDIF()

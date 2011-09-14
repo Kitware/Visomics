@@ -73,11 +73,24 @@ SET(CPACK_PACKAGE_VERSION_PATCH "${Visomics_BUILD_VERSION}")
 SET(CPACK_PACKAGE_INSTALL_DIRECTORY "Visomics ${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "Visomics-${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}")
 SET(CPACK_PACKAGE_EXECUTABLES "Visomics;Visomics")
+SET(CPACK_CREATE_DESKTOP_LINKS "visomics ${Visomics_VERSION}")
+
+IF(Q_WS_WIN)
+  INSTALL(FILES ${Visomics_SOURCE_DIR}/Base/Resources/Icons/visomics.ico
+    DESTINATION ${Visomics_INSTALL_BIN_DIR} COMPONENT Runtime)
+ENDIF()
+
+CONFIGURE_FILE(
+  ${PROJECT_SOURCE_DIR}/CMake/VisomicsCPackOptions.cmake.in
+  ${PROJECT_BINARY_DIR}/VisomicsCPackOptions.cmake @ONLY)
+
+SET(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/VisomicsCPackOptions.cmake")
 
 # -------------------------------------------------------------------------
 # Install Visomics
 # -------------------------------------------------------------------------
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};Visomics;Runtime;/")
+
 
 # -------------------------------------------------------------------------
 # Install VTK

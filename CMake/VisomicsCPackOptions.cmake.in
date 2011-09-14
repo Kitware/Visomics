@@ -1,0 +1,22 @@
+
+if(CPACK_GENERATOR MATCHES "NSIS")
+  SET(CPACK_PACKAGE_ICON "@Visomics_SOURCE_DIR@\\Base\\Resources\\Icons\\VisomicsLogo.bmp")
+
+  # set the install/unistall icon used for the installer itself
+  # There is a bug in NSIS that does not handle full unix paths properly.
+  SET(CPACK_NSIS_MUI_ICON "@Visomics_SOURCE_DIR@\\Base\\Resources\\Icons\\visomics.ico")
+  SET(CPACK_NSIS_MUI_UNIICON "@Visomics_SOURCE_DIR@\\Base\\Resources\\Icons\\visomics.ico")
+
+  # Tell cpack to create links to the doc files
+  SET(CPACK_NSIS_MENU_LINKS
+    "http://www.visomics.org" "Visomics Web Site"
+    )
+
+  SET(CPACK_CREATE_DESKTOP_LINKS "@CPACK_CREATE_DESKTOP_LINKS@")
+  SET(CPACK_NSIS_INSTALLED_ICON_NAME "bin\\\\visomics.ico")
+  SET(CPACK_NSIS_DISPLAY_NAME "Visomics - Platform for visualization and analysis of 'omics data.")
+  SET(CPACK_NSIS_HELP_LINK "http:\\\\www.visomics.org")
+  SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\www.visomics.org")
+  SET(CPACK_NSIS_CONTACT visomics@visomics.org)
+endif()
+

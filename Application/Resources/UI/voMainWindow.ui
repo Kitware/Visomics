@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../../../Base/Resources/VisomicsBase.qrc">
+    <normaloff>:/Icons/VisomicsIcon-32.png</normaloff>:/Icons/VisomicsIcon-32.png</iconset>
+  </property>
   <widget class="QWidget" name="centralwidget"/>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
@@ -70,6 +74,10 @@
    <addaction name="actionHelpAbout"/>
   </widget>
   <widget class="QDockWidget" name="DataBrowserDockWidget">
+   <property name="windowIcon">
+    <iconset resource="../../../Base/Resources/VisomicsBase.qrc">
+     <normaloff>:/Icons/VisomicsIcon-32.png</normaloff>:/Icons/VisomicsIcon-32.png</iconset>
+   </property>
    <property name="windowTitle">
     <string>Data Browser</string>
    </property>
@@ -95,6 +103,10 @@
    </widget>
   </widget>
   <widget class="QDockWidget" name="AnalysisParameterDockWidget">
+   <property name="windowIcon">
+    <iconset resource="../../../Base/Resources/VisomicsBase.qrc">
+     <normaloff>:/Icons/VisomicsIcon-32.png</normaloff>:/Icons/VisomicsIcon-32.png</iconset>
+   </property>
    <property name="windowTitle">
     <string>Analysis Parameters</string>
    </property>
@@ -224,6 +236,7 @@
  </customwidgets>
  <resources>
   <include location="../VisomicsApp.qrc"/>
+  <include location="../../../Base/Resources/VisomicsBase.qrc"/>
  </resources>
  <connections>
   <connection>

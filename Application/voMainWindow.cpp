@@ -16,6 +16,7 @@
 
 // Visomics includes
 #include "ui_voMainWindow.h"
+#include "voAboutDialog.h"
 #include "voAnalysisParameterDialog.h"
 #include "voApplication.h"
 #include "voAnalysis.h"
@@ -27,6 +28,7 @@
 #include "voDelimitedTextImportDialog.h"
 #include "voIOManager.h"
 #include "voMainWindow.h"
+#include "voStartupView.h"
 #ifdef Visomics_BUILD_TESTING
 # include "voTestConfigure.h"
 #endif
@@ -76,6 +78,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
 
   d->ViewStackedWidget = new voViewStackedWidget(this);
   this->setCentralWidget(d->ViewStackedWidget);
+
+  d->ViewStackedWidget->addWidget(new voStartupView(this));
 
   connect(voApplication::application()->viewManager(),
           SIGNAL(viewCreated(const QString&, voView*)),
@@ -203,10 +207,8 @@ void voMainWindow::onViewErrorLogActionTriggered()
 // --------------------------------------------------------------------------
 void voMainWindow::about()
 {
-  QMessageBox::about(this, tr("About Visomics"),
-          tr("<h2>Visomics %1</h2>"
-             "<p>Copyright &copy; 2010 Kitware Inc."
-             "<p>Visomics is a platform for visualization and analysis of 'omics data.").arg(Visomics_VERSION));
+  voAboutDialog aboutDialog(this);
+  aboutDialog.exec();
 }
 
 // --------------------------------------------------------------------------
