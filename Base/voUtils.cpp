@@ -513,7 +513,6 @@ void voUtils::addCounterLabels(vtkStringArray* srcArray, vtkStringArray* destArr
     }
 
   vtkIdType arraySize = srcArray->GetNumberOfValues();
-  int padding = QString::number(arraySize+1).size(); // Padding makes sorting work properly
 
   destArray->SetNumberOfValues(arraySize);
   for(vtkIdType i = 0; i < arraySize; ++i)
@@ -521,7 +520,7 @@ void voUtils::addCounterLabels(vtkStringArray* srcArray, vtkStringArray* destArr
     QString label = alpha ?
                     voUtils::counterIntToAlpha(i) :
                     QString::number(i+1);
-    QString labeledString = QString(srcArray->GetValue(i)).prepend(QString("%1: ").arg(label, padding, ' '));
+    QString labeledString = QString(srcArray->GetValue(i)).prepend(QString("%1: ").arg(label));
     destArray->SetValue(i, labeledString.toStdString());
     }
 }
