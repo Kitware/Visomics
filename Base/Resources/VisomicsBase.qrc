@@ -3,5 +3,10 @@
         <file>Icons/Bulb.png</file>
         <file alias="Icons/saveScreenshot.png">Icons/nuvola/32x32/devices/camera.png</file>
         <file>Icons/csv_text.png</file>
+        <file>Icons/VisomicsIcon-32.png</file>
+        <file>Icons/VisomicsIcon-48.png</file>
+        <file>Icons/VisomicsIcon-64.png</file>
+        <file>Icons/VisomicsIcon-128.png</file>
+        <file>Icons/VisomicsLogo.png</file>
     </qresource>
 </RCC>
