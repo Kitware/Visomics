@@ -38,6 +38,8 @@ public:
   voCorrelationGraphView(QWidget * newParent = 0);
   virtual ~voCorrelationGraphView();
 
+  virtual QString hints()const;
+
 protected:
   void setupUi(QLayout * layout);
 

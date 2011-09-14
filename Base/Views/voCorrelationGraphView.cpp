@@ -108,6 +108,12 @@ void voCorrelationGraphView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
+QString voCorrelationGraphView::hints()const
+{
+  return QString("<img src=\":/Icons/Bulb.png\">&nbsp;Only correlations more significant than %1 0.5 are displayed.").arg(QChar(177));
+}
+
+// --------------------------------------------------------------------------
 void voCorrelationGraphView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voCorrelationGraphView);
