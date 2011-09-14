@@ -117,6 +117,15 @@ void voTableView::setupUi(QLayout *layout)
   layout->addWidget(d->TableView);
 }
 
+namespace
+{
+// --------------------------------------------------------------------------
+enum Roles
+{
+  SortRole = Qt::UserRole + 1
+};
+} // end of anonymous namespace
+
 // --------------------------------------------------------------------------
 void voTableView::setDataObjectInternal(const voDataObject& dataObject)
 {
@@ -154,7 +163,13 @@ void voTableView::setDataObjectInternal(const voDataObject& dataObject)
     d->Model.setHeaderData(modelCol, Qt::Horizontal, QString(table->GetColumnName(dataCol)));
     for (vtkIdType r = 0; r < num_rows; ++r)
       {
-      QStandardItem* item = new QStandardItem(QString(table->GetValue(r, dataCol).ToString()));
+      QStandardItem* item = new QStandardItem();
+      vtkVariant variant = table->GetValue(r, dataCol);
+      item->setText(QString(variant.ToString()));
+      if (sortable)
+        {
+        item->setData(variant.ToDouble(), SortRole);
+        }
       item->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable); // Item is view-only
       d->Model.setItem(static_cast<int>(r), modelCol, item);
       }
@@ -163,7 +178,9 @@ void voTableView::setDataObjectInternal(const voDataObject& dataObject)
     {
     if(sortable)
       {
-      d->Model.item(r, 0)->setBackground(QPalette().color(QPalette::Window));
+      QStandardItem * item = d->Model.item(r, 0);
+      item->setBackground(QPalette().color(QPalette::Window));
+      item->setData(r, SortRole);
       d->Model.setHeaderData(static_cast<int>(r), Qt::Vertical, QString());
       }
     else
@@ -176,6 +193,12 @@ void voTableView::setDataObjectInternal(const voDataObject& dataObject)
   d->TableView->resizeColumnsToContents();
 
   d->TableView->setSortingEnabled(sortable);
+
+  QStandardItemModel* standardModel = qobject_cast<QStandardItemModel*>(d->TableView->model());
+  if (standardModel)
+    {
+    standardModel->setSortRole(SortRole);
+    }
 
   // Retrieve the selected subtable
   //vtkSmartPointer<vtkTable> ot = vtkSmartPointer<vtkTable>::New();
