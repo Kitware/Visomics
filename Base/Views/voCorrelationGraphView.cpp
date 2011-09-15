@@ -108,6 +108,12 @@ void voCorrelationGraphView::setupUi(QLayout *layout)
 }
 
 // --------------------------------------------------------------------------
+QString voCorrelationGraphView::hints()const
+{
+  return QString("<img src=\":/Icons/Bulb.png\">&nbsp;Only correlations more significant than %1 0.5 are displayed.").arg(QChar(177));
+}
+
+// --------------------------------------------------------------------------
 void voCorrelationGraphView::setDataObjectInternal(const voDataObject& dataObject)
 {
   Q_D(voCorrelationGraphView);
@@ -118,13 +124,6 @@ void voCorrelationGraphView::setDataObjectInternal(const voDataObject& dataObjec
     qCritical() << "voCorrelationGraphView - Failed to setDataObject - vtkGraph data is expected !";
     return;
     }
-
-  //  vtkNew<vtkLookupTable> lut;
-  //  lut->SetHueRange(0.65, 0.65);
-  //  lut->SetSaturationRange(1.0, 1.0);
-  //  lut->SetValueRange(0.8, 0.8);
-  //  lut->SetAlphaRange(0.0, 1.0);
-  //  lut->Build();
 
   double minValue = -1.0;
   if (dataObject.property("min_value").isValid())
@@ -159,6 +158,7 @@ void voCorrelationGraphView::setDataObjectInternal(const voDataObject& dataObjec
   theme->SetBackgroundColor2(1.0, 1.0, 1.0);
   theme->SetLineWidth(2);
   theme->SetCellLookupTable(transferFunction.GetPointer());
+  theme->ScaleCellLookupTableOff();
   theme->GetPointTextProperty()->SetColor(0.0, 0.0, 0.0);
   d->GraphView->ApplyViewTheme(theme.GetPointer());
 

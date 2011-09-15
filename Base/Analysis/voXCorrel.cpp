@@ -189,7 +189,7 @@ bool voXCorrel::execute()
       for (vtkIdType c = r+1; c < corrMatrixNumberOfRows; ++c)
         {
         double val = corrTable->GetValue(r, c + 1).ToDouble();
-        if (val > 0.1)
+        if (qAbs(val) > 0.5)
           {
           col1->InsertNextValue(analyteNames->GetValue(r));
           col2->InsertNextValue(analyteNames->GetValue(c));
