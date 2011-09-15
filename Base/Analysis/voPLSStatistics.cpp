@@ -327,6 +327,12 @@ bool voPLSStatistics::execute()
   vtkNew<vtkTable> yLoadingsTable;
     {
     voUtils::arrayToTable(outputArrayData->GetArrayByName("yLoadingsArray"), yLoadingsTable.GetPointer());
+    yLoadingsTable->Dump();
+    if(responseRangeList.size() == 1)
+      {
+      // arrayToTable is unable to determine the proper orientation of a 1-by-n array
+      voUtils::transposeTable(yLoadingsTable.GetPointer());
+      }
 
     // Add column labels (components)
     for(vtkIdType c = 0; c < yLoadingsTable->GetNumberOfColumns(); ++c)

@@ -101,6 +101,8 @@ void voFoldChange::setParameterInformation()
 QString voFoldChange::parameterDescription()const
 {
   return QString("<dl>"
+                 "<dt><b>Mean Method</b>:</dt>"
+                 "<dd>The type of average used to form each sample group.</dd>"
                  "<dt><b>Initial / Final Sample(s)</b>:</dt>"
                  "<dd>A group of Experiments, specified by a range and/or list of column letters.</dd>"
                  "</dl>");
