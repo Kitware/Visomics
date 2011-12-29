@@ -79,7 +79,8 @@ bool checkDataObjectType(const voDataObject& dataObject, const char* typeName)
     return false;
     }
 
-  if (!dataObject.data().canConvert<TYPE>())
+  QVariant temp = dataObject.data();
+  if (!temp.canConvert<TYPE>())
     {
     std::cerr << "Line " << __LINE__ << " - Problem with voDataObject::data()" << std::endl;
     return false;
