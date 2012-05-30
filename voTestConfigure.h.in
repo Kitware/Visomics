@@ -24,4 +24,3 @@
 #define VISOMICS_DATA_DIR "@VisomicsData_DIR@"
 
 #endif
-

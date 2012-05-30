@@ -11,4 +11,3 @@
 #define CTK_CORE_EXPORT
 
 #endif
-

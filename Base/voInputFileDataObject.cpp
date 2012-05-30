@@ -84,4 +84,3 @@ void voInputFileDataObject::setFileName(const QString& newFileName)
   Q_D(voInputFileDataObject);
   d->FileName = newFileName;
 }
-

@@ -182,4 +182,3 @@ int voLog2Test(int /*argc*/, char * /*argv*/ [])
 
   return EXIT_SUCCESS;
 }
-

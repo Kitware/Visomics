@@ -67,4 +67,3 @@ TARGET_LINK_LIBRARIES(
   ${libname}
   ${${PROJECT_NAME}_LINK_LIBRARIES}
   )
-

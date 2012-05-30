@@ -11,4 +11,3 @@
 #define CTK_VISUALIZATION_VTK_CORE_EXPORT
 
 #endif
-

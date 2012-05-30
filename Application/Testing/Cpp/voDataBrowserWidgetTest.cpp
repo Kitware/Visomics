@@ -103,4 +103,3 @@ int voDataBrowserWidgetTest(int argc, char * argv [])
   //  }
   return app.exec();
 }
-

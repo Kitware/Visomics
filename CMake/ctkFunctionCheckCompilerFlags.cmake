@@ -46,4 +46,3 @@ FUNCTION(ctkFunctionCheckCompilerFlags CXX_FLAG_TO_TEST RESULT_VAR)
   ENDIF()
 
 ENDFUNCTION()
-

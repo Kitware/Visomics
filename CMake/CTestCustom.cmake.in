@@ -24,4 +24,3 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   # VTK
   "VTK/Utilities/vtktiff/"
   )
-

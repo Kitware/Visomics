@@ -31,4 +31,3 @@ IF(NOT DEFINED QtPropertyBrowser_DIR)
 ELSE()
   ctkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 ENDIF()
-

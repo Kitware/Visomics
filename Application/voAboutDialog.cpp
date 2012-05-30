@@ -89,4 +89,3 @@ voAboutDialog::voAboutDialog(QWidget* newParent):Superclass(newParent),
 voAboutDialog::~voAboutDialog()
 {
 }
-

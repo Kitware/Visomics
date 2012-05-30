@@ -216,4 +216,3 @@ IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Analysis/Testing)
   ADD_SUBDIRECTORY(Normalization/Testing)
 ENDIF()
-

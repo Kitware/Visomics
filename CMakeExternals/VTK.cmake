@@ -56,4 +56,3 @@ ELSE()
   # let's add an 'empty' one
   ctkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 ENDIF()
-

@@ -111,4 +111,3 @@ voAnalysisParameterDialog::voAnalysisParameterDialog(voAnalysis * analysis, QWid
 voAnalysisParameterDialog::~voAnalysisParameterDialog()
 {
 }
-

@@ -22,5 +22,3 @@ ENDMACRO()
 SIMPLE_TEST(voDataBrowserWidgetTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
 #SIMPLE_TEST(voDelimitedTextImportDialogTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
 SIMPLE_TEST(voDelimitedTextImportWidgetTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
-
-

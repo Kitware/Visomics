@@ -71,4 +71,3 @@ int voDelimitedTextImportWidgetTest(int argc, char * argv [])
   //  }
   return app.exec();
 }
-

@@ -96,4 +96,3 @@ QString cleanString(const QString& text);
 }
 
 #endif
-

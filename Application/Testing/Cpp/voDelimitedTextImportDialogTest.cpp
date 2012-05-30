@@ -69,4 +69,3 @@ int voDelimitedTextImportDialogTest(int argc, char * argv [])
 
   return EXIT_SUCCESS;
 }
-
