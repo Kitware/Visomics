@@ -46,11 +46,11 @@ public:
 
   /// Return a reference to the application singleton
   static voApplication* application();
-  
+
   /// Initialize application
   /// If exitWhenDone is True, it's your responsability to exit the application
   void initialize(bool& exitWhenDone);
-  
+
   /// Return true if the application has been initialized
   /// \note initialize() should be called only one time.
   bool initialized() const;
@@ -81,14 +81,14 @@ public:
   voViewFactory* viewFactory()const;
 
   QMainWindow* mainWindow()const;
-  
+
 protected:
   QScopedPointer<voApplicationPrivate> d_ptr;
 
 private:
   Q_DECLARE_PRIVATE(voApplication);
   Q_DISABLE_COPY(voApplication);
-  
+
 };
 
 #endif

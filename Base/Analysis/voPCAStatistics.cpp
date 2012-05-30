@@ -54,7 +54,7 @@ voPCAStatistics::voPCAStatistics():
     Superclass(), d_ptr(new voPCAStatisticsPrivate)
 {
   Q_D(voPCAStatistics);
-  
+
   d->RCalc = vtkSmartPointer<vtkRCalculatorFilter>::New();
 }
 

@@ -239,7 +239,7 @@ set(run_ctest_with_coverage TRUE)
 set(run_ctest_with_memcheck TRUE)
 set(run_ctest_with_packages TRUE)
 set(run_ctest_with_notes TRUE)
-    
+
 #
 # run_ctest macro
 #
@@ -264,7 +264,7 @@ DOCUMENTATION_ARCHIVES_OUTPUT_DIRECTORY:PATH=${DOCUMENTATION_ARCHIVES_OUTPUT_DIR
 ${ADDITIONAL_CMAKECACHE_OPTION}
 ")
   endif()
-  
+
   #-----------------------------------------------------------------------------
   # Update
   #-----------------------------------------------------------------------------
@@ -272,29 +272,29 @@ ${ADDITIONAL_CMAKECACHE_OPTION}
   if (run_ctest_with_update)
     ctest_update(SOURCE "${CTEST_SOURCE_DIRECTORY}" RETURN_VALUE FILES_UPDATED)
   endif()
-  
+
   if (FILES_UPDATED GREATER 0 OR force_build)
 
     set(force_build 0)
-    
+
     #-----------------------------------------------------------------------------
     # Submit Update
     #-----------------------------------------------------------------------------
     if(run_ctest_with_update)
       ctest_submit(PARTS Update)
     endif()
-    
+
     #-----------------------------------------------------------------------------
     # Configure
     #-----------------------------------------------------------------------------
     if (run_ctest_with_configure)
       message("----------- [ Configure ${CTEST_PROJECT_NAME} ] -----------")
-      
+
       #set(label ${CTEST_PROJECT_NAME})
-      
+
       set_property(GLOBAL PROPERTY SubProject ${label})
       set_property(GLOBAL PROPERTY Label ${label})
-       
+
       ctest_configure(BUILD "${CTEST_BINARY_DIRECTORY}")
       ctest_read_custom_files("${CTEST_BINARY_DIRECTORY}")
       ctest_submit(PARTS Configure)
@@ -308,41 +308,41 @@ ${ADDITIONAL_CMAKECACHE_OPTION}
       ctest_build(BUILD "${CTEST_BINARY_DIRECTORY}" APPEND)
       ctest_submit(PARTS Build)
     endif()
-    
+
     #-----------------------------------------------------------------------------
     # Inner build directory
     #-----------------------------------------------------------------------------
     set(project_build_dir "${CTEST_BINARY_DIRECTORY}/${CTEST_PROJECT_NAME}-build")
-    
+
     #-----------------------------------------------------------------------------
     # Test
     #-----------------------------------------------------------------------------
     if (run_ctest_with_test)
       message("----------- [ Test ${CTEST_PROJECT_NAME} ] -----------")
       ctest_test(
-        BUILD "${project_build_dir}" 
+        BUILD "${project_build_dir}"
         #INCLUDE_LABEL ${label}
         PARALLEL_LEVEL ${CTEST_PARALLEL_LEVEL}
         EXCLUDE ${TEST_TO_EXCLUDE_REGEX})
       # runs only tests that have a LABELS property matching "${label}"
       ctest_submit(PARTS Test)
     endif()
-    
+
     #-----------------------------------------------------------------------------
-    # Global coverage ... 
+    # Global coverage ...
     #-----------------------------------------------------------------------------
     if (run_ctest_with_coverage)
       # HACK Unfortunately ctest_coverage ignores the BUILD argument, try to force it...
       file(READ ${project_build_dir}/CMakeFiles/TargetDirectories.txt project_build_coverage_dirs)
       file(APPEND "${CTEST_BINARY_DIRECTORY}/CMakeFiles/TargetDirectories.txt" "${project_build_coverage_dirs}")
-      
+
       if (WITH_COVERAGE AND CTEST_COVERAGE_COMMAND)
         message("----------- [ Global coverage ] -----------")
         ctest_coverage(BUILD "${project_build_dir}")
         ctest_submit(PARTS Coverage)
       endif ()
     endif()
-    
+
     #-----------------------------------------------------------------------------
     # Global dynamic analysis ...
     #-----------------------------------------------------------------------------
@@ -351,7 +351,7 @@ ${ADDITIONAL_CMAKECACHE_OPTION}
         ctest_memcheck(BUILD "${project_build_dir}")
         ctest_submit(PARTS MemCheck)
     endif ()
-    
+
     #-----------------------------------------------------------------------------
     # Create packages / installers ...
     #-----------------------------------------------------------------------------
@@ -361,7 +361,7 @@ ${ADDITIONAL_CMAKECACHE_OPTION}
       #set(packages)
       #message("Packaging ...")
       #SlicerFunctionCTestPackage(
-      #  BINARY_DIR ${project_build_dir} 
+      #  BINARY_DIR ${project_build_dir}
       #  CONFIG ${CTEST_BUILD_CONFIGURATION}
       #  RETURN_VAR packages)
       #message("Uploading ...")
@@ -370,14 +370,14 @@ ${ADDITIONAL_CMAKECACHE_OPTION}
       #  ctest_submit(PARTS Upload)
       #endforeach()
     endif()
-    
+
     #-----------------------------------------------------------------------------
     # Note should be at the end
     #-----------------------------------------------------------------------------
     if (run_ctest_with_notes)
       ctest_submit(PARTS Notes)
     endif()
-  
+
   endif()
 endmacro()
 

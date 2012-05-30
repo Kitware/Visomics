@@ -39,9 +39,9 @@ public:
 
   typedef bool(*ApplyNormalizationFunction)(vtkTable*, const QHash<int, QVariant>&);
   void registerMethod(const QString& methodName, ApplyNormalizationFunction function);
-  
+
   bool apply(const QString& methodName, vtkTable * dataTable, const QHash<int, QVariant>& settings);
-  
+
 protected:
   QScopedPointer<voRegistryPrivate> d_ptr;
 

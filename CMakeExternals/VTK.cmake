@@ -50,9 +50,9 @@ IF(NOT DEFINED VTK_DIR)
       ${proj_DEPENDENCIES}
     )
   SET(VTK_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
-  
+
 ELSE()
-  # The project is provided using VTK_DIR, nevertheless since other project may depend on VTK, 
+  # The project is provided using VTK_DIR, nevertheless since other project may depend on VTK,
   # let's add an 'empty' one
   ctkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 ENDIF()

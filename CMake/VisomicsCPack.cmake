@@ -60,7 +60,7 @@ ENDFOREACH()
 #ENDIF()
 
 # -------------------------------------------------------------------------
-# Build a CPack installer 
+# Build a CPack installer
 # -------------------------------------------------------------------------
 
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Visomics - Application allowing to import, analyze and visualize metabolomics and genomics data.")

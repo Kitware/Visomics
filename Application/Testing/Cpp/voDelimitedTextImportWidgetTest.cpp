@@ -38,7 +38,7 @@ int voDelimitedTextImportWidgetTest(int argc, char * argv [])
   QApplication app(argc, argv);
 
   Q_INIT_RESOURCE(VisomicsApp);
-  
+
   if (argc < 2)
     {
     // TODO Add a better to handle arguments. May be by using ctkCommandLineParser

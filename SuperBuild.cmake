@@ -51,7 +51,7 @@ set(ep_suffix      "-cmake")
 
 SET(ep_common_c_flags "${CMAKE_C_FLAGS_INIT} ${ADDITIONAL_C_FLAGS}")
 SET(ep_common_cxx_flags "${CMAKE_CXX_FLAGS_INIT} ${ADDITIONAL_CXX_FLAGS}")
-  
+
 # Compute -G arg for configuring external projects with the same CMake generator:
 if(CMAKE_EXTRA_GENERATOR)
   set(gen "${CMAKE_EXTRA_GENERATOR} - ${CMAKE_GENERATOR}")
@@ -79,7 +79,7 @@ SET(project_cmake_boolean_args
   WITH_COVERAGE
   #WITH_MEMCHECK # Not used
   )
-  
+
 SET(project_superbuild_boolean_args)
 FOREACH(project_cmake_arg ${project_cmake_boolean_args})
   LIST(APPEND project_superbuild_boolean_args -D${project_cmake_arg}:BOOL=${${project_cmake_arg}})
@@ -133,7 +133,7 @@ ExternalProject_Add(${proj}
     #-DCTK_DIR:PATH=${CTK_DIR}
   DOWNLOAD_COMMAND ""
   INSTALL_COMMAND ""
-  DEPENDS 
+  DEPENDS
     # Mandatory dependencies
     ${QtPropertyBrowser_DEPENDS}
     ${VisomicsData_DEPENDS}

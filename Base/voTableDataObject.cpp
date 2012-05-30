@@ -41,7 +41,7 @@ public:
 voTableDataObjectPrivate::voTableDataObjectPrivate()
 {
 }
-  
+
 // --------------------------------------------------------------------------
 // voTableDataObject methods
 

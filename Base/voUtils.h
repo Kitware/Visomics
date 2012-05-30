@@ -35,7 +35,7 @@ class QString;
 class vtkArray;
 template <class T> class vtkSmartPointer;
 
-namespace voUtils 
+namespace voUtils
 {
 
 enum TransposeOption

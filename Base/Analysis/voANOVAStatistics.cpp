@@ -56,7 +56,7 @@ voANOVAStatistics::voANOVAStatistics():
     Superclass(), d_ptr(new voANOVAStatisticsPrivate)
 {
   Q_D(voANOVAStatistics);
-  
+
   d->RCalc = vtkSmartPointer<vtkRCalculatorFilter>::New();
 }
 
@@ -73,7 +73,7 @@ void voANOVAStatistics::setInputInformation()
 
 // --------------------------------------------------------------------------
 void voANOVAStatistics::setOutputInformation()
-{    
+{
   this->addOutputType("ANOVA_table", "vtkTable" ,
                       "", "",
                       "voTableView", "Significance (Table)");

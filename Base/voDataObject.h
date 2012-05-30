@@ -46,14 +46,14 @@ public:
   voDataObject(const QString& newName, const QVariant& newData, QObject* newParent = 0);
   voDataObject(const QString& newName, vtkDataObject * newData, QObject* newParent = 0);
   virtual ~voDataObject();
-  
+
   QString name()const;
   void setName(const QString& newName);
 
   QString type()const;
 
   QString uuid()const;
-  
+
   QVariant data()const;
   void setData(const QVariant& newData);
 

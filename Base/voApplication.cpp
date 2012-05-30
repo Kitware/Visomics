@@ -155,7 +155,7 @@ void voApplication::initialize(bool& exitWhenDone)
   // Register normalization methods
   this->normalizerRegistry()->registerMethod("Log2", Normalization::applyLog2);
   this->normalizerRegistry()->registerMethod("Quantile", Normalization::applyQuantile);
-  
+
   QWebSettings::globalSettings()->setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 
   // TODO Parse command line arguments

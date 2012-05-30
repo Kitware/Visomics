@@ -40,7 +40,7 @@ protected:
   voDataModelItem* const q_ptr;
 public:
   voDataModelItemPrivate(voDataModelItem& object);
-  
+
   QExplicitlySharedDataPointer<voDataObject>  DataObject;
   QList<voDataModelItem*>                     ChildItems;
   int                                         Column;

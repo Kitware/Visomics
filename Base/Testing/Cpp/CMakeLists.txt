@@ -9,7 +9,7 @@ CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voUtilsTest.cpp
   vtkExtendedTableTest.cpp
   )
-  
+
 SET(TestsToRun ${Tests})
 REMOVE(TestsToRun ${KIT}CppTests.cpp)
 

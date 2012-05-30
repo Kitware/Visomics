@@ -1,11 +1,11 @@
 
 ####################################################################################
-# OS      : 
-# Hardware: 
-# GPU     : 
+# OS      :
+# Hardware:
+# GPU     :
 ####################################################################################
-# WARNING - The specific version and processor type of this machine should be reported 
-# in the header above. Indeed, this file will be send to the dashboard as a NOTE file. 
+# WARNING - The specific version and processor type of this machine should be reported
+# in the header above. Indeed, this file will be send to the dashboard as a NOTE file.
 #
 # On linux, you could run:
 #     'uname -o' and 'cat /etc/*-release' to obtain the OS name.
@@ -22,7 +22,7 @@ cmake_minimum_required(VERSION 2.8.2)
 #-----------------------------------------------------------------------------
 # Dashboard properties
 #-----------------------------------------------------------------------------
-set(MY_OPERATING_SYSTEM   "Linux") # Windows, Linux, Darwin... 
+set(MY_OPERATING_SYSTEM   "Linux") # Windows, Linux, Darwin...
 set(MY_COMPILER           "g++4.4.3")
 set(MY_QT_VERSION         "4.7")
 set(MY_R_VERSION          "2.11.1")
@@ -37,7 +37,7 @@ set(CTEST_CMAKE_GENERATOR "Unix Makefiles")
 #-----------------------------------------------------------------------------
 # Attempt to extract dashboard option passed from command line
 #-----------------------------------------------------------------------------
-# Note: The syntax to pass option from the command line while invoking ctest is 
+# Note: The syntax to pass option from the command line while invoking ctest is
 #       the following: ctest -S /path/to/script.cmake,OPTNAME1##OPTVALUE1^^OPTNAME2##OPTVALUE2
 #
 # Example:
@@ -75,14 +75,14 @@ setIfNotDefined(CTEST_BUILD_CONFIGURATION "Release") # Release or Debug
 setIfNotDefined(CTEST_TEST_TIMEOUT 100)
 setIfNotDefined(CTEST_BUILD_FLAGS "") # Use multiple CPU cores to build. For example "-j4" on unix
 
-# experimental: 
+# experimental:
 #     - run_ctest() macro will be called *ONE* time
 #     - binary directory will *NOT* be cleaned
-# continuous: 
-#     - run_ctest() macro will be called EVERY 5 minutes ... 
+# continuous:
+#     - run_ctest() macro will be called EVERY 5 minutes ...
 #     - binary directory will *NOT* be cleaned
 #     - configure/build will be executed *ONLY* if the repository has been updated
-# nightly: 
+# nightly:
 #     - run_ctest() macro will be called *ONE* time
 #     - binary directory *WILL BE* cleaned
 setIfNotDefined(SCRIPT_MODE "nightly") # "experimental", "continuous", "nightly"
@@ -197,7 +197,7 @@ MACRO(downloadFile url dest)
 ENDMACRO()
 
 #
-# Download and include dashboard driver script 
+# Download and include dashboard driver script
 #
 set(url http://kwsource.kitwarein.com/bioinformatics/visomics/blobs/raw/master/CMake/VisomicsDashboardDriverScript.cmake)
 set(dest ${CTEST_SCRIPT_DIRECTORY}/${CTEST_SCRIPT_NAME}.driver)

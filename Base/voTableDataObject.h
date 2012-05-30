@@ -40,7 +40,7 @@ public:
 
   bool sortable()const;
   void setSortable(const bool& newSortable);
-  
+
 protected:
   QScopedPointer<voTableDataObjectPrivate> d_ptr;
 

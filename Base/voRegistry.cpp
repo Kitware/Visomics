@@ -66,7 +66,7 @@ void voRegistry::registerMethod(const QString& methodName, ApplyNormalizationFun
   d->MethodNameToFunctionMap.insert(methodName, function);
 }
 
-//----------------------------------------------------------------------------  
+//----------------------------------------------------------------------------
 bool voRegistry::apply(const QString& methodName, vtkTable * dataTable, const QHash<int, QVariant>& settings)
 {
   Q_D(voRegistry);

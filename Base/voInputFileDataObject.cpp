@@ -43,7 +43,7 @@ public:
 voInputFileDataObjectPrivate::voInputFileDataObjectPrivate()
 {
 }
-  
+
 // --------------------------------------------------------------------------
 // voInputFileDataObject methods
 

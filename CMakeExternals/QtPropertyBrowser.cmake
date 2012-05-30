@@ -27,7 +27,7 @@ IF(NOT DEFINED QtPropertyBrowser_DIR)
       ${proj_DEPENDENCIES}
     )
   SET(QtPropertyBrowser_DIR ${CMAKE_BINARY_DIR}/${proj}-build)
-  
+
 ELSE()
   ctkMacroEmptyExternalProject(${proj} "${proj_DEPENDENCIES}")
 ENDIF()

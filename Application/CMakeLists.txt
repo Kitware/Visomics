@@ -51,7 +51,7 @@ SET(KIT_UI_FORMS
   Resources/UI/voDelimitedTextImportDialog.ui
   Resources/UI/voDelimitedTextImportWidget.ui
   )
-  
+
 SET(KIT_resources
   Resources/VisomicsApp.qrc
   )

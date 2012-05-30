@@ -91,7 +91,7 @@ protected:
 private:
   Q_DECLARE_PRIVATE(voDataModel);
   Q_DISABLE_COPY(voDataModel);
-  
+
 };
 
 #endif

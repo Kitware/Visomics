@@ -6,7 +6,7 @@ CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voDelimitedTextImportDialogTest.cpp
   voDelimitedTextImportWidgetTest.cpp
   )
-  
+
 SET(TestsToRun ${Tests})
 REMOVE(TestsToRun ${KIT}CppTests.cpp)
 
