@@ -9,7 +9,7 @@ CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voUtilsTest.cpp
   vtkExtendedTableTest.cpp
   )
-  
+
 SET(TestsToRun ${Tests})
 REMOVE(TestsToRun ${KIT}CppTests.cpp)
 
@@ -29,5 +29,3 @@ SET_PROPERTY(TEST voCheckR_HOMETest PROPERTY FAIL_REGULAR_EXPRESSION "R_HOME:[ ]
 SIMPLE_TEST(voDataObjectTest)
 SIMPLE_TEST(voUtilsTest)
 SIMPLE_TEST(vtkExtendedTableTest)
-
-

@@ -163,7 +163,7 @@ int voLog2Test(int /*argc*/, char * /*argv*/ [])
     log2NormalizationExpectedOutputArray->InsertValue(4, 2.0);
     log2NormalizationExpectedOutput->AddColumn(log2NormalizationExpectedOutputArray.GetPointer());
     }
-    
+
   Normalization::applyLog2(log2NormalizationInput.GetPointer(), QHash<int, QVariant>());
 
   if (!compareTable(log2NormalizationInput.GetPointer(), log2NormalizationExpectedOutput.GetPointer()))
@@ -182,4 +182,3 @@ int voLog2Test(int /*argc*/, char * /*argv*/ [])
 
   return EXIT_SUCCESS;
 }
-

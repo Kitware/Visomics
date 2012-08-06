@@ -40,7 +40,7 @@ public:
 
   QString fileName()const;
   void setFileName(const QString& newFileName);
-  
+
 protected:
   QScopedPointer<voInputFileDataObjectPrivate> d_ptr;
 

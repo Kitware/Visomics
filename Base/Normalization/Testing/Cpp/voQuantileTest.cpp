@@ -197,4 +197,3 @@ int voQuantileTest(int /*argc*/, char * /*argv*/ [])
 
   return EXIT_SUCCESS;
 }
-

@@ -176,4 +176,3 @@ def init(prefetch = True):
       allPathways.update(IDToPathways(ID))
     IDsToTitles(list(allPathways))
     print "  done"
-

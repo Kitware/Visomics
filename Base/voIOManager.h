@@ -48,7 +48,7 @@ public:
   void openCSVFile(const QString& fileName, const voDelimitedTextImportSettings& settings);
 
   static bool writeDataObjectToFile(vtkDataObject * dataObject, const QString& fileName);
-  
+
 };
 
 #endif

@@ -79,7 +79,7 @@ public:
 
   void setDataObject(voDataObject* newDataObject);
   voDataObject * dataObject() const;
-  
+
 protected:
   QScopedPointer<voDataModelItemPrivate> d_ptr;
 

@@ -31,7 +31,7 @@ class voAboutDialogPrivate
   Q_DECLARE_PUBLIC(voAboutDialog);
 protected:
   voAboutDialog* const q_ptr;
-  
+
 public:
   voAboutDialogPrivate(voAboutDialog& object);
   void init();
@@ -78,7 +78,7 @@ void voAboutDialogPrivate::init()
 // voAboutDialog methods
 
 // --------------------------------------------------------------------------
-voAboutDialog::voAboutDialog(QWidget* newParent):Superclass(newParent), 
+voAboutDialog::voAboutDialog(QWidget* newParent):Superclass(newParent),
   d_ptr(new voAboutDialogPrivate(*this))
 {
   Q_D(voAboutDialog);
@@ -89,4 +89,3 @@ voAboutDialog::voAboutDialog(QWidget* newParent):Superclass(newParent),
 voAboutDialog::~voAboutDialog()
 {
 }
-

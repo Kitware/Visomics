@@ -181,4 +181,3 @@ void ctkVTKErrorLogMessageHandler::setEnabledInternal(bool value)
     d->SavedVTKOutputWindow = 0;
     }
 }
-

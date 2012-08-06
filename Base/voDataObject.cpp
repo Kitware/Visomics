@@ -48,7 +48,7 @@ voDataObjectPrivate::voDataObjectPrivate()
   qRegisterMetaType<vtkVariant>("vtkVariant");
   this->Uuid = QUuid::createUuid().toString();
 }
-  
+
 // --------------------------------------------------------------------------
 // voDataObject methods
 

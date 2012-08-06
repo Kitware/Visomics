@@ -27,7 +27,7 @@
 class voViewStackedWidgetPrivate
 {
 public:
-  
+
 };
 
 // --------------------------------------------------------------------------
@@ -37,7 +37,7 @@ public:
 // voViewStackedWidget methods
 
 // --------------------------------------------------------------------------
-voViewStackedWidget::voViewStackedWidget(QWidget* newParent):Superclass(newParent), 
+voViewStackedWidget::voViewStackedWidget(QWidget* newParent):Superclass(newParent),
   d_ptr(new voViewStackedWidgetPrivate)
 {
 }

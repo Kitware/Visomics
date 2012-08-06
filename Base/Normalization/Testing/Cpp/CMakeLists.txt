@@ -5,7 +5,7 @@ CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voLog2Test.cpp
   voQuantileTest.cpp
   )
-  
+
 SET(TestsToRun ${Tests})
 REMOVE(TestsToRun ${KIT}CppTests.cpp)
 

@@ -51,7 +51,7 @@ SET(KIT_UI_FORMS
   Resources/UI/voDelimitedTextImportDialog.ui
   Resources/UI/voDelimitedTextImportWidget.ui
   )
-  
+
 SET(KIT_resources
   Resources/VisomicsApp.qrc
   )
@@ -128,4 +128,3 @@ INSTALL(TARGETS ${PROJECT_NAME}-real DESTINATION ${Visomics_INSTALL_LIB_DIR} COM
 IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Testing)
 ENDIF()
-

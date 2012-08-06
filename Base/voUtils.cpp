@@ -767,4 +767,3 @@ QString voUtils::cleanString(const QString& text)
   cleanedText.remove(QRegExp("^_|_$"));
   return cleanedText;
 }
-

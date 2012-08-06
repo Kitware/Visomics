@@ -40,4 +40,3 @@ namespace Normalization
 } // end of Normalization namespace
 
 #endif
-
