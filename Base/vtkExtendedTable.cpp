@@ -37,10 +37,10 @@ class vtkExtendedTable::vtkInternal
 {
 public:
   vtkInternal();
-  
+
   vtkSmartPointer<vtkTable> ColumnMetaData;
   vtkSmartPointer<vtkTable> RowMetaData;
-  
+
   vtkIdType ColumnMetaDataTypeOfInterest;
   vtkIdType RowMetaDataTypeOfInterest;
 
@@ -57,7 +57,7 @@ vtkExtendedTable::vtkInternal::vtkInternal()
   this->ColumnMetaDataTypeOfInterest = -1;
   this->RowMetaDataTypeOfInterest = -1;
 }
-  
+
 //----------------------------------------------------------------------------
 // vtkExtendedTable methods
 
@@ -203,7 +203,7 @@ vtkIdType vtkExtendedTable::GetNumberOfColumnMetaDataTypes() const
   return this->Internal->ColumnMetaData->GetNumberOfColumns();
 }
 
-//---------------------------------------------------------------------------- 
+//----------------------------------------------------------------------------
 vtkAbstractArray* vtkExtendedTable::GetColumnMetaData(vtkIdType id) const
 {
   if (!this->Internal->ColumnMetaData)
@@ -244,9 +244,9 @@ void vtkExtendedTable::SetColumnMetaDataTypeOfInterest(vtkIdType id)
                   << " - NumberOfColumnMetaDataTypes:" << this->GetNumberOfColumnMetaDataTypes());
     return;
     }
-  
+
   this->Internal->ColumnMetaDataTypeOfInterest = id;
-  
+
   this->Modified();
 }
 
@@ -370,16 +370,16 @@ void vtkExtendedTable::SetRowMetaDataTypeOfInterest(vtkIdType id)
     {
     return;
     }
-    
+
   if (id < 0 || id >= this->GetNumberOfRowMetaDataTypes())
     {
     vtkErrorMacro(<< "vtkExtendedTable::SetRowMetaDataTypeOfInterest - Invalid id:" << id
                   << " - NumberOfRowMetaDataTypes:" << this->GetNumberOfRowMetaDataTypes());
     return;
     }
-  
+
   this->Internal->RowMetaDataTypeOfInterest = id;
-  
+
   this->Modified();
 }
 

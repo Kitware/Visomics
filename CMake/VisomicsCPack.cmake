@@ -53,14 +53,14 @@ ENDFOREACH()
 #      LIST(APPEND files ${R_LIBRARY_LAPACK})
 #    ENDIF()
 #    INSTALL(FILES ${files}
-#	    DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime)
+#    DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime)
 #  ELSEIF(WIN32)
 #    #TODO
 #  ENDIF()
 #ENDIF()
 
 # -------------------------------------------------------------------------
-# Build a CPack installer 
+# Build a CPack installer
 # -------------------------------------------------------------------------
 
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Visomics - Application allowing to import, analyze and visualize metabolomics and genomics data.")
@@ -102,4 +102,3 @@ endif()
 
 INCLUDE (InstallRequiredSystemLibraries)
 INCLUDE(CPack)
-

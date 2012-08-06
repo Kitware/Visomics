@@ -676,4 +676,3 @@ void voDelimitedTextPreviewModel::updatePreview()
 
   d->updateDataPreview();
 }
-

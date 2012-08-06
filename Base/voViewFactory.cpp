@@ -113,7 +113,7 @@ void voViewFactory::registerView(const QString& viewName)
     {
     tmpViewName = viewClassName;
     }
-    
+
   if (this->registeredViewNames().contains(tmpViewName))
     {
     return;

@@ -117,7 +117,7 @@ OPTION(WITH_COVERAGE "Enable/Disable coverage" OFF)
 
 #-----------------------------------------------------------------------------
 # Check compiler version
-# 
+#
 IF(CMAKE_COMPILER_IS_GNUCXX)
   SET(REQUIRED_GNUCXX_VERSION "4.2.0")
   ctkFunctionGetGccVersion(${CMAKE_CXX_COMPILER} GCC_VERSION)

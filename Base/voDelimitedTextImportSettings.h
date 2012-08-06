@@ -39,7 +39,7 @@ public:
     UseStringDelimiter,
     // vtkExtendedTable settings
     Transpose,
-    NumberOfColumnMetaDataTypes, 
+    NumberOfColumnMetaDataTypes,
     ColumnMetaDataTypeOfInterest,
     NumberOfRowMetaDataTypes,
     RowMetaDataTypeOfInterest,
@@ -50,7 +50,7 @@ public:
   voDelimitedTextImportSettings();
 
   virtual void printAdditionalInfo()const;
-    
+
   void setDefaultSettings();
 };
 

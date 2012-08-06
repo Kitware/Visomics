@@ -32,4 +32,3 @@ int vtkExtendedTableTest(int /*argc*/, char * /*argv*/ [])
   //
   return EXIT_SUCCESS;
 }
-

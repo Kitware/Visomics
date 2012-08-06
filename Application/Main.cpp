@@ -147,7 +147,7 @@ int main(int argc, char* argv[])
     {
     return EXIT_SUCCESS;
     }
-  
+
   voMainWindow mainwindow;
   mainwindow.show();
 
@@ -155,6 +155,6 @@ int main(int argc, char* argv[])
   callback.setCallback(checkRPrerequisites);
   callback.setCallbackData(&mainwindow);
   QTimer::singleShot(0, &callback, SLOT(invoke()));
-  
+
   return app.exec();
 }

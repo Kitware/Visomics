@@ -85,7 +85,7 @@ void voKMeansClustering::setParameterInformation()
   kmeans_algorithms << "Hartigan-Wong" << "Lloyd" << "Forgy" << "MacQueen";
   kmeans_parameters << this->addEnumParameter("algorithm", "Algorithm", kmeans_algorithms);
 
-   // KMeans / number of random start 
+   // KMeans / number of random start
   kmeans_parameters << this->addIntegerParameter("nstart", QObject::tr("Number of random start"), 1, 50, 10);
 
   this->addParameterGroup("KMeans parameters", kmeans_parameters);

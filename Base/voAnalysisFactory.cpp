@@ -111,7 +111,7 @@ template<typename AnalysisClassType>
 void voAnalysisFactory::registerAnalysis(const QString& analysisPrettyName)
 {
   Q_D(voAnalysisFactory);
-  
+
   if (analysisPrettyName.isEmpty())
     {
     qCritical() << "Failed to register analysis - analysisPrettyName is an empty string";

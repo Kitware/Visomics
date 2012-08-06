@@ -218,4 +218,3 @@ void voHeatMapView::setDataObjectInternal(const voDataObject& dataObject)
 
   d->ChartView->Render();
 }
-

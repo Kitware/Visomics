@@ -59,4 +59,3 @@ voDelimitedTextPreview::voDelimitedTextPreview(QWidget* newParent) :
 voDelimitedTextPreview::~voDelimitedTextPreview()
 {
 }
-

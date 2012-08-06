@@ -40,4 +40,3 @@
 #define Visomics_KEGG_SERVER_PORT @Visomics_KEGG_SERVER_PORT@
 
 #endif
-

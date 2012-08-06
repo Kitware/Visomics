@@ -1,11 +1,11 @@
 
 #
-# - This module locates an installed R distribution.  
+# - This module locates an installed R distribution.
 #
 # Defines the following:
 #
 # R_INCLUDE_DIR - Path to R include directory
-# R_LIBRARY     - Path to R library 
+# R_LIBRARY     - Path to R library
 # R_COMMAND     - Path to R command
 #
 
@@ -28,4 +28,3 @@ SET(R_LIBRARIES ${R_LIBRARY_BASE} ${R_LIBRARY_BLAS} ${R_LIBRARY_LAPACK} ${R_LIBR
 IF (R_LIBRARY_READLINE)
   SET(R_LIBRARIES ${R_LIBRARIES} ${R_LIBRARY_READLINE})
 ENDIF (R_LIBRARY_READLINE)
-

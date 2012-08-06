@@ -30,7 +30,7 @@
 class voViewTabWidgetPrivate
 {
 public:
-  
+
 };
 
 // --------------------------------------------------------------------------
@@ -40,7 +40,7 @@ public:
 // voViewTabWidget methods
 
 // --------------------------------------------------------------------------
-voViewTabWidget::voViewTabWidget(QWidget* newParent):Superclass(newParent), 
+voViewTabWidget::voViewTabWidget(QWidget* newParent):Superclass(newParent),
   d_ptr(new voViewTabWidgetPrivate)
 {
   this->setTabsClosable(true);

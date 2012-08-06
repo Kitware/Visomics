@@ -57,7 +57,7 @@ voPLSStatistics::voPLSStatistics():
     Superclass(), d_ptr(new voPLSStatisticsPrivate)
 {
   Q_D(voPLSStatistics);
-  
+
   d->RCalc = vtkSmartPointer<vtkRCalculatorFilter>::New();
 }
 
@@ -115,8 +115,8 @@ void voPLSStatistics::setParameterInformation()
 
   pls_parameters << this->addStringParameter("predictor_range", QObject::tr("Predictor Analyte(s)"), "1-3,6");
   pls_parameters << this->addStringParameter("response_range", QObject::tr("Response Analyte(s)"), "4,5,7-10");
-  pls_parameters << this->addEnumParameter("algorithm", tr("Algorithm"), 
-                            (QStringList() << "Kernel" << "Wide Kernel" << "SIMPLS" << "Orthogonal Scores"), 
+  pls_parameters << this->addEnumParameter("algorithm", tr("Algorithm"),
+                            (QStringList() << "Kernel" << "Wide Kernel" << "SIMPLS" << "Orthogonal Scores"),
                             "Kernel");
 
   this->addParameterGroup("PLS parameters", pls_parameters);

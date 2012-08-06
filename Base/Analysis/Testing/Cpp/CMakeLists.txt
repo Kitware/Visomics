@@ -4,7 +4,7 @@ SET(KIT ${PROJECT_NAME}Analysis)
 CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voAnalysisRunTest.cpp
   )
-  
+
 SET(TestsToRun ${Tests})
 REMOVE(TestsToRun ${KIT}CppTests.cpp)
 

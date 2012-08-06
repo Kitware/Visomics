@@ -42,7 +42,7 @@ public:
   typedef QMainWindow Superclass;
   voMainWindow(QWidget * newParent = 0);
   virtual ~voMainWindow();
-  
+
 public slots:
   void onFileOpenActionTriggered();
   void onViewErrorLogActionTriggered();

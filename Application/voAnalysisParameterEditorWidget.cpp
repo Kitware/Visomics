@@ -286,4 +286,3 @@ void voAnalysisParameterEditorWidget::cloneAnalysis()
 
   emit runAnalysisRequested(d->Analysis->objectName(), parameters);
 }
-

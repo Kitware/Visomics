@@ -19,4 +19,3 @@ if(CPACK_GENERATOR MATCHES "NSIS")
   SET(CPACK_NSIS_URL_INFO_ABOUT "http:\\\\www.visomics.org")
   SET(CPACK_NSIS_CONTACT visomics@visomics.org)
 endif()
-

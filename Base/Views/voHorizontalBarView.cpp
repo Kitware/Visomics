@@ -90,7 +90,7 @@ void voHorizontalBarView::setupUi(QLayout * layout)
   d->ChartView->GetRenderer()->SetBackground(1.0, 1.0, 1.0);
   d->ChartView->GetScene()->AddItem(d->Chart);
   d->BarPlot = vtkPlotBar::SafeDownCast(d->Chart->AddPlot(vtkChart::BAR));
-  
+
   layout->addWidget(d->Widget);
 }
 

@@ -6,7 +6,7 @@ CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voDelimitedTextImportDialogTest.cpp
   voDelimitedTextImportWidgetTest.cpp
   )
-  
+
 SET(TestsToRun ${Tests})
 REMOVE(TestsToRun ${KIT}CppTests.cpp)
 
@@ -22,5 +22,3 @@ ENDMACRO()
 SIMPLE_TEST(voDataBrowserWidgetTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
 #SIMPLE_TEST(voDelimitedTextImportDialogTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
 SIMPLE_TEST(voDelimitedTextImportWidgetTest ${VisomicsData_DIR}/Data/UNC/All_conc_kitware_transposed.csv)
-
-

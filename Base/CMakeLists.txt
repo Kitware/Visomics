@@ -26,7 +26,7 @@ SET(KIT_SRCS
   Normalization/voNormalization.h
   Normalization/voLog2.cpp
   Normalization/voQuantile.cpp
-  
+
   Views/voCorrelationGraphView.cpp
   Views/voCorrelationGraphView.h
   Views/voExtendedTableView.cpp
@@ -59,7 +59,7 @@ SET(KIT_SRCS
   Views/voTreeGraphView.cpp
   Views/voVolcanoView.cpp
   Views/voVolcanoView.h
-  
+
   voAnalysis.cpp
   voAnalysis.h
   voAnalysisDriver.cpp
@@ -102,7 +102,7 @@ SET(KIT_SRCS
   vtkExtendedTable.cpp
   vtkExtendedTable.h
   )
-  
+
 SET(KIT_MOC_SRCS
   Analysis/voFoldChange.h
   Analysis/voANOVAStatistics.h
@@ -114,7 +114,7 @@ SET(KIT_MOC_SRCS
   Analysis/voTTest.h
   Analysis/voPLSStatistics.h
   Analysis/voXCorrel.h
-  
+
   Views/voCorrelationGraphView.h
   Views/voExtendedTableView.h
   Views/voHeatMapView.h
@@ -130,7 +130,7 @@ SET(KIT_MOC_SRCS
   Views/voTableView.h
   Views/voTreeGraphView.h
   Views/voVolcanoView.h
-  
+
   voAnalysis.h
   voAnalysisDriver.h
   voApplication.h
@@ -143,14 +143,14 @@ SET(KIT_MOC_SRCS
   voView.h
   voViewManager.h
   )
-  
+
 SET(KIT_UI_FORMS
   )
-  
+
 SET(KIT_resources
   Resources/VisomicsBase.qrc
   )
-  
+
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -216,4 +216,3 @@ IF(BUILD_TESTING)
   ADD_SUBDIRECTORY(Analysis/Testing)
   ADD_SUBDIRECTORY(Normalization/Testing)
 ENDIF()
-
