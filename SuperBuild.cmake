@@ -120,6 +120,8 @@ ExternalProject_Add(${proj}
     -DVisomics_SUPERBUILD:BOOL=OFF
     -DVisomics_C_FLAGS:STRING=${Visomics_C_FLAGS}
     -DVisomics_CXX_FLAGS:STRING=${Visomics_CXX_FLAGS}
+    -DVisomics_KEGG_SERVER_HOSTNAME=${Visomics_KEGG_SERVER_HOSTNAME}
+    -DVisomics_KEGG_SERVER_PORT=${Visomics_KEGG_SERVER_PORT}
     # QtPropertyBrowser
     -DQtPropertyBrowser_DIR:PATH=${QtPropertyBrowser_DIR}
     # VisomicsData
