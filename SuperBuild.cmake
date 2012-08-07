@@ -28,7 +28,7 @@ find_package(R REQUIRED)
 include(CMakeExternals/RExternalPackages.cmake)
 
 #-----------------------------------------------------------------------------
-# Git protocole option
+# Git protocol option
 #-----------------------------------------------------------------------------
 
 option(Visomics_USE_GIT_PROTOCOL "If behind a firewall turn this off to use http instead." ON)
@@ -120,6 +120,8 @@ ExternalProject_Add(${proj}
     -DVisomics_SUPERBUILD:BOOL=OFF
     -DVisomics_C_FLAGS:STRING=${Visomics_C_FLAGS}
     -DVisomics_CXX_FLAGS:STRING=${Visomics_CXX_FLAGS}
+    -DVisomics_KEGG_SERVER_HOSTNAME=${Visomics_KEGG_SERVER_HOSTNAME}
+    -DVisomics_KEGG_SERVER_PORT=${Visomics_KEGG_SERVER_PORT}
     # QtPropertyBrowser
     -DQtPropertyBrowser_DIR:PATH=${QtPropertyBrowser_DIR}
     # VisomicsData
