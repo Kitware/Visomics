@@ -92,6 +92,7 @@ set(VTK_LIBRARIES
     vtkChartsCore
     vtkFiltersStatisticsGnuR
     vtkIOInfovis
+    vtkRenderingFreeTypeOpenGL # remove this eventually; when VTK is fixed
     vtkViewsContext2D
     vtkViewsQt
     )
