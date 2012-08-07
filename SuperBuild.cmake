@@ -28,7 +28,7 @@ find_package(R REQUIRED)
 include(CMakeExternals/RExternalPackages.cmake)
 
 #-----------------------------------------------------------------------------
-# Git protocole option
+# Git protocol option
 #-----------------------------------------------------------------------------
 
 option(Visomics_USE_GIT_PROTOCOL "If behind a firewall turn this off to use http instead." ON)
