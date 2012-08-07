@@ -146,9 +146,7 @@ void voHeatMapView::setDataObjectInternal(const voDataObject& dataObject)
                        0, corrMatrixNumberOfRows-1,
                        0,
                        0);
-  imageData->SetNumberOfScalarComponents(1);
-  imageData->SetScalarTypeToDouble();
-  imageData->AllocateScalars();
+  imageData->AllocateScalars(VTK_DOUBLE, 1);
   imageData->SetOrigin(0.0, 0.0, 0.0);
   imageData->SetSpacing(1.0, 1.0, 1.0);
 
@@ -164,7 +162,7 @@ void voHeatMapView::setDataObjectInternal(const voDataObject& dataObject)
       }
     }
 
-  d->Chart->SetInput( imageData );
+  d->Chart->SetInputData( imageData );
 
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle("");
   d->Chart->GetAxis(vtkAxis::LEFT)->SetBehavior(vtkAxis::FIXED);

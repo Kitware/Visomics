@@ -23,7 +23,7 @@
 #include "voConfigure.h"
 
 // VTK includes
-#include <vtkConfigure.h>
+#include <vtkVersionMacros.h>
 
 // --------------------------------------------------------------------------
 class voAboutDialogPrivate

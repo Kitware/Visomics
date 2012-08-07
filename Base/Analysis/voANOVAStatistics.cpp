@@ -169,7 +169,7 @@ bool voANOVAStatistics::execute()
 
   // Run R code
   d->RCalc->SetRoutput(0);
-  d->RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
+  d->RCalc->SetInputData(RInputArrayData.GetPointer());
   d->RCalc->PutArray("0", "sample1Array");
   d->RCalc->PutArray("1", "sample2Array");
   d->RCalc->GetArray("P-Value","pValue");

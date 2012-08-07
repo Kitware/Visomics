@@ -122,7 +122,7 @@ bool voPCAStatistics::execute()
     }
 
   d->RCalc->SetRoutput(0);
-  d->RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
+  d->RCalc->SetInputData(RInputArrayData.GetPointer());
   d->RCalc->PutArray("0", "PCAData");
   d->RCalc->GetArray("pcaRot", "pcaRot");
   d->RCalc->GetArray("pcaSdev", "pcaSdev");

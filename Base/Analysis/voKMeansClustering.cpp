@@ -190,7 +190,7 @@ bool voKMeansClustering::execute()
   // Run R
   vtkNew<vtkRCalculatorFilter> RCalc;
   RCalc->SetRoutput(0);
-  RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
+  RCalc->SetInputData(RInputArrayData.GetPointer());
   RCalc->PutArray("0", "metabData");
   RCalc->GetArray("kmCenters", "kmCenters");
   RCalc->GetArray("kmCluster", "kmCluster");

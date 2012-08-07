@@ -123,7 +123,7 @@ void voPCAProjectionView::setDataObjectInternal(const voDataObject& dataObject)
   unsigned char color[3] = {166, 206, 227};
 
   // TODO Extract only the first two rows of the data table instead of transposing the entire table
-  d->Plot->SetInput(transpose.GetPointer(), 1, 2);
+  d->Plot->SetInputData(transpose.GetPointer(), 1, 2);
   d->Plot->SetColor(color[0], color[1], color[2], 255);
   d->Plot->SetWidth(10);
   d->Plot->SetIndexedLabels(labels);
