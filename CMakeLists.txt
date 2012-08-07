@@ -82,7 +82,7 @@ ENDFOREACH()
 #-----------------------------------------------------------------------------
 # Qt
 #
-FIND_PACKAGE(Qt4 4.7 COMPONENTS QtCore QtGui QtNetwork QtScript QtWebKit REQUIRED)
+FIND_PACKAGE(Qt4 4.7 REQUIRED COMPONENTS QtCore QtGui QtNetwork QtScript QtWebKit)
 INCLUDE(${QT_USE_FILE})
 
 #-----------------------------------------------------------------------------
@@ -110,6 +110,13 @@ ENDIF()
 # Coverage
 #
 OPTION(WITH_COVERAGE "Enable/Disable coverage" OFF)
+IF(WITH_COVERAGE)
+  IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
+    SET(coverage_flags "-g -fprofile-arcs -ftest-coverage -O0 -DNDEBUG")
+    SET(COVERAGE_CXX_FLAGS ${coverage_flags})
+    SET(COVERAGE_C_FLAGS ${coverage_flags})
+  ENDIF()
+ENDIF()
 
 #-----------------------------------------------------------------------------
 # Documentation
@@ -133,17 +140,6 @@ SET(ADDITIONAL_C_FLAGS "" CACHE STRING "Additional C Flags")
 MARK_AS_ADVANCED(ADDITIONAL_C_FLAGS)
 SET(ADDITIONAL_CXX_FLAGS "" CACHE STRING "Additional CXX Flags")
 MARK_AS_ADVANCED(ADDITIONAL_CXX_FLAGS)
-
-#-----------------------------------------------------------------------------
-# Set coverage Flags
-#
-IF(WITH_COVERAGE)
-  IF("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
-    SET(coverage_flags "-g -fprofile-arcs -ftest-coverage -O0 -DNDEBUG")
-    SET(COVERAGE_CXX_FLAGS ${coverage_flags})
-    SET(COVERAGE_C_FLAGS ${coverage_flags})
-  ENDIF()
-ENDIF()
 
 #-----------------------------------------------------------------------------
 # Visomics C/CXX Flags
@@ -186,7 +182,7 @@ ENDIF()
 
 #-----------------------------------------------------------------------------
 # QtPropertyBrowser
-
+#
 FIND_PACKAGE(QtPropertyBrowser REQUIRED)
 INCLUDE(${QtPropertyBrowser_USE_FILE})
 
