@@ -131,7 +131,7 @@ bool voHierarchicalClustering::execute()
   // Run R
   vtkNew <vtkRCalculatorFilter> RCalc;
   RCalc->SetRoutput(0);
-  RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
+  RCalc->SetInputData(RInputArrayData.GetPointer());
   RCalc->PutArray("0", "metabData");
   RCalc->GetArray("height","height");
 //  RCalc->GetArray("order","order");

@@ -95,7 +95,7 @@ bool voIOManager::writeTableToCVSFile(vtkTable* table, const QString& fileName)
 
   writer->SetFileName(fileName.toLatin1());
 
-  writer->SetInput(table);
+  writer->SetInputData(table);
   writer->Update();
 
   return true;
@@ -300,7 +300,7 @@ bool voIOManager::writeDataObjectToFile(vtkDataObject * dataObject, const QStrin
 
   vtkNew<vtkGenericDataObjectWriter> dataWriter;
   dataWriter->SetFileName(fileName.toLatin1());
-  dataWriter->SetInput(dataObject);
+  dataWriter->SetInputData(dataObject);
   dataWriter->Update();
 
   return true;

@@ -131,7 +131,7 @@ void voPCABarView::setDataObjectInternal(const voDataObject& dataObject)
   // See http://www.colorjack.com/?swatch=A6CEE3
   unsigned char color[3] = {166, 206, 227};
 
-  d->Plot->SetInput(transpose.GetPointer(), 1, 2);
+  d->Plot->SetInputData(transpose.GetPointer(), 1, 2);
   d->Plot->SetColor(color[0], color[1], color[2], 255);
   d->Plot->SetIndexedLabels(labels);
   d->Plot->SetTooltipLabelFormat("%i: %y");

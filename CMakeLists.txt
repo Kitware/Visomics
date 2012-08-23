@@ -86,6 +86,18 @@ FIND_PACKAGE(Qt4 4.7 REQUIRED COMPONENTS QtCore QtGui QtNetwork QtScript QtWebKi
 INCLUDE(${QT_USE_FILE})
 
 #-----------------------------------------------------------------------------
+# VTK Libraries
+#
+set(VTK_LIBRARIES
+    vtkChartsCore
+    vtkFiltersStatisticsGnuR
+    vtkIOInfovis
+    vtkRenderingFreeTypeOpenGL # remove this eventually; when VTK is fixed
+    vtkViewsContext2D
+    vtkViewsQt
+    )
+
+#-----------------------------------------------------------------------------
 # Testing
 #
 OPTION(BUILD_TESTING "Test the project" ON)
@@ -168,7 +180,7 @@ ENDIF()
 #-----------------------------------------------------------------------------
 # VTK
 #
-FIND_PACKAGE(VTK REQUIRED)
+FIND_PACKAGE(VTK REQUIRED COMPONENTS ${VTK_LIBRARIES})
 INCLUDE(${VTK_USE_FILE})
 GET_FILENAME_COMPONENT(VTK_QT_QMAKE_EXECUTABLE_REALPATH ${VTK_QT_QMAKE_EXECUTABLE} REALPATH)
 GET_FILENAME_COMPONENT(QT_QMAKE_EXECUTABLE_REALPATH ${QT_QMAKE_EXECUTABLE} REALPATH)

@@ -217,7 +217,7 @@ bool voPLSStatistics::execute()
 
   // Run R code
   d->RCalc->SetRoutput(0);
-  d->RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
+  d->RCalc->SetInputData(RInputArrayData.GetPointer());
   d->RCalc->PutArray("0", "predictorArray");
   d->RCalc->PutArray("1", "responseArray");
   d->RCalc->GetArray("scoresArray","scoresArray");

@@ -58,7 +58,7 @@ bool applyQuantile(vtkTable * dataTable, const QHash<int, QVariant>& settings)
   // Run R code
   vtkNew<vtkRCalculatorFilter> RCalc;
   RCalc->SetRoutput(0);
-  RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
+  RCalc->SetInputData(RInputArrayData.GetPointer());
   RCalc->PutArray("0", "inputData");
   RCalc->GetArray("outputData","outputData");
   RCalc->SetRscript(QString(

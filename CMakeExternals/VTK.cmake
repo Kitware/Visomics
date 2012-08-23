@@ -10,13 +10,16 @@ ENDIF()
 SET(proj VTK)
 SET(proj_DEPENDENCIES)
 
-SET(VTK_DEPENDS ${proj})
+SET(VTK_MODULE_ARGS)
+FOREACH(VTK_LIBRARY ${VTK_LIBRARIES})
+  LIST(APPEND VTK_MODULE_ARGS -DModule_${VTK_LIBRARY}:BOOL=ON )
+ENDFOREACH()
 
 IF(NOT DEFINED VTK_DIR)
   MESSAGE(STATUS "Adding external project: ${proj}")
   ExternalProject_Add(${proj}
     GIT_REPOSITORY ${git_protocol}://vtk.org/VTK.git
-    GIT_TAG "v5.10.0"
+    GIT_TAG "origin/master"
     INSTALL_COMMAND ""
     SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
     BINARY_DIR ${proj}-build
@@ -32,22 +35,18 @@ IF(NOT DEFINED VTK_DIR)
       -DVTK_WRAP_JAVA:BOOL=OFF
       -DVTK_WRAP_PYTHON:BOOL=OFF
       -DVTK_WRAP_TCL:BOOL=OFF
-      # Build features
-      -DVTK_USE_GNU_R:BOOL=ON
-      -DVTK_USE_N_WAY_ARRAYS:BOOL=ON # Required for using R interface
-      -DVTK_USE_INFOVIS:BOOL=ON # Required for using R interface
-      -DVTK_USE_GUISUPPORT:BOOL=ON
-      -DVTK_USE_QVTK_QTOPENGL:BOOL=ON
-      -DVTK_USE_QT:BOOL=ON
-      # Options for R
+      # Modules
+      -DVTK_Group_StandAlone:BOOL=OFF
+      ${VTK_MODULE_ARGS}
+      # Module options - vtkFiltersStatisticsGnuR
       -DR_COMMAND:PATH=${R_COMMAND}
-      -DVTK_R_HOME:PATH=${R_HOME}
+      -DR_HOME:PATH=${R_HOME}
       -DR_INCLUDE_DIR:PATH=${R_INCLUDE_DIR}
       -DR_LIBRARY_BASE:FILEPATH=${R_LIBRARY_BASE}
       -DR_LIBRARY_BLAS:FILEPATH=${R_LIBRARY_BLAS}
       -DR_LIBRARY_LAPACK:FILEPATH=${R_LIBRARY_LAPACK}
       -DR_LIBRARY_READLINE:FILEPATH=${R_LIBRARY_READLINE}
-      # Options for Qt
+      # Module options - vtkViewsQt
       -DQT_QMAKE_EXECUTABLE:FILEPATH=${QT_QMAKE_EXECUTABLE}
     DEPENDS
       ${proj_DEPENDENCIES}

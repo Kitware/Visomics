@@ -137,7 +137,7 @@ bool voXCorrel::execute()
     }
 
   d->RCalc->SetRoutput(0);
-  d->RCalc->SetInputConnection(RInputArrayData->GetProducerPort());
+  d->RCalc->SetInputData(RInputArrayData.GetPointer());
   d->RCalc->PutArray("0", "metabData");
   d->RCalc->GetArray("correl","correl");
   d->RCalc->SetRscript(
@@ -204,7 +204,7 @@ bool voXCorrel::execute()
 
   // Build the graph
   vtkNew<vtkTableToGraph> correlGraphAlg;
-  correlGraphAlg->SetInput(sparseCorr.GetPointer());
+  correlGraphAlg->SetInputData(sparseCorr.GetPointer());
   correlGraphAlg->AddLinkVertex("Column 1");
   correlGraphAlg->AddLinkVertex("Column 2");
   correlGraphAlg->AddLinkEdge("Column 1", "Column 2");

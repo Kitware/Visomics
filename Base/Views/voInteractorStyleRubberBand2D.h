@@ -23,9 +23,10 @@
 #define __voInteractorStyleRubberBand2D_h
 
 // VTK includes
+#include "vtkInteractionStyleModule.h" // For export macro
 #include <vtkInteractorStyleRubberBand2D.h>
 
-class VTK_RENDERING_EXPORT voInteractorStyleRubberBand2D : public vtkInteractorStyleRubberBand2D
+class VTKINTERACTIONSTYLE_EXPORT voInteractorStyleRubberBand2D : public vtkInteractorStyleRubberBand2D
 {
 public:
   static voInteractorStyleRubberBand2D *New();
