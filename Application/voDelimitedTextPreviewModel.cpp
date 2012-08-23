@@ -663,7 +663,7 @@ void voDelimitedTextPreviewModel::updatePreview()
 
   // TODO: Add missing value identification/rectification step
   vtkNew<vtkStringToNumeric> numericToStringFilter;
-  numericToStringFilter->SetInput(d->OriginalDataTable);
+  numericToStringFilter->SetInputData(d->OriginalDataTable.GetPointer());
   numericToStringFilter->Update();
   vtkTable * numericDataTable = vtkTable::SafeDownCast(numericToStringFilter->GetOutput());
   Q_ASSERT(numericDataTable);

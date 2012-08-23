@@ -19,7 +19,7 @@
 #endif
 
 // VTK includes
-#include <vtkConfigure.h>
+#include <vtkFiltersStatisticsGnuRConfigure.h>
 
 // VTKSYS includes
 #include <vtksys/SharedForward.h>

@@ -129,7 +129,7 @@ void voHorizontalBarView::setDataObjectInternal(const voDataObject& dataObject)
   // See http://www.colorjack.com/?swatch=A6CEE3
   unsigned char color[3] = {166, 206, 227};
 
-  d->BarPlot->SetInput(localTable.GetPointer(), 1, 2);
+  d->BarPlot->SetInputData(localTable.GetPointer(), 1, 2);
   d->BarPlot->SetOrientation(vtkPlotBar::HORIZONTAL);
   d->BarPlot->SetColor(color[0], color[1], color[2], 255);
   d->BarPlot->SetIndexedLabels(verticalLabels);

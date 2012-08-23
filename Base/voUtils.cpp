@@ -551,7 +551,7 @@ bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destAr
     }
 
   vtkNew<vtkTableToArray> tabToArr;
-  tabToArr->SetInputConnection(srcTable->GetProducerPort());
+  tabToArr->SetInputData(srcTable);
 
   foreach (int ctr, columnList)
     {
@@ -580,7 +580,7 @@ void voUtils::arrayToTable(vtkArray* srcArray, vtkTable* destTable)
   arrData->AddArray(srcArray);
 
   vtkNew<vtkArrayToTable> arrToTab;
-  arrToTab->SetInputConnection(arrData->GetProducerPort());
+  arrToTab->SetInputData(arrData.GetPointer());
   arrToTab->Update();
 
   destTable->ShallowCopy(arrToTab->GetOutput());

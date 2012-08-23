@@ -113,7 +113,7 @@ void voVolcanoView::setDataObjectInternal(const voDataObject& dataObject)
   // See http://www.colorjack.com/?swatch=A6CEE3
   unsigned char color[3] = {166, 206, 227};
 
-  d->Plot->SetInput(table, 1, 2);
+  d->Plot->SetInputData(table, 1, 2);
   d->Plot->SetColor(color[0], color[1], color[2], 255);
   d->Plot->SetWidth(10);
   d->Plot->SetIndexedLabels(labels);
