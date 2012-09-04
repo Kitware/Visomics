@@ -2,8 +2,6 @@
 PROJECT(VisomicsApp)
 
 SET(KIT_SRCS
-  voAboutDialog.cpp
-  voAboutDialog.h
   voAnalysisParameterDialog.cpp
   voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.cpp
@@ -29,6 +27,11 @@ SET(KIT_SRCS
   voViewStackedWidget.cpp
   voViewStackedWidget.h
   )
+IF(USE_ARBOR_BRAND)
+  SET(KIT_SRCS  "${KIT_SRCS};voAboutDialog_Arbor.cpp;voAboutDialog_Arbor.h")
+ELSE()
+  SET(KIT_SRCS  "${KIT_SRCS};voAboutDialog.cpp;voAboutDialog.h")
+ENDIF()
 
 SET(KIT_MOC_SRCS
   voAboutDialog.h
@@ -47,10 +50,15 @@ SET(KIT_MOC_SRCS
   )
 
 SET(KIT_UI_FORMS
-  Resources/UI/voMainWindow.ui
   Resources/UI/voDelimitedTextImportDialog.ui
   Resources/UI/voDelimitedTextImportWidget.ui
   )
+
+IF(USE_ARBOR_BRAND)
+  SET(KIT_UI_FORMS  "${KIT_UI_FORMS};Resources/UI/voMainWindow_Arbor.ui")
+ELSE()
+  SET(KIT_UI_FORMS  "${KIT_UI_FORMS};Resources/UI/voMainWindow.ui")
+ENDIF()
 
 SET(KIT_resources
   Resources/VisomicsApp.qrc

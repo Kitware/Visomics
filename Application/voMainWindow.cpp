@@ -15,15 +15,22 @@
 #include <ctkErrorLogWidget.h>
 
 // Visomics includes
-#include "ui_voMainWindow.h"
-#include "voAboutDialog.h"
+
+#include "voConfigure.h" // For Visomics_INSTALL_DATA_DIR, Visomics_VERSION, Visomics_BUILD_TESTING, USE_ARBOR_BRAND
+#ifdef USE_ARBOR_BRAND
+  #include "ui_voMainWindow_Arbor.h"
+  #include "voAboutDialog_Arbor.h"
+#else
+  #include "ui_voMainWindow.h"
+  #include "voAboutDialog.h"
+#endif
+
 #include "voAnalysisParameterDialog.h"
 #include "voApplication.h"
 #include "voAnalysis.h"
 #include "voAnalysisDriver.h"
 #include "voAnalysisFactory.h"
 #include "voApplication.h"
-#include "voConfigure.h" // For Visomics_INSTALL_DATA_DIR, Visomics_VERSION, Visomics_BUILD_TESTING
 #include "voDataModel.h"
 #include "voDelimitedTextImportDialog.h"
 #include "voIOManager.h"
@@ -72,7 +79,12 @@ voMainWindow::voMainWindow(QWidget * newParent)
   Q_D(voMainWindow);
 
   d->setupUi(this);
+ 
+#ifdef USE_ARBOR_BRAND
+  this->setWindowTitle(QString("Arbor %1").arg(Visomics_VERSION));
+#else
   this->setWindowTitle(QString("Visomics %1").arg(Visomics_VERSION));
+#endif
 
   d->ErrorLogWidget.setErrorLogModel(voApplication::application()->errorLogModel());
 

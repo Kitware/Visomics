@@ -147,9 +147,11 @@ SET(KIT_MOC_SRCS
 SET(KIT_UI_FORMS
   )
 
-SET(KIT_resources
-  Resources/VisomicsBase.qrc
-  )
+IF(USE_ARBOR_BRAND)
+  SET(KIT_resources Resources/ArborBase.qrc)
+ELSE()
+  SET(KIT_resources Resources/VisomicsBase.qrc)
+ENDIF()
 
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}

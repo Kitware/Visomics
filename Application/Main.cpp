@@ -139,7 +139,11 @@ int main(int argc, char* argv[])
   voApplication app(argc, argv);
 
   Q_INIT_RESOURCE(VisomicsApp);
+#ifdef USE_ARBOR_BRAND
+  Q_INIT_RESOURCE(ArborBase);
+#else
   Q_INIT_RESOURCE(VisomicsBase);
+#endif
 
   bool exitWhenDone = false;
   app.initialize(exitWhenDone);
