@@ -88,18 +88,40 @@ void voViewManager::createView(const QString& objectUuid)
     {
     viewType = dataModelItem->rawViewType();
     }
-  voDataObject* dataObject = dataModelItem->dataObject();
+
 
   if (viewType.isEmpty())
     {
     qCritical() << "voViewManager - Failed to create view: viewType is an empty string";
     return;
     }
-  if (!dataObject)
+
+  voDataObject * dataObject;
+  QList<voDataObject*> dataObjectList;
+  QList<voDataModelItem*> childItems = dataModelItem->childItems();
+  if (childItems.empty())
     {
-    qCritical() << "voViewManager - Failed to create view: dataObject is NULL";
-    return;
+    dataObject = dataModelItem->dataObject();
+    if (!dataObject)
+      {
+      qCritical() << "voViewManager - Failed to create view: dataObject is NULL";
+      return;
+      }
     }
+  else
+    {
+    for (int i = 0; i< childItems.size(); i++)
+      {
+      dataObjectList.append(childItems[i]->dataObject());
+      }
+    if (dataObjectList.empty())
+      {
+      qCritical() << "voViewManager - Failed to create view: dataObjectList is NULL";
+      return;
+      }
+    }
+
+
   // Check if view has already been instantiated
   voView * view = 0;
   if (d->UuidToViewMap.contains(objectUuid))
@@ -131,7 +153,14 @@ void voViewManager::createView(const QString& objectUuid)
     dataModelItem->setData(QVariant(QMetaType::VoidStar, &view), voDataModelItem::ViewVoidStarRole);
     }
 
-  view->setDataObject(dataObject);
+  if (childItems.empty())
+    {
+    view->setDataObject(dataObject);
+    }
+  else
+    {
+    view->setDataObjectList(dataObjectList);
+    }
 
   emit this->viewCreated(objectUuid, view);
 }

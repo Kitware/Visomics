@@ -141,30 +141,62 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
 
   //qDebug() << "  " << analysis->numberOfInput() << " inputs expected";
 
-  int providedInputCount = 1;
-  if (analysis->numberOfInput() != providedInputCount)
-    {
-    qWarning() << "Failed to runAnalysis - Number of input provided"
-        << providedInputCount << "is different from the number of input expected"
-        << analysis->numberOfInput();
-    return;
-    }
+  QStringList inputNames = analysis->inputNames();
 
-  QString inputName = analysis->inputNames().value(0);
-  voDataObject * dataObject = inputTarget->dataObject();
+  voDataObject * dataObject;
+  QString inputName;
+  if ( inputNames.size() == 1 )
+    {// for most analysis, only one input is required
+    dataObject = inputTarget->dataObject();
+    inputName =  inputNames.value(0);
 
-  // Does the type of the provided input match the expected one ?
-  QString expectedInputType = analysis->inputType(inputName);
-  QString providedInputType = dataObject->type();
-  if (expectedInputType != providedInputType)
-    {
-    qWarning() << QObject::tr("Failed to runAnalysis - Provided input type %1 is "
-                              "different from the expected input type %2").
+    // Does the type of the provided input match the expected one ?
+    QString expectedInputType = analysis->inputType(inputName);
+    QString providedInputType = dataObject->type();
+    if (expectedInputType != providedInputType)
+      {
+      qWarning() << QObject::tr("Failed to runAnalysis - Provided input type %1 is "
+        "different from the expected input type %2").
         arg(providedInputType).arg(expectedInputType);
-    return;
+      return;
+      }
+
+    analysis->addInput(inputName, dataObject);
+    }
+  else
+    {//require multiple inputs
+    if (inputNames.size() ==  inputTarget->childItems().size())
+      {
+      for (int i = 0; i < inputNames.size(); i++)
+        {
+        voDataModelItem * childItem =  dynamic_cast<voDataModelItem*>(inputTarget->child(i));
+        dataObject = childItem->dataObject();
+        inputName =  inputNames.value(i);
+
+        // Does the type of the provided input match the expected one ?
+        QString expectedInputType = analysis->inputType(inputName);
+        QString providedInputType = dataObject->type();
+        if (expectedInputType != providedInputType)
+          {
+          qWarning() << QObject::tr("Failed to runAnalysis - Provided input type %1 is "
+            "different from the expected input type %2").
+            arg(providedInputType).arg(expectedInputType);
+          return;
+          }
+
+        analysis->addInput(inputName, dataObject);
+        }
+      }
+    else
+      {//error report
+      qWarning() << QObject::tr("Failed to runAnalysis - Provided input number %1 is "
+        "different from the expected input number %2").
+        arg(inputTarget->childItems().size()).arg(inputNames.size());
+      return;
+      }
     }
 
-  analysis->setInput(inputName, dataObject);
+
 
   // Initialize parameter
   analysis->initializeParameterInformation();
@@ -185,7 +217,7 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
   voAnalysisDriver::addAnalysisToObjectModel(analysisScopedPtr.take(), inputTarget);
 
   connect(analysis, SIGNAL(outputSet(const QString&, voDataObject*, voAnalysis*)),
-          SLOT(onAnalysisOutputSet(const QString&,voDataObject*,voAnalysis*)));
+    SLOT(onAnalysisOutputSet(const QString&,voDataObject*,voAnalysis*)));
 
   emit this->analysisAddedToObjectModel(analysis);
 
@@ -204,7 +236,7 @@ void voAnalysisDriver::runAnalysisForCurrentInput(
 
   voAnalysisFactory * analysisFactory = voApplication::application()->analysisFactory();
   voAnalysis * newAnalysis = analysisFactory->createAnalysis(
-        analysisFactory->analysisNameFromPrettyName(analysisName));
+    analysisFactory->analysisNameFromPrettyName(analysisName));
   Q_ASSERT(newAnalysis);
   newAnalysis->initializeParameterInformation(parameters);
   newAnalysis->setAcceptDefaultParameterValues(true);

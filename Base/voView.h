@@ -42,8 +42,10 @@ public:
   virtual QString hints()const;
 
   voDataObject* dataObject()const;
+  QList<voDataObject*> dataObjectList()const;
 
   void setDataObject(voDataObject* dataObject);
+  void setDataObjectList(QList<voDataObject*> dataObjectList);
 
   virtual QList<QAction*> actions();
 
@@ -58,7 +60,10 @@ protected:
 
   virtual QWidget* mainWidget();
 
-  virtual void setDataObjectInternal(const voDataObject& dataObject) = 0;
+  virtual void setDataObjectInternal(const voDataObject& dataObject) = 0 ;
+
+  //for views that require mutiple dataobject inputs
+  virtual void setDataObjectListInternal(const QList<voDataObject*> dataObjectList);
 
 protected:
   QScopedPointer<voViewPrivate> d_ptr;

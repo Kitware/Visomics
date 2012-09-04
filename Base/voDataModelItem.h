@@ -79,6 +79,8 @@ public:
 
   void setDataObject(voDataObject* newDataObject);
   voDataObject * dataObject() const;
+  QList<voDataModelItem*>  childItems() const;
+  void  addChildItem(voDataModelItem * childItem);
 
 protected:
   QScopedPointer<voDataModelItemPrivate> d_ptr;

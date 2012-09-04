@@ -180,19 +180,70 @@ voMainWindow::~voMainWindow()
 void voMainWindow::onFileOpenActionTriggered()
 {
   QStringList files = QFileDialog::getOpenFileNames(
-      this, tr("Open table data"), "*.csv", tr("CSV files (*.csv)"));
+    this, tr("Open table or tree"), "", tr("All files(*.*);;*.csv(*.csv);;*.phy(*.phy)"));
 
   files.sort();
 
-  voDelimitedTextImportDialog dialog(this);
+  QStringList acceptedImageFileTypeList;
+  acceptedImageFileTypeList << "csv" << "phy";
 
   foreach(const QString& file, files)
     {
-    dialog.setFileName(file);
-    int status = dialog.exec();
-    if (status == voDelimitedTextImportDialog::Accepted)
+    QStringList splittedStrList = file.split(".");
+
+    if( ((splittedStrList.size())-1) >= 0)
       {
-      voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
+      QString extension = splittedStrList[splittedStrList.size()-1];
+      if (acceptedImageFileTypeList.contains(extension))
+        {
+        if ( extension  == "csv" )
+          {
+          voDelimitedTextImportDialog dialog(this);
+          dialog.setFileName(file);
+          int status = dialog.exec();
+          if (status == voDelimitedTextImportDialog::Accepted)
+            {
+            voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
+            }
+          }
+        if (extension == "phy")
+          {
+            //open associated tree node data
+            QString fileExt = "";
+            QMessageBox msgBox;
+            msgBox.setInformativeText("Do you want to load associated data (*.csv) with the tree?");
+            msgBox.setStandardButtons(QMessageBox::Yes  |  QMessageBox::No);
+            msgBox.setDefaultButton(QMessageBox::No);
+            int ret = msgBox.exec();
+            if (ret == QMessageBox::Yes)
+              {
+              QString fileExt = QFileDialog::getOpenFileName(
+                this, tr("Open associated tree node table"), "", tr("*.csv(*.csv)"));
+              voDelimitedTextImportDialog dialog(this);
+              dialog.setFileName(fileExt);
+              int status = dialog.exec();
+              if (status == voDelimitedTextImportDialog::Accepted)
+                {
+                voApplication::application()->ioManager()->openPHYFile(file, fileExt, dialog.importSettings());
+                }
+              else
+                {
+                QMessageBox errorMsgBox;
+                errorMsgBox.setInformativeText("Failed to load the table data.");
+                errorMsgBox.exec();
+                voApplication::application()->ioManager()->openPHYFile(file);
+                }
+              }
+            else
+              {
+              voApplication::application()->ioManager()->openPHYFile(file);
+              }
+          }
+        }
+      else
+        {
+        qWarning()<<"This is an invalid input file.";
+        }
       }
     }
 }

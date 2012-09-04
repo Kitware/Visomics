@@ -115,7 +115,7 @@ int voAnalysisRunTest(int argc, char * argv [])
   analysis->initializeInputInformation();
   analysis->initializeOutputInformation();
   analysis->initializeParameterInformation();
-  analysis->setInput("input", new voInputFileDataObject(fileName, extendedTable.GetPointer()));
+  analysis->addInput("input", new voInputFileDataObject(fileName, extendedTable.GetPointer()));
   analysis->setWriteOutputsToFilesEnabled(generateOutputBaselines);
   dataDirectory.append("/Baseline/Base/Analysis/");
   analysis->setOutputDirectory(dataDirectory);

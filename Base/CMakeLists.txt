@@ -22,6 +22,8 @@ SET(KIT_SRCS
   Analysis/voPLSStatistics.h
   Analysis/voXCorrel.cpp
   Analysis/voXCorrel.h
+  Analysis/voGeigerModelFitting.cpp
+  Analysis/voGeigerModelFitting.h
 
   Normalization/voNormalization.h
   Normalization/voLog2.cpp
@@ -57,6 +59,8 @@ SET(KIT_SRCS
   Views/voTableView.h
   Views/voTreeGraphView.h
   Views/voTreeGraphView.cpp
+  Views/voTreeHeatmapView.h
+  Views/voTreeHeatmapView.cpp
   Views/voVolcanoView.cpp
   Views/voVolcanoView.h
 
@@ -114,6 +118,7 @@ SET(KIT_MOC_SRCS
   Analysis/voTTest.h
   Analysis/voPLSStatistics.h
   Analysis/voXCorrel.h
+  Analysis/voGeigerModelFitting.h
 
   Views/voCorrelationGraphView.h
   Views/voExtendedTableView.h
@@ -129,7 +134,9 @@ SET(KIT_MOC_SRCS
   Views/voPCAProjectionView.h
   Views/voTableView.h
   Views/voTreeGraphView.h
+  Views/voTreeHeatmapView.h
   Views/voVolcanoView.h
+
 
   voAnalysis.h
   voAnalysisDriver.h

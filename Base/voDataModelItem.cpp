@@ -226,3 +226,17 @@ voDataObject * voDataModelItem::dataObject() const
   Q_D(const voDataModelItem);
   return d->DataObject.data();
 }
+
+// --------------------------------------------------------------------------
+QList<voDataModelItem*> voDataModelItem::childItems() const
+{
+  Q_D(const voDataModelItem);
+  return d->ChildItems;
+}
+
+// --------------------------------------------------------------------------
+void voDataModelItem::addChildItem(voDataModelItem * childItem)
+{
+  Q_D(voDataModelItem);
+  d->ChildItems.append(childItem);
+}
