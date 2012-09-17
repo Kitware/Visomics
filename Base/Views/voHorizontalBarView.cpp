@@ -138,8 +138,7 @@ void voHorizontalBarView::setDataObjectInternal(const voDataObject& dataObject)
   d->Chart->GetAxis(vtkAxis::LEFT)->SetBehavior(vtkAxis::FIXED);
   // Default vertical zoom shows all bars at once. If we have many bars, we may want to change this.
   d->Chart->GetAxis(vtkAxis::LEFT)->SetRange(0.0, static_cast<double>(localTable->GetNumberOfRows()) + 1.0);
-  d->Chart->GetAxis(vtkAxis::LEFT)->SetTickPositions(verticalLocations.GetPointer());
-  d->Chart->GetAxis(vtkAxis::LEFT)->SetTickLabels(verticalLabels);
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetCustomTickPositions(verticalLocations.GetPointer(), verticalLabels);
   d->Chart->GetAxis(vtkAxis::LEFT)->SetGridVisible(false);
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle("");
 

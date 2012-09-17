@@ -166,15 +166,13 @@ void voHeatMapView::setDataObjectInternal(const voDataObject& dataObject)
 
   d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle("");
   d->Chart->GetAxis(vtkAxis::LEFT)->SetBehavior(vtkAxis::FIXED);
-  d->Chart->GetAxis(vtkAxis::LEFT)->SetTickLabels(verticalLabels.GetPointer());
   d->Chart->GetAxis(vtkAxis::LEFT)->SetRange(0.0, static_cast<double>(table->GetNumberOfRows()));
-  d->Chart->GetAxis(vtkAxis::LEFT)->SetTickPositions(verticalTicks.GetPointer());
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetCustomTickPositions(verticalTicks.GetPointer(),verticalLabels.GetPointer());
 
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle("");
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetBehavior(vtkAxis::FIXED);
-  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTickLabels(horizontalLabels.GetPointer());
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetRange(0.0, static_cast<double>(table->GetNumberOfColumns()-1));
-  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTickPositions(horizontalTicks.GetPointer());
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetCustomTickPositions(horizontalTicks.GetPointer(),horizontalLabels.GetPointer());
   d->Chart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetOrientation(270.0);
   d->Chart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetJustificationToRight(); // This actually justifies to the left
   d->Chart->GetAxis(vtkAxis::BOTTOM)->GetLabelProperties()->SetVerticalJustificationToCentered();

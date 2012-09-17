@@ -138,8 +138,7 @@ void voPCABarView::setDataObjectInternal(const voDataObject& dataObject)
 
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetBehavior(vtkAxis::FIXED);
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
-  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTickPositions(horizontalLocations.GetPointer());
-  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTickLabels(horizontalLabels.GetPointer());
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetCustomTickPositions(horizontalLocations.GetPointer(),horizontalLabels.GetPointer());
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetRange(-0.5, static_cast<double>(horizontalLocations->GetNumberOfTuples()) - 0.5);
   d->Chart->GetAxis(vtkAxis::BOTTOM)->SetGridVisible(false);
 
