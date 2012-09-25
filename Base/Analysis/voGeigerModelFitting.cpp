@@ -78,8 +78,8 @@ void voGeigerModelFitting::setInputInformation()
 // --------------------------------------------------------------------------
 void voGeigerModelFitting::setOutputInformation()
 {
-  this->addOutputType("modelTree", "vtkTree" ,
-                      "voTreeHeatmapView", "Fitted Model Tree");
+  this->addOutputType("resultTable", "vtkTable" ,
+                      "voTableView", "fitted modeling parameters");
 
 }
 
@@ -89,7 +89,7 @@ void voGeigerModelFitting::setParameterInformation()
   QList<QtProperty*> GeigerModel_parameters;
 
   QStringList modeling_methods;
-  // Note: R supports additional methods not provided here
+
   modeling_methods << "OU" << "BM" << "lambda";
   GeigerModel_parameters << this->addEnumParameter("modelType", tr("Model Type"), modeling_methods, "OU");
 
@@ -140,40 +140,28 @@ bool voGeigerModelFitting::execute()
   RCalc->RemoveAllPutVariables();
   RCalc->RemoveAllGetVariables();
   RCalc->SetRoutput(0);
-  RCalc->AddInputData(0,tree);
   RCalc->AddInputData(0,table);
+  RCalc->AddInputData(0,tree);
   RCalc->PutTree("tree");
   RCalc->PutTable("tableData");
-  RCalc->GetTree("modelTree");
+  RCalc->GetTable("resultTable");
 
-  if (modelType == "OU")
-    {
-    RCalc->SetRscript(QString(
-        "library(geiger)\n"
-        "svl<-as.numeric(tableData$SVL)\n"
-        "names(svl)<-tree$tip.label \n"
-        "o<-fitContinuous(tree, svl, model=\"%1\",bounds=list(alpha=c(1e-10,150)))\n"
-        "tree_t=tree[1:4]\n" //ouTree() only takes input phylo tree without "node.label"
-        "class(tree_t)=\"phylo\"\n" //so just recreate a phylo tree with the 5th element removed
-        "modelTree<-ouTree(tree_t,alpha=o$opt$alpha)\n"
-        ).arg(modelType).toLatin1());
-    }
+  RCalc->SetRscript(QString(
+      "library(geiger)\n"
+      "data<-as.numeric(tableData$\"%1\")\n"
+      "names(data)<-tree$tip.label \n"
+      "o<-fitContinuous(tree, data, model=\"%2\")\n"             //,bounds=list(alpha=c(1e-10,150)))\n"
+      "resultTable=o$opt\n"                                      //o$opt is a list of output parameters
+      "resultTable=c(list(paramter=\"values\"),resultTable)\n"   //insert the title pair to the top of the list
+      "str(resultTable)\n"
+  ).arg(modelType).toLatin1());
 
-
-  if (modelType == "BM")
-    {
-    }
-
-  if (modelType == "lamda")
-    {
-    }
 
   RCalc->Update();
 
-  // Get R output
-  vtkTree * outModelTree = vtkTree::SafeDownCast(RCalc->GetOutput());
+  vtkTable * outTable= vtkTable::SafeDownCast(RCalc->GetOutput());
 
-  this->setOutput("modelTree", new voDataObject("modelTree",outModelTree));
+  this->setOutput("resultTable", new voTableDataObject("resultTable",outTable));
 
   return true;
 }
