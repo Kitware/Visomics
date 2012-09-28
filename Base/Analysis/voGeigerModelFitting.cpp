@@ -167,8 +167,8 @@ bool voGeigerModelFitting::execute()
   RCalc->SetRscript(QString(
       "library(geiger)\n"
       "data<-as.numeric(tableData$\"%1\")\n"
-      "names(data)<-tree$tip.label \n"
-      "o<-fitContinuous(tree, data, model=\"%2\")\n"             //,bounds=list(alpha=c(1e-10,150)))\n"
+      "names(data)<-tableData[[1]] \n" // the first element of the list(tableData) is the name
+      "o<-fitContinuous(tree, data, model=\"%2\",SE=0)\n"
       "resultTable=o$opt\n"                                      //o$opt is a list of output parameters
       "resultTable=c(list(paramter=\"values\"),resultTable)\n"   //insert the title pair to the top of the list
       "str(resultTable)\n"
