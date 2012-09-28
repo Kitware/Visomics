@@ -66,7 +66,7 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voPLSStatistics>("PLS");
   this->registerAnalysis<voTTest>("T-Test");
   this->registerAnalysis<voXCorrel>("Cross Correlation");
-  this->registerAnalysis<voGeigerModelFitting>("GeigerModelFitting");
+  this->registerAnalysis<voGeigerModelFitting>("GeigerTreeModelFitting");
 }
 
 
