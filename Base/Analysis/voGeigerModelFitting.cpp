@@ -93,6 +93,8 @@ void voGeigerModelFitting::setParameterInformation()
   modeling_methods << "OU" << "BM" << "lambda";
   GeigerModel_parameters << this->addEnumParameter("modelType", tr("Model Type"), modeling_methods, "OU");
 
+  GeigerModel_parameters<< this->addStringParameter("selectedDataName", QObject::tr("Data Column Name"), "awesomeness");
+
   this->addParameterGroup("GeigerModel parameters", GeigerModel_parameters);
 }
 
@@ -103,6 +105,9 @@ QString voGeigerModelFitting::parameterDescription()const
                  "<dt><b>Model Type</b>:</dt>"
                  "<dd>Geiger Tree Model Types.<br>"
                  "<u>Choose from the three existing models</u>,OU, BM, and lambda </dd>"
+                 "<dt><b>Data Column Name</b>:</dt>"
+                 "<dd>Choose a data column to be used for the modeling fitting.<br>"
+                 "<u>Choose from the table data attached with the tree. </dd>"
                  "</dl>");
 }
 
@@ -111,8 +116,6 @@ bool voGeigerModelFitting::execute()
 {
   Q_D(voGeigerModelFitting);
 
-  // Parameters
-  QString modelType= this->enumParameter("modelType");
 
   // Import tree and assiciated traits table
   vtkTree* tree =  vtkTree::SafeDownCast(this->input("input1")->dataAsVTKDataObject());
@@ -129,11 +132,26 @@ bool voGeigerModelFitting::execute()
     return false;
     }
 
-  //table
-  vtkNew<vtkArrayData> RInputArrayData;
-  vtkSmartPointer<vtkArray> RInputArray;
-  voUtils::tableToArray(table, RInputArray);
-  RInputArrayData->AddArray(RInputArray.GetPointer());
+  // Parameters
+  QString modelType = this->enumParameter("modelType");
+  QString selectedDataName = this->stringParameter("selectedDataName");
+
+  //check whether the data name exsits in the table
+  bool FOUND = false;
+  for (unsigned int c = 1; c < table->GetNumberOfColumns(); c++)
+    {
+    const char * v = table->GetColumnName(c);
+    if (selectedDataName.compare(QString(v)) == 0)
+      {
+      FOUND = true;
+      }
+    }
+
+  if (not FOUND)
+    {
+    qWarning() << QObject::tr("Invalid data columne name,could not find a matching data name");
+    return false;
+    }
 
   // Run R
   vtkNew <vtkRCalculatorFilter> RCalc;
@@ -154,7 +172,7 @@ bool voGeigerModelFitting::execute()
       "resultTable=o$opt\n"                                      //o$opt is a list of output parameters
       "resultTable=c(list(paramter=\"values\"),resultTable)\n"   //insert the title pair to the top of the list
       "str(resultTable)\n"
-  ).arg(modelType).toLatin1());
+  ).arg(selectedDataName,modelType).toLatin1());
 
 
   RCalc->Update();
