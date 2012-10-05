@@ -90,7 +90,7 @@ void voGeigerModelFitting::setParameterInformation()
 
   QStringList modeling_methods;
 
-  modeling_methods << "OU" << "BM" << "lambda";
+  modeling_methods << "OU" << "BM" << "EB";
   GeigerModel_parameters << this->addEnumParameter("modelType", tr("Model Type"), modeling_methods, "OU");
 
   GeigerModel_parameters<< this->addStringParameter("selectedDataName", QObject::tr("Data Column Name"), "awesomeness");
@@ -104,7 +104,7 @@ QString voGeigerModelFitting::parameterDescription()const
   return QString("<dl>"
                  "<dt><b>Model Type</b>:</dt>"
                  "<dd>Geiger Tree Model Types.<br>"
-                 "<u>Choose from the three existing models</u>,OU, BM, and lambda </dd>"
+                 "<u>Choose from the three existing models</u>,OU(Ornstein-Uhlenbeck), BM(Brownian Motion), and EB(Early Burst) </dd>"
                  "<dt><b>Data Column Name</b>:</dt>"
                  "<dd>Choose a data column to be used for the modeling fitting.<br>"
                  "<u>Choose from the table data attached with the tree. </dd>"
@@ -164,15 +164,35 @@ bool voGeigerModelFitting::execute()
   RCalc->PutTable("tableData");
   RCalc->GetTable("resultTable");
 
+
+  QString R_ComposeOutputTable = "";
+  
+  if (modelType == QString("OU"))
+    {
+    R_ComposeOutputTable = "resultTable=list(parameter=\"value\",sigsq=result$sigsq,alpha=result$alpha,\" \"=\" \",lnL=result$lnL,AIC=result$aic,AICc=result$aicc)";
+    }
+  else if (modelType== "BM")
+    {
+    R_ComposeOutputTable = "resultTable=list(parameter=\"value\",sigsq=result$sigsq,\" \"=\" \",lnL=result$lnL,AIC=result$aic,AICc=result$aicc)";
+    }
+  else if (modelType == "EB")
+    {
+    R_ComposeOutputTable = "resultTable=list(parameter=\"value\",sigsq=result$sigsq,a=result$a,\" \"=\" \",lnL=result$lnL,AIC=result$aic,AICc=result$aicc)";
+    }
+  else
+   {
+    return false;
+   }
+
+
   RCalc->SetRscript(QString(
       "library(geiger)\n"
       "data<-as.numeric(tableData$\"%1\")\n"
       "names(data)<-tableData[[1]] \n" // the first element of the list(tableData) is the name
       "o<-fitContinuous(tree, data, model=\"%2\",SE=0)\n"
-      "resultTable=o$opt\n"                                      //o$opt is a list of output parameters
-      "resultTable=c(list(paramter=\"values\"),resultTable)\n"   //insert the title pair to the top of the list
-      "str(resultTable)\n"
-  ).arg(selectedDataName,modelType).toLatin1());
+      "result=o$opt\n" //o$opt is a list of output parameters
+      "%3\n"
+  ).arg(selectedDataName,modelType,R_ComposeOutputTable).toLatin1());
 
 
   RCalc->Update();
