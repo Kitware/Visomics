@@ -198,6 +198,11 @@ bool voGeigerModelFitting::execute()
   RCalc->Update();
 
   vtkTable * outTable= vtkTable::SafeDownCast(RCalc->GetOutput());
+  if(!outTable)
+    {
+    qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
+    return false;
+    }
 
   this->setOutput("resultTable", new voTableDataObject("resultTable",outTable));
 
