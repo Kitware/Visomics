@@ -178,19 +178,19 @@ int voAnalysisTest(int argc, char * argv [])
     return EXIT_FAILURE;
     }
 
-  analysis.setInput("input", 0);
+  analysis.addInput("input", 0);
   if (analysis.input("input") != 0)
     {
-    std::cerr << "Line " << __LINE__ << " - Problem with setInput() / input() !" << std::endl;
+    std::cerr << "Line " << __LINE__ << " - Problem with addInput() / input() !" << std::endl;
     return EXIT_FAILURE;
     }
 
   vtkNew<vtkTable> inputTable;
   voDataObject * inputDataObject = new voDataObject("input", inputTable.GetPointer());
-  analysis.setInput("input", inputDataObject);
+  analysis.addInput("input", inputDataObject);
   if (analysis.input("input") != inputDataObject)
     {
-    std::cerr << "Line " << __LINE__ << " - Problem with setInput() / input() !" << std::endl;
+    std::cerr << "Line " << __LINE__ << " - Problem with addInput() / input() !" << std::endl;
     return EXIT_FAILURE;
     }
 
@@ -566,7 +566,7 @@ int voAnalysisTest(int argc, char * argv [])
     }
 
   vtkNew<vtkArrayData> arrayData;
-  analysis.setInput("input", new voDataObject("input", arrayData.GetPointer()));
+  analysis.addInput("input", new voDataObject("input", arrayData.GetPointer()));
 
   if (analysis.run())
     {
@@ -581,7 +581,7 @@ int voAnalysisTest(int argc, char * argv [])
   intColumn->SetValue(0, 1);
   intColumn->SetValue(1, 2);
   table->AddColumn(intColumn);
-  analysis.setInput("input", new voDataObject("input", table.GetPointer()));
+  analysis.addInput("input", new voDataObject("input", table.GetPointer()));
 
   if (!analysis.run())
     {

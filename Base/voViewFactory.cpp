@@ -40,6 +40,7 @@
 #include "voPCABarView.h"
 #include "voTableView.h"
 #include "voTreeGraphView.h"
+#include "voTreeHeatmapView.h"
 #include "voVolcanoView.h"
 
 //----------------------------------------------------------------------------
@@ -73,6 +74,7 @@ voViewFactory::voViewFactory():d_ptr(new voViewFactoryPrivate)
   this->registerView<voPCAProjectionView>();
   this->registerView<voTableView>();
   this->registerView<voTreeGraphView>();
+  this->registerView<voTreeHeatmapView>();
   this->registerView<voVolcanoView>();
 }
 

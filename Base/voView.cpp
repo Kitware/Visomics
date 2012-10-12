@@ -39,6 +39,7 @@ class voViewPrivate
 {
 public:
   voDataObject * DataObject;
+  QList<voDataObject *> DataObjectList;
 };
 
 // --------------------------------------------------------------------------
@@ -84,6 +85,13 @@ voDataObject* voView::dataObject()const
 }
 
 // --------------------------------------------------------------------------
+QList<voDataObject*> voView::dataObjectList()const
+{
+  Q_D(const voView);
+  return d->DataObjectList;
+}
+
+// --------------------------------------------------------------------------
 void voView::setDataObject(voDataObject* dataObject)
 {
   Q_D(voView);
@@ -97,6 +105,30 @@ void voView::setDataObject(voDataObject* dataObject)
   this->setDataObjectInternal(*dataObject);
 }
 
+// --------------------------------------------------------------------------
+void voView::setDataObjectList(QList<voDataObject*> dataObjectList)
+{
+  Q_D(voView);
+  if (dataObjectList.empty())
+    {
+    qCritical() << qPrintable(this->objectName())
+                << "- Failed to setDataObjects - dataObject list is NULL";
+    return;
+    }
+  d->DataObjectList = dataObjectList;
+  this->setDataObjectListInternal(dataObjectList);
+}
+
+// --------------------------------------------------------------------------
+void voView::setDataObjectListInternal(QList<voDataObject*> dataObjectList)
+{//Derived voView classes that take in multiple dataobjects should overide this function 
+  if (dataObjectList.empty())
+    {
+    qCritical() << qPrintable(this->objectName())
+                << "- Failed to setDataObjectListInternal - dataObject list is NULL";
+    return;
+    }
+}
 // --------------------------------------------------------------------------
 QList<QAction*> voView::actions()
 {

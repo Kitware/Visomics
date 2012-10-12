@@ -25,6 +25,11 @@ PROJECT(Visomics)
 #-----------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------
+OPTION(USE_ARBOR_BRAND "Swtich to the brand name: ARBOR  for Phylogenetic data analysis." OFF)
+MARK_AS_ADVANCED(USE_ARBOR_BRAND)
+#-----------------------------------------------------------------------------
+
+#-----------------------------------------------------------------------------
 # Superbuild Option - Enabled by default
 #
 OPTION(Visomics_SUPERBUILD "Build Visomics and the projects it depends on via SuperBuild.cmake." ON)

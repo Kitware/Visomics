@@ -36,6 +36,7 @@
 #include "voPLSStatistics.h"
 #include "voTTest.h"
 #include "voXCorrel.h"
+#include "voGeigerModelFitting.h"
 
 //----------------------------------------------------------------------------
 class voAnalysisFactoryPrivate
@@ -65,6 +66,7 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voPLSStatistics>("PLS");
   this->registerAnalysis<voTTest>("T-Test");
   this->registerAnalysis<voXCorrel>("Cross Correlation");
+  this->registerAnalysis<voGeigerModelFitting>("GeigerTreeModelFitting");
 }
 
 

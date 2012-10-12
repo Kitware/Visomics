@@ -35,6 +35,7 @@
 #define Visomics_SOURCE_DIR "@Visomics_SOURCE_DIR@"
 
 #cmakedefine Visomics_BUILD_TESTING
+#cmakedefine USE_ARBOR_BRAND
 
 #define Visomics_KEGG_SERVER_HOSTNAME "@Visomics_KEGG_SERVER_HOSTNAME@"
 #define Visomics_KEGG_SERVER_PORT @Visomics_KEGG_SERVER_PORT@

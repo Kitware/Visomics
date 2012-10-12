@@ -38,14 +38,16 @@ public:
   typedef voIOManager Self;
 
   static bool readCSVFileIntoTable(const QString& fileName, vtkTable * outputTable,
-                                   const voDelimitedTextImportSettings& settings = voDelimitedTextImportSettings());
+                                   const voDelimitedTextImportSettings& settings = voDelimitedTextImportSettings(), const bool haveHeaders = false);
 
   static bool writeTableToCVSFile(vtkTable* table, const QString& fileName);
 
   static void fillExtendedTable(vtkTable* sourceTable, vtkExtendedTable* destTable,
                                 const voDelimitedTextImportSettings& settings = voDelimitedTextImportSettings());
 
-  void openCSVFile(const QString& fileName, const voDelimitedTextImportSettings& settings);
+  void openCSVFile(const QString& fileName,const voDelimitedTextImportSettings& settings);
+  void openPHYFile(const QString& fileName,const QString& tableFileName,const voDelimitedTextImportSettings& settings);
+  void openPHYFile(const QString& fileName);
 
   static bool writeDataObjectToFile(vtkDataObject * dataObject, const QString& fileName);
 

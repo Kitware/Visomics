@@ -19,9 +19,25 @@ MACRO(ANALYSIS_RUN_TEST ANALYSISNAME)
   #SET_PROPERTY(TEST ${TESTNAME} PROPERTY LABELS ${PROJECT_NAME})
 ENDMACRO()
 
-# Glob all analysis
-FILE(GLOB allAnalysis RELATIVE ${VisomicsBase_SOURCE_DIR}/Analysis/ "${VisomicsBase_SOURCE_DIR}/Analysis/*.h")
-FOREACH(analysisHeader ${allAnalysis})
-  get_filename_component(analysisName ${analysisHeader} NAME_WE)
+
+# commonAnalysisTests collects tests that use the same input sample data
+SET(commonAnalysisTests
+voANOVAStatistics
+voFoldChange
+voHierarchicalClustering
+voKEGGCompounds
+voKEGGPathway
+voKMeansClustering
+voPCAStatistics
+voPLSStatistics
+voTTest
+voXCorrel
+)
+
+FOREACH(analysisName ${commonAnalysisTests})
   ANALYSIS_RUN_TEST(${analysisName})
 ENDFOREACH()
+
+
+
+# other independent tests:

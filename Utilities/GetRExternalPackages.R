@@ -39,3 +39,12 @@ if( !is.installed("preprocessCore") ) {
 } else {
   write("  Package 'preprocessCore' found", file = "")
 }
+
+write("Checking for R package 'geiger'...", file = "")
+if( !is.installed("geiger") ) {
+  write("  Package 'geiger' not found; installing...", file = "")
+  install.packages(pkgs="geiger", repos="http://cran.r-project.org",dependencies=TRUE)
+} else {
+  write("  Package 'geiger' found", file = "")
+}
+

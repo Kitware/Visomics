@@ -54,7 +54,7 @@ public:
 
   bool hasInput(const QString& inputName) const;
 
-  void setInput(const QString& inputName, voDataObject * dataObject);
+  void addInput(const QString& inputName, voDataObject * dataObject);
 
   voDataObject * input(const QString& inputName = QLatin1String("input")) const;
 

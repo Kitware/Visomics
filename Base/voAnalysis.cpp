@@ -219,7 +219,7 @@ bool voAnalysis::hasInput(const QString& inputName)const
 }
 
 // --------------------------------------------------------------------------
-void voAnalysis::setInput(const QString& inputName, voDataObject * dataObject)
+void voAnalysis::addInput(const QString& inputName, voDataObject * dataObject)
 {
   Q_D(voAnalysis);
   if (!this->hasInput(inputName))

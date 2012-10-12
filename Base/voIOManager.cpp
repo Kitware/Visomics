@@ -32,6 +32,7 @@
 #include "voRegistry.h"
 #include "voUtils.h"
 #include "vtkExtendedTable.h"
+#include "voTableDataObject.h"
 
 // VTK includes
 #include <vtkDelimitedTextReader.h>
@@ -42,9 +43,13 @@
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
+#include <vtkNewickTreeReader.h>
+#include <vtkGraphLayoutView.h>
+#include <vtkTree.h>
+
 
 // --------------------------------------------------------------------------
-bool voIOManager::readCSVFileIntoTable(const QString& fileName, vtkTable * outputTable, const voDelimitedTextImportSettings& settings)
+bool voIOManager::readCSVFileIntoTable(const QString& fileName, vtkTable * outputTable, const voDelimitedTextImportSettings& settings, const bool haveHeaders)
 {
   if (!outputTable)
     {
@@ -63,7 +68,7 @@ bool voIOManager::readCSVFileIntoTable(const QString& fileName, vtkTable * outpu
         settings.value(voDelimitedTextImportSettings::StringDelimiter).toChar().toLatin1());
   reader->SetUseStringDelimiter(
         settings.value(voDelimitedTextImportSettings::UseStringDelimiter).toBool());
-  reader->SetHaveHeaders(false);
+  reader->SetHaveHeaders(haveHeaders);
 
   // Read data
   reader->Update();
@@ -288,6 +293,72 @@ void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImpo
   model->setSelected(newItem);
 
   //extendedTable->Dump();
+}
+
+void voIOManager::openPHYFile(const QString& fileName)
+{
+  // load the phylo tree
+  vtkSmartPointer<vtkNewickTreeReader> reader =
+        vtkSmartPointer<vtkNewickTreeReader>::New();
+
+  reader->SetFileName(fileName.toStdString().c_str());
+  vtkTree *tree = reader->GetOutput();
+  reader->Update();
+
+  voInputFileDataObject * dataObject =
+      new voInputFileDataObject(fileName, tree);
+
+  voDataModel * model = voApplication::application()->dataModel();
+
+  voDataModelItem * newItem = model->addDataObject(dataObject);
+
+  newItem->setRawViewType("voTreeHeatmapView");
+
+  // Select added item
+  model->setSelected(newItem);
+
+
+}
+// --------------------------------------------------------------------------
+void voIOManager::openPHYFile(const QString& fileName, const QString & tableFileName, const voDelimitedTextImportSettings& settings )
+{
+  voDataModel * model = voApplication::application()->dataModel();
+  voDataObject * emptyDataObject = new voDataObject(QFileInfo(fileName).baseName(),NULL);
+  voDataModelItem * newItem = model->addDataObject(emptyDataObject);
+
+  // load the phylo tree
+  vtkSmartPointer<vtkNewickTreeReader> reader =
+        vtkSmartPointer<vtkNewickTreeReader>::New();
+
+  reader->SetFileName(fileName.toStdString().c_str());
+  vtkTree *tree = reader->GetOutput();
+  reader->Update();
+
+  voInputFileDataObject * dataObjectTree =
+    new voInputFileDataObject(fileName, tree);
+
+  voDataModelItem * treeItem = model->addDataObjectAsChild(dataObjectTree, newItem);
+  treeItem->setRawViewType("voTreeHeatmapView");
+
+
+  // load associated table data
+  vtkNew<vtkTable> table;
+  Self::readCSVFileIntoTable(tableFileName, table.GetPointer(), settings, true);
+
+ voTableDataObject * dataObjectTable =
+  new voTableDataObject(QFileInfo(tableFileName).baseName(), table.GetPointer(), /* sortable= */ true);
+  voDataModelItem * tableItem = model->addDataObjectAsChild(dataObjectTable,newItem);
+  tableItem->setRawViewType("voTableView");
+
+
+  //use tree heat map view
+  newItem->setRawViewType("voTreeHeatmapView");
+  newItem->addChildItem(treeItem);
+  newItem->addChildItem(tableItem);
+
+  newItem->setType(voDataModelItem::InputType);
+
+  model->setSelected(newItem);
 }
 
 // --------------------------------------------------------------------------

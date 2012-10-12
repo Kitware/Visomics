@@ -1,0 +1,307 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>voMainWindow</class>
+ <widget class="QMainWindow" name="voMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>MainWindow</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="../../../Base/Resources/ArborBase.qrc">
+    <normaloff>:/Icons/ArborIcon-32.png</normaloff>:/Icons/ArborIcon-32.png</iconset>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>25</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>&amp;File</string>
+    </property>
+    <addaction name="actionFileOpen"/>
+    <addaction name="actionFileExit"/>
+   </widget>
+   <widget class="QMenu" name="menuAnalysis">
+    <property name="title">
+     <string>&amp;Analysis</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>&amp;Help</string>
+    </property>
+    <addaction name="actionHelpAbout"/>
+   </widget>
+   <widget class="QMenu" name="menu_View">
+    <property name="title">
+     <string>&amp;View</string>
+    </property>
+    <addaction name="actionViewDataBrowser"/>
+    <addaction name="actionViewAnalysisParameters"/>
+    <addaction name="separator"/>
+    <addaction name="actionViewErrorLog"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuAnalysis"/>
+   <addaction name="menu_View"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <widget class="QToolBar" name="toolBar">
+   <property name="windowTitle">
+    <string>Arbor Action</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionFileOpen"/>
+   <addaction name="actionHelpAbout"/>
+  </widget>
+  <widget class="QDockWidget" name="DataBrowserDockWidget">
+   <property name="windowIcon">
+    <iconset resource="../../../Base/Resources/ArborBase.qrc">
+     <normaloff>:/Icons/ArborIcon-32.png</normaloff>:/Icons/ArborIcon-32.png</iconset>
+   </property>
+   <property name="windowTitle">
+    <string>Data Browser</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="DataBrowserDockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout">
+     <property name="spacing">
+      <number>0</number>
+     </property>
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="voDataBrowserWidget" name="DataBrowserWidget">
+       <property name="headerHidden">
+        <bool>true</bool>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="AnalysisParameterDockWidget">
+   <property name="windowIcon">
+    <iconset resource="../../../Base/Resources/ArborBase.qrc">
+     <normaloff>:/Icons/ArborIcon-32.png</normaloff>:/Icons/ArborIcon-32.png</iconset>
+   </property>
+   <property name="windowTitle">
+    <string>Analysis Parameters</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="AnalysisParameterDockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
+     <property name="margin">
+      <number>0</number>
+     </property>
+     <item>
+      <widget class="voAnalysisParameterEditorWidget" name="AnalysisParameterEditorWidget" native="true"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QToolBar" name="DatasetsToolBar">
+   <property name="windowTitle">
+    <string>Datasets</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionLoadSampleDataset"/>
+  </widget>
+  <widget class="QToolBar" name="ViewActionsToolBar">
+   <property name="windowTitle">
+    <string>View actions</string>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+  </widget>
+  <action name="actionFileOpen">
+   <property name="icon">
+    <iconset resource="../ArborApp.qrc">
+     <normaloff>:/Icons/open.png</normaloff>:/Icons/open.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Open</string>
+   </property>
+   <property name="statusTip">
+    <string>Open an existing csv file</string>
+   </property>
+  </action>
+  <action name="actionFileExit">
+   <property name="text">
+    <string>E&amp;xit</string>
+   </property>
+   <property name="statusTip">
+    <string>Exit the application</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionHelpAbout">
+   <property name="icon">
+    <iconset resource="../ArborApp.qrc">
+     <normaloff>:/Icons/help.png</normaloff>:/Icons/help.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;About</string>
+   </property>
+   <property name="statusTip">
+    <string>Show the application's About box</string>
+   </property>
+  </action>
+  <action name="actionViewDataBrowser">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Data Browser</string>
+   </property>
+  </action>
+  <action name="actionViewAnalysisParameters">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Analysis Parameters</string>
+   </property>
+  </action>
+  <action name="actionViewErrorLog">
+   <property name="text">
+    <string>&amp;Error log</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Alt+E</string>
+   </property>
+  </action>
+  <action name="actionLoadSampleDataset">
+   <property name="text">
+    <string>Load Sample Dataset</string>
+   </property>
+   <property name="toolTip">
+    <string>Load Sample dataset (4Kb)</string>
+   </property>
+  </action>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>voAnalysisParameterEditorWidget</class>
+   <extends>QWidget</extends>
+   <header>voAnalysisParameterEditorWidget.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>voDataBrowserWidget</class>
+   <extends>QTreeView</extends>
+   <header>voDataBrowserWidget.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="../ArborApp.qrc"/>
+  <include location="../../../Base/Resources/ArborBase.qrc"/>
+ </resources>
+ <connections>
+  <connection>
+   <sender>actionViewAnalysisParameters</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>AnalysisParameterDockWidget</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>127</x>
+     <y>536</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionViewDataBrowser</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>DataBrowserDockWidget</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>127</x>
+     <y>278</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>AnalysisParameterDockWidget</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionViewAnalysisParameters</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>127</x>
+     <y>537</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DataBrowserDockWidget</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionViewDataBrowser</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>127</x>
+     <y>277</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>
