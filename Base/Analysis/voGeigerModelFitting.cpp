@@ -149,7 +149,7 @@ bool voGeigerModelFitting::execute()
 
   if (not FOUND)
     {
-    qWarning() << QObject::tr("Invalid data columne name,could not find a matching data name");
+    qCritical() << QObject::tr("Invalid data columne name,could not find a matching data name");
     return false;
     }
 
@@ -201,6 +201,7 @@ bool voGeigerModelFitting::execute()
   if(!outTable)
     {
     qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
+    qCritical() << QObject::tr("Please make sure your geiger version is at least 1.4-4");
     return false;
     }
 
