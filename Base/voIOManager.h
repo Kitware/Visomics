@@ -46,8 +46,8 @@ public:
                                 const voDelimitedTextImportSettings& settings = voDelimitedTextImportSettings());
 
   void openCSVFile(const QString& fileName,const voDelimitedTextImportSettings& settings);
-  void openPHYFile(const QString& fileName,const QString& tableFileName,const voDelimitedTextImportSettings& settings);
-  void openPHYFile(const QString& fileName);
+  void loadPhyloTreeDataSet(const QString& fileName,const QString& tableFileName,const voDelimitedTextImportSettings& settings);
+  void loadPhyloTreeDataSet(const QString& fileName);
 
   static bool writeDataObjectToFile(vtkDataObject * dataObject, const QString& fileName);
 
