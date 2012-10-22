@@ -14,6 +14,8 @@ SET(KIT_SRCS
   Analysis/voKEGGPathway.cpp
   Analysis/voKMeansClustering.cpp
   Analysis/voKMeansClustering.h
+  Analysis/voOneZoom.cpp
+  Analysis/voOneZoom.h
   Analysis/voPCAStatistics.cpp
   Analysis/voPCAStatistics.h
   Analysis/voTTest.cpp
@@ -49,6 +51,8 @@ SET(KIT_SRCS
   Views/voKEGGTableView.h
   Views/voKMeansClusteringDynView.cpp
   Views/voKMeansClusteringDynView.h
+  Views/voOneZoomDynView.cpp
+  Views/voOneZoomDynView.h
   Views/voPCABarView.cpp
   Views/voPCABarView.h
   Views/voPCAProjectionDynView.cpp
@@ -114,6 +118,7 @@ SET(KIT_MOC_SRCS
   Analysis/voKEGGCompounds.h
   Analysis/voKEGGPathway.h
   Analysis/voKMeansClustering.h
+  Analysis/voOneZoom.h
   Analysis/voPCAStatistics.h
   Analysis/voTTest.h
   Analysis/voPLSStatistics.h
@@ -129,6 +134,7 @@ SET(KIT_MOC_SRCS
   Views/voKEGGPathwayView.h
   Views/voKEGGTableView.h
   Views/voKMeansClusteringDynView.h
+  Views/voOneZoomDynView.h
   Views/voPCABarView.h
   Views/voPCAProjectionDynView.h
   Views/voPCAProjectionView.h

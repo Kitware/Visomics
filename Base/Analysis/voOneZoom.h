@@ -18,52 +18,33 @@
 
 =========================================================================*/
 
-
-#ifndef __voDynView_h
-#define __voDynView_h
+#ifndef __voOneZoom_h
+#define __voOneZoom_h
 
 // Qt includes
 #include <QScopedPointer>
-#include <QUrl>
 
 // Visomics includes
-#include "voView.h"
+#include "voAnalysis.h"
 
-class voDataObject;
-class voDynViewPrivate;
-
-class voDynView : public voView
+class voOneZoom : public voAnalysis
 {
   Q_OBJECT
-  Q_PROPERTY(QString htmlFilePath READ htmlFilePath)
 public:
-  typedef voView Superclass;
-  voDynView(QWidget* newParent = 0);
-  virtual ~voDynView();
-
-  QString htmlFilePath()const;
-
-  virtual void initialize();
-
-  QString viewName()const;
-
-protected slots:
-  void loadDataObject();
-  void newWindowOnLinkClicked(const QUrl & url);
+  typedef voAnalysis Superclass;
+  voOneZoom();
+  virtual ~voOneZoom();
 
 protected:
-  virtual void setupUi(QLayout * layout);
+  virtual void setInputInformation();
+  virtual void setOutputInformation();
+  virtual void setParameterInformation();
+  virtual QString parameterDescription()const;
 
-  virtual void setDataObjectInternal(const voDataObject& dataObject);
-
-  virtual QString stringify(const voDataObject& dataObject);
-
-protected:
-  QScopedPointer<voDynViewPrivate> d_ptr;
+  virtual bool execute();
 
 private:
-  Q_DECLARE_PRIVATE(voDynView);
-  Q_DISABLE_COPY(voDynView);
+  Q_DISABLE_COPY(voOneZoom);
 };
 
 #endif

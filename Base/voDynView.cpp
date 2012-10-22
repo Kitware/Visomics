@@ -24,6 +24,7 @@
 #include <QWebFrame>
 #include <QWebPage>
 #include <QWebView>
+#include <QDesktopServices>
 
 // Visomics includes
 #include "voApplication.h"
@@ -139,7 +140,18 @@ void voDynView::setDataObjectInternal(const voDataObject& dataObject)
   Q_D(voDynView);
   const_cast<voDataObject*>(&dataObject)->setProperty("json", this->stringify(dataObject));
   connect(d->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), SLOT(loadDataObject()));
+
+  d->Widget->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
+  connect(d->Widget->page(), SIGNAL(linkClicked(const QUrl &)),
+                         SLOT(newWindowOnLinkClicked(const QUrl &)));
+
   d->Widget->reload();
+}
+
+// --------------------------------------------------------------------------
+void voDynView::newWindowOnLinkClicked(const QUrl & url)
+{
+  QDesktopServices::openUrl(url);
 }
 
 // --------------------------------------------------------------------------

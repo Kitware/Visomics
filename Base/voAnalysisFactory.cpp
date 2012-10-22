@@ -32,6 +32,7 @@
 #include "voKEGGCompounds.h"
 #include "voKEGGPathway.h"
 #include "voKMeansClustering.h"
+#include "voOneZoom.h"
 #include "voPCAStatistics.h"
 #include "voPLSStatistics.h"
 #include "voTTest.h"
@@ -62,6 +63,7 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voKEGGCompounds>("KEGG Compounds");
   this->registerAnalysis<voKEGGPathway>("KEGG Pathway");
   this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
+  this->registerAnalysis<voOneZoom>("OneZoom Visulization");
   this->registerAnalysis<voPCAStatistics>("PCA");
   this->registerAnalysis<voPLSStatistics>("PLS");
   this->registerAnalysis<voTTest>("T-Test");
