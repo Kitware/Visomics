@@ -180,12 +180,12 @@ voMainWindow::~voMainWindow()
 void voMainWindow::onFileOpenActionTriggered()
 {
   QStringList files = QFileDialog::getOpenFileNames(
-    this, tr("Open table or tree"), "", tr("All files(*.*);;*.csv(*.csv);;*.phy(*.phy)"));
+    this, tr("Open table or tree"), "", tr("All files(*.*);;*.csv(*.csv);;*.phy(*.phy);;*.tre(*.tre)"));
 
   files.sort();
 
   QStringList acceptedImageFileTypeList;
-  acceptedImageFileTypeList << "csv" << "phy";
+  acceptedImageFileTypeList << "csv" << "phy" << "tre";
 
   foreach(const QString& file, files)
     {
@@ -206,12 +206,12 @@ void voMainWindow::onFileOpenActionTriggered()
             voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
             }
           }
-        if (extension == "phy")
+        if (extension == "phy" || extension == "tre")
           {
             //open associated tree node data
             QString fileExt = "";
             QMessageBox msgBox;
-            msgBox.setInformativeText("Do you want to load associated data (*.csv) with the tree?");
+            msgBox.setInformativeText("Do you want to load associated data (*.csv) with the tree file?");
             msgBox.setStandardButtons(QMessageBox::Yes  |  QMessageBox::No);
             msgBox.setDefaultButton(QMessageBox::No);
             int ret = msgBox.exec();
@@ -224,19 +224,19 @@ void voMainWindow::onFileOpenActionTriggered()
               int status = dialog.exec();
               if (status == voDelimitedTextImportDialog::Accepted)
                 {
-                voApplication::application()->ioManager()->openPHYFile(file, fileExt, dialog.importSettings());
+                voApplication::application()->ioManager()->loadPhyloTreeDataSet(file, fileExt, dialog.importSettings());
                 }
               else
                 {
                 QMessageBox errorMsgBox;
                 errorMsgBox.setInformativeText("Failed to load the table data.");
                 errorMsgBox.exec();
-                voApplication::application()->ioManager()->openPHYFile(file);
+                voApplication::application()->ioManager()->loadPhyloTreeDataSet(file);
                 }
               }
             else
               {
-              voApplication::application()->ioManager()->openPHYFile(file);
+              voApplication::application()->ioManager()->loadPhyloTreeDataSet(file);
               }
           }
         }
