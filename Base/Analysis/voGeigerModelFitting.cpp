@@ -169,15 +169,15 @@ bool voGeigerModelFitting::execute()
   
   if (modelType == QString("OU"))
     {
-    R_ComposeOutputTable = "resultTable=list(parameter=\"value\",sigsq=result$sigsq,alpha=result$alpha,\" \"=\" \",lnL=result$lnL,AIC=result$aic,AICc=result$aicc)";
+    R_ComposeOutputTable = "resultTable=list(parameter=\"value\",z0=result$z0,sigsq=result$sigsq,alpha=result$alpha,\" \"=\" \",lnL=result$lnL,AIC=result$aic,AICc=result$aicc)";
     }
   else if (modelType== "BM")
     {
-    R_ComposeOutputTable = "resultTable=list(parameter=\"value\",sigsq=result$sigsq,\" \"=\" \",lnL=result$lnL,AIC=result$aic,AICc=result$aicc)";
+    R_ComposeOutputTable = "resultTable=list(parameter=\"value\",z0=result$z0,sigsq=result$sigsq,\" \"=\" \",lnL=result$lnL,AIC=result$aic,AICc=result$aicc)";
     }
   else if (modelType == "EB")
     {
-    R_ComposeOutputTable = "resultTable=list(parameter=\"value\",sigsq=result$sigsq,a=result$a,\" \"=\" \",lnL=result$lnL,AIC=result$aic,AICc=result$aicc)";
+    R_ComposeOutputTable = "resultTable=list(parameter=\"value\",z0=result$z0,sigsq=result$sigsq,a=result$a,\" \"=\" \",lnL=result$lnL,AIC=result$aic,AICc=result$aicc)";
     }
   else
    {
