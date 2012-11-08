@@ -87,6 +87,8 @@ SET(KIT_SRCS
   voDelimitedTextImportSettings.h
   voDynView.cpp
   voDynView.h
+  voJavascriptBridge.cpp
+  voJavascriptBridge.h
   voInputFileDataObject.cpp
   voInputFileDataObject.h
   voIOManager.cpp
@@ -151,6 +153,7 @@ SET(KIT_MOC_SRCS
   voDataModel_p.h
   voDataObject.h
   voDynView.h
+  voJavascriptBridge.h
   voInputFileDataObject.h
   voTableDataObject.h
   voView.h

@@ -32,9 +32,11 @@
 #include "voDataObject.h"
 #include "voDynView.h"
 #include "voUtils.h"
-
+#include "voJavascriptBridge.h"
 // VTK includes
 #include <vtkTable.h>
+
+
 
 // --------------------------------------------------------------------------
 class voDynViewPrivate
@@ -70,6 +72,8 @@ QWebFrame* voDynViewPrivate::mainFrame()
 voDynView::voDynView(QWidget* newParent) :
   Superclass(newParent), d_ptr(new voDynViewPrivate)
 {
+
+
 }
 
 // --------------------------------------------------------------------------
@@ -86,6 +90,8 @@ void voDynView::setupUi(QLayout * layout)
   this->d_ptr->Widget->setUrl(this->htmlFilePath());
   this->d_ptr->Widget->show();
   layout->addWidget(d->Widget);
+  this->jsBridge = new voJavascriptBridge();
+
 }
 
 // --------------------------------------------------------------------------
@@ -127,6 +133,13 @@ QString voDynView::stringify(const voDataObject& dataObject)
   return QString();
 }
 
+
+// --------------------------------------------------------------------------
+void voDynView::loadJavaScriptBridge()
+{
+  Q_D(voDynView);
+  d->mainFrame()->addToJavaScriptWindowObject("jsBridge", this->jsBridge);
+}
 // --------------------------------------------------------------------------
 void voDynView::loadDataObject()
 {
@@ -141,12 +154,19 @@ void voDynView::setDataObjectInternal(const voDataObject& dataObject)
   const_cast<voDataObject*>(&dataObject)->setProperty("json", this->stringify(dataObject));
   connect(d->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), SLOT(loadDataObject()));
 
+
   d->Widget->page()->setLinkDelegationPolicy(QWebPage::DelegateAllLinks);
   connect(d->Widget->page(), SIGNAL(linkClicked(const QUrl &)),
                          SLOT(newWindowOnLinkClicked(const QUrl &)));
 
+  connect(d->mainFrame(), SIGNAL(javaScriptWindowObjectCleared()), SLOT(loadJavaScriptBridge()));
+
+
   d->Widget->reload();
 }
+
+
+
 
 // --------------------------------------------------------------------------
 void voDynView::newWindowOnLinkClicked(const QUrl & url)

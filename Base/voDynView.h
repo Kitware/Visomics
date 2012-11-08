@@ -29,8 +29,11 @@
 // Visomics includes
 #include "voView.h"
 
+
 class voDataObject;
 class voDynViewPrivate;
+class voJavascriptBridge;
+
 
 class voDynView : public voView
 {
@@ -49,6 +52,7 @@ public:
 
 protected slots:
   void loadDataObject();
+  void loadJavaScriptBridge();
   void newWindowOnLinkClicked(const QUrl & url);
 
 protected:
@@ -64,6 +68,7 @@ protected:
 private:
   Q_DECLARE_PRIVATE(voDynView);
   Q_DISABLE_COPY(voDynView);
+  voJavascriptBridge * jsBridge;
 };
 
 #endif

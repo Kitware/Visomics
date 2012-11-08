@@ -1858,6 +1858,7 @@ This software has been tested on the latest versions of safari (Mac), Google Chr
 	var threshold =2; // for the detail threshold
 	
 	var mywindow;
+  var jsBridge;
 	
 	// INITIALISERS
 	
@@ -2868,7 +2869,7 @@ This software has been tested on the latest versions of safari (Mac), Google Chr
 	
 	function Link2OZ()
 	{
-		mywindow = window.open("http://www.OneZoom.org");
+		jsBridge.openURL("http://www.OneZoom.org");
 	}
 	
 	function draw_loading()
@@ -3050,13 +3051,13 @@ This software has been tested on the latest versions of safari (Mac), Google Chr
 					}
 					else
 					{
-						mywindow = window.open("http://en.wikipedia.org/wiki/" + this.name2.toLowerCase());
+						jsBridge.openURL("http://en.wikipedia.org/wiki/" + this.name2.toLowerCase());
 					}
 				}
 			}
 			else
 			{
-				mywindow = window.open("http://en.wikipedia.org/wiki/" + this.name2 + "_" + this.name1);
+				jsBridge.openURL("http://en.wikipedia.org/wiki/" + this.name2 + "_" + this.name1);
 			}
 		}
 	}
