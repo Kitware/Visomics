@@ -42,6 +42,7 @@
 #include "voTreeGraphView.h"
 #include "voTreeHeatmapView.h"
 #include "voVolcanoView.h"
+#include "voOneZoomDynView.h"
 
 //----------------------------------------------------------------------------
 class voViewFactoryPrivate
@@ -69,6 +70,7 @@ voViewFactory::voViewFactory():d_ptr(new voViewFactoryPrivate)
   this->registerView<voKEGGPathwayView>();
   this->registerView<voKEGGTableView>();
   this->registerView<voKMeansClusteringDynView>();
+  this->registerView<voOneZoomDynView>();
   this->registerView<voPCABarView>();
   this->registerView<voPCAProjectionDynView>();
   this->registerView<voPCAProjectionView>();
