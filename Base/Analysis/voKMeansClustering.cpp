@@ -236,7 +236,6 @@ bool voKMeansClustering::execute()
       clusterTable->AddColumn(newCol.GetPointer());
       }
     }
-  clusterTable->Dump();
 
   // Renumber cluster table to be consistent
   // Since the cluster id associated with each columns is arbitrary,
