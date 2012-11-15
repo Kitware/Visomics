@@ -21,6 +21,7 @@
 // Qt includes
 #include <QCryptographicHash>
 #include <QDebug>
+#include <QDir>
 #include <QExplicitlySharedDataPointer>
 #include <QFile>
 #include <QHash>
@@ -609,6 +610,8 @@ void voAnalysis::writeOutputsToFiles(const QString& directory) const
       }
     }
 
+  QDir().mkpath(directory);
+
   foreach(const QString& outputName, this->outputNames())
     {
     voDataObject * dataObject = this->output(outputName);
@@ -617,7 +620,7 @@ void voAnalysis::writeOutputsToFiles(const QString& directory) const
       continue;
       }
     QString filename("%1/%2%3_%4.vtk"); // <directory>/(<inputHash>_)<analysisName>_<outputName>.vtk
-    filename = filename.arg(directory).arg(inputHash).arg(this->metaObject()->className()).arg(outputName);
+    filename = filename.arg(QDir::cleanPath(directory)).arg(inputHash).arg(this->metaObject()->className()).arg(outputName);
     bool success = voIOManager::writeDataObjectToFile(dataObject->dataAsVTKDataObject(), filename);
     if (!success)
       {
