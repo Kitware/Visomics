@@ -279,13 +279,13 @@ void voMainWindow::loadSampleDataset()
 {
 #ifdef Visomics_BUILD_TESTING
   voApplication * app = voApplication::application();
-  QString file = app->homeDirectory() + "/" + Visomics_INSTALL_DATA_DIR + "/All_conc_kitware_transposed.csv";
+  QString file = app->homeDirectory() + "/" + Visomics_INSTALL_DATA_DIR + "/visomics-sample_liver.csv";
   if (!app->isInstalled())
     {
-    file = QString(VISOMICS_DATA_DIR) + "/Data/UNC/All_conc_kitware_transposed.csv";
+    file = QString(VISOMICS_DATA_DIR) + "/Data/sample/visomics-sample_liver.csv";
     }
   voDelimitedTextImportSettings defaultSettings;
-  defaultSettings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes, 4);
+  defaultSettings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes, 3);
   voDelimitedTextImportDialog dialog(this, defaultSettings);
   dialog.setFileName(file);
   int status = dialog.exec();

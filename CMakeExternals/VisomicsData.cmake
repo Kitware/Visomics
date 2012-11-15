@@ -18,7 +18,7 @@ if(BUILD_TESTING)
   IF(NOT DEFINED VisomicsData_DIR)
     MESSAGE(STATUS "Adding external project: ${proj}")
     ExternalProject_Add(${proj}
-      GIT_REPOSITORY ${git_protocol}://kwsource.kitwarein.com/bioinformatics/visomicsdata.git
+      GIT_REPOSITORY ${git_protocol}://visomics.org/visomicsdata.git
       GIT_TAG "origin/master"
       SOURCE_DIR ${CMAKE_BINARY_DIR}/${proj}
       BINARY_DIR ${proj}-build
