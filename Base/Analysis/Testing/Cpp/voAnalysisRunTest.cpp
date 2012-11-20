@@ -60,7 +60,7 @@ int voAnalysisRunTest(int argc, char * argv [])
 
   // Extract test parameters
   QString dataDirectory(VISOMICS_DATA_DIR);
-  QString fileName("Data/UNC/All_conc_kitware_transposed.csv");
+  QString fileName("Data/sample/visomics-sample_liver.csv");
   QString analysisName(argv[1]);
   bool generateOutputBaselines = app.arguments().contains("-I");
   bool keepTemporaryOutput = app.arguments().contains("-K");
