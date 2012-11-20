@@ -237,7 +237,7 @@ ADD_SUBDIRECTORY(Application)
 # R scripts
 #
 set(r_scripts
-  Utilities/GetRExternalPackages.R
+  ${CMAKE_BINARY_DIR}/GetRExternalPackages.R
   )
 INSTALL(FILES ${r_scripts} DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR} COMPONENT Runtime)
 
