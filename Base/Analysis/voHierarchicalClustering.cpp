@@ -289,17 +289,31 @@ bool voHierarchicalClustering::execute()
 
   // Generate table for heatmap
   vtkNew<vtkTable> clusterTable;
-  // Get analyte names with row labels
-  vtkNew<vtkStringArray> rowNames;
-  voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
-                            rowNames.GetPointer(), false);
-  clusterTable->AddColumn(rowNames.GetPointer());
-  foreach(const QString& colLabel, reverseBFSLabels)
     {
-    QString rawColLabel = colLabel.mid(colLabel.indexOf(": ") + 2);
-    clusterTable->AddColumn(inputDataTable->GetColumnByName(rawColLabel.toLatin1().data()));
-    // Can't rename column until it's been copied by AddColumn()
-    clusterTable->GetColumn(clusterTable->GetNumberOfColumns() - 1)->SetName(colLabel.toLatin1());
+    // Get analyte names with row labels
+    vtkNew<vtkStringArray> rowNames;
+    voUtils::addCounterLabels(extendedTable->GetRowMetaDataOfInterestAsString(),
+      rowNames.GetPointer(), false);
+    clusterTable->AddColumn(rowNames.GetPointer());
+
+    vtkNew<vtkTable> tmpDataTable; // making sure the inputDataTable is not modified
+    tmpDataTable->DeepCopy(inputDataTable);
+    foreach(const QString& colLabel, reverseBFSLabels)
+      {
+      QString rawColLabel = colLabel.mid(colLabel.indexOf(": ") + 2);
+
+      vtkAbstractArray * colArray =  tmpDataTable->GetColumnByName(rawColLabel.toLatin1().data());
+      if (colArray)
+        {
+        colArray->SetName(colLabel.toLatin1());
+        clusterTable->AddColumn(colArray);
+        }
+      else
+        {
+        qCritical() << QObject::tr("Can not find column with name %1").arg(rawColLabel.toLatin1().data());
+        return false;
+        }
+      }
     }
 
   // Compute min/max
