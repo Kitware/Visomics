@@ -20,6 +20,7 @@ add_custom_target(${target} ALL
    "-DR_cmd_args=${R_cmd_args}"
    -DR_output_name=${R_output_name}
    -P ${CMAKE_SOURCE_DIR}/Utilities/GetRExternalPackages.cmake
+  DEPENDS VisomicsData
   COMMENT "Installing external R packages"
   VERBATIM
   )
