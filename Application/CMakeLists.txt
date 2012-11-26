@@ -1,7 +1,6 @@
+project(VisomicsApp)
 
-PROJECT(VisomicsApp)
-
-SET(KIT_SRCS
+set(KIT_SRCS
   voAnalysisParameterDialog.cpp
   voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.cpp
@@ -27,13 +26,15 @@ SET(KIT_SRCS
   voViewStackedWidget.cpp
   voViewStackedWidget.h
   )
-IF(USE_ARBOR_BRAND)
-  SET(KIT_SRCS  "${KIT_SRCS};voAboutDialog_Arbor.cpp;voAboutDialog_Arbor.h")
-ELSE()
-  SET(KIT_SRCS  "${KIT_SRCS};voAboutDialog.cpp;voAboutDialog.h")
-ENDIF()
+if(USE_ARBOR_BRAND)
+  set(KIT_SRCS  "${KIT_SRCS};voAboutDialog_Arbor.cpp;voAboutDialog_Arbor.h")
+  set(APP_NAME "Arbor")
+else()
+  set(KIT_SRCS  "${KIT_SRCS};voAboutDialog.cpp;voAboutDialog.h")
+  set(APP_NAME "Visomics")
+endif()
 
-SET(KIT_MOC_SRCS
+set(KIT_MOC_SRCS
   voAboutDialog.h
   voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.h
@@ -49,22 +50,22 @@ SET(KIT_MOC_SRCS
   voViewTabWidget.h
   )
 
-SET(KIT_UI_FORMS
+set(KIT_UI_FORMS
   Resources/UI/voDelimitedTextImportDialog.ui
   Resources/UI/voDelimitedTextImportWidget.ui
   )
 
-IF(USE_ARBOR_BRAND)
-  SET(KIT_UI_FORMS  "${KIT_UI_FORMS};Resources/UI/voMainWindow_Arbor.ui")
-ELSE()
-  SET(KIT_UI_FORMS  "${KIT_UI_FORMS};Resources/UI/voMainWindow.ui")
-ENDIF()
+if(USE_ARBOR_BRAND)
+  set(KIT_UI_FORMS  "${KIT_UI_FORMS};Resources/UI/voMainWindow_Arbor.ui")
+else()
+  set(KIT_UI_FORMS  "${KIT_UI_FORMS};Resources/UI/voMainWindow.ui")
+endif()
 
-SET(KIT_resources
+set(KIT_resources
   Resources/VisomicsApp.qrc
   )
 
-INCLUDE_DIRECTORIES(
+include_directories(
   ${Visomics_SOURCE_DIR}/Base
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
@@ -74,24 +75,15 @@ QT4_WRAP_UI(KIT_UI_CPP ${KIT_UI_FORMS})
 QT4_WRAP_CPP(KIT_MOC_CPP ${KIT_MOC_SRCS} )
 QT4_ADD_RESOURCES(KIT_QRC_SRCS ${KIT_resources})
 
-SET(libname ${PROJECT_NAME}Lib)
-ADD_LIBRARY(${libname} STATIC
+add_library(VisomicsAppLib STATIC
   ${KIT_SRCS}
   ${KIT_UI_CPP}
   ${KIT_MOC_CPP}
   ${KIT_QRC_SRCS}
   )
+target_link_libraries(VisomicsAppLib VisomicsBaseLib)
 
-SET(${PROJECT_NAME}_LINK_LIBRARIES
-  VisomicsBaseLib
-  )
-TARGET_LINK_LIBRARIES(
-  ${libname}
-  ${${PROJECT_NAME}_LINK_LIBRARIES}
-  )
-
-
-# Set Visomics_FORWARD_PATH_BUILD
+# Set Visomics_FORWARD_PATH_BUILD and Visomics_FORWARD_PATH_INSTALL
 set(tmp "\".\" CONFIG_DIR_POST")
 if(WIN32)
   set(tmp "${tmp}, \"${QT_BINARY_DIR}\"")
@@ -99,40 +91,96 @@ else()
   set(tmp "${tmp}, \"${QT_LIBRARY_DIR}\"")
 endif()
 set(Visomics_FORWARD_PATH_BUILD ${tmp})
+set(Visomics_FORWARD_PATH_INSTALL "../lib")
+if(APPLE)
+  set(Visomics_FORWARD_PATH_INSTALL ".")
+endif()
 
-CONFIGURE_FILE(
-  ${Visomics_SOURCE_DIR}/CMake/visomics-forward.c.in
-  ${CMAKE_CURRENT_BINARY_DIR}/visomics-forward.c
+configure_file(
+  ${Visomics_SOURCE_DIR}/CMake/visomics-forward.cxx.in
+  ${CMAKE_CURRENT_BINARY_DIR}/visomics-forward.cxx
   @ONLY IMMEDIATE)
 
 # Add forward executable
-SET(FORWARD_SRCS ${CMAKE_CURRENT_BINARY_DIR}/visomics-forward.c)
-IF(Q_WS_WIN)
-  LIST(APPEND FORWARD_SRCS Resources/VisomicsApp.rc)
-ENDIF()
-ADD_EXECUTABLE(${PROJECT_NAME} ${FORWARD_SRCS})
-ADD_DEPENDENCIES(${PROJECT_NAME} ${PROJECT_NAME}-real)
-SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES OUTPUT_NAME visomics)
+set(FORWARD_SRCS ${CMAKE_CURRENT_BINARY_DIR}/visomics-forward.cxx)
+if(Q_WS_WIN)
+  list(APPEND FORWARD_SRCS Resources/VisomicsApp.rc)
+endif()
+if(APPLE)
+  # Use our Visomics icons to represent the Mac bundle
+  set(Visomics_Icons
+    ${VisomicsBase_SOURCE_DIR}/Resources/Icons/VisomicsIcon.icns)
+  list(APPEND FORWARD_SRCS ${Visomics_Icons})
+  set(MACOSX_BUNDLE_ICON_FILE VisomicsIcon.icns)
+  set_SOURCE_FILES_PROPERTIES(${Visomics_Icons} PROPERTIES
+    MACOSX_PACKAGE_LOCATION Resources)
+endif()
+add_executable(VisomicsApp MACOSX_BUNDLE ${FORWARD_SRCS})
+target_link_libraries(VisomicsApp vtksys)
+add_dependencies(VisomicsApp VisomicsApp-real)
+set_target_properties(VisomicsApp PROPERTIES OUTPUT_NAME ${APP_NAME})
 
 # Add regular application
-ADD_EXECUTABLE(${PROJECT_NAME}-real Main.cpp)
-TARGET_LINK_LIBRARIES(${PROJECT_NAME}-real ${libname})
-SET_TARGET_PROPERTIES(${PROJECT_NAME}-real PROPERTIES OUTPUT_NAME visomics-real)
+add_executable(VisomicsApp-real Main.cpp)
+target_link_libraries(VisomicsApp-real VisomicsAppLib)
+set_target_properties(VisomicsApp-real PROPERTIES OUTPUT_NAME ${APP_NAME}-real)
 
-# Install rules
-INSTALL(TARGETS ${PROJECT_NAME} DESTINATION ${Visomics_INSTALL_BIN_DIR} COMPONENT Runtime)
-INSTALL(TARGETS ${PROJECT_NAME}-real DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime)
+if(APPLE)
+  # Name of bundle
+  set(APP "${APP_NAME}.app")
 
-#ADD_EXECUTABLE(${PROJECT_NAME}
-#  Main.cpp
-#  )
-#TARGET_LINK_LIBRARIES(${PROJECT_NAME} ${libname})
+  # Make sure the "regular application" gets included in the bundle
+  set_property(TARGET VisomicsApp-real PROPERTY RUNTIME_OUTPUT_DIRECTORY
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${APP}/Contents/MacOS)
 
-#INSTALL(TARGETS ${PROJECT_NAME}
-#  RUNTIME DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime
-#  LIBRARY DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Runtime
-#  ARCHIVE DESTINATION ${Visomics_INSTALL_LIB_DIR} COMPONENT Development)
+  # Install Visomics
+  install(TARGETS VisomicsApp
+    DESTINATION "."
+    COMPONENT Runtime
+    )
 
-IF(BUILD_TESTING)
-  ADD_SUBDIRECTORY(Testing)
-ENDIF()
+  # Make sure Qt plugins are properly installed
+  get_filename_component(qgif_plugin ${QT_QGIF_PLUGIN_RELEASE} NAME)
+  get_filename_component(qico_plugin ${QT_QICO_PLUGIN_RELEASE} NAME)
+  get_filename_component(qjpeg_plugin ${QT_QJPEG_PLUGIN_RELEASE} NAME)
+  get_filename_component(qmng_plugin ${QT_QMNG_PLUGIN_RELEASE} NAME)
+  get_filename_component(qsvg_plugin ${QT_QSVG_PLUGIN_RELEASE} NAME)
+  get_filename_component(qtiff_plugin ${QT_QTIFF_PLUGIN_RELEASE} NAME)
+  set(plugin_path "${APP}/Contents/plugins/imageformats")
+  install(FILES ${QT_QGIF_PLUGIN_RELEASE}
+                ${QT_QICO_PLUGIN_RELEASE}
+                ${QT_QJPEG_PLUGIN_RELEASE}
+                ${QT_QMNG_PLUGIN_RELEASE}
+                ${QT_QSVG_PLUGIN_RELEASE}
+                ${QT_QTIFF_PLUGIN_RELEASE}
+          DESTINATION ${plugin_path}
+          COMPONENT Runtime
+    )
+  install(FILES ${Visomics_SOURCE_DIR}/CMake/qt.conf
+          DESTINATION "${APP}/Contents/Resources"
+          COMPONENT Runtime
+    )
+
+  # Setup the script that's run at install time
+  configure_file(
+    "${Visomics_SOURCE_DIR}/CMake/CompleteBundles.cmake.in"
+    "${Visomics_BINARY_DIR}/CompleteBundles.cmake"
+    @ONLY
+  )
+  install(SCRIPT "${Visomics_BINARY_DIR}/CompleteBundles.cmake"
+          COMPONENT Runtime)
+else(APPLE)
+  # Install rules
+  install(TARGETS VisomicsApp
+    DESTINATION ${Visomics_INSTALL_BIN_DIR}
+    COMPONENT Runtime
+    )
+  install(TARGETS VisomicsApp-real
+    DESTINATION ${Visomics_INSTALL_BIN_DIR}
+    COMPONENT Runtime
+    )
+endif(APPLE)
+
+if(BUILD_TESTING)
+  add_subdirectory(Testing)
+endif()

@@ -237,7 +237,7 @@ ADD_SUBDIRECTORY(Application)
 # R scripts
 #
 set(r_scripts
-  ${CMAKE_BINARY_DIR}/GetRExternalPackages.R
+  ${CMAKE_BINARY_DIR}/../GetRExternalPackages.R
   )
 INSTALL(FILES ${r_scripts} DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR} COMPONENT Runtime)
 
@@ -247,6 +247,8 @@ INSTALL(FILES ${r_scripts} DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR} COMPONEN
 IF(BUILD_TESTING)
   SET(datasets
     ${VisomicsData_DIR}/Data/sample/visomics-sample_liver.csv
+    ${VisomicsData_DIR}/Data/sample/anolis.phy
+    ${VisomicsData_DIR}/Data/sample/anolisDataAppended.csv
     )
   INSTALL(FILES ${datasets} DESTINATION ${Visomics_INSTALL_DATA_DIR} COMPONENT Runtime)
 ENDIF()

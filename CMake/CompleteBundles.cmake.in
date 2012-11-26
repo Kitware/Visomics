@@ -1,0 +1,45 @@
+include(BundleUtilities)
+
+# Make it so BundleUtilities treats files in /Library/Frameworks as "system"
+# This means that they shouldn't be copied into the bundle.
+function(gp_resolved_file_type_override resolved_file type_var)
+  if(file MATCHES "^/Library/Frameworks/")
+    set(${type_var} system PARENT_SCOPE)
+  endif()
+endfunction()
+
+
+# This is a project-specific override of BundleUtilities.cmake's
+# gp_item_default_embedded_path
+#
+# Its purpose in Visomics is to put the Qt plugins in the proper
+# subdirectory.
+function(gp_item_default_embedded_path_override item default_embedded_path_var)
+  # By default, embed items as set by gp_item_default_embedded_path:
+  set(path "${${default_embedded_path_var}}")
+
+  # For Visomics, embed libq* in the plugins folder:
+  if(item MATCHES "^libq")
+    set(path "@executable_path/../plugins/imageformats")
+  endif(item MATCHES "^libq")
+
+  set(${default_embedded_path_var} "${path}" PARENT_SCOPE)
+endfunction(gp_item_default_embedded_path_override)
+
+
+# Set up Qt plugins that fixup_bundle needs to know about.
+set(Qt_plugins "")
+list(APPEND Qt_plugins "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@plugin_path@/@qgif_plugin@")
+list(APPEND Qt_plugins "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@plugin_path@/@qico_plugin@")
+list(APPEND Qt_plugins "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@plugin_path@/@qjpeg_plugin@")
+list(APPEND Qt_plugins "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@plugin_path@/@qmng_plugin@")
+list(APPEND Qt_plugins "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@plugin_path@/@qsvg_plugin@")
+list(APPEND Qt_plugins "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@plugin_path@/@qtiff_plugin@")
+
+
+# Fixup that bundle!
+fixup_bundle(
+  "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@APP@"
+  "${Qt_plugins}"
+  "@QT_LIBRARY_DIR@"
+)

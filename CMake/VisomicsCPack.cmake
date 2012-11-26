@@ -6,8 +6,13 @@
 SET(QT_INSTALL_LIB_DIR ${Visomics_INSTALL_LIB_DIR})
 
 SET(QTLIBLIST QTCORE QTGUI QTNETWORK QTXML QTTEST QTSQL QTOPENGL QTWEBKIT PHONON QTXMLPATTERNS QTSCRIPT)
-IF(UNIX OR APPLE)
+IF(UNIX)
   LIST(APPEND QTLIBLIST QTDBUS)
+ENDIF()
+IF(APPLE)
+  SET(QTLIBLIST "")
+  SET(CPACK_PACKAGING_INSTALL_PREFIX "/")
+  SET(CPACK_PACKAGE_DEFAULT_LOCATION "/Applications/Visomics")
 ENDIF()
 FOREACH(qtlib ${QTLIBLIST})
   IF (QT_${qtlib}_LIBRARY_RELEASE)
@@ -63,7 +68,7 @@ ENDFOREACH()
 # Build a CPack installer
 # -------------------------------------------------------------------------
 
-SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Visomics - Application allowing to import, analyze and visualize metabolomics and genomics data.")
+SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Visomics - import, analyze and visualize metabolomics and genomics data.")
 SET(CPACK_PACKAGE_VENDOR "Kitware, Inc.")
 
 CONFIGURE_FILE(
@@ -71,6 +76,16 @@ CONFIGURE_FILE(
   ${CMAKE_CURRENT_BINARY_DIR}/NOTICE.txt
   COPYONLY)
 SET(CPACK_PACKAGE_DESCRIPTION_FILE "${CMAKE_CURRENT_BINARY_DIR}/NOTICE.txt")
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/ABOUT
+  ${CMAKE_CURRENT_BINARY_DIR}/ABOUT.txt
+  COPYONLY)
+SET(CPACK_RESOURCE_FILE_WELCOME "${CMAKE_CURRENT_BINARY_DIR}/ABOUT.txt")
+CONFIGURE_FILE(
+  ${CMAKE_CURRENT_SOURCE_DIR}/README
+  ${CMAKE_CURRENT_BINARY_DIR}/README.txt
+  COPYONLY)
+SET(CPACK_RESOURCE_FILE_README "${CMAKE_CURRENT_BINARY_DIR}/README.txt")
 SET(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_BINARY_DIR}/NOTICE.txt")
 
 SET(CPACK_PACKAGE_VERSION_MAJOR "${Visomics_MAJOR_VERSION}")
@@ -97,14 +112,6 @@ SET(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/VisomicsCPackOptions.cmake"
 # -------------------------------------------------------------------------
 set(CPACK_INSTALL_CMAKE_PROJECTS "${CMAKE_CURRENT_BINARY_DIR};Visomics;Runtime;/")
 
-
-# -------------------------------------------------------------------------
-# Install VTK
-# -------------------------------------------------------------------------
-if(EXISTS "${VTK_DIR}/CMakeCache.txt")
-  # Note: To work as expected, VTK has to be configured with -DVTK_INSTALL_LIB_DIR:PATH=lib
-  set(CPACK_INSTALL_CMAKE_PROJECTS "${CPACK_INSTALL_CMAKE_PROJECTS};${VTK_DIR};VTK;RuntimeLibraries;/")
-endif()
 
 INCLUDE (InstallRequiredSystemLibraries)
 INCLUDE(CPack)
