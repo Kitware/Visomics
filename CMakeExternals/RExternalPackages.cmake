@@ -14,13 +14,17 @@ configure_file(
   @ONLY
 )
 
+if(BUILD_TESTING)
+  set(depends "VisomicsData")
+endif()
+
 add_custom_target(${target} ALL
   COMMAND ${CMAKE_COMMAND}
    -DR_cmd=${R_cmd}
    "-DR_cmd_args=${R_cmd_args}"
    -DR_output_name=${R_output_name}
    -P ${CMAKE_SOURCE_DIR}/Utilities/GetRExternalPackages.cmake
-  DEPENDS VisomicsData
+  DEPENDS ${depends}
   COMMENT "Installing external R packages"
   VERBATIM
   )
