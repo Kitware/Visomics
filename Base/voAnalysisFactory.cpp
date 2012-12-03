@@ -63,7 +63,7 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voKEGGCompounds>("KEGG Compounds");
   this->registerAnalysis<voKEGGPathway>("KEGG Pathway");
   this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
-  this->registerAnalysis<voOneZoom>("OneZoom Visulization");
+  this->registerAnalysis<voOneZoom>("OneZoom Visualization");
   this->registerAnalysis<voPCAStatistics>("PCA");
   this->registerAnalysis<voPLSStatistics>("PLS");
   this->registerAnalysis<voTTest>("T-Test");

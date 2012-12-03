@@ -27,6 +27,13 @@ PROJECT(Visomics)
 #-----------------------------------------------------------------------------
 OPTION(USE_ARBOR_BRAND "Swtich to the brand name: ARBOR  for Phylogenetic data analysis." OFF)
 MARK_AS_ADVANCED(USE_ARBOR_BRAND)
+IF(USE_ARBOR_BRAND)
+  set(APP_NAME "Arbor")
+  SET(APP_WEBSITE "www.arborworkflows.com")
+ELSE()
+  SET(APP_NAME "Visomics")
+  SET(APP_WEBSITE "www.visomics.org")
+ENDIF()
 #-----------------------------------------------------------------------------
 
 #-----------------------------------------------------------------------------

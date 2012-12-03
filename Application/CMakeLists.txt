@@ -28,10 +28,8 @@ set(KIT_SRCS
   )
 if(USE_ARBOR_BRAND)
   set(KIT_SRCS  "${KIT_SRCS};voAboutDialog_Arbor.cpp;voAboutDialog_Arbor.h")
-  set(APP_NAME "Arbor")
 else()
   set(KIT_SRCS  "${KIT_SRCS};voAboutDialog.cpp;voAboutDialog.h")
-  set(APP_NAME "Visomics")
 endif()
 
 set(KIT_MOC_SRCS

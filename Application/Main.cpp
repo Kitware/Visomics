@@ -61,7 +61,7 @@ void checkRPrerequisites(void * data)
   QString message;
   if (!QFile::exists(app->rHome()))
     {
-    message = "<big>GnuR expects <b>R_HOME</b> environement variable.</big><br><br>";
+    message = "<big>GnuR expects <b>R_HOME</b> environment variable.</big><br><br>";
     if (app->rHome().isEmpty())
       {
       message.append("R_HOME is either not set or set to an empty value.<br>");
