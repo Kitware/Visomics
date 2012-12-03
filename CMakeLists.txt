@@ -247,8 +247,8 @@ INSTALL(FILES ${r_scripts} DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR} COMPONEN
 IF(BUILD_TESTING)
   SET(datasets
     ${VisomicsData_DIR}/Data/sample/visomics-sample_liver.csv
-    ${VisomicsData_DIR}/Data/sample/anolis.phy
-    ${VisomicsData_DIR}/Data/sample/anolisDataAppended.csv
+    ${VisomicsData_DIR}/Data/treeData/anolis.phy
+    ${VisomicsData_DIR}/Data/treeData/anolisDataAppended.csv
     )
   INSTALL(FILES ${datasets} DESTINATION ${Visomics_INSTALL_DATA_DIR} COMPONENT Runtime)
 ENDIF()
