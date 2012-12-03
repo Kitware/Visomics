@@ -143,16 +143,39 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
 
   QStringList inputNames = analysis->inputNames();
 
-  voDataObject * dataObject;
-  QString inputName;
+  voDataObject * dataObject = NULL;
+  QString inputName = inputNames.value(0);
+  QString expectedInputType = analysis->inputType(inputName);
+  QString providedInputType = "";
+  voDataModelItem * childItemForSingleInput = NULL;
   if ( inputNames.size() == 1 )
-    {// for most analysis, only one input is required
-    dataObject = inputTarget->dataObject();
-    inputName =  inputNames.value(0);
+    {
+    // for most analysis, only one input is required
+    // nonetheless, for the convenience of our users, we'll handle the case
+    // where they passed in a group of inputs.
+    if (inputTarget->childItems().size() > 0)
+      {
+      for (int i = 0; i < inputTarget->childItems().size(); ++i)
+        {
+        childItemForSingleInput =
+          dynamic_cast<voDataModelItem*>(inputTarget->child(i));
+        if (childItemForSingleInput->dataObject()->type() == expectedInputType)
+          {
+          dataObject = childItemForSingleInput->dataObject();
+          providedInputType = dataObject->type();
+          break;
+          }
+        childItemForSingleInput = NULL;
+        }
+      }
+    else
+      // "normal" case: single input specified
+      {
+      dataObject = inputTarget->dataObject();
+      providedInputType = dataObject->type();
+      }
 
     // Does the type of the provided input match the expected one ?
-    QString expectedInputType = analysis->inputType(inputName);
-    QString providedInputType = dataObject->type();
     if (expectedInputType != providedInputType)
       {
       qWarning() << QObject::tr("Failed to runAnalysis - Provided input type %1 is "
@@ -196,8 +219,6 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
       }
     }
 
-
-
   // Initialize parameter
   analysis->initializeParameterInformation();
 
@@ -214,7 +235,16 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
     return;
     }
 
-  voAnalysisDriver::addAnalysisToObjectModel(analysisScopedPtr.take(), inputTarget);
+  if (childItemForSingleInput == NULL)
+    {
+    voAnalysisDriver::addAnalysisToObjectModel(
+      analysisScopedPtr.take(), inputTarget);
+    }
+  else
+    {
+    voAnalysisDriver::addAnalysisToObjectModel(
+      analysisScopedPtr.take(), childItemForSingleInput);
+    }
 
   connect(analysis, SIGNAL(outputSet(const QString&, voDataObject*, voAnalysis*)),
     SLOT(onAnalysisOutputSet(const QString&,voDataObject*,voAnalysis*)));
