@@ -156,7 +156,7 @@
     <string>&amp;Open</string>
    </property>
    <property name="statusTip">
-    <string>Open an existing csv file</string>
+    <string>Open an existing data file</string>
    </property>
   </action>
   <action name="actionFileExit">
