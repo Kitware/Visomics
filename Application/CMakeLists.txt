@@ -176,7 +176,7 @@ else(APPLE)
     COMPONENT Runtime
     )
   install(TARGETS VisomicsApp-real
-    DESTINATION ${Visomics_INSTALL_BIN_DIR}
+    DESTINATION ${Visomics_INSTALL_LIB_DIR}
     COMPONENT Runtime
     )
 endif(APPLE)
