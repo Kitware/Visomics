@@ -67,6 +67,7 @@ void voDataModelPrivate::onCurrentRowChanged(const QModelIndex & current,
     qDebug() << "onCurrentRowChanged - InputType" << item->dataObject()->name();
     this->SelectedInputDataObjects << item;
     emit q->viewSelected(item->uuid());
+    emit q->inputSelected(item);
     }
   else if(item->type() == voDataModelItem::OutputType)
     {

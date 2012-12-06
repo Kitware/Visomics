@@ -38,7 +38,6 @@ public:
   virtual ~voKEGGCompounds();
 
 protected:
-  virtual void setInputInformation();
   virtual void setOutputInformation();
 
   virtual bool execute();

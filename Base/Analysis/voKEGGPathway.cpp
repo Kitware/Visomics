@@ -72,12 +72,6 @@ voKEGGPathway::~voKEGGPathway()
 }
 
 // --------------------------------------------------------------------------
-void voKEGGPathway::setInputInformation()
-{
-  this->addInputType("input", "vtkExtendedTable");
-}
-
-// --------------------------------------------------------------------------
 void voKEGGPathway::setOutputInformation()
 {
   this->addOutputType("pathway_graph", "vtkGraph",

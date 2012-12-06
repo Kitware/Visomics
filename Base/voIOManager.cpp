@@ -370,6 +370,7 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
     treeItem->setRawViewType("voTreeHeatmapView");
 
     voDataModelItem * tableItem = model->addDataObjectAsChild(dataObjectTable,newItem);
+    tableItem->setType(voDataModelItem::InputType);
     tableItem->setRawViewType("voTableView");
 
     // add table data

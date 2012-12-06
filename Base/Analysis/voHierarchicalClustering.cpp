@@ -61,12 +61,6 @@ voHierarchicalClustering::~voHierarchicalClustering()
 }
 
 // --------------------------------------------------------------------------
-void voHierarchicalClustering::setInputInformation()
-{
-  this->addInputType("input", "vtkExtendedTable");
-}
-
-// --------------------------------------------------------------------------
 void voHierarchicalClustering::setOutputInformation()
 {
   this->addOutputType("clusterTree", "vtkTree",

@@ -65,11 +65,6 @@ voTTest::~voTTest()
 {
 }
 
-// --------------------------------------------------------------------------
-void voTTest::setInputInformation()
-{
-  this->addInputType("input", "vtkExtendedTable");
-}
 
 // --------------------------------------------------------------------------
 void voTTest::setOutputInformation()

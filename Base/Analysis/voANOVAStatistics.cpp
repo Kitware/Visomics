@@ -66,12 +66,6 @@ voANOVAStatistics::~voANOVAStatistics()
 }
 
 // --------------------------------------------------------------------------
-void voANOVAStatistics::setInputInformation()
-{
-  this->addInputType("input", "vtkExtendedTable");
-}
-
-// --------------------------------------------------------------------------
 void voANOVAStatistics::setOutputInformation()
 {
   this->addOutputType("ANOVA_table", "vtkTable" ,

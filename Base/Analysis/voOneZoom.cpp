@@ -55,11 +55,6 @@ voOneZoom::~voOneZoom()
 {
 }
 
-// --------------------------------------------------------------------------
-void voOneZoom::setInputInformation()
-{
-  this->addInputType("input", "vtkTree");
-}
 
 // --------------------------------------------------------------------------
 void voOneZoom::setOutputInformation()
@@ -83,8 +78,8 @@ QString voOneZoom::parameterDescription()const
 // --------------------------------------------------------------------------
 bool voOneZoom::execute()
 {
-  vtkTree* tree =  vtkTree::SafeDownCast(this->input("input")->dataAsVTKDataObject());
-  QString filename =  dynamic_cast<voInputFileDataObject *>(this->input("input"))->fileName();
+  vtkTree* tree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
+  QString filename =  dynamic_cast<voInputFileDataObject *>(this->input(0))->fileName();
   if (!tree)
     {
     qCritical() << "Input tree is Null";

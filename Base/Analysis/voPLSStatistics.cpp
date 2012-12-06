@@ -66,11 +66,6 @@ voPLSStatistics::~voPLSStatistics()
 {
 }
 
-// --------------------------------------------------------------------------
-void voPLSStatistics::setInputInformation()
-{
-  this->addInputType("input", "vtkExtendedTable");
-}
 
 // --------------------------------------------------------------------------
 void voPLSStatistics::setOutputInformation()

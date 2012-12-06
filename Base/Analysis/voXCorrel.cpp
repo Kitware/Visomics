@@ -68,11 +68,6 @@ voXCorrel::~voXCorrel()
 {
 }
 
-// --------------------------------------------------------------------------
-void voXCorrel::setInputInformation()
-{
-  this->addInputType("input", "vtkExtendedTable");
-}
 
 // --------------------------------------------------------------------------
 void voXCorrel::setOutputInformation()

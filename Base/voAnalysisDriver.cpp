@@ -63,6 +63,30 @@ voAnalysisDriverPrivate::~voAnalysisDriverPrivate()
 voAnalysisDriver::voAnalysisDriver(QObject* newParent):
     Superclass(newParent), d_ptr(new voAnalysisDriverPrivate)
 {
+  analysisNameToInputTypes.insert(
+    "ANOVA", QStringList() << "vtkExtendedTable");
+  analysisNameToInputTypes.insert(
+    "Cross Correlation", QStringList() << "vtkExtendedTable");
+  analysisNameToInputTypes.insert(
+    "Fold Change", QStringList() << "vtkExtendedTable");
+  analysisNameToInputTypes.insert(
+    "GeigerTreeModelFitting", QStringList() << "vtkTree" << "vtkTable");
+  analysisNameToInputTypes.insert(
+    "Hierarchical Clustering", QStringList() << "vtkExtendedTable");
+  analysisNameToInputTypes.insert(
+    "KEGG Compounds", QStringList() << "vtkExtendedTable");
+  analysisNameToInputTypes.insert(
+    "KEGG Pathway", QStringList() << "vtkExtendedTable");
+  analysisNameToInputTypes.insert(
+    "KMeans Clustering", QStringList() << "vtkExtendedTable");
+  analysisNameToInputTypes.insert(
+    "OneZoom Visualization", QStringList() << "vtkTree");
+  analysisNameToInputTypes.insert(
+    "PCA", QStringList() << "vtkExtendedTable");
+  analysisNameToInputTypes.insert(
+    "PLS", QStringList() << "vtkExtendedTable");
+  analysisNameToInputTypes.insert(
+    "T-Test", QStringList() << "vtkExtendedTable");
 }
 
 // --------------------------------------------------------------------------
@@ -136,86 +160,66 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
   analysis->removeAllOutputs();
 
   // Initialize input and output
-  analysis->initializeInputInformation();
   analysis->initializeOutputInformation();
 
   //qDebug() << "  " << analysis->numberOfInput() << " inputs expected";
 
-  QStringList inputNames = analysis->inputNames();
+  QString analysisName = analysis->objectName();
+  QStringList expectedInputTypes = analysisNameToInputTypes.value(analysisName);
 
   voDataObject * dataObject = NULL;
-  QString inputName = inputNames.value(0);
-  QString expectedInputType = analysis->inputType(inputName);
-  QString providedInputType = "";
   voDataModelItem * childItemForSingleInput = NULL;
-  if ( inputNames.size() == 1 )
-    {
-    // for most analysis, only one input is required
-    // nonetheless, for the convenience of our users, we'll handle the case
-    // where they passed in a group of inputs.
-    if (inputTarget->childItems().size() > 0)
-      {
-      for (int i = 0; i < inputTarget->childItems().size(); ++i)
-        {
-        childItemForSingleInput =
-          dynamic_cast<voDataModelItem*>(inputTarget->child(i));
-        if (childItemForSingleInput->dataObject()->type() == expectedInputType)
-          {
-          dataObject = childItemForSingleInput->dataObject();
-          providedInputType = dataObject->type();
-          break;
-          }
-        childItemForSingleInput = NULL;
-        }
-      }
-    else
-      // "normal" case: single input specified
-      {
-      dataObject = inputTarget->dataObject();
-      providedInputType = dataObject->type();
-      }
 
-    // Does the type of the provided input match the expected one ?
-    if (expectedInputType != providedInputType)
+  if ( expectedInputTypes.size() == 1  && inputTarget->childItems().size() > 0)
+    {
+    // For most analyses, only one input is required.
+    // Nonetheless, for the convenience of our users, we'll handle the case
+    // where they passed in a group of inputs.
+    bool inputMatches = false;
+    for (int i = 0; i < inputTarget->childItems().size(); ++i)
       {
-      qWarning() << QObject::tr("Failed to runAnalysis - Provided input type %1 is "
-        "different from the expected input type %2").
-        arg(providedInputType).arg(expectedInputType);
+      childItemForSingleInput =
+        dynamic_cast<voDataModelItem*>(inputTarget->child(i));
+
+      if (this->doesInputMatchAnalysis(analysisName, childItemForSingleInput,
+                                       true))
+        {
+        dataObject = childItemForSingleInput->dataObject();
+        inputMatches = true;
+        break;
+        }
+      childItemForSingleInput = NULL;
+      }
+    if (!inputMatches)
+      {
       return;
       }
-
-    analysis->addInput(inputName, dataObject);
     }
   else
-    {//require multiple inputs
-    if (inputNames.size() ==  inputTarget->childItems().size())
+    {
+    if (!this->doesInputMatchAnalysis(analysisName, inputTarget, true))
       {
-      for (int i = 0; i < inputNames.size(); i++)
-        {
-        voDataModelItem * childItem =  dynamic_cast<voDataModelItem*>(inputTarget->child(i));
-        dataObject = childItem->dataObject();
-        inputName =  inputNames.value(i);
-
-        // Does the type of the provided input match the expected one ?
-        QString expectedInputType = analysis->inputType(inputName);
-        QString providedInputType = dataObject->type();
-        if (expectedInputType != providedInputType)
-          {
-          qWarning() << QObject::tr("Failed to runAnalysis - Provided input type %1 is "
-            "different from the expected input type %2").
-            arg(providedInputType).arg(expectedInputType);
-          return;
-          }
-
-        analysis->addInput(inputName, dataObject);
-        }
-      }
-    else
-      {//error report
-      qWarning() << QObject::tr("Failed to runAnalysis - Provided input number %1 is "
-        "different from the expected input number %2").
-        arg(inputTarget->childItems().size()).arg(inputNames.size());
       return;
+      }
+    dataObject = inputTarget->dataObject();
+    }
+
+  // At this point we've verified that our input is good.  Now we need
+  // to pass this input into the analysis.
+  if (expectedInputTypes.size() == 1)
+    {
+    // Single input case.
+    analysis->addInput(dataObject);
+    }
+  else
+    {
+    // Multiple input case.
+    for (int i = 0; i < expectedInputTypes.size(); i++)
+      {
+      voDataModelItem * childItem =
+        dynamic_cast<voDataModelItem*>(inputTarget->child(i));
+      dataObject = childItem->dataObject();
+      analysis->addInput(dataObject);
       }
     }
 
@@ -377,4 +381,66 @@ void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
       viewItem->setData(outputName, voDataModelItem::OutputNameRole);
       }
     }
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysisDriver::doesInputMatchAnalysis(const QString& analysisName,
+                                              voDataModelItem* inputTarget,
+                                              bool warnOnFail)
+{
+  if (analysisName.isEmpty())
+    {
+    qWarning() << "AnalysisName is empty";
+    return false;
+    }
+
+  QStringList expectedInputTypes = analysisNameToInputTypes.value(analysisName);
+  QString expectedInputType = expectedInputTypes.at(0);
+  QString providedInputType = inputTarget->dataObject()->type();
+
+  // This analysis requires a single input.
+  if ( expectedInputTypes.size() == 1 )
+    {
+    // Does the type of the provided input match the expected one ?
+    if (expectedInputType == providedInputType)
+      {
+      return true;
+      }
+    if (warnOnFail)
+      {
+      qWarning() << QObject::tr("Provided input type %1 is "
+        "different from the expected input type %2").
+        arg(providedInputType).arg(expectedInputType);
+      }
+    return false;
+    }
+
+  // This analysis requires multiple inputs.
+  if (expectedInputTypes.size() != inputTarget->childItems().size())
+    {
+    if (warnOnFail)
+      {
+      qWarning() << QObject::tr("Provided input number %1 is "
+        "different from the expected input number %2").
+        arg(inputTarget->childItems().size()).arg(expectedInputTypes.size());
+      }
+    return false;
+    }
+  for (int i = 0; i < expectedInputTypes.size(); i++)
+    {
+    expectedInputType = expectedInputTypes.at(i);
+    voDataModelItem * childItem =  dynamic_cast<voDataModelItem*>(inputTarget->child(i));
+    providedInputType = childItem->dataObject()->type();
+    if (expectedInputType != providedInputType)
+      {
+      if (warnOnFail)
+        {
+        qWarning() << QObject::tr("Provided input type %1 is "
+          "different from the expected input type %2").
+          arg(providedInputType).arg(expectedInputType);
+        }
+      return false;
+      }
+    }
+    return true;
 }

@@ -49,11 +49,6 @@ public:
 
   virtual bool execute()
     {
-    if (this->numberOfInput() == 0)
-      {
-      //std::cerr << "There are no inputs." << std::endl;
-      return false;
-      }
     if (!this->input())
       {
       //std::cerr << "There is no Data associated with the input." << std::endl;
@@ -79,11 +74,6 @@ public:
     this->setOutput("output", new voDataObject("output", outputTable.GetPointer()));
 
     return true;
-    }
-
-  virtual void setInputInformation()
-    {
-    this->addInputType("input", "vtkTable");
     }
 
   virtual void setOutputInformation()
@@ -123,63 +113,8 @@ int voAnalysisTest(int argc, char * argv [])
   //-----------------------------------------------------------------------------
   // Input
   //-----------------------------------------------------------------------------
-
-  if (analysis.numberOfInput() != 0)
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with numberOfInput() !" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  if (analysis.inputNames().size() != 0)
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with inputNames() !" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  analysis.addInputType("", "vtkTable");
-
-  if (analysis.numberOfInput() != 0)
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with numberOfInput() !" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  analysis.addInputType("input", "");
-
-  if (analysis.numberOfInput() != 0)
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with numberOfInput() !" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  analysis.addInputType("input", "vtkTable");
-
-  if (analysis.numberOfInput() != 1)
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with numberOfInput() !" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  if (analysis.inputNames().size() != 1)
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with inputNames() !" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  if (analysis.inputNames().at(0) != "input")
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with inputNames() !" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  if (!analysis.hasInput("input"))
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with hasInput() !" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  analysis.addInput("input", 0);
-  if (analysis.input("input") != 0)
+  analysis.addInput(0);
+  if (analysis.input(0) != 0)
     {
     std::cerr << "Line " << __LINE__ << " - Problem with addInput() / input() !" << std::endl;
     return EXIT_FAILURE;
@@ -187,26 +122,14 @@ int voAnalysisTest(int argc, char * argv [])
 
   vtkNew<vtkTable> inputTable;
   voDataObject * inputDataObject = new voDataObject("input", inputTable.GetPointer());
-  analysis.addInput("input", inputDataObject);
-  if (analysis.input("input") != inputDataObject)
+  analysis.addInput(inputDataObject);
+  if (analysis.input(0) != inputDataObject)
     {
     std::cerr << "Line " << __LINE__ << " - Problem with addInput() / input() !" << std::endl;
     return EXIT_FAILURE;
     }
 
   analysis.removeAllInputs();
-
-  if (analysis.numberOfInput() != 0)
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with numberOfInput() !" << std::endl;
-    return EXIT_FAILURE;
-    }
-
-  if (analysis.inputNames().size() != 0)
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with inputNames() !" << std::endl;
-    return EXIT_FAILURE;
-    }
 
   //-----------------------------------------------------------------------------
   // Output
@@ -543,14 +466,7 @@ int voAnalysisTest(int argc, char * argv [])
     return EXIT_FAILURE;
     }
 
-  analysis.initializeInputInformation();
   analysis.initializeOutputInformation();
-
-  if (analysis.numberOfInput() != 1)
-    {
-    std::cerr << "Line " << __LINE__ << " - Problem with numberOfInput() !" << std::endl;
-    return EXIT_FAILURE;
-    }
 
   if (analysis.numberOfOutput() != 1)
     {
@@ -566,7 +482,7 @@ int voAnalysisTest(int argc, char * argv [])
     }
 
   vtkNew<vtkArrayData> arrayData;
-  analysis.addInput("input", new voDataObject("input", arrayData.GetPointer()));
+  analysis.addInput(new voDataObject("input", arrayData.GetPointer()));
 
   if (analysis.run())
     {
@@ -581,7 +497,7 @@ int voAnalysisTest(int argc, char * argv [])
   intColumn->SetValue(0, 1);
   intColumn->SetValue(1, 2);
   table->AddColumn(intColumn);
-  analysis.addInput("input", new voDataObject("input", table.GetPointer()));
+  analysis.addInput(new voDataObject("input", table.GetPointer()));
 
   if (!analysis.run())
     {

@@ -67,12 +67,6 @@ voFoldChange::~voFoldChange()
 }
 
 // --------------------------------------------------------------------------
-void voFoldChange::setInputInformation()
-{
-  this->addInputType("input", "vtkExtendedTable");
-}
-
-// --------------------------------------------------------------------------
 void voFoldChange::setOutputInformation()
 {
   this->addOutputType("foldChange", "vtkTable" ,

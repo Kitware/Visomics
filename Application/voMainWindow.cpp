@@ -32,6 +32,7 @@
 #include "voAnalysisFactory.h"
 #include "voApplication.h"
 #include "voDataModel.h"
+#include "voDataModelItem.h"
 #include "voDelimitedTextImportDialog.h"
 #include "voIOManager.h"
 #include "voMainWindow.h"
@@ -118,6 +119,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
   foreach(const QString& analysisName, registeredAnalysisPrettyNames)
     {
     QAction * action = new QAction(analysisName, this);
+    action->setEnabled(false);
     d->AnalysisActionMapper.setMapping(action, analysisName);
     connect(action, SIGNAL(triggered()), &d->AnalysisActionMapper, SLOT(map()));
     analysisActions << action;
@@ -147,6 +149,9 @@ voMainWindow::voMainWindow(QWidget * newParent)
 
   connect(dataModel, SIGNAL(activeAnalysisChanged(voAnalysis*)),
           SLOT(onActiveAnalysisChanged(voAnalysis*)));
+
+  connect(dataModel, SIGNAL(inputSelected(voDataModelItem*)), this,
+          SLOT(onInputSelected(voDataModelItem*)));
 
   connect(voApplication::application()->analysisDriver(),
           SIGNAL(aboutToRunAnalysis(voAnalysis*)),
@@ -303,6 +308,42 @@ void voMainWindow::onAnalysisSelected(voAnalysis* analysis)
 {
   Q_UNUSED(analysis);
   // Q_D(voMainWindow);
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::onInputSelected(voDataModelItem* inputTarget)
+{
+  Q_D(voMainWindow);
+
+  voAnalysisDriver *driver = voApplication::application()->analysisDriver();
+
+  for (int i = 0; i < d->menuAnalysis->actions().size(); ++i)
+    {
+    QAction *analysisAction = d->menuAnalysis->actions().at(i);
+    if (driver->doesInputMatchAnalysis(analysisAction->text(), inputTarget,
+                                       false))
+      {
+      analysisAction->setEnabled(true);
+      }
+    else
+      {
+      analysisAction->setEnabled(false);
+      }
+    if (inputTarget->childItems().size() > 0)
+      {
+      for (int i = 0; i < inputTarget->childItems().size(); ++i)
+        {
+        voDataModelItem *childItemForSingleInput =
+          dynamic_cast<voDataModelItem*>(inputTarget->child(i));
+
+        if (driver->doesInputMatchAnalysis(analysisAction->text(),
+                                           childItemForSingleInput, false))
+          {
+          analysisAction->setEnabled(true);
+          }
+        }
+      }
+    }
 }
 
 // --------------------------------------------------------------------------

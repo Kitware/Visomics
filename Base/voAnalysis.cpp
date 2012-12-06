@@ -55,14 +55,9 @@ public:
 
   void init();
 
-  // TODO Use vtkInformationVector ?
-  //vtkInformationVector* InputInformation;
-  //vtkInformationVector* OutputInformation;
-
   QString Uuid;
 
-  QHash<QString, QString> InputInformation;
-  QHash<QString, QExplicitlySharedDataPointer<voDataObject> > InputDataObjects;
+  QList<QExplicitlySharedDataPointer<voDataObject> > InputDataObjects;
   QHash<QString, QString> OutputInformation;
   QHash<QString, QString> OutputViewInformation;
   QHash<QString, QString> OutputRawView;
@@ -70,7 +65,6 @@ public:
   QHash<QString, QString> OutputRawViewPrettyName;
   QHash<QString, QExplicitlySharedDataPointer<voDataObject> > OutputDataObjects;
 
-  bool InputInformationInitialized;
   bool OutputInformationInitialized;
   bool ParameterInformationInitialized;
 
@@ -97,7 +91,6 @@ void voAnalysisPrivate::init()
 {
   Q_Q(voAnalysis);
   this->Uuid = QUuid::createUuid().toString();
-  this->InputInformationInitialized = false;
   this->OutputInformationInitialized = false;
   this->ParameterInformationInitialized = false;
   this->AcceptDefaultParameterValues = false;
@@ -166,79 +159,21 @@ void checkForLeadingOrTrailingSpaces(const char* className, const char* funcName
 }
 
 // --------------------------------------------------------------------------
-void voAnalysis::addInputType(const QString& inputName, const QString& inputType)
+void voAnalysis::addInput(voDataObject * dataObject)
 {
   Q_D(voAnalysis);
-
-  const char* className = this->metaObject()->className();
-  checkForSpaces(className, "addInputType", "inputName", inputName);
-  checkForSpaces(className, "addInputType", "inputType", inputType);
-
-  if (checkIfEmpty(className, "addInputType", "inputName", inputName) ||
-      checkIfEmpty(className, "addInputType", "inputType", inputType))
-    {
-    return;
-    }
-
-  if (this->hasInput(inputName))
-    {
-    return;
-    }
-  d->InputInformation.insert(inputName, inputType);
+  d->InputDataObjects << QExplicitlySharedDataPointer<voDataObject>(dataObject);
 }
 
 // --------------------------------------------------------------------------
-QString voAnalysis::inputType(const QString& inputName) const
+voDataObject * voAnalysis::input(int i) const
 {
   Q_D(const voAnalysis);
-  if (!this->hasInput(inputName))
-    {
-    return QString();
-    }
-  return d->InputInformation.value(inputName);
-}
-
-// --------------------------------------------------------------------------
-int voAnalysis::numberOfInput()
-{
-  Q_D(const voAnalysis);
-  return d->InputInformation.count();
-}
-
-// --------------------------------------------------------------------------
-QStringList voAnalysis::inputNames()const
-{
-  Q_D(const voAnalysis);
-  return d->InputInformation.keys();
-}
-
-// --------------------------------------------------------------------------
-bool voAnalysis::hasInput(const QString& inputName)const
-{
-  Q_D(const voAnalysis);
-  return d->InputInformation.contains(inputName);
-}
-
-// --------------------------------------------------------------------------
-void voAnalysis::addInput(const QString& inputName, voDataObject * dataObject)
-{
-  Q_D(voAnalysis);
-  if (!this->hasInput(inputName))
-    {
-    return;
-    }
-  d->InputDataObjects.insert(inputName, QExplicitlySharedDataPointer<voDataObject>(dataObject));
-}
-
-// --------------------------------------------------------------------------
-voDataObject * voAnalysis::input(const QString& inputName) const
-{
-  Q_D(const voAnalysis);
-  if (!this->hasInput(inputName))
+  if (i >= d->InputDataObjects.size())
     {
     return 0;
     }
-  return d->InputDataObjects.value(inputName).data();
+  return d->InputDataObjects.at(i).data();
 }
 
 // --------------------------------------------------------------------------
@@ -246,8 +181,6 @@ void voAnalysis::removeAllInputs()
 {
   Q_D(voAnalysis);
   d->InputDataObjects.clear();
-  d->InputInformation.clear();
-  d->InputInformationInitialized = false;
 }
 
 // --------------------------------------------------------------------------
@@ -567,18 +500,6 @@ bool voAnalysis::run()
 bool voAnalysis::execute()
 {
   return true;
-}
-
-// --------------------------------------------------------------------------
-void voAnalysis::initializeInputInformation()
-{
-  Q_D(voAnalysis);
-  if (d->InputInformationInitialized)
-    {
-    return;
-    }
-  this->setInputInformation();
-  d->InputInformationInitialized = true;
 }
 
 // --------------------------------------------------------------------------

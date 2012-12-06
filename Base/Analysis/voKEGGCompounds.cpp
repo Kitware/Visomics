@@ -102,12 +102,6 @@ voKEGGCompounds::~voKEGGCompounds()
 }
 
 // --------------------------------------------------------------------------
-void voKEGGCompounds::setInputInformation()
-{
-  this->addInputType("input", "vtkExtendedTable");
-}
-
-// --------------------------------------------------------------------------
 void voKEGGCompounds::setOutputInformation()
 {
   this->addOutputType("analyte_IDs", "vtkTable",

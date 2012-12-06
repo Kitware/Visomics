@@ -63,11 +63,6 @@ voPCAStatistics::~voPCAStatistics()
 {
 }
 
-// --------------------------------------------------------------------------
-void voPCAStatistics::setInputInformation()
-{
-  this->addInputType("input", "vtkExtendedTable");
-}
 
 // --------------------------------------------------------------------------
 void voPCAStatistics::setOutputInformation()

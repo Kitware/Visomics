@@ -31,6 +31,7 @@ class QTableWidget;
 
 class voAnalysisPanel;
 class voAnalysis;
+class voDataModelItem;
 class voView;
 
 class voMainWindowPrivate;
@@ -54,6 +55,7 @@ public slots:
 protected slots:
   void onAnalysisSelected(voAnalysis* analysis);
   void onActiveAnalysisChanged(voAnalysis* analysis);
+  void onInputSelected(voDataModelItem* inputTarget);
   void onAboutToRunAnalysis(voAnalysis* analysis);
 
   void setViewActions(const QString& objectUuid, voView* newView);

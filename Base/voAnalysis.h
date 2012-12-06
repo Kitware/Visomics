@@ -44,19 +44,9 @@ public:
 
   QString uuid()const;
 
-  void addInputType(const QString& inputName, const QString& inputType);
+  void addInput(voDataObject * dataObject);
 
-  QString inputType(const QString& inputName) const;
-
-  int numberOfInput();
-
-  QStringList inputNames()const;
-
-  bool hasInput(const QString& inputName) const;
-
-  void addInput(const QString& inputName, voDataObject * dataObject);
-
-  voDataObject * input(const QString& inputName = QLatin1String("input")) const;
+  voDataObject * input(int i = 0) const;
 
   void removeAllInputs();
 
@@ -109,7 +99,6 @@ public:
 
   bool run();
 
-  void initializeInputInformation();
   void initializeOutputInformation();
 
   void writeOutputsToFiles(const QString& directory = QLatin1String(".")) const;
@@ -140,7 +129,6 @@ protected:
 
   virtual bool execute();
 
-  virtual void setInputInformation(){}
   virtual void setOutputInformation(){}
   virtual void setParameterInformation(){}
 

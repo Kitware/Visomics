@@ -81,6 +81,7 @@ public slots:
 signals:
 
   void viewSelected(const QString& objectUuid);
+  void inputSelected(voDataModelItem* inputTarget);
 
   void activeAnalysisChanged(voAnalysis * analysis);
   void analysisSelected(voAnalysis * analysis);

@@ -38,7 +38,6 @@ public:
   virtual ~voPCAStatistics();
 
 protected:
-  virtual void setInputInformation();
   virtual void setOutputInformation();
 
   virtual bool execute();

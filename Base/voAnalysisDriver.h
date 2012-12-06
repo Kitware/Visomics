@@ -23,6 +23,7 @@
 // Qt includes
 #include <QScopedPointer>
 #include <QObject>
+#include <QMap>
 #include <QHash>
 
 class voAnalysis;
@@ -39,6 +40,9 @@ public:
   virtual ~voAnalysisDriver();
 
   void runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool acceptDefaultParameter = false);
+
+  bool doesInputMatchAnalysis(const QString& analysisName,
+                              voDataModelItem* inputTarget, bool warnOnFail);
 
 signals:
   void aboutToRunAnalysis(voAnalysis*);
@@ -64,6 +68,7 @@ protected:
 
 protected:
   QScopedPointer<voAnalysisDriverPrivate> d_ptr;
+  QMap< QString, QStringList > analysisNameToInputTypes;
 
 private:
   Q_DECLARE_PRIVATE(voAnalysisDriver);

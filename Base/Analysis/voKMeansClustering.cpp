@@ -55,11 +55,6 @@ voKMeansClustering::~voKMeansClustering()
 {
 }
 
-// --------------------------------------------------------------------------
-void voKMeansClustering::setInputInformation()
-{
-  this->addInputType("input", "vtkExtendedTable");
-}
 
 // --------------------------------------------------------------------------
 void voKMeansClustering::setOutputInformation()

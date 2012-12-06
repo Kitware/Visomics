@@ -69,13 +69,6 @@ voGeigerModelFitting::~voGeigerModelFitting()
 
 
 // --------------------------------------------------------------------------
-void voGeigerModelFitting::setInputInformation()
-{
-  this->addInputType("input1", "vtkTree");
-  this->addInputType("input2", "vtkTable");
-}
-
-// --------------------------------------------------------------------------
 void voGeigerModelFitting::setOutputInformation()
 {
   this->addOutputType("resultTable", "vtkTable" ,
@@ -114,18 +107,15 @@ QString voGeigerModelFitting::parameterDescription()const
 // --------------------------------------------------------------------------
 bool voGeigerModelFitting::execute()
 {
-  Q_D(voGeigerModelFitting);
-
-
   // Import tree and assiciated traits table
-  vtkTree* tree =  vtkTree::SafeDownCast(this->input("input1")->dataAsVTKDataObject());
+  vtkTree* tree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
   if (!tree)
     {
     qCritical() << "Input 1 (tree) is Null";
     return false;
     }
 
-  vtkTable* table =  vtkTable::SafeDownCast(this->input("input2")->dataAsVTKDataObject());
+  vtkTable* table =  vtkTable::SafeDownCast(this->input(1)->dataAsVTKDataObject());
   if (!table)
     {
     qCritical() << "Input 2 (table) is Null";
