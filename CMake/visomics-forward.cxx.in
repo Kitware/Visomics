@@ -62,9 +62,9 @@ int main(int argc, char* argv[])
       } while (pipe != vtksysProcess_Pipe_None);
 
     vtksysProcess_Delete(process);
-    if (newPath.empty())
+    if (newPath.compare("R_HOME=") == 0)
       {
-      newPath = VTK_R_HOME;
+      newPath.append(VTK_R_HOME);
       }
     else
       {
