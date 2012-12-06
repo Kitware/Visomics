@@ -40,6 +40,7 @@ public:
 
   vtkSmartPointer<vtkTable> ColumnMetaData;
   vtkSmartPointer<vtkTable> RowMetaData;
+  vtkSmartPointer<vtkTable> InputData;
 
   vtkIdType ColumnMetaDataTypeOfInterest;
   vtkIdType RowMetaDataTypeOfInterest;
@@ -200,7 +201,11 @@ vtkTable* vtkExtendedTable::GetDataWithRowHeader()
 //----------------------------------------------------------------------------
 vtkIdType vtkExtendedTable::GetNumberOfColumnMetaDataTypes() const
 {
-  return this->Internal->ColumnMetaData->GetNumberOfColumns();
+  if (this->Internal->ColumnMetaData)
+    {
+    return this->Internal->ColumnMetaData->GetNumberOfColumns();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -312,7 +317,11 @@ vtkStringArray* vtkExtendedTable::GetColumnMetaDataLabels() const
 //----------------------------------------------------------------------------
 vtkIdType vtkExtendedTable::GetNumberOfRowMetaDataTypes() const
 {
-  return this->Internal->RowMetaData->GetNumberOfColumns();
+  if (this->Internal->RowMetaData)
+    {
+    return this->Internal->RowMetaData->GetNumberOfColumns();
+    }
+  return 0;
 }
 
 //----------------------------------------------------------------------------
@@ -419,4 +428,25 @@ void vtkExtendedTable::SetRowMetaDataLabels(vtkStringArray* rowMetaDataLabels)
 vtkStringArray* vtkExtendedTable::GetRowMetaDataLabels() const
 {
   return this->Internal->RowMetaDataLabels;
+}
+
+//----------------------------------------------------------------------------
+void vtkExtendedTable::SetInputDataTable(vtkTable* inputData)
+{
+  if (inputData == this->Internal->InputData)
+    {
+    return;
+    }
+  this->Internal->InputData = inputData;
+  this->Modified();
+}
+
+//----------------------------------------------------------------------------
+vtkTable* vtkExtendedTable::GetInputData() const
+{
+  if (!this->Internal->InputData)
+    {
+    return 0;
+    }
+  return this->Internal->InputData;
 }

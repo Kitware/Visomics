@@ -115,7 +115,15 @@ bool voGeigerModelFitting::execute()
     return false;
     }
 
-  vtkTable* table =  vtkTable::SafeDownCast(this->input(1)->dataAsVTKDataObject());
+  vtkExtendedTable* extendedTable =
+    vtkExtendedTable::SafeDownCast(this->input(1)->dataAsVTKDataObject());
+  if (!extendedTable)
+    {
+    qCritical() << "Input 2 (extended table) is Null";
+    return false;
+    }
+
+  vtkTable* table = extendedTable->GetInputData();
   if (!table)
     {
     qCritical() << "Input 2 (table) is Null";

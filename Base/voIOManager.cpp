@@ -357,9 +357,12 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
   // load associated table data
   vtkNew<vtkTable> table;
   Self::readCSVFileIntoTable(tableFileName, table.GetPointer(), settings, true);
+  vtkNew<vtkExtendedTable> extendedTable;
+  Self::fillExtendedTable(table.GetPointer(), extendedTable.GetPointer(), settings);
+  extendedTable->SetInputDataTable(table.GetPointer());
 
   voTableDataObject * dataObjectTable =
-    new voTableDataObject(QFileInfo(tableFileName).baseName(), table.GetPointer(), /* sortable= */ true);
+    new voTableDataObject(QFileInfo(tableFileName).baseName(), extendedTable.GetPointer());
 
   if (forest->GetNumberOfPieces() == 1)
     { //single tree
@@ -385,7 +388,7 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
       ++NumberOfLeafNodes;
       }
 
-    if (table->GetNumberOfRows() == NumberOfLeafNodes ) 
+    if (table->GetNumberOfRows() == NumberOfLeafNodes )
       {//display data table as a heat map
       newItem->setRawViewType("voTreeHeatmapView");
       newItem->setType(voDataModelItem::InputType);

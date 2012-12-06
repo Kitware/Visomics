@@ -70,7 +70,7 @@ voAnalysisDriver::voAnalysisDriver(QObject* newParent):
   analysisNameToInputTypes.insert(
     "Fold Change", QStringList() << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
-    "GeigerTreeModelFitting", QStringList() << "vtkTree" << "vtkTable");
+    "GeigerTreeModelFitting", QStringList() << "vtkTree" << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
     "Hierarchical Clustering", QStringList() << "vtkExtendedTable");
   analysisNameToInputTypes.insert(

@@ -25,6 +25,7 @@
 // Visomics includes
 #include "voDataObject.h"
 #include "voTreeHeatmapView.h"
+#include "vtkExtendedTable.h"
 
 // VTK includes
 #include <QVTKWidget.h>
@@ -36,7 +37,6 @@
 #include <vtkTextProperty.h>
 #include <vtkContextView.h>
 #include <vtkTree.h>
-#include <vtkTable.h>
 #include <vtkViewTheme.h>
 #include <vtkTreeHeatmapItem.h>
 #include <vtkContextItem.h>
@@ -115,15 +115,15 @@ void voTreeHeatmapView::setDataObjectListInternal(const QList<voDataObject*> dat
     return;
     }
 
- vtkTable * Table = vtkTable::SafeDownCast(dataObjects[1]->dataAsVTKDataObject());
+ vtkExtendedTable * Table = vtkExtendedTable::SafeDownCast(dataObjects[1]->dataAsVTKDataObject());
   if (!Table)
     {
-    qCritical() << "voTreeHeatmapView - Failed to setDataObject - vtkTable data is expected !";
+    qCritical() << "voTreeHeatmapView - Failed to setDataObject - vtkExtendedTable data is expected !";
     return;
     }
 
   d->TreeItem->SetTree(Tree);
-  d->TreeItem->SetTable(Table);
+  d->TreeItem->SetTable(Table->GetInputData());
   d->ContextView->GetRenderWindow()->SetMultiSamples(0);
   d->ContextView->Render();
 }

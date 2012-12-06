@@ -133,6 +133,12 @@ public:
 
   vtkStringArray*     GetRowMetaDataLabels() const;
 
+  //
+  // Input Data
+  //
+
+  void SetInputDataTable(vtkTable* inputData);
+  vtkTable* GetInputData() const;
 
 protected:
   vtkExtendedTable();
