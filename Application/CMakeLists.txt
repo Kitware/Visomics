@@ -105,11 +105,18 @@ if(Q_WS_WIN)
   list(APPEND FORWARD_SRCS Resources/VisomicsApp.rc)
 endif()
 if(APPLE)
-  # Use our Visomics icons to represent the Mac bundle
-  set(Visomics_Icons
-    ${VisomicsBase_SOURCE_DIR}/Resources/Icons/VisomicsIcon.icns)
+  # Use icons to represent the Mac bundle
+  if(USE_ARBOR_BRAND)
+    set(Visomics_Icons
+      ${VisomicsBase_SOURCE_DIR}/Resources/Icons/ArborIcon.icns)
+    set(Visomics_Icons_Filename "ArborIcon.icns")
+  else()
+    set(Visomics_Icons
+      ${VisomicsBase_SOURCE_DIR}/Resources/Icons/VisomicsIcon.icns)
+    set(Visomics_Icons_Filename "VisomicsIcon.icns")
+  endif()
   list(APPEND FORWARD_SRCS ${Visomics_Icons})
-  set(MACOSX_BUNDLE_ICON_FILE VisomicsIcon.icns)
+  set(MACOSX_BUNDLE_ICON_FILE ${Visomics_Icons_Filename})
   set_SOURCE_FILES_PROPERTIES(${Visomics_Icons} PROPERTIES
     MACOSX_PACKAGE_LOCATION Resources)
 endif()
