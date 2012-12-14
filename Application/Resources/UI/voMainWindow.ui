@@ -71,6 +71,7 @@
     <bool>false</bool>
    </attribute>
    <addaction name="actionFileOpen"/>
+   <addaction name="actionFileClose"/>
    <addaction name="actionHelpAbout"/>
   </widget>
   <widget class="QDockWidget" name="DataBrowserDockWidget">
@@ -157,6 +158,18 @@
    </property>
    <property name="statusTip">
     <string>Open an existing data file</string>
+   </property>
+  </action>
+  <action name="actionFileClose">
+   <property name="icon">
+    <iconset resource="../ArborApp.qrc">
+     <normaloff>:/Icons/close.png</normaloff>:/Icons/close.png</iconset>
+   </property>
+   <property name="text">
+    <string>&amp;Close</string>
+   </property>
+   <property name="statusTip">
+    <string>Close a data file</string>
    </property>
   </action>
   <action name="actionFileExit">

@@ -48,6 +48,7 @@ public:
 
   QItemSelectionModel*          SelectionModel;
   QList<voDataModelItem*>       SelectedInputDataObjects;
+  voDataModelItem*              SelectedDataObject;
   QHash<QString, unsigned int>  NameCountMap;
   voAnalysis*                   ActiveAnalysis;
 };

@@ -39,6 +39,7 @@ public:
 public slots:
 
   void createView(const QString& objectUuid);
+  void deleteView(const QString& objectUuid);
 
 
 signals:

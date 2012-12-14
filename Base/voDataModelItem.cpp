@@ -240,3 +240,10 @@ void voDataModelItem::addChildItem(voDataModelItem * childItem)
   Q_D(voDataModelItem);
   d->ChildItems.append(childItem);
 }
+
+// --------------------------------------------------------------------------
+void voDataModelItem::removeChildItem(voDataModelItem * childItem)
+{
+  Q_D(voDataModelItem);
+  d->ChildItems.removeOne(childItem);
+}

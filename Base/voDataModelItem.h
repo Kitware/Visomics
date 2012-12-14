@@ -81,6 +81,7 @@ public:
   voDataObject * dataObject() const;
   QList<voDataModelItem*>  childItems() const;
   void  addChildItem(voDataModelItem * childItem);
+  void  removeChildItem(voDataModelItem * childItem);
 
 protected:
   QScopedPointer<voDataModelItemPrivate> d_ptr;

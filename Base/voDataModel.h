@@ -62,6 +62,9 @@ public:
 
   voDataModelItem* selectedInputObject() const;
   const QList<voDataModelItem*>& selectedInputObjects() const;
+  voDataModelItem* selectedObject() const;
+
+  bool removeObject(voDataModelItem *itemToRemove, QStandardItem* parent = 0);
 
   voAnalysis* activeAnalysis()const;
   voDataModelItem* inputTargetForAnalysis(voAnalysis * analysis)const;
@@ -85,6 +88,8 @@ signals:
 
   void activeAnalysisChanged(voAnalysis * analysis);
   void analysisSelected(voAnalysis * analysis);
+
+  void objectRemoved(const QString& objectUuid);
 
 protected:
   QScopedPointer<voDataModelPrivate> d_ptr;

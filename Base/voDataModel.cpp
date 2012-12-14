@@ -51,6 +51,15 @@ void voDataModelPrivate::onCurrentRowChanged(const QModelIndex & current,
 {
   Q_UNUSED(previous);
   Q_Q(voDataModel);
+
+  this->SelectedDataObject = 0;
+
+  // Handle case where we deleted the only input
+  if (current.row() == -1 && current.column() == -1)
+    {
+    return;
+    }
+
   voDataModelItem * item = dynamic_cast<voDataModelItem*>(q->itemFromIndex(current));
   Q_ASSERT(item);
   if (!item)
@@ -61,6 +70,8 @@ void voDataModelPrivate::onCurrentRowChanged(const QModelIndex & current,
   // Clear list
   this->SelectedInputDataObjects.clear();
   voAnalysis * selectedAnalysis = 0;
+
+  this->SelectedDataObject = item;
 
   if (item->type() == voDataModelItem::InputType)
     {
@@ -248,10 +259,62 @@ voDataModelItem* voDataModel::selectedInputObject() const
 }
 
 // --------------------------------------------------------------------------
+voDataModelItem* voDataModel::selectedObject() const
+{
+  Q_D(const voDataModel);
+  return d->SelectedDataObject;
+}
+
+// --------------------------------------------------------------------------
 const QList<voDataModelItem*>& voDataModel::selectedInputObjects() const
 {
   Q_D(const voDataModel);
   return d->SelectedInputDataObjects;
+}
+
+// --------------------------------------------------------------------------
+bool voDataModel::removeObject(voDataModelItem *objectToRemove,
+                               QStandardItem* parent)
+{
+  if (!parent)
+    {
+    parent = this->invisibleRootItem();
+    }
+  for (int row = 0; row < this->rowCount(parent->index()); ++row)
+    {
+    for (int col = 0; col < this->columnCount(parent->index()); ++col)
+      {
+      voDataModelItem *item =
+        dynamic_cast<voDataModelItem*>(
+          this->itemFromIndex(this->index(row, col, parent->index())));
+      if (item == objectToRemove)
+        {
+        emit this->objectRemoved(objectToRemove->uuid());
+        this->removeRow(row, parent->index());
+        if (parent != this->invisibleRootItem())
+          {
+          voDataModelItem *parentItem = dynamic_cast<voDataModelItem*>(parent);
+          parentItem->removeChildItem(item);
+
+          // if we just removed the parent's last row, we should get rid of the
+          // parent too.
+          if (this->rowCount(parent->index()) == 0)
+            {
+            this->removeObject(parentItem, parent->parent());
+            }
+          }
+        return true;
+        }
+      else if (this->hasChildren(item->index()))
+        {
+        if (this->removeObject(objectToRemove, item))
+          {
+          return true;
+          }
+        }
+      }
+    }
+  return false;
 }
 
 // --------------------------------------------------------------------------

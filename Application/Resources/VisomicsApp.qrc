@@ -4,6 +4,7 @@
         <file>Icons/help.png</file>
         <file>Icons/graph.png</file>
         <file>Icons/open.png</file>
+        <file>Icons/close.png</file>
         <file>Icons/table.png</file>
     </qresource>
 </RCC>

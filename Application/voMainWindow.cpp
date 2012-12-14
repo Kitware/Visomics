@@ -106,6 +106,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
   // Setup actions
   d->actionFileOpen->setShortcut(QKeySequence::Open);
   connect(d->actionFileOpen, SIGNAL(triggered()), this, SLOT(onFileOpenActionTriggered()));
+  d->actionFileClose->setShortcut(QKeySequence::Close);
+  connect(d->actionFileClose, SIGNAL(triggered()), this, SLOT(onCloseActionTriggered()));
   connect(d->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
   connect(d->actionHelpAbout, SIGNAL(triggered()), this, SLOT(about()));
   connect(d->actionLoadSampleDataset, SIGNAL(triggered()), this, SLOT(loadSampleDataset()));
@@ -152,6 +154,11 @@ voMainWindow::voMainWindow(QWidget * newParent)
 
   connect(dataModel, SIGNAL(inputSelected(voDataModelItem*)), this,
           SLOT(onInputSelected(voDataModelItem*)));
+
+  connect(dataModel,
+          SIGNAL(objectRemoved(const QString&)),
+          voApplication::application()->viewManager(),
+          SLOT(deleteView(const QString&)));
 
   connect(voApplication::application()->analysisDriver(),
           SIGNAL(aboutToRunAnalysis(voAnalysis*)),
@@ -251,6 +258,15 @@ void voMainWindow::onFileOpenActionTriggered()
         }
       }
     }
+}
+
+//-----------------------------------------------------------------------------
+void voMainWindow::onCloseActionTriggered()
+{
+  voDataModelItem* objectToRemove =
+    voApplication::application()->dataModel()->selectedObject();
+
+  voApplication::application()->dataModel()->removeObject(objectToRemove);
 }
 
 //-----------------------------------------------------------------------------

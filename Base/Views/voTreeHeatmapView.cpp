@@ -102,28 +102,55 @@ void voTreeHeatmapView::setupUi(QLayout *layout)
 void voTreeHeatmapView::setDataObjectListInternal(const QList<voDataObject*> dataObjects)
 {
   Q_D(voTreeHeatmapView);
-  if (dataObjects.size() != 2)
+  if (dataObjects.size() == 2)
     {
-    qCritical() << "voTreeHeatmapView - Failed to setDataObjectListInternal - A tree with a table is expected !";
-    return;
+    vtkTree * Tree = vtkTree::SafeDownCast(dataObjects[0]->dataAsVTKDataObject());
+    if (!Tree)
+      {
+      qCritical() << "voTreeHeatmapView - Failed to setDataObject - vtkTree data is expected !";
+      return;
+      }
+
+    vtkExtendedTable * Table = vtkExtendedTable::SafeDownCast(dataObjects[1]->dataAsVTKDataObject());
+    if (!Table)
+      {
+      qCritical() << "voTreeHeatmapView - Failed to setDataObject - vtkExtendedTable data is expected !";
+      return;
+      }
+    d->TreeItem->SetTree(Tree);
+    d->TreeItem->SetTable(Table->GetInputData());
+    }
+  else
+    {
+    // one of our dataObjects must have been deleted...
+    d->TreeItem->SetTable(NULL);
+    d->TreeItem->SetTree(NULL);
+
+    // first check if we have ANY data left
+    if (dataObjects.size() == 0)
+      {
+      return;
+      }
+
+    vtkTree * Tree = vtkTree::SafeDownCast(dataObjects[0]->dataAsVTKDataObject());
+    if (Tree)
+      {
+      // do we have a tree?
+      d->TreeItem->SetTree(Tree);
+      }
+    else
+      {
+      // or do we have a table?
+      vtkExtendedTable * Table = vtkExtendedTable::SafeDownCast(dataObjects[0]->dataAsVTKDataObject());
+      if (!Table)
+        {
+        qCritical() << "voTreeHeatmapView - Failed to setDataObjectListInternal - Neither tree or table were found !";
+        return;
+        }
+      d->TreeItem->SetTable(Table->GetInputData());
+      }
     }
 
-  vtkTree * Tree = vtkTree::SafeDownCast(dataObjects[0]->dataAsVTKDataObject());
-  if (!Tree)
-    {
-    qCritical() << "voTreeHeatmapView - Failed to setDataObject - vtkTree data is expected !";
-    return;
-    }
-
- vtkExtendedTable * Table = vtkExtendedTable::SafeDownCast(dataObjects[1]->dataAsVTKDataObject());
-  if (!Table)
-    {
-    qCritical() << "voTreeHeatmapView - Failed to setDataObject - vtkExtendedTable data is expected !";
-    return;
-    }
-
-  d->TreeItem->SetTree(Tree);
-  d->TreeItem->SetTable(Table->GetInputData());
   d->ContextView->GetRenderWindow()->SetMultiSamples(0);
   d->ContextView->Render();
 }
