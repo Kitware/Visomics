@@ -80,7 +80,18 @@ void voDataModelPrivate::onCurrentRowChanged(const QModelIndex & current,
     emit q->viewSelected(item->uuid());
     emit q->inputSelected(item);
     }
-  else if(item->type() == voDataModelItem::OutputType)
+  else
+    {
+    // here we assume that any toplevel item is "InputType"
+    voDataModelItem * childItem = item;
+    while (childItem->parent() != 0)
+      {
+      childItem = dynamic_cast<voDataModelItem*>(childItem->parent());
+      }
+    this->SelectedInputDataObjects << childItem;
+    }
+
+  if(item->type() == voDataModelItem::OutputType)
     {
     qDebug() << "onCurrentRowChanged - OutputType" << item->dataObject()->name();
     emit q->viewSelected(item->uuid());
