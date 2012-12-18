@@ -121,7 +121,7 @@ IF(BUILD_TESTING)
   if(APPLE)
     set(Visomics_LAUNCHER_EXECUTABLE ${Visomics_BINARY_DIR}/bin/${APP_NAME}.app/Contents/MacOS/${APP_NAME})
   else()
-    set(Visomics_LAUNCHER_EXECUTABLE ${Visomics_BINARY_DIR}/bin/visomics)
+    set(Visomics_LAUNCHER_EXECUTABLE ${Visomics_BINARY_DIR}/bin/${APP_NAME})
   endif()
   set(Visomics_LAUNCH_COMMAND ${Visomics_LAUNCHER_EXECUTABLE} --command)
 
