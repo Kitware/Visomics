@@ -118,7 +118,11 @@ IF(BUILD_TESTING)
   INCLUDE(CTest)
   MARK_AS_ADVANCED(TCL_TCLSH DART_ROOT)
 
-  set(Visomics_LAUNCHER_EXECUTABLE ${Visomics_BINARY_DIR}/bin/visomics)
+  if(APPLE)
+    set(Visomics_LAUNCHER_EXECUTABLE ${Visomics_BINARY_DIR}/bin/${APP_NAME}.app/Contents/MacOS/${APP_NAME})
+  else()
+    set(Visomics_LAUNCHER_EXECUTABLE ${Visomics_BINARY_DIR}/bin/visomics)
+  endif()
   set(Visomics_LAUNCH_COMMAND ${Visomics_LAUNCHER_EXECUTABLE} --command)
 
   # Setup file for setting custom ctest vars
