@@ -5,9 +5,12 @@ include(BundleUtilities)
 function(gp_resolved_file_type_override resolved_file type_var)
   if(file MATCHES "^/Library/Frameworks/")
     set(${type_var} system PARENT_SCOPE)
+    if(file MATCHES "R.framework")
+      string(REGEX REPLACE "[0-9]+\\.[0-9]+" "Current" resolved_file "${file}")
+      set (resolved_file ${resolved_file} PARENT_SCOPE)
+    endif()
   endif()
 endfunction()
-
 
 # This is a project-specific override of BundleUtilities.cmake's
 # gp_item_default_embedded_path
@@ -43,3 +46,33 @@ fixup_bundle(
   "${Qt_plugins}"
   "@QT_LIBRARY_DIR@"
 )
+
+# Fix reference to R to be less picky about version
+set(exe_path "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@APP@/Contents/MacOS/@APP_NAME@-real")
+
+execute_process(
+  COMMAND "otool" "-L" "${exe_path}"
+  OUTPUT_VARIABLE otool_output
+)
+string(REPLACE "\n" ";" otool_output ${otool_output})
+set(otool_output ${otool_output})
+set(install_name_tool_cmd "install_name_tool")
+
+foreach(otool_line ${otool_output})
+  if(otool_line MATCHES "R.framework")
+    # Trim leading whitespace
+    string(STRIP "${otool_line}" otool_line)
+
+    # Remove " (compatibility ...)" from the end of the line
+    string(REGEX REPLACE " \\(compat.*\\)" "" otool_line "${otool_line}")
+
+    # Generate arguments for install_name_tool
+    list(APPEND install_name_tool_cmd  "-change")
+    list(APPEND install_name_tool_cmd "${otool_line}")
+    string(REGEX REPLACE "[0-9]+\\.[0-9]+" "Current" otool_line "${otool_line}")
+    list(APPEND install_name_tool_cmd "${otool_line}")
+  endif()
+endforeach()
+
+list(APPEND install_name_tool_cmd "${exe_path}")
+execute_process(COMMAND ${install_name_tool_cmd})
