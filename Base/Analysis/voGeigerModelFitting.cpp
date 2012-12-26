@@ -136,7 +136,7 @@ bool voGeigerModelFitting::execute()
 
   //check whether the data name exsits in the table
   bool FOUND = false;
-  for (unsigned int c = 1; c < table->GetNumberOfColumns(); c++)
+  for (int c = 1; c < table->GetNumberOfColumns(); c++)
     {
     const char * v = table->GetColumnName(c);
     if (selectedDataName.compare(QString(v)) == 0)
@@ -145,7 +145,7 @@ bool voGeigerModelFitting::execute()
       }
     }
 
-  if (not FOUND)
+  if (!FOUND)
     {
     qCritical() << QObject::tr("Invalid data columne name,could not find a matching data name");
     return false;
@@ -164,7 +164,7 @@ bool voGeigerModelFitting::execute()
 
 
   QString R_ComposeOutputTable = "";
-  
+
   if (modelType == QString("OU"))
     {
     R_ComposeOutputTable = "resultTable=list(parameter=\"value\",z0=result$z0,sigsq=result$sigsq,alpha=result$alpha,\" \"=\" \",lnL=result$lnL,AIC=result$aic,AICc=result$aicc)";
