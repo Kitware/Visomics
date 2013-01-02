@@ -162,6 +162,10 @@ void checkForLeadingOrTrailingSpaces(const char* className, const char* funcName
 void voAnalysis::addInput(voDataObject * dataObject)
 {
   Q_D(voAnalysis);
+  if (dataObject == 0)
+    {
+    return;
+    }
   d->InputDataObjects << QExplicitlySharedDataPointer<voDataObject>(dataObject);
 }
 

@@ -24,4 +24,5 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   # VTK
   "VTK/Utilities/vtktiff/"
   "This function or variable may be unsafe. Consider using"
+  "old-style cast"
   )
