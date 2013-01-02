@@ -490,6 +490,7 @@ int voAnalysisTest(int argc, char * argv [])
     std::cerr << "Line " << __LINE__ << " - Problem with run() !" << std::endl;
     return EXIT_FAILURE;
     }
+  analysis.removeAllInputs();
 
   vtkNew<vtkTable> table;
   vtkIntArray * intColumn = vtkIntArray::New();
