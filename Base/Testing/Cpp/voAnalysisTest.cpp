@@ -493,11 +493,11 @@ int voAnalysisTest(int argc, char * argv [])
   analysis.removeAllInputs();
 
   vtkNew<vtkTable> table;
-  vtkIntArray * intColumn = vtkIntArray::New();
+  vtkNew<vtkIntArray> intColumn;
   intColumn->SetNumberOfValues(2);
   intColumn->SetValue(0, 1);
   intColumn->SetValue(1, 2);
-  table->AddColumn(intColumn);
+  table->AddColumn(intColumn.GetPointer());
   analysis.addInput(new voDataObject("input", table.GetPointer()));
 
   if (!analysis.run())

@@ -1306,6 +1306,7 @@ int voUtilsTest(int argc, char * argv [])
     std::cerr << "Line " << __LINE__ << " - Problem with tableToArray method !" << std::endl;
     return EXIT_FAILURE;
     }
+  expectedIntArray->Delete();
 
   //-----------------------------------------------------------------------------
   // Test tableToArray() (all columns)
@@ -1335,6 +1336,7 @@ int voUtilsTest(int argc, char * argv [])
     std::cerr << "Line " << __LINE__ << " - Problem with tableToArray method !" << std::endl;
     return EXIT_FAILURE;
     }
+  tableToArrayBaseArray->Delete();
 
   //-----------------------------------------------------------------------------
   // Test arrayToTable()
@@ -1363,6 +1365,7 @@ int voUtilsTest(int argc, char * argv [])
   vtkNew<vtkTable> arrayToTableTestTable;
   voUtils::arrayToTable(0, arrayToTableTestTable.GetPointer());  // Passing a Null source array shouldn't crash
   voUtils::arrayToTable(arrayToTableTestArray, arrayToTableTestTable.GetPointer());
+  arrayToTableTestArray->Delete();
 
   // Compare arrayToTable converted table to table build directly from 1D arrays (created in prior test)
   if (!compareTable(__LINE__, insertTableTest.GetPointer(),
