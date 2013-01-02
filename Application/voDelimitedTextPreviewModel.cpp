@@ -227,6 +227,8 @@ void voDelimitedTextPreviewModelPrivate::updateDataPreviewCallback(vtkObject *ca
                                                                    void * callData)
 {
   Q_UNUSED(callData);
+  Q_UNUSED(caller);
+  Q_UNUSED(eid);
   Q_ASSERT(eid == vtkCommand::ModifiedEvent);
   Q_ASSERT(clientData);
   voDelimitedTextPreviewModelPrivate * d =

@@ -121,6 +121,7 @@ void voDynView::initialize()
   QRegExp rx("^vo(.+)DynView$");
   bool match = rx.exactMatch(this->metaObject()->className());
   Q_ASSERT(match);
+  Q_UNUSED(match);
   d->ViewName = rx.cap(1);
 
   this->Superclass::initialize();
