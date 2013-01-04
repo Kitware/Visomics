@@ -48,7 +48,7 @@ fixup_bundle(
 )
 
 # Fix reference to R to be less picky about version
-set(exe_path "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@APP@/Contents/MacOS/@APP_NAME@-real")
+set(exe_path "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/@APP@/Contents/Resources/@APP_NAME@-real")
 
 execute_process(
   COMMAND "otool" "-L" "${exe_path}"

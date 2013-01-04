@@ -91,7 +91,7 @@ endif()
 set(Visomics_FORWARD_PATH_BUILD ${tmp})
 set(Visomics_FORWARD_PATH_INSTALL "../lib")
 if(APPLE)
-  set(Visomics_FORWARD_PATH_INSTALL ".")
+  set(Visomics_FORWARD_PATH_INSTALL "../Resources")
 endif()
 
 configure_file(
@@ -136,7 +136,7 @@ if(APPLE)
 
   # Make sure the "regular application" gets included in the bundle
   set_property(TARGET VisomicsApp-real PROPERTY RUNTIME_OUTPUT_DIRECTORY
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${APP}/Contents/MacOS)
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${APP}/Contents/Resources)
 
   # Install Visomics
   install(TARGETS VisomicsApp
