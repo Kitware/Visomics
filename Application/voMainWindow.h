@@ -26,8 +26,10 @@
 
 class QDockWidget;
 class QSplitter;
+class QStandardItem;
 class QTreeWidget;
 class QTableWidget;
+class QXmlStreamWriter;
 
 class voAnalysisPanel;
 class voAnalysis;
@@ -48,6 +50,8 @@ public slots:
   void onFileOpenActionTriggered();
   void onCloseActionTriggered();
   void onViewErrorLogActionTriggered();
+  void onFileSaveStateActionTriggered();
+  void onFileLoadStateActionTriggered();
   void onFileMakeTreeHeatmapActionTriggered();
 
   void about();
@@ -66,6 +70,7 @@ protected slots:
 
 protected:
   QScopedPointer<voMainWindowPrivate> d_ptr;
+  void saveItemToXML(QStandardItem* parent, QXmlStreamWriter *stream);
 
 private:
   Q_DECLARE_PRIVATE(voMainWindow);

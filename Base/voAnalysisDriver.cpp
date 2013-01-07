@@ -444,3 +444,14 @@ bool voAnalysisDriver::doesInputMatchAnalysis(const QString& analysisName,
     }
     return true;
 }
+
+// --------------------------------------------------------------------------
+int voAnalysisDriver::numberOfInputsForAnalysis(QString analysisName)
+{
+  if (!analysisNameToInputTypes.contains(analysisName))
+    {
+    return 0;
+    }
+
+  return analysisNameToInputTypes.value(analysisName).size();
+}

@@ -43,6 +43,7 @@ public:
 
   bool doesInputMatchAnalysis(const QString& analysisName,
                               voDataModelItem* inputTarget, bool warnOnFail);
+  int numberOfInputsForAnalysis(QString analysisName);
 
 signals:
   void aboutToRunAnalysis(voAnalysis*);
