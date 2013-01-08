@@ -26,10 +26,8 @@
 
 class QDockWidget;
 class QSplitter;
-class QStandardItem;
 class QTreeWidget;
 class QTableWidget;
-class QXmlStreamWriter;
 
 class voAnalysisPanel;
 class voAnalysis;
@@ -70,7 +68,6 @@ protected slots:
 
 protected:
   QScopedPointer<voMainWindowPrivate> d_ptr;
-  void saveItemToXML(QStandardItem* parent, QXmlStreamWriter *stream);
 
 private:
   Q_DECLARE_PRIVATE(voMainWindow);

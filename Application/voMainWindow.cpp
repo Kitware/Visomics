@@ -12,7 +12,6 @@
 #include <QStatusBar>
 #include <QSignalMapper>
 #include <QToolBar>
-#include <QXmlStreamWriter>
 
 // CTK includes
 #include <ctkErrorLogWidget.h>
@@ -36,11 +35,9 @@
 #include "voApplication.h"
 #include "voDataModel.h"
 #include "voDataModelItem.h"
-#include "voDataObject.h"
 #include "voDelimitedTextImportDialog.h"
 #include "voInputFileDataObject.h"
 #include "voIOManager.h"
-#include "voInputFileDataObject.h"
 #include "voMainWindow.h"
 #include "voStartupView.h"
 #ifdef Visomics_BUILD_TESTING
@@ -439,146 +436,22 @@ void voMainWindow::onViewErrorLogActionTriggered()
   d->ErrorLogWidget.raise();
 }
 
-//debug
-#include <iostream>
-//end debug
-
 // --------------------------------------------------------------------------
 void voMainWindow::onFileSaveStateActionTriggered()
 {
   QString fileName =
     QFileDialog::getSaveFileName(this, tr("Save State"), "",
                                  tr(".xml file (*.xml)"));
-  QFile file(fileName);
-  if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-  {
-    //probably should complain here
-    return;
-  }
-
-  QXmlStreamWriter stream(&file);
-  stream.setAutoFormatting(true);
-  stream.writeStartDocument();
-
-  QStandardItem *parent = NULL;
-  this->saveItemToXML(parent, &stream);
-
-  stream.writeEndDocument();
-}
-
-// --------------------------------------------------------------------------
-void voMainWindow::saveItemToXML(QStandardItem* parent,
-                                 QXmlStreamWriter *stream)
-{
-  voDataModel * dataModel = voApplication::application()->dataModel();
-  voAnalysisDriver *driver = voApplication::application()->analysisDriver();
-
-  if (!parent)
-    {
-    parent = dataModel->invisibleRootItem();
-    }
-
-  for (int row = 0; row < dataModel->rowCount(parent->index()); ++row)
-    {
-    for (int col = 0; col < dataModel->columnCount(parent->index()); ++col)
-      {
-      voDataModelItem *item =
-        dynamic_cast<voDataModelItem*>(
-        dataModel->itemFromIndex(dataModel->index(row, col, parent->index())));
-
-      if (item->data(voDataModelItem::IsAnalysisContainerRole).toBool())
-        {
-        voAnalysis *analysis = reinterpret_cast<voAnalysis*>(
-              item->data(voDataModelItem::AnalysisVoidStarRole).value<void*>());
-        QString analysisName = analysis->objectName();
-        //std::cout << " Analysis " << analysisName.toStdString() << " has input(s) ";
-        for (int i = 0; i < driver->numberOfInputsForAnalysis(analysisName); ++i)
-          {
-          //std::cout << analysis->input(i)->name().toStdString() << ", ";
-          }
-        }
-      else if (item->type() == voDataModelItem::InputType)
-        {
-        // Only record top-level input.  Child input objects are saved
-        // as attributes of their parents.
-        if (parent != dataModel->invisibleRootItem())
-          {
-          continue;
-          }
-
-        stream->writeStartElement("input");
-
-        // check what type of data it is
-        if (item->rawViewType() == "voTreeHeatmapView")
-          {
-          // tree + heatmap.
-          if (dataModel->hasChildren(item->index()))
-            {
-            stream->writeAttribute("type", "TreeHeatmap");
-            // This code assumes that children are saved as rows (not columns)
-            for (int i = 0; i < item->rowCount(); ++i)
-              {
-              voDataModelItem *childItem =
-                dynamic_cast<voDataModelItem*>(item->child(i));
-              voInputFileDataObject *inputObject =
-                dynamic_cast<voInputFileDataObject*>(childItem->dataObject());
-              if (!inputObject)
-                {
-                std::cout << "skipping " << childItem->rawViewType().toStdString() << std::endl;
-                continue;
-                }
-              stream->writeStartElement("filename");
-              stream->writeCharacters(inputObject->fileName());
-              stream->writeEndElement(); // filename
-              }
-            }
-
-          // just a tree
-          else
-            {
-            stream->writeAttribute("type", "Tree");
-            voInputFileDataObject *inputObject =
-              dynamic_cast<voInputFileDataObject*>(item->dataObject());
-            if (!inputObject)
-              {
-              std::cout << "bug time" << std::endl;
-              continue;
-              }
-            stream->writeStartElement("filename");
-            stream->writeCharacters(inputObject->fileName());
-            stream->writeEndElement(); // filename
-            }
-          }
-        else if(item->rawViewType() == "voExtendedTableView" ||
-                item->rawViewType() == "voTableView")
-          {
-          stream->writeAttribute("type", "Table");
-          voInputFileDataObject *inputObject =
-            dynamic_cast<voInputFileDataObject*>(item->dataObject());
-          if (!inputObject)
-            {
-            std::cout << "bug time" << std::endl;
-            continue;
-            }
-          stream->writeStartElement("filename");
-          stream->writeCharacters(inputObject->fileName());
-          stream->writeEndElement(); // filename
-          }
-        stream->writeEndElement(); // input
-        }
-      //std::cout << std::endl;
-
-      if (dataModel->hasChildren(item->index()))
-        {
-        this->saveItemToXML(item, stream);
-        }
-      }
-    }
+  voApplication::application()->ioManager()->saveState(fileName);
 }
 
 // --------------------------------------------------------------------------
 void voMainWindow::onFileLoadStateActionTriggered()
 {
+  QString fileName =
+    QFileDialog::getOpenFileName(this, tr("Save State"), "",
+                                 tr(".xml file (*.xml)"));
+  voApplication::application()->ioManager()->loadState(fileName);
 }
 
 // --------------------------------------------------------------------------

@@ -28,6 +28,10 @@
 // Visomics includes
 #include "voDelimitedTextImportSettings.h"
 
+class QStandardItem;
+class QXmlStreamReader;
+class QXmlStreamWriter;
+class voDataModelItem;
 class voInputFileDataObject;
 class vtkDataObject;
 class vtkExtendedTable;
@@ -63,6 +67,16 @@ public:
 
 protected:
   bool treeAndTableMatch(vtkTree *tree, vtkTable *table);
+  void saveState(const QString& fileName);
+  void loadState(const QString& fileName);
+  void writeItemToXML(QStandardItem* parent, QXmlStreamWriter *stream);
+  void writeTreeHeatmapToXML(voDataModelItem *item, QXmlStreamWriter *stream);
+  void writeInputToXML(const QString& type, voDataModelItem *item,
+                       QXmlStreamWriter *stream);
+  void writeTableSettingsToXML(voDataModelItem *item, QXmlStreamWriter *stream);
+  void loadTreeHeatmapFromXML(QXmlStreamReader *stream);
+  QMap<voInputFileDataObject *, voDelimitedTextImportSettings>
+    tableSettings;
 };
 
 #endif
