@@ -514,7 +514,6 @@ void voMainWindow::saveItemToXML(QStandardItem* parent,
           // tree + heatmap.
           if (dataModel->hasChildren(item->index()))
             {
-            int inputItr = 1;
             stream->writeAttribute("type", "TreeHeatmap");
             // This code assumes that children are saved as rows (not columns)
             for (int i = 0; i < item->rowCount(); ++i)
@@ -528,9 +527,9 @@ void voMainWindow::saveItemToXML(QStandardItem* parent,
                 std::cout << "skipping " << childItem->rawViewType().toStdString() << std::endl;
                 continue;
                 }
-              QString attributeName = QString("filename%1").arg(inputItr);
-              ++inputItr;
-              stream->writeAttribute(attributeName, inputObject->fileName());
+              stream->writeStartElement("filename");
+              stream->writeCharacters(inputObject->fileName());
+              stream->writeEndElement(); // filename
               }
             }
 
@@ -545,7 +544,9 @@ void voMainWindow::saveItemToXML(QStandardItem* parent,
               std::cout << "bug time" << std::endl;
               continue;
               }
-            stream->writeAttribute("filename", inputObject->fileName());
+            stream->writeStartElement("filename");
+            stream->writeCharacters(inputObject->fileName());
+            stream->writeEndElement(); // filename
             }
           }
         else if(item->rawViewType() == "voExtendedTableView" ||
@@ -559,9 +560,11 @@ void voMainWindow::saveItemToXML(QStandardItem* parent,
             std::cout << "bug time" << std::endl;
             continue;
             }
-          stream->writeAttribute("filename", inputObject->fileName());
+          stream->writeStartElement("filename");
+          stream->writeCharacters(inputObject->fileName());
+          stream->writeEndElement(); // filename
           }
-        stream->writeEndElement();
+        stream->writeEndElement(); // input
         }
       //std::cout << std::endl;
 
