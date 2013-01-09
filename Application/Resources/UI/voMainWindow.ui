@@ -32,6 +32,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionFileOpen"/>
+    <addaction name="actionFileMakeTreeHeatmap"/>
     <addaction name="actionFileExit"/>
    </widget>
    <widget class="QMenu" name="menuAnalysis">
@@ -158,6 +159,14 @@
    </property>
    <property name="statusTip">
     <string>Open an existing data file</string>
+   </property>
+  </action>
+  <action name="actionFileMakeTreeHeatmap">
+   <property name="text">
+    <string>Associate table with tree</string>
+   </property>
+   <property name="statusTip">
+    <string>Combine a tree and a corresponding table into a single data item</string>
    </property>
   </action>
   <action name="actionFileClose">

@@ -1,9 +1,11 @@
 
 // Qt includes
+#include <QAbstractButton>
 #include <QAction>
 #include <QDebug>
 #include <QDesktopWidget>
 #include <QFileDialog>
+#include <QItemSelection>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
@@ -33,7 +35,9 @@
 #include "voApplication.h"
 #include "voDataModel.h"
 #include "voDataModelItem.h"
+#include "voDataObject.h"
 #include "voDelimitedTextImportDialog.h"
+#include "voInputFileDataObject.h"
 #include "voIOManager.h"
 #include "voMainWindow.h"
 #include "voStartupView.h"
@@ -112,6 +116,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionHelpAbout, SIGNAL(triggered()), this, SLOT(about()));
   connect(d->actionLoadSampleDataset, SIGNAL(triggered()), this, SLOT(loadSampleDataset()));
   connect(d->actionViewErrorLog, SIGNAL(triggered()), this, SLOT(onViewErrorLogActionTriggered()));
+  connect(d->actionFileMakeTreeHeatmap, SIGNAL(triggered()),
+          this, SLOT(onFileMakeTreeHeatmapActionTriggered()));
 
   // Populate Analysis menu
   voAnalysisFactory* analysisFactory = voApplication::application()->analysisFactory();
@@ -258,6 +264,147 @@ void voMainWindow::onFileOpenActionTriggered()
         }
       }
     }
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::onFileMakeTreeHeatmapActionTriggered()
+{
+  Q_D(voMainWindow);
+
+  // temporarily enable multi-select
+  d->DataBrowserWidget->setSelectionMode(QAbstractItemView::MultiSelection);
+
+  // display a non-modal dialog
+  QMessageBox* msgBox = new QMessageBox();
+  msgBox->setAttribute(Qt::WA_DeleteOnClose);
+  msgBox->setInformativeText("Select the tree and the table that you'd like to combine.");
+  msgBox->setStandardButtons(QMessageBox::Ok  |  QMessageBox::Cancel);
+  msgBox->setDefaultButton(QMessageBox::Cancel);
+  msgBox->setModal(false);
+  msgBox->setWindowModality(Qt::NonModal);
+
+  // workaround Qt bug where accepted() and rejected() aren't emitted when
+  // the user clicks on "Ok" or "Cancel", respectively.
+  connect(msgBox->buttons()[0], SIGNAL(clicked()),
+          this, SLOT(makeTreeHeatmap()));
+  connect(msgBox->buttons()[1], SIGNAL(clicked()),
+          this, SLOT(makeTreeHeatmapDialogClosed()));
+  // rejected() IS emitted when the user closes the dialog, however.
+  connect(msgBox, SIGNAL(rejected()),
+          this, SLOT(makeTreeHeatmapDialogClosed()));
+
+  msgBox->show();
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::makeTreeHeatmap()
+{
+  // make sure exactly two items are selected
+  voDataModel * dataModel = voApplication::application()->dataModel();
+  QItemSelection selection = dataModel->selectionModel()->selection();
+  if (selection.size() != 2)
+    {
+    qCritical() << "Exactly two inputs must be selected";
+    this->makeTreeHeatmapDialogClosed();
+    return;
+    }
+
+  // make sure one is a tree and the other is a table
+  voDataModelItem * firstItem = dynamic_cast<voDataModelItem*>
+    (dataModel->itemFromIndex(selection.indexes()[0]));
+  voDataModelItem * secondItem = dynamic_cast<voDataModelItem*>
+    (dataModel->itemFromIndex(selection.indexes()[1]));
+
+  voInputFileDataObject* treeObject = NULL;
+  voInputFileDataObject* tableObject = NULL;
+
+  // tree is 1st, table is 2nd
+  if (firstItem->dataObject()->type() == "vtkTree")
+    {
+    treeObject = dynamic_cast<voInputFileDataObject*>(firstItem->dataObject());
+    if (!treeObject)
+      {
+      qCritical() << "Expected vtkTree, found NULL";
+      this->makeTreeHeatmapDialogClosed();
+      return;
+      }
+
+    tableObject = dynamic_cast<voInputFileDataObject*>(secondItem->dataObject());
+    if (!tableObject)
+      {
+      qCritical() << "Expected vtkExtendedTable, found NULL";
+      this->makeTreeHeatmapDialogClosed();
+      return;
+      }
+
+    QString type = tableObject->type();
+    if (type != "vtkExtendedTable")
+      {
+      qCritical() << QString("Expected vtkExtendedTable, found %1").arg(type);
+      this->makeTreeHeatmapDialogClosed();
+      return;
+      }
+    }
+
+  // table is 1st, tree is 2nd
+  else if (firstItem->dataObject()->type() == "vtkExtendedTable")
+    {
+    tableObject = dynamic_cast<voInputFileDataObject*>(firstItem->dataObject());
+    if (!tableObject)
+      {
+      qCritical() << "Expected vtkExtendedTable, found NULL";
+      this->makeTreeHeatmapDialogClosed();
+      return;
+      }
+
+    treeObject =
+      dynamic_cast<voInputFileDataObject*>(secondItem->dataObject());
+    if (!treeObject)
+      {
+      qCritical() << "Expected vtkTree, found NULL";
+      this->makeTreeHeatmapDialogClosed();
+      return;
+      }
+
+    QString type = treeObject->type();
+    if (type != "vtkTree")
+      {
+      qCritical() << QString("Expected vtkTree, found %1").arg(type);
+      this->makeTreeHeatmapDialogClosed();
+      return;
+      }
+    }
+  else
+    {
+    qCritical() << QString("Expected vtkTree or vtkExtendedTable, found %1").
+        arg(firstItem->dataObject()->type());
+    }
+
+  // create the new grouped entry and remove the old items
+  QStandardItem *firstParent =
+    dataModel->itemFromIndex(dataModel->parent(dataModel->indexFromItem(firstItem)));
+  QStandardItem *secondParent =
+    dataModel->itemFromIndex(dataModel->parent(dataModel->indexFromItem(secondItem)));
+
+  voApplication::application()->ioManager()->createTreeHeatmapItem(
+    QFileInfo(treeObject->fileName()).baseName(), treeObject, tableObject);
+
+  dataModel->removeObject(firstItem, firstParent);
+  dataModel->removeObject(secondItem, secondParent);
+
+  this->makeTreeHeatmapDialogClosed();
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::makeTreeHeatmapDialogClosed()
+{
+  Q_D(voMainWindow);
+
+  // clear the selection
+  d->DataBrowserWidget->clearSelection();
+
+  // revert selection mode back to normal afterwards
+  d->DataBrowserWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 }
 
 //-----------------------------------------------------------------------------

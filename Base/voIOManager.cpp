@@ -32,7 +32,6 @@
 #include "voRegistry.h"
 #include "voUtils.h"
 #include "vtkExtendedTable.h"
-#include "voTableDataObject.h"
 
 // VTK includes
 #include <vtkDelimitedTextReader.h>
@@ -76,6 +75,26 @@ bool voIOManager::readCSVFileIntoTable(const QString& fileName, vtkTable * outpu
   reader->Update();
 
   outputTable->ShallowCopy(reader->GetOutput());
+
+  return true;
+}
+
+// --------------------------------------------------------------------------
+bool voIOManager::readCSVFileIntoExtendedTable(const QString& fileName,
+                                               vtkExtendedTable *outputTable,
+                                               const voDelimitedTextImportSettings& settings)
+{
+  if (!outputTable)
+    {
+    return false;
+    }
+
+  vtkNew<vtkTable> dataTable;
+  vtkNew<vtkTable> inputToExtendedTable;
+  Self::readCSVFileIntoTable(fileName, dataTable.GetPointer(), settings, true);
+  Self::readCSVFileIntoTable(fileName, inputToExtendedTable.GetPointer(), settings, false);
+  Self::fillExtendedTable(inputToExtendedTable.GetPointer(), outputTable, settings);
+  outputTable->SetInputDataTable(dataTable.GetPointer());
 
   return true;
 }
@@ -209,35 +228,48 @@ void voIOManager::fillExtendedTable(vtkTable* sourceTable, vtkExtendedTable* des
     {
     vtkStringArray * column = vtkStringArray::SafeDownCast(sourceTable->GetColumn(cid));
     Q_ASSERT(column);
+
+    // determine whether this column contains numerical or categorical data.
+    vtkNew<vtkDoubleArray> doubleColumn;
+    vtkNew<vtkStringArray> stringColumn;
+    vtkStdString value = column->GetValue(numberOfColumnMetaDataTypes);
+    bool dataIsNumerical = false;
+    vtkVariant(value).ToDouble(&dataIsNumerical);
+    if (dataIsNumerical)
+      {
+      doubleColumn->SetNumberOfValues(
+        sourceTable->GetNumberOfRows() - numberOfColumnMetaDataTypes);
+      data->AddColumn(doubleColumn.GetPointer());
+      }
+    else
+      {
+      stringColumn->SetNumberOfValues(
+        sourceTable->GetNumberOfRows() - numberOfColumnMetaDataTypes);
+      data->AddColumn(stringColumn.GetPointer());
+      }
+
     for (int rid = numberOfColumnMetaDataTypes; rid < column->GetNumberOfValues(); ++rid)
       {
-      vtkSmartPointer<vtkDoubleArray> newColumn;
-      if (rid == numberOfColumnMetaDataTypes)
+      vtkStdString value = column->GetValue(rid);
+      if (dataIsNumerical)
         {
-        newColumn = vtkSmartPointer<vtkDoubleArray>::New();
-        newColumn->SetNumberOfValues(sourceTable->GetNumberOfRows() - numberOfColumnMetaDataTypes);
-        data->AddColumn(newColumn);
+        // Convert to numeric
+        bool ok = false;
+        double doubleValue = vtkVariant(value).ToDouble(&ok);
+        if (!ok)
+          {
+          qCritical() << "Data at column" << cid << "and row" << rid << "is not a numeric value !"
+                      << " - Defaulting to 0";
+          doubleValue = 0;
+          }
+        doubleColumn->SetValue(rid - numberOfColumnMetaDataTypes, doubleValue);
         }
       else
         {
-        newColumn = vtkDoubleArray::SafeDownCast(data->GetColumn(cid - numberOfRowMetaDataTypes));
+        stringColumn->SetValue(rid - numberOfColumnMetaDataTypes, value);
         }
-      Q_ASSERT(newColumn);
-      vtkStdString value = column->GetValue(rid);
-      // Convert to numeric
-      bool ok = false;
-      double doubleValue = vtkVariant(value).ToDouble(&ok);
-      if (!ok)
-        {
-        qCritical() << "Data at column" << cid << "and row" << rid << "is not a numeric value !"
-                    << " - Defaulting to 0";
-        doubleValue = 0;
-        }
-      newColumn->SetValue(rid - numberOfColumnMetaDataTypes, doubleValue);
       }
     }
-
-  //data->Dump();
 
   // ColumnMetaDataTypeOfInterest
   int columnMetaDataTypeOfInterest =
@@ -268,35 +300,26 @@ void voIOManager::fillExtendedTable(vtkTable* sourceTable, vtkExtendedTable* des
     voApplication::application()->normalizerRegistry()->apply(
           normalizationMethod, destTable->GetData(), settings);
     }
-
-  //destTable->GetData()->Dump();
 }
 
 // --------------------------------------------------------------------------
 void voIOManager::openCSVFile(const QString& fileName, const voDelimitedTextImportSettings& settings)
 {
-  // settings.printAdditionalInfo();
-
-  vtkNew<vtkTable> table;
-  Self::readCSVFileIntoTable(fileName, table.GetPointer(), settings);
-
   vtkNew<vtkExtendedTable> extendedTable;
-  Self::fillExtendedTable(table.GetPointer(), extendedTable.GetPointer(), settings);
-
+  Self::readCSVFileIntoExtendedTable(fileName, extendedTable.GetPointer(),
+                                     settings);
   voInputFileDataObject * dataObject =
       new voInputFileDataObject(fileName, extendedTable.GetPointer());
 
   voDataModel * model = voApplication::application()->dataModel();
-
   voDataModelItem * newItem = model->addDataObject(dataObject);
   newItem->setRawViewType("voExtendedTableView");
 
   // Select added item
   model->setSelected(newItem);
-
-  //extendedTable->Dump();
 }
 
+// --------------------------------------------------------------------------
 void voIOManager::loadPhyloTreeDataSet(const QString& fileName)
 {
   // load the phylo tree data set file
@@ -342,84 +365,138 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName)
 void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
   const QString & tableFileName, const voDelimitedTextImportSettings& settings )
 {
-  voDataModel * model = voApplication::application()->dataModel();
-  voDataObject * emptyDataObject = new voDataObject(QFileInfo(fileName).baseName(),NULL);
-  voDataModelItem * newItem = model->addDataObject(emptyDataObject);
-
   // load the phylo tree
   vtkSmartPointer<vtkMultiNewickTreeReader> reader =
         vtkSmartPointer<vtkMultiNewickTreeReader>::New();
-
   reader->SetFileName(fileName.toStdString().c_str());
   vtkMultiPieceDataSet * forest = reader->GetOutput();
   reader->Update();
 
-  // load associated table data
-  vtkNew<vtkTable> dataTable;
-  vtkNew<vtkTable> inputTable;
-  Self::readCSVFileIntoTable(tableFileName, dataTable.GetPointer(), settings, true);
-  Self::readCSVFileIntoTable(tableFileName, inputTable.GetPointer(), settings);
+  // load the associated table data
   vtkNew<vtkExtendedTable> extendedTable;
-  Self::fillExtendedTable(inputTable.GetPointer(), extendedTable.GetPointer(), settings);
-  extendedTable->SetInputDataTable(dataTable.GetPointer());
+  Self::readCSVFileIntoExtendedTable(tableFileName, extendedTable.GetPointer(),
+                                     settings);
+  voInputFileDataObject * tableObject = new voInputFileDataObject(
+    QFileInfo(tableFileName).baseName(), extendedTable.GetPointer());
 
-  voTableDataObject * dataObjectTable =
-    new voTableDataObject(QFileInfo(tableFileName).baseName(), extendedTable.GetPointer());
-
+  //single tree
   if (forest->GetNumberOfPieces() == 1)
-    { //single tree
+    {
     vtkTree * tree =  vtkTree::SafeDownCast( forest->GetPieceAsDataObject(0));
-    voInputFileDataObject * dataObject =
-      new voInputFileDataObject(fileName, tree);
-    voDataModelItem * treeItem = model->addDataObjectAsChild(dataObject, newItem);
-    treeItem->setRawViewType("voTreeHeatmapView");
 
-    voDataModelItem * tableItem = model->addDataObjectAsChild(dataObjectTable,newItem);
-    tableItem->setType(voDataModelItem::InputType);
-    tableItem->setRawViewType("voExtendedTableView");
-
-    // add table data
-    // use tree heat map view, the tree and the table must be matching
-    unsigned int NumberOfLeafNodes = 0;
-    for (vtkIdType vertex = 0; vertex < tree->GetNumberOfVertices(); ++vertex)
+    if (!this->treeAndTableMatch(tree, extendedTable->GetInputData()))
       {
-      if (!tree->IsLeaf(vertex))
-        {
-        continue;
-        }
-      ++NumberOfLeafNodes;
+      return;
       }
 
-    if (dataTable->GetNumberOfRows() == NumberOfLeafNodes )
-      {//display data table as a heat map
-      newItem->setRawViewType("voTreeHeatmapView");
-      newItem->setType(voDataModelItem::InputType);
-      }
-    newItem->addChildItem(treeItem);
-    newItem->addChildItem(tableItem);
+    voInputFileDataObject * treeObject =
+      new voInputFileDataObject(fileName, tree);
 
+    this->createTreeHeatmapItem(QFileInfo(fileName).baseName(), treeObject,
+                                tableObject);
     }
+
+  // multiple trees
   else
-    {//multiple trees --forest
+    {
+    QList<voInputFileDataObject *> treeObjects;
     for (unsigned int i = 0; i < forest->GetNumberOfPieces(); i++)
       {
       vtkTree * tree =  vtkTree::SafeDownCast( forest->GetPieceAsDataObject(i));
-      QString displayName = QString("tree-%1").arg(QString::number(i));
-      voInputFileDataObject * dataObject = new voInputFileDataObject(displayName, tree);
-      voDataModelItem * treeItem = model->addDataObjectAsChild(dataObject, newItem);
-      treeItem->setRawViewType("voTreeHeatmapView");
+      if (!this->treeAndTableMatch(tree, extendedTable->GetInputData()))
+        {
+        return;
+        }
 
-      newItem->addChildItem(treeItem);
+      QString displayName = QString("tree-%1").arg(QString::number(i));
+      voInputFileDataObject * treeObject = new voInputFileDataObject(displayName, tree);
+      treeObjects << treeObject;
       }
 
-    //add table item
-    voDataModelItem * tableItem = model->addDataObjectAsChild(dataObjectTable,newItem);
-    tableItem->setRawViewType("voTableView");
-    newItem->addChildItem(tableItem);
+    this->createTreeHeatmapItem(QFileInfo(fileName).baseName(), treeObjects, tableObject);
+    }
+}
+
+// --------------------------------------------------------------------------
+bool voIOManager::treeAndTableMatch(vtkTree *tree, vtkTable *table)
+{
+  unsigned int NumberOfLeafNodes = 0;
+  for (vtkIdType vertex = 0; vertex < tree->GetNumberOfVertices(); ++vertex)
+    {
+    if (!tree->IsLeaf(vertex))
+      {
+      continue;
+      }
+    ++NumberOfLeafNodes;
     }
 
-  model->setSelected(newItem);
+  if (table->GetNumberOfRows() != NumberOfLeafNodes )
+    {
+    return false;
+    }
+  return true;
+}
 
+// --------------------------------------------------------------------------
+void voIOManager::createTreeHeatmapItem(QString name,
+                                        voInputFileDataObject * treeObject,
+                                        voInputFileDataObject * tableObject)
+{
+  voDataModel * model = voApplication::application()->dataModel();
+
+  // create a new item for our TreeHeatmap
+  voDataObject * emptyDataObject = new voDataObject(name, NULL);
+  voDataModelItem * newItem = model->addDataObject(emptyDataObject);
+
+  // create a DataModelItem for our tree
+  voDataModelItem * treeItem = model->addDataObjectAsChild(treeObject, newItem);
+  treeItem->setRawViewType("voTreeHeatmapView");
+  newItem->addChildItem(treeItem);
+
+  // do the same for our table
+  voDataModelItem * tableItem = model->addDataObjectAsChild(tableObject, newItem);
+  tableItem->setType(voDataModelItem::InputType);
+  tableItem->setRawViewType("voExtendedTableView");
+  newItem->addChildItem(tableItem);
+
+  // set up the visualization of the new TreeHeatmap
+  newItem->setRawViewType("voTreeHeatmapView");
+  newItem->setType(voDataModelItem::InputType);
+
+  model->setSelected(newItem);
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::createTreeHeatmapItem(QString name,
+                                        QList<voInputFileDataObject *> treeObjects,
+                                        voInputFileDataObject * tableObject)
+{
+  voDataModel * model = voApplication::application()->dataModel();
+
+  // create a new item for our TreeHeatmap
+  voDataObject * emptyDataObject = new voDataObject(name, NULL);
+  voDataModelItem * newItem = model->addDataObject(emptyDataObject);
+
+  // create a DataModelItem for each of our trees
+  for (int i = 0; i < treeObjects.size(); ++i)
+    {
+    voInputFileDataObject * treeObject = treeObjects[i];
+    voDataModelItem * treeItem = model->addDataObjectAsChild(treeObject, newItem);
+    treeItem->setRawViewType("voTreeHeatmapView");
+    newItem->addChildItem(treeItem);
+    }
+
+  // do the same for our table
+  voDataModelItem * tableItem = model->addDataObjectAsChild(tableObject, newItem);
+  tableItem->setType(voDataModelItem::InputType);
+  tableItem->setRawViewType("voExtendedTableView");
+  newItem->addChildItem(tableItem);
+
+  // set up the visualization of the new TreeHeatmap
+  newItem->setRawViewType("voTreeHeatmapView");
+  newItem->setType(voDataModelItem::InputType);
+
+  model->setSelected(newItem);
 }
 
 // --------------------------------------------------------------------------

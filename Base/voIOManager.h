@@ -28,9 +28,11 @@
 // Visomics includes
 #include "voDelimitedTextImportSettings.h"
 
+class voInputFileDataObject;
 class vtkDataObject;
 class vtkExtendedTable;
 class vtkTable;
+class vtkTree;
 
 class voIOManager
 {
@@ -39,6 +41,9 @@ public:
 
   static bool readCSVFileIntoTable(const QString& fileName, vtkTable * outputTable,
                                    const voDelimitedTextImportSettings& settings = voDelimitedTextImportSettings(), const bool haveHeaders = false);
+  static bool readCSVFileIntoExtendedTable(const QString& fileName,
+                                           vtkExtendedTable *outputTable,
+                                           const voDelimitedTextImportSettings& settings = voDelimitedTextImportSettings());
 
   static bool writeTableToCVSFile(vtkTable* table, const QString& fileName);
 
@@ -51,6 +56,13 @@ public:
 
   static bool writeDataObjectToFile(vtkDataObject * dataObject, const QString& fileName);
 
+  void createTreeHeatmapItem(QString name, voInputFileDataObject * treeObject,
+                             voInputFileDataObject * tableObject);
+  void createTreeHeatmapItem(QString name, QList<voInputFileDataObject *> forest,
+                             voInputFileDataObject * tableObject);
+
+protected:
+  bool treeAndTableMatch(vtkTree *tree, vtkTable *table);
 };
 
 #endif
