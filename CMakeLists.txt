@@ -53,7 +53,7 @@ SET(Visomics_KEGG_SERVER_PORT "8090" CACHE STRING "KEGG Server port")
 #
 SET(Visomics_MAJOR_VERSION 0)
 SET(Visomics_MINOR_VERSION 5)
-SET(Visomics_BUILD_VERSION 2)
+SET(Visomics_BUILD_VERSION 3)
 SET(Visomics_VERSION
     "${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}.${Visomics_BUILD_VERSION}")
 

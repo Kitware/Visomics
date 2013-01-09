@@ -48,6 +48,7 @@ public slots:
   void onFileOpenActionTriggered();
   void onCloseActionTriggered();
   void onViewErrorLogActionTriggered();
+  void onFileMakeTreeHeatmapActionTriggered();
 
   void about();
 
@@ -60,6 +61,8 @@ protected slots:
   void onAboutToRunAnalysis(voAnalysis* analysis);
 
   void setViewActions(const QString& objectUuid, voView* newView);
+  void makeTreeHeatmap();
+  void makeTreeHeatmapDialogClosed();
 
 protected:
   QScopedPointer<voMainWindowPrivate> d_ptr;

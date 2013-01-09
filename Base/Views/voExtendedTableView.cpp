@@ -216,8 +216,21 @@ void voExtendedTableView::setDataObjectInternal(const voDataObject& dataObject)
     for (int cid = 0; cid < data->GetNumberOfColumns(); ++cid)
       {
       vtkDoubleArray * dataColumn = vtkDoubleArray::SafeDownCast(data->GetColumn(cid));
-      Q_ASSERT(dataColumn);
-      for (int rid = 0; rid < dataColumn->GetNumberOfTuples(); ++rid)
+      vtkStringArray * stringColumn = NULL;
+      bool dataIsNumerical = true;
+      int numRows = 0;
+      if (!dataColumn)
+        {
+        dataIsNumerical = false;
+        stringColumn = vtkStringArray::SafeDownCast(data->GetColumn(cid));
+        Q_ASSERT(stringColumn);
+        numRows = stringColumn->GetNumberOfTuples();
+        }
+      else
+        {
+        numRows = dataColumn->GetNumberOfTuples();
+        }
+      for (int rid = 0; rid < numRows; ++rid)
         {
         int modelColumnId = cid;
         if (extendedTable->HasRowMetaData())
@@ -229,8 +242,17 @@ void voExtendedTableView::setDataObjectInternal(const voDataObject& dataObject)
           {
           modelRowId += extendedTable->GetNumberOfColumnMetaDataTypes() - 1;
           }
-        double value = dataColumn->GetValue(rid);
-        QStandardItem * currentItem = new QStandardItem(QString::number(value));
+        QStandardItem * currentItem;
+        if (dataIsNumerical)
+          {
+          double value = dataColumn->GetValue(rid);
+          currentItem = new QStandardItem(QString::number(value));
+          }
+        else
+          {
+          vtkStdString strValue = stringColumn->GetValue(rid);
+          currentItem = new QStandardItem(QString(strValue));
+          }
         d->Model.setItem(modelRowId, modelColumnId, currentItem);
         currentItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         }
