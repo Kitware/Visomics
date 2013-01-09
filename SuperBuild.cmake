@@ -25,7 +25,6 @@
 #       cmake <OTHER_OPTIONS> -DR_COMMAND:FILEPATH=/path/to/R-2.11.1/bin/R ../Visomics
 
 find_package(R REQUIRED)
-include(CMakeExternals/RExternalPackages.cmake)
 
 #-----------------------------------------------------------------------------
 # Git protocol option
@@ -66,6 +65,7 @@ endif()
 include(CMakeExternals/VTK.cmake)
 include(CMakeExternals/QtPropertyBrowser.cmake)
 include(CMakeExternals/VisomicsData.cmake)
+include(CMakeExternals/RExternalPackages.cmake)
 #include(CMakeExternals/CTK.cmake)
 
 #-----------------------------------------------------------------------------

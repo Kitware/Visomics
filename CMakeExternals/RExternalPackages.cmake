@@ -14,8 +14,9 @@ configure_file(
   @ONLY
 )
 
+set(depends ${CMAKE_BINARY_DIR}/GetRExternalPackages.R)
 if(BUILD_TESTING)
-  set(depends "VisomicsData")
+  list(APPEND depends "VisomicsData")
 endif()
 
 add_custom_target(${target} ALL
