@@ -355,11 +355,13 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
   reader->Update();
 
   // load associated table data
-  vtkNew<vtkTable> table;
-  Self::readCSVFileIntoTable(tableFileName, table.GetPointer(), settings, true);
+  vtkNew<vtkTable> dataTable;
+  vtkNew<vtkTable> inputTable;
+  Self::readCSVFileIntoTable(tableFileName, dataTable.GetPointer(), settings, true);
+  Self::readCSVFileIntoTable(tableFileName, inputTable.GetPointer(), settings);
   vtkNew<vtkExtendedTable> extendedTable;
-  Self::fillExtendedTable(table.GetPointer(), extendedTable.GetPointer(), settings);
-  extendedTable->SetInputDataTable(table.GetPointer());
+  Self::fillExtendedTable(inputTable.GetPointer(), extendedTable.GetPointer(), settings);
+  extendedTable->SetInputDataTable(dataTable.GetPointer());
 
   voTableDataObject * dataObjectTable =
     new voTableDataObject(QFileInfo(tableFileName).baseName(), extendedTable.GetPointer());
@@ -374,7 +376,7 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
 
     voDataModelItem * tableItem = model->addDataObjectAsChild(dataObjectTable,newItem);
     tableItem->setType(voDataModelItem::InputType);
-    tableItem->setRawViewType("voTableView");
+    tableItem->setRawViewType("voExtendedTableView");
 
     // add table data
     // use tree heat map view, the tree and the table must be matching
@@ -388,7 +390,7 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
       ++NumberOfLeafNodes;
       }
 
-    if (table->GetNumberOfRows() == NumberOfLeafNodes )
+    if (dataTable->GetNumberOfRows() == NumberOfLeafNodes )
       {//display data table as a heat map
       newItem->setRawViewType("voTreeHeatmapView");
       newItem->setType(voDataModelItem::InputType);
