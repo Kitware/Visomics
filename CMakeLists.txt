@@ -248,9 +248,12 @@ ADD_SUBDIRECTORY(Application)
 # R scripts
 #
 set(r_scripts
-  ${CMAKE_BINARY_DIR}/../GetRExternalPackages.R
+  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/GetRExternalPackages.installed.R
   )
-INSTALL(FILES ${r_scripts} DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR} COMPONENT Runtime)
+INSTALL(FILES ${r_scripts}
+        DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR}
+        COMPONENT Runtime
+        RENAME GetRExternalPackages.R)
 
 #-----------------------------------------------------------------------------
 # Install sample dataset(s)
@@ -262,6 +265,8 @@ IF(BUILD_TESTING)
     ${VisomicsData_DIR}/Data/treeData/anolisDataAppended.csv
     )
   INSTALL(FILES ${datasets} DESTINATION ${Visomics_INSTALL_DATA_DIR} COMPONENT Runtime)
+  INSTALL(FILES ${VisomicsData_DIR}/ThirdParty/RPackages/geiger_1.4-5.667.tar.gz
+          DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR} COMPONENT Runtime)
 ENDIF()
 
 #-----------------------------------------------------------------------------
