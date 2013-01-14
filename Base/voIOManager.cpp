@@ -382,9 +382,9 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
   Self::readCSVFileIntoExtendedTable(tableFileName, extendedTable.GetPointer(),
                                      settings);
   voInputFileDataObject * tableObject = new voInputFileDataObject(
-    QFileInfo(tableFileName).baseName(), extendedTable.GetPointer());
+    tableFileName, extendedTable.GetPointer());
 
-  tableSettings.insert(dataObjectTable,
+  tableSettings.insert(tableObject,
                        const_cast<voDelimitedTextImportSettings&>(settings));
 
   //single tree
@@ -626,16 +626,23 @@ void voIOManager::writeTreeHeatmapToXML(voDataModelItem *item,
       {
       continue;
       }
-    else if(childItem->rawViewType() == "voExtendedTableView" ||
-            childItem->rawViewType() == "voTableView")
+    stream->writeStartElement("input");
+    if(childItem->rawViewType() == "voExtendedTableView" ||
+       childItem->rawViewType() == "voTableView")
       {
+      stream->writeAttribute("type", "Table");
       this->writeTableSettingsToXML(childItem, stream);
+      }
+    else
+      {
+      stream->writeAttribute("type", "Tree");
       }
     stream->writeStartElement("filename");
     stream->writeCharacters(inputObject->fileName());
     stream->writeEndElement(); // filename
+    stream->writeEndElement(); // tree or table input
     }
-  stream->writeEndElement(); // input
+  stream->writeEndElement(); // tree heatmap input
 }
 
 // --------------------------------------------------------------------------
