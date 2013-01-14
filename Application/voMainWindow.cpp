@@ -204,7 +204,7 @@ void voMainWindow::onFileOpenActionTriggered()
   files.sort();
 
   QStringList acceptedImageFileTypeList;
-  acceptedImageFileTypeList << "csv" << "phy" << "tre";
+  acceptedImageFileTypeList << "csv" << "phy" << "tre" << "xml";
 
   foreach(const QString& file, files)
     {
@@ -257,6 +257,10 @@ void voMainWindow::onFileOpenActionTriggered()
               {
               voApplication::application()->ioManager()->loadPhyloTreeDataSet(file);
               }
+          }
+        if (extension == "xml")
+          {
+          voApplication::application()->ioManager()->loadState(file);
           }
         }
       else

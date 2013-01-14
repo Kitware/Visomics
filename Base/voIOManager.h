@@ -76,6 +76,12 @@ protected:
                        QXmlStreamWriter *stream);
   void writeTableSettingsToXML(voDataModelItem *item, QXmlStreamWriter *stream);
   void loadTreeHeatmapFromXML(QXmlStreamReader *stream);
+  void loadTreeFromXML(QXmlStreamReader *stream);
+  void loadTableFromXML(QXmlStreamReader *stream);
+  QString readTreeFileNameFromXML(QXmlStreamReader *stream);
+  voDelimitedTextImportSettings readTableFromXML(QXmlStreamReader *stream,
+                                                 QString *fileName);
+
   QMap<voInputFileDataObject *, voDelimitedTextImportSettings>
     tableSettings;
 };

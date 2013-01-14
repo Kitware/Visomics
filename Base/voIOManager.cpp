@@ -660,13 +660,13 @@ void voIOManager::writeInputToXML(const QString& type, voDataModelItem *item,
     stream->writeEndElement(); // input
     return;
     }
-  stream->writeStartElement("filename");
-  stream->writeCharacters(inputObject->fileName());
-  stream->writeEndElement(); // filename
   if (type == "Table")
     {
     this->writeTableSettingsToXML(item, stream);
     }
+  stream->writeStartElement("filename");
+  stream->writeCharacters(inputObject->fileName());
+  stream->writeEndElement(); // filename
   stream->writeEndElement(); // input
 }
 
@@ -781,9 +781,11 @@ void voIOManager::loadState(const QString& fileName)
           }
         else if (type == "Tree")
           {
+          this->loadTreeFromXML(&stream);
           }
         else if (type == "Table")
           {
+          this->loadTableFromXML(&stream);
           }
         }
       }
@@ -797,33 +799,205 @@ void voIOManager::loadState(const QString& fileName)
 // --------------------------------------------------------------------------
 void voIOManager::loadTreeHeatmapFromXML(QXmlStreamReader *stream)
 {
-  stream->readNextStartElement();
+  stream->readNextStartElement();  // input (tree)
   QString name = stream->name().toString();
-  if (name != "filename")
+  if (name != "input")
     {
-    qCritical() << "expecting filename tag (1)";
+    qCritical() << "expected input, found " << name;
     return;
     }
-
- QString treeFile = stream->readElementText();
+ QString treeFile = this->readTreeFileNameFromXML(stream);
  if (treeFile == "")
    {
    qCritical() << "tree filename is empty string";
    return;
    }
 
-  stream->readNextStartElement();
+  stream->readNext(); // </filename>
+  stream->readNext(); // </input>
+
+  stream->readNextStartElement(); // <input>
   name = stream->name().toString();
-  if (name != "filename")
+  if (name != "input")
     {
-    qCritical() << "expecting filename tag (1)";
+    qCritical() << "expected input, found " << name;
+    return;
+    }
+  QStringRef type = stream->attributes().value("type");
+  if (type != "Table")
+    {
+    qCritical() << "expected Table, found " << type;
     return;
     }
 
- QString tableFile = stream->readElementText();
+  QString tableFile;
+  voDelimitedTextImportSettings settings =
+    this->readTableFromXML(stream, &tableFile);
  if (tableFile == "")
    {
    qCritical() << "tree filename is empty string";
    return;
    }
+
+  this->loadPhyloTreeDataSet(treeFile, tableFile, settings);
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::loadTreeFromXML(QXmlStreamReader *stream)
+{
+  QString fileName = this->readTreeFileNameFromXML(stream);
+ if (fileName == "")
+   {
+   qCritical() << "tree filename is empty string";
+   return;
+   }
+  this->loadPhyloTreeDataSet(fileName);
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::loadTableFromXML(QXmlStreamReader *stream)
+{
+  QString fileName;
+  voDelimitedTextImportSettings settings =
+    this->readTableFromXML(stream, &fileName);
+ if (fileName == "")
+   {
+   qCritical() << "table filename is empty string";
+   return;
+   }
+  this->openCSVFile(fileName, settings);
+}
+
+// --------------------------------------------------------------------------
+QString voIOManager::readTreeFileNameFromXML(QXmlStreamReader *stream)
+{
+  QStringRef type = stream->attributes().value("type");
+  if (type != "Tree")
+    {
+    qCritical() << "expected Tree, found " << type;
+    return "";
+    }
+
+  stream->readNextStartElement();  // filename of Tree
+  QString name = stream->name().toString();
+  if (name != "filename")
+    {
+    qCritical() << "expecting filename, found " << name;
+    return "";
+    }
+
+ return stream->readElementText();
+}
+
+// --------------------------------------------------------------------------
+voDelimitedTextImportSettings voIOManager::readTableFromXML(
+  QXmlStreamReader *stream, QString *fileName)
+{
+  voDelimitedTextImportSettings settings;
+  stream->readNextStartElement();
+  QString name = stream->name().toString();
+  if (name != "table_reader_settings")
+    {
+    qCritical() << "expected table_reader_settings, found " << name;
+    return settings;
+    }
+
+  // read table settings
+  stream->readNext();
+  stream->readNextStartElement();
+  name = stream->name().toString();
+  while (name != "table_reader_settings" && !stream->atEnd())
+    {
+    if (name != "setting")
+      {
+      qCritical() << "expected setting, found " << name;
+      return settings;
+      }
+
+    QStringRef settingType = stream->attributes().value("name");
+    QString value = stream->readElementText();
+    if (settingType == "FieldDelimiterCharacters") // QString
+      {
+      settings.insert(voDelimitedTextImportSettings::FieldDelimiterCharacters,
+                      value);
+      }
+    else if ("MergeConsecutiveDelimiters") // bool
+      {
+      bool b = false;
+      if (value == "true")
+        {
+        b = true;
+        }
+      settings.insert(voDelimitedTextImportSettings::MergeConsecutiveDelimiters,
+                      b);
+      }
+    else if ("StringDelimiter") // char
+      {
+      settings.insert(voDelimitedTextImportSettings::StringDelimiter,
+                      value.at(0).toAscii());
+      }
+    else if ("UseStringDelimiter") // bool
+      {
+      bool b = false;
+      if (value == "true")
+        {
+        b = true;
+        }
+      settings.insert(voDelimitedTextImportSettings::UseStringDelimiter,
+                      b);
+      }
+    else if ("Transpose") // bool
+      {
+      bool b = false;
+      if (value == "true")
+        {
+        b = true;
+        }
+      settings.insert(voDelimitedTextImportSettings::Transpose,
+                      b);
+      }
+    else if ("NumberOfColumnMetaDataTypes") // int
+      {
+      settings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes,
+                      value.toInt());
+      }
+    else if ("ColumnMetaDataTypeOfInterest") // int
+      {
+      settings.insert(voDelimitedTextImportSettings::ColumnMetaDataTypeOfInterest,
+                      value.toInt());
+      }
+    else if ("NumberOfRowMetaDataTypes") // int
+      {
+      settings.insert(voDelimitedTextImportSettings::NumberOfRowMetaDataTypes,
+                      value.toInt());
+      }
+    else if ("RowMetaDataTypeOfInterest") // int
+      {
+      settings.insert(voDelimitedTextImportSettings::RowMetaDataTypeOfInterest,
+                      value.toInt());
+      }
+    else if ("NormalizationMethod") // QString
+      {
+      settings.insert(voDelimitedTextImportSettings::NormalizationMethod,
+                      value);
+      }
+    else
+      {
+      qWarning() << "unhandled table setting encountered: " << settingType;
+      }
+    stream->readNextStartElement();
+    name = stream->name().toString();
+    }
+  // end settings
+
+  stream->readNextStartElement();
+  name = stream->name().toString();
+  if (name != "filename")
+    {
+    qCritical() << "expected filename, found " << name;
+    return settings;
+    }
+
+ *fileName = stream->readElementText();
+ return settings;
 }
