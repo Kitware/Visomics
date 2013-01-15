@@ -761,8 +761,12 @@ void voIOManager::loadState(const QString& fileName)
     qCritical() << "Could not open " << fileName << " for reading!";
     return;
   }
-  QXmlStreamReader stream(&file);
 
+  voDataModel * model = voApplication::application()->dataModel();
+  model->clear();
+  model->setColumnCount(1);
+
+  QXmlStreamReader stream(&file);
   while (!stream.atEnd())
     {
     QString attribute = "";
