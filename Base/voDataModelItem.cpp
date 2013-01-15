@@ -25,6 +25,7 @@
 #include <QDebug>
 
 // Visomics includes
+#include "voApplication.h"
 #include "voDataModelItem.h"
 #include "voDataModel.h"
 #include "voDataObject.h"
@@ -83,7 +84,9 @@ voDataModelItem::voDataModelItem(voDataObject * newDataObject, int newColumn):
     {
     case voDataModel::NameColumn:
       this->setFlags(flags | /*Qt::ItemIsEditable |*/ Qt::ItemIsSelectable);
-      this->setText(d->DataObject->name());
+      voDataModel * model = voApplication::application()->dataModel();
+      QString uniqueText = model->generateUniqueName(d->DataObject->name());
+      this->setText(uniqueText);
       break;
     }
 
@@ -103,7 +106,9 @@ voDataModelItem::voDataModelItem(const QString& newText, int newColumn):
 
   if (d->Column == voDataModel::NameColumn)
     {
-    this->setText(newText);
+    voDataModel * model = voApplication::application()->dataModel();
+    QString uniqueText = model->generateUniqueName(newText);
+    this->setText(uniqueText);
     }
   this->setFlags(flags);
 }

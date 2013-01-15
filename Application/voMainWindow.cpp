@@ -391,8 +391,10 @@ void voMainWindow::makeTreeHeatmap()
   QStandardItem *secondParent =
     dataModel->itemFromIndex(dataModel->parent(dataModel->indexFromItem(secondItem)));
 
+  QString treeHeatmapName =
+    QString("%1 TreeHeatmap").arg(QFileInfo(treeObject->fileName()).baseName());
   voApplication::application()->ioManager()->createTreeHeatmapItem(
-    QFileInfo(treeObject->fileName()).baseName(), treeObject, tableObject);
+    treeHeatmapName, treeObject, tableObject);
 
   dataModel->removeObject(firstItem, firstParent);
   dataModel->removeObject(secondItem, secondParent);

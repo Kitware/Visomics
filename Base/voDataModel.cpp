@@ -465,3 +465,51 @@ QString voDataModel::analysisNameForUuid(const QString& uuid)
     }
   return QString();
 }
+
+// --------------------------------------------------------------------------
+bool voDataModel::nameIsAvailable(QString desiredName,
+                                  QStandardItem* parent)
+{
+  if (!parent)
+    {
+    parent = this->invisibleRootItem();
+    }
+  for (int row = 0; row < this->rowCount(parent->index()); ++row)
+    {
+    for (int col = 0; col < this->columnCount(parent->index()); ++col)
+      {
+      voDataModelItem *item =
+        dynamic_cast<voDataModelItem*>(
+          this->itemFromIndex(this->index(row, col, parent->index())));
+      if (item->text() == desiredName)
+        {
+        return false;
+        }
+      else if (this->hasChildren(item->index()))
+        {
+        if (!this->nameIsAvailable(desiredName, item))
+          {
+          return false;
+          }
+        }
+      }
+    }
+  return true;
+}
+
+// --------------------------------------------------------------------------
+QString voDataModel::generateUniqueName(QString desiredName)
+{
+  QString uniqueName = desiredName;
+  bool nameIsUnique = this->nameIsAvailable(desiredName, NULL);
+  int itr = 2;
+
+  while (!nameIsUnique)
+    {
+    uniqueName = QString("%1 %2").arg(desiredName).arg(itr);
+    nameIsUnique = this->nameIsAvailable(uniqueName, NULL);
+    ++itr;
+    }
+
+  return uniqueName;
+}

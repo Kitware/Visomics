@@ -78,6 +78,8 @@ public:
 
   QString analysisNameForUuid(const QString& uuid);
 
+  QString generateUniqueName(QString desiredName);
+
 public slots:
   void setActiveAnalysis(voAnalysis* analysis);
 
@@ -92,6 +94,8 @@ signals:
   void objectRemoved(const QString& objectUuid);
 
 protected:
+  bool nameIsAvailable(QString desiredName, QStandardItem* parent);
+
   QScopedPointer<voDataModelPrivate> d_ptr;
 
 private:

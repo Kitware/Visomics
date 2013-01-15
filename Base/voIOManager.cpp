@@ -387,6 +387,9 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
   tableSettings.insert(tableObject,
                        const_cast<voDelimitedTextImportSettings&>(settings));
 
+  QString treeHeatmapName =
+    QString("%1 TreeHeatmap").arg(QFileInfo(fileName).baseName());
+
   //single tree
   if (forest->GetNumberOfPieces() == 1)
     {
@@ -400,8 +403,7 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
     voInputFileDataObject * treeObject =
       new voInputFileDataObject(fileName, tree);
 
-    this->createTreeHeatmapItem(QFileInfo(fileName).baseName(), treeObject,
-                                tableObject);
+    this->createTreeHeatmapItem(treeHeatmapName, treeObject, tableObject);
     }
 
   // multiple trees
@@ -421,7 +423,7 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
       treeObjects << treeObject;
       }
 
-    this->createTreeHeatmapItem(QFileInfo(fileName).baseName(), treeObjects, tableObject);
+    this->createTreeHeatmapItem(treeHeatmapName, treeObjects, tableObject);
     }
 }
 
