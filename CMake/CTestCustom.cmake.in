@@ -23,6 +23,7 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   ${CTEST_CUSTOM_WARNING_EXCEPTION}
   # VTK
   "VTK/Utilities/vtktiff/"
-  "This function or variable may be unsafe. Consider using"
+  "may be unsafe"
   "old-style cast"
+  "The POSIX name for this item is deprecated"
   )
