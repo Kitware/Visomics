@@ -28,12 +28,16 @@
 #include <QStringList>
 #include <QVariant>
 
+// VTK includes
+#include <vtkSmartPointer.h>
+
 class QtProperty;
 class QtVariantPropertyManager;
 class QtVariantProperty;
 class voAnalysisPrivate;
 class voDataObject;
 class vtkDataObject;
+class vtkExtendedTable;
 
 class voAnalysis : public QObject
 {
@@ -120,6 +124,8 @@ public:
   QtVariantPropertyManager * propertyManager()const;
 
   virtual QString parameterDescription()const;
+
+  vtkSmartPointer<vtkExtendedTable> getInputTable() const;
 
 signals:
 

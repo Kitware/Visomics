@@ -127,7 +127,7 @@ bool voKEGGCompounds::execute()
   QString keggURL = QString("http://%1:%2/kegg/").arg(Visomics_KEGG_SERVER_HOSTNAME).arg(Visomics_KEGG_SERVER_PORT);
 
   // Import data table locally
-  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  vtkSmartPointer<vtkExtendedTable> extendedTable = this->getInputTable();
   if (!extendedTable)
     {
     qWarning() << "Input is Null";

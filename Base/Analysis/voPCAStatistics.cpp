@@ -98,7 +98,7 @@ bool voPCAStatistics::execute()
   Q_D(voPCAStatistics);
 
   // Import data table locally
-  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  vtkSmartPointer<vtkExtendedTable> extendedTable = this->getInputTable();
   if (!extendedTable)
     {
     qCritical() << "Input is Null";

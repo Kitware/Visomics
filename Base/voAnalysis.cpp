@@ -39,7 +39,9 @@
 
 // VTK includes
 #include <vtkDataObject.h>
+#include <vtkExtendedTable.h>
 #include <vtkSmartPointer.h>
+#include <vtkTable.h>
 
 // --------------------------------------------------------------------------
 class voAnalysisPrivate
@@ -792,4 +794,24 @@ QtVariantProperty*  voAnalysis::addBooleanParameter(const QString& id, const QSt
   param->setValue(value);
 
   return param;
+}
+
+// --------------------------------------------------------------------------
+vtkSmartPointer<vtkExtendedTable> voAnalysis::getInputTable() const
+{
+  vtkSmartPointer<vtkExtendedTable> extendedTable =
+    vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  if (extendedTable)
+    {
+    return extendedTable;
+    }
+  vtkTable *table =
+    vtkTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  if (table)
+    {
+    extendedTable = vtkSmartPointer<vtkExtendedTable>::New();
+    extendedTable->SetData(table);
+    return extendedTable;
+    }
+  return NULL;
 }

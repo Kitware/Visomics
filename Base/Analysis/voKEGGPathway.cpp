@@ -121,7 +121,7 @@ bool voKEGGPathway::execute()
     }
 
   // Import data table locally
-  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  vtkSmartPointer<vtkExtendedTable> extendedTable = this->getInputTable();
   if (!extendedTable)
     {
     qWarning() << "Input is Null";

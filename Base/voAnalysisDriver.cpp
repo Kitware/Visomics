@@ -406,6 +406,12 @@ bool voAnalysisDriver::doesInputMatchAnalysis(const QString& analysisName,
       {
       return true;
       }
+    // Special case to allow chained analyses
+    if (expectedInputType == "vtkExtendedTable" &&
+        providedInputType == "vtkTable")
+      {
+      return true;
+      }
     if (warnOnFail)
       {
       qWarning() << QObject::tr("Provided input type %1 is "

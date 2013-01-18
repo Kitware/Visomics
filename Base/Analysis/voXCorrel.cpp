@@ -114,7 +114,7 @@ bool voXCorrel::execute()
   QString cor_method = this->enumParameter("method");
 
   // Import data table locally
-  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  vtkSmartPointer<vtkExtendedTable> extendedTable = this->getInputTable();
   if (!extendedTable)
     {
     qCritical() << "Input is Null";
