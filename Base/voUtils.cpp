@@ -37,6 +37,7 @@
 #include <vtkDataSetAttributes.h>
 #include <vtkDoubleArray.h>
 #include <vtkIntArray.h>
+#include <vtkMath.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
@@ -565,6 +566,19 @@ bool voUtils::tableToArray(vtkTable* srcTable, vtkSmartPointer<vtkArray>& destAr
 
   // Reference count will be incremented
   destArray = tabToArr->GetOutput()->GetArray(0);
+
+  // Make sure our output doesn't contain any NaNs
+  for (int row = 0; row < destArray->GetExtent(0).GetEnd(); ++row)
+    {
+    for (int col = 0; col < destArray->GetExtent(1).GetEnd(); ++col)
+      {
+      if ( vtkMath::IsNan(destArray->GetVariantValue(row, col).ToDouble()) )
+        {
+        destArray->SetVariantValue(row, col, vtkVariant(0.0));
+        }
+      }
+    }
+
   return true;
 }
 

@@ -113,7 +113,7 @@ voDataModelItem::voDataModelItem(const QString& newText, int newColumn):
     {
       QString uniqueText = newText;
       voApplication *app = voApplication::application();
-      if (app)
+      if (app && d->DataObject)
         {
         voDataModel * model = voApplication::application()->dataModel();
         uniqueText = model->generateUniqueName(d->DataObject->name());
