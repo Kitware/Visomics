@@ -1007,3 +1007,46 @@ voDelimitedTextImportSettings voIOManager::readTableFromXML(
  *fileName = stream->readElementText();
  return settings;
 }
+
+// --------------------------------------------------------------------------
+void voIOManager::convertTableToExtended(vtkTable *table,
+                                         vtkExtendedTable *extendedTable)
+{
+  // column meta data: the names of each array in the input table
+  vtkNew<vtkTable> columnMetaData;
+  vtkNew<vtkStringArray> columnNames;
+  for(int i = 0; i < table->GetNumberOfColumns(); ++i)
+    {
+    columnNames->InsertNextValue(table->GetColumn(i)->GetName());
+    }
+  columnMetaData->AddColumn(columnNames.GetPointer());
+  extendedTable->SetColumnMetaDataTable(columnMetaData.GetPointer());
+
+  // row meta data: the first column of the input table
+  vtkNew<vtkTable> rowMetaData;
+  rowMetaData->AddColumn(table->GetColumn(0));
+  extendedTable->SetRowMetaDataTable(rowMetaData.GetPointer());
+
+  // "data": all of the columns of the input table, except for the first
+  vtkNew<vtkTable> data;
+  for (int i = 1; i < table->GetNumberOfColumns(); ++i)
+    {
+    data->AddColumn(table->GetColumn(i));
+    }
+  extendedTable->SetData(data.GetPointer());
+
+  extendedTable->SetColumnMetaDataTypeOfInterest(0);
+  extendedTable->SetRowMetaDataTypeOfInterest(0);
+
+  vtkNew<vtkStringArray> columnMetaDataLabels;
+  columnMetaDataLabels->InsertNextValue(table->GetValue(0, 0).ToString());
+  extendedTable->SetColumnMetaDataLabels(columnMetaDataLabels.GetPointer());
+
+  vtkNew<vtkStringArray> rowMetaDataLabels;
+  rowMetaDataLabels->InsertNextValue(table->GetValue(0, 0).ToString());
+  extendedTable->SetRowMetaDataLabels(rowMetaDataLabels.GetPointer());
+
+  // Set column names
+  voUtils::setTableColumnNames(extendedTable->GetData(),
+    extendedTable->GetColumnMetaDataOfInterestAsString());
+}

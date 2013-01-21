@@ -54,6 +54,9 @@ public:
   static void fillExtendedTable(vtkTable* sourceTable, vtkExtendedTable* destTable,
                                 const voDelimitedTextImportSettings& settings = voDelimitedTextImportSettings());
 
+  static void convertTableToExtended(vtkTable *table,
+                                     vtkExtendedTable *extendedTable);
+
   void openCSVFile(const QString& fileName,const voDelimitedTextImportSettings& settings);
   void loadPhyloTreeDataSet(const QString& fileName,const QString& tableFileName,const voDelimitedTextImportSettings& settings);
   void loadPhyloTreeDataSet(const QString& fileName);

@@ -810,7 +810,7 @@ vtkSmartPointer<vtkExtendedTable> voAnalysis::getInputTable() const
   if (table)
     {
     extendedTable = vtkSmartPointer<vtkExtendedTable>::New();
-    extendedTable->SetData(table);
+    voIOManager::convertTableToExtended(table, extendedTable.GetPointer());
     return extendedTable;
     }
   return NULL;
