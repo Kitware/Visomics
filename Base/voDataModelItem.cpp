@@ -107,16 +107,17 @@ voDataModelItem::voDataModelItem(const QString& newText, int newColumn):
 
   d->Column = newColumn;
 
-  Qt::ItemFlags flags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable | Qt::ItemIsSelectable);
+  Qt::ItemFlags flags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable |
+                      Qt::ItemIsSelectable);
 
   if (d->Column == voDataModel::NameColumn)
     {
       QString uniqueText = newText;
       voApplication *app = voApplication::application();
-      if (app && d->DataObject)
+      if (app)
         {
         voDataModel * model = voApplication::application()->dataModel();
-        uniqueText = model->generateUniqueName(d->DataObject->name());
+        uniqueText = model->generateUniqueName(newText);
         }
       this->setText(uniqueText);
     }

@@ -24,6 +24,10 @@
 #include <QStandardItem>
 #include <QXmlStreamWriter>
 
+// QtPropertyBrowser includes
+#include <QtVariantPropertyManager>
+#include <QtVariantProperty>
+
 // Visomics includes
 #include "voAnalysis.h"
 #include "voAnalysisDriver.h"
@@ -538,10 +542,12 @@ void voIOManager::saveState(const QString& fileName)
   QXmlStreamWriter stream(&file);
   stream.setAutoFormatting(true);
   stream.writeStartDocument();
+  stream.writeStartElement("state");
 
   QStandardItem *parent = NULL;
   this->writeItemToXML(parent, &stream);
 
+  stream.writeEndElement(); //state
   stream.writeEndDocument();
 }
 
@@ -550,7 +556,6 @@ void voIOManager::writeItemToXML(QStandardItem* parent,
                                  QXmlStreamWriter *stream)
 {
   voDataModel * dataModel = voApplication::application()->dataModel();
-  voAnalysisDriver *driver = voApplication::application()->analysisDriver();
 
   if (!parent)
     {
@@ -567,27 +572,25 @@ void voIOManager::writeItemToXML(QStandardItem* parent,
 
       if (item->data(voDataModelItem::IsAnalysisContainerRole).toBool())
         {
-        voAnalysis *analysis = reinterpret_cast<voAnalysis*>(
-              item->data(voDataModelItem::AnalysisVoidStarRole).value<void*>());
-        QString analysisName = analysis->objectName();
-        //std::cout << " Analysis " << analysisName.toStdString() << " has input(s) ";
-        for (int i = 0; i < driver->numberOfInputsForAnalysis(analysisName); ++i)
-          {
-          //std::cout << analysis->input(i)->name().toStdString() << ", ";
-          }
+        this->writeAnalysisToXML(item, stream);
         }
+
       else if (item->type() == voDataModelItem::InputType)
         {
         // Only record top-level input.  Child input objects are saved
         // with their parents.
         if (parent != dataModel->invisibleRootItem())
           {
+          if (dataModel->hasChildren(item->index()))
+            {
+            this->writeItemToXML(item, stream);
+            }
           continue;
           }
 
         if (item->rawViewType() == "voTreeHeatmapView")
           {
-          if (dataModel->hasChildren(item->index()))
+          if (item->text().contains("TreeHeatmap"))
             {
             this->writeTreeHeatmapToXML(item, stream);
             }
@@ -609,6 +612,45 @@ void voIOManager::writeItemToXML(QStandardItem* parent,
         }
       }
     }
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::writeAnalysisToXML(voDataModelItem *item,
+                                     QXmlStreamWriter *stream)
+{
+  stream->writeStartElement("analysis");
+
+  voAnalysis *analysis = reinterpret_cast<voAnalysis*>(
+        item->data(voDataModelItem::AnalysisVoidStarRole).value<void*>());
+  QString analysisName = analysis->objectName();
+  stream->writeAttribute("type", analysisName);
+
+  voDataModelItem *parentItem =
+    dynamic_cast<voDataModelItem*>(item->parent());
+  stream->writeStartElement("parent");
+  stream->writeCharacters(parentItem->text());
+  stream->writeEndElement(); // parent
+
+  QSet<QtProperty*> properties = analysis->propertyManager()->properties();
+  stream->writeStartElement("parameters");
+  foreach (QtProperty* property, properties)
+    {
+    QtVariantProperty* variantProperty =
+      dynamic_cast<QtVariantProperty*>(property);
+    if (!variantProperty ||
+        variantProperty->propertyType() ==
+        QtVariantPropertyManager::groupTypeId())
+      {
+      continue;
+      }
+    stream->writeStartElement("parameter");
+    stream->writeAttribute("name", variantProperty->propertyId());
+    stream->writeAttribute("type", QString::number(variantProperty->propertyType()));
+    stream->writeCharacters(variantProperty->value().toString());
+    stream->writeEndElement(); // parameter
+    }
+  stream->writeEndElement(); // parameters
+  stream->writeEndElement(); // analysis
 }
 
 // --------------------------------------------------------------------------
@@ -793,6 +835,10 @@ void voIOManager::loadState(const QString& fileName)
           {
           this->loadTableFromXML(&stream);
           }
+        }
+      else if(name == "analysis")
+        {
+        this->loadAnalysisFromXML(&stream);
         }
       }
     }
@@ -1006,6 +1052,54 @@ voDelimitedTextImportSettings voIOManager::readTableFromXML(
 
  *fileName = stream->readElementText();
  return settings;
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::loadAnalysisFromXML(QXmlStreamReader *stream)
+{
+  QString type = stream->attributes().value("type").toString();
+  type.remove(QChar('"'));
+
+  stream->readNextStartElement();
+  QString name = stream->name().toString();
+  if (name != "parent")
+    {
+    qCritical() << "expected parent, found " << name;
+    return;
+    }
+  QString parent = stream->readElementText();
+
+  stream->readNextStartElement();
+  name = stream->name().toString();
+  if (name != "parameters")
+    {
+    qCritical() << "expected parameters, found " << name;
+    }
+
+  QHash<QString, QVariant> parameters;
+
+  stream->readNextStartElement();
+  name = stream->name().toString();
+  while (name != "parameters" && !stream->atEnd())
+    {
+    if (name != "parameter")
+      {
+      qCritical() << "expected parameter, found " << name;
+      return;
+      }
+
+    QStringRef parameterName = stream->attributes().value("name");
+    QString parameterValue = stream->readElementText();
+    parameters.insert(parameterName.toString(), QVariant(parameterValue));
+    stream->readNextStartElement();
+    name = stream->name().toString();
+    }
+
+  voDataModel * model = voApplication::application()->dataModel();
+  voDataModelItem *inputTarget = model->findItemWithText(parent);
+
+  voAnalysisDriver *driver = voApplication::application()->analysisDriver();
+  driver->runAnalysis(type, inputTarget, parameters);
 }
 
 // --------------------------------------------------------------------------

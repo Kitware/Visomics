@@ -115,24 +115,57 @@ void voAnalysisDriver::runAnalysisForAllInputs(const QString& analysisName, bool
 }
 
 // --------------------------------------------------------------------------
-void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool acceptDefaultParameter)
+voAnalysis * voAnalysisDriver::createAnalysis(const QString& analysisName)
 {
   if (analysisName.isEmpty())
     {
-    qWarning() << "Failed to runAnalysis - AnalysisName is an empty string";
-    return;
-    }
-  if (!inputTarget)
-    {
-    qWarning() << "Failed to runAnalysis - InputTarget is NULL";
-    return;
+    qWarning() << "Failed to createAnalysis - AnalysisName is an empty string";
+    return NULL;
     }
   voAnalysisFactory * analysisFactory = voApplication::application()->analysisFactory();
   voAnalysis * analysis = analysisFactory->createAnalysis(
         analysisFactory->analysisNameFromPrettyName(analysisName));
   Q_ASSERT(analysis);
   analysis->setParent(qApp);
+  return analysis;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool acceptDefaultParameter)
+{
+  if (!inputTarget)
+    {
+    qWarning() << "Failed to runAnalysis - InputTarget is NULL";
+    return;
+    }
+  voAnalysis * analysis = this->createAnalysis(analysisName);
+  if (!analysis)
+    {
+    return;
+    }
   analysis->setAcceptDefaultParameterValues(acceptDefaultParameter);
+  this->runAnalysis(analysis, inputTarget);
+}
+
+// --------------------------------------------------------------------------
+void voAnalysisDriver::runAnalysis(const QString& analysisName,
+                                   voDataModelItem* inputTarget,
+                                   const QHash<QString, QVariant>& parameters)
+{
+  if (!inputTarget)
+    {
+    qWarning() << "Failed to runAnalysis - InputTarget is NULL";
+    return;
+    }
+  voAnalysis * analysis = this->createAnalysis(analysisName);
+  if (!analysis)
+    {
+    return;
+    }
+
+  analysis->initializeParameterInformation();
+  analysis->setParameterValues(parameters);
+  analysis->setAcceptDefaultParameterValues(true);
   this->runAnalysis(analysis, inputTarget);
 }
 

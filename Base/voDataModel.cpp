@@ -203,7 +203,8 @@ voDataModelItem* voDataModel::addOutput(voDataObject * newDataObject, QStandardI
   voDataModelItem * newItem = this->addDataObjectAsChild(newDataObject, parent);
   if (!rawViewPrettyName.isEmpty())
     {
-    newItem->setText(rawViewPrettyName);
+    QString uniqueText = this->generateUniqueName(rawViewPrettyName);
+    newItem->setText(uniqueText);
     }
   newItem->setRawViewType(rawViewType);
   return newItem;
@@ -311,7 +312,9 @@ bool voDataModel::removeObject(voDataModelItem *objectToRemove,
 
           // if we just removed the parent's last row, we should get rid of the
           // parent too.
-          if (this->rowCount(parent->index()) == 0)
+          if (this->rowCount(parent->index()) == 0 &&
+               (parent->parent() == NULL ||
+                parent->parent() == this->invisibleRootItem()))
             {
             this->removeObject(parentItem, parent->parent());
             }
@@ -434,10 +437,50 @@ QList<voDataModelItem*> voDataModel::findItemsWithRole(int role, const QVariant&
 }
 
 // --------------------------------------------------------------------------
+voDataModelItem* voDataModel::findItemWithText(const QString& text,
+                                               QStandardItem* parent) const
+{
+  if (text.isEmpty() || text.isNull())
+    {
+    return NULL;
+    }
+
+  if (!parent)
+    {
+    parent = this->invisibleRootItem();
+    }
+
+  voDataModelItem *retval = NULL;
+
+  for (int row = 0; row < this->rowCount(parent->index()); ++row)
+    {
+    for (int col = 0; col < this->columnCount(parent->index()); ++col)
+      {
+      voDataModelItem *item =
+        dynamic_cast<voDataModelItem*>(
+          this->itemFromIndex(this->index(row, col, parent->index())));
+      if (item->text() == text)
+        {
+        return item;
+        }
+      if (this->hasChildren(item->index()))
+        {
+        retval = this->findItemWithText(text, item);
+        if (retval != NULL)
+          {
+          return retval;
+          }
+        }
+      }
+    }
+  return retval;
+}
+
+// --------------------------------------------------------------------------
 QString voDataModel::getNextName(const QString& name)
 {
   Q_D(voDataModel);
-  int count = d->NameCountMap.value(name, 0);
+  int count = d->NameCountMap.value(name, 1);
   d->NameCountMap.insert(name, count + 1);
   return QString("%1 %2").arg(name).arg(count);
 }

@@ -74,6 +74,7 @@ public:
 protected:
   bool treeAndTableMatch(vtkTree *tree, vtkTable *table);
   void writeItemToXML(QStandardItem* parent, QXmlStreamWriter *stream);
+  void writeAnalysisToXML(voDataModelItem *item, QXmlStreamWriter *stream);
   void writeTreeHeatmapToXML(voDataModelItem *item, QXmlStreamWriter *stream);
   void writeInputToXML(const QString& type, voDataModelItem *item,
                        QXmlStreamWriter *stream);
@@ -81,6 +82,7 @@ protected:
   void loadTreeHeatmapFromXML(QXmlStreamReader *stream);
   void loadTreeFromXML(QXmlStreamReader *stream);
   void loadTableFromXML(QXmlStreamReader *stream);
+  void loadAnalysisFromXML(QXmlStreamReader *stream);
   QString readTreeFileNameFromXML(QXmlStreamReader *stream);
   voDelimitedTextImportSettings readTableFromXML(QXmlStreamReader *stream,
                                                  QString *fileName);
