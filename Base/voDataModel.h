@@ -73,10 +73,14 @@ public:
 
   voDataModelItem* findItemWithUuid(const QString& uuid)const;
   QList<voDataModelItem*> findItemsWithRole(int role, const QVariant& value, voDataModelItem * start = 0)const;
+  voDataModelItem* findItemWithText(const QString& text,
+                                    QStandardItem* parent = 0) const;
 
   QString getNextName(const QString& name);
 
   QString analysisNameForUuid(const QString& uuid);
+
+  QString generateUniqueName(QString desiredName);
 
 public slots:
   void setActiveAnalysis(voAnalysis* analysis);
@@ -92,6 +96,8 @@ signals:
   void objectRemoved(const QString& objectUuid);
 
 protected:
+  bool nameIsAvailable(QString desiredName, QStandardItem* parent);
+
   QScopedPointer<voDataModelPrivate> d_ptr;
 
 private:

@@ -48,6 +48,8 @@ public slots:
   void onFileOpenActionTriggered();
   void onCloseActionTriggered();
   void onViewErrorLogActionTriggered();
+  void onFileSaveStateActionTriggered();
+  void onFileLoadStateActionTriggered();
   void onFileMakeTreeHeatmapActionTriggered();
 
   void about();

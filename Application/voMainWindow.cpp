@@ -35,7 +35,6 @@
 #include "voApplication.h"
 #include "voDataModel.h"
 #include "voDataModelItem.h"
-#include "voDataObject.h"
 #include "voDelimitedTextImportDialog.h"
 #include "voInputFileDataObject.h"
 #include "voIOManager.h"
@@ -116,6 +115,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionHelpAbout, SIGNAL(triggered()), this, SLOT(about()));
   connect(d->actionLoadSampleDataset, SIGNAL(triggered()), this, SLOT(loadSampleDataset()));
   connect(d->actionViewErrorLog, SIGNAL(triggered()), this, SLOT(onViewErrorLogActionTriggered()));
+  connect(d->actionFileSaveState, SIGNAL(triggered()), this, SLOT(onFileSaveStateActionTriggered()));
+  connect(d->actionFileLoadState, SIGNAL(triggered()), this, SLOT(onFileLoadStateActionTriggered()));
   connect(d->actionFileMakeTreeHeatmap, SIGNAL(triggered()),
           this, SLOT(onFileMakeTreeHeatmapActionTriggered()));
 
@@ -203,7 +204,7 @@ void voMainWindow::onFileOpenActionTriggered()
   files.sort();
 
   QStringList acceptedImageFileTypeList;
-  acceptedImageFileTypeList << "csv" << "phy" << "tre";
+  acceptedImageFileTypeList << "csv" << "phy" << "tre" << "xml";
 
   foreach(const QString& file, files)
     {
@@ -256,6 +257,10 @@ void voMainWindow::onFileOpenActionTriggered()
               {
               voApplication::application()->ioManager()->loadPhyloTreeDataSet(file);
               }
+          }
+        if (extension == "xml")
+          {
+          voApplication::application()->ioManager()->loadState(file);
           }
         }
       else
@@ -386,8 +391,10 @@ void voMainWindow::makeTreeHeatmap()
   QStandardItem *secondParent =
     dataModel->itemFromIndex(dataModel->parent(dataModel->indexFromItem(secondItem)));
 
+  QString treeHeatmapName =
+    QString("%1 TreeHeatmap").arg(QFileInfo(treeObject->fileName()).baseName());
   voApplication::application()->ioManager()->createTreeHeatmapItem(
-    QFileInfo(treeObject->fileName()).baseName(), treeObject, tableObject);
+    treeHeatmapName, treeObject, tableObject);
 
   dataModel->removeObject(firstItem, firstParent);
   dataModel->removeObject(secondItem, secondParent);
@@ -433,6 +440,24 @@ void voMainWindow::onViewErrorLogActionTriggered()
 
   d->ErrorLogWidget.activateWindow();
   d->ErrorLogWidget.raise();
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::onFileSaveStateActionTriggered()
+{
+  QString fileName =
+    QFileDialog::getSaveFileName(this, tr("Save State"), "",
+                                 tr(".xml file (*.xml)"));
+  voApplication::application()->ioManager()->saveState(fileName);
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::onFileLoadStateActionTriggered()
+{
+  QString fileName =
+    QFileDialog::getOpenFileName(this, tr("Save State"), "",
+                                 tr(".xml file (*.xml)"));
+  voApplication::application()->ioManager()->loadState(fileName);
 }
 
 // --------------------------------------------------------------------------

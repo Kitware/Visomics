@@ -105,7 +105,7 @@ bool voHierarchicalClustering::execute()
   QString hclust_method = this->enumParameter("method");
 
   // Import data table
-  vtkExtendedTable* extendedTable =  vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  vtkSmartPointer<vtkExtendedTable> extendedTable = this->getInputTable();
   if (!extendedTable)
     {
     qCritical() << "Input is Null";

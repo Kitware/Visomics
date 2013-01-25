@@ -72,8 +72,8 @@ voGeigerModelFitting::~voGeigerModelFitting()
 void voGeigerModelFitting::setOutputInformation()
 {
   this->addOutputType("resultTable", "vtkTable" ,
+                      "", "",
                       "voTableView", "fitted modeling parameters");
-
 }
 
 // --------------------------------------------------------------------------

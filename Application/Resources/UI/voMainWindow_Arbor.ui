@@ -32,6 +32,8 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionFileOpen"/>
+    <addaction name="actionFileSaveState"/>
+    <addaction name="actionFileLoadState"/>
     <addaction name="actionFileMakeTreeHeatmap"/>
     <addaction name="actionFileExit"/>
    </widget>
@@ -190,6 +192,22 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+Q</string>
+   </property>
+  </action>
+  <action name="actionFileSaveState">
+   <property name="text">
+    <string>Save State</string>
+   </property>
+   <property name="statusTip">
+    <string>Save the current state</string>
+   </property>
+  </action>
+  <action name="actionFileLoadState">
+   <property name="text">
+    <string>Load State</string>
+   </property>
+   <property name="statusTip">
+    <string>Load the current state</string>
    </property>
   </action>
   <action name="actionHelpAbout">

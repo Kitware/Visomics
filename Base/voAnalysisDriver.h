@@ -41,8 +41,12 @@ public:
 
   void runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool acceptDefaultParameter = false);
 
+  void runAnalysis(const QString& analysisName, voDataModelItem* inputTarget,
+                   const QHash<QString, QVariant>& parameters);
+
   bool doesInputMatchAnalysis(const QString& analysisName,
                               voDataModelItem* inputTarget, bool warnOnFail);
+  int numberOfInputsForAnalysis(QString analysisName);
 
 signals:
   void aboutToRunAnalysis(voAnalysis*);
@@ -63,6 +67,7 @@ protected slots:
 
 protected:
   void runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget);
+  voAnalysis * createAnalysis(const QString& analysisName);
 
   static void addAnalysisToObjectModel(voAnalysis * analysis, voDataModelItem* insertLocation);
 

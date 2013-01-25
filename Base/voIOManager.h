@@ -28,6 +28,10 @@
 // Visomics includes
 #include "voDelimitedTextImportSettings.h"
 
+class QStandardItem;
+class QXmlStreamReader;
+class QXmlStreamWriter;
+class voDataModelItem;
 class voInputFileDataObject;
 class vtkDataObject;
 class vtkExtendedTable;
@@ -50,6 +54,9 @@ public:
   static void fillExtendedTable(vtkTable* sourceTable, vtkExtendedTable* destTable,
                                 const voDelimitedTextImportSettings& settings = voDelimitedTextImportSettings());
 
+  static void convertTableToExtended(vtkTable *table,
+                                     vtkExtendedTable *extendedTable);
+
   void openCSVFile(const QString& fileName,const voDelimitedTextImportSettings& settings);
   void loadPhyloTreeDataSet(const QString& fileName,const QString& tableFileName,const voDelimitedTextImportSettings& settings);
   void loadPhyloTreeDataSet(const QString& fileName);
@@ -61,8 +68,27 @@ public:
   void createTreeHeatmapItem(QString name, QList<voInputFileDataObject *> forest,
                              voInputFileDataObject * tableObject);
 
+  void saveState(const QString& fileName);
+  void loadState(const QString& fileName);
+
 protected:
   bool treeAndTableMatch(vtkTree *tree, vtkTable *table);
+  void writeItemToXML(QStandardItem* parent, QXmlStreamWriter *stream);
+  void writeAnalysisToXML(voDataModelItem *item, QXmlStreamWriter *stream);
+  void writeTreeHeatmapToXML(voDataModelItem *item, QXmlStreamWriter *stream);
+  void writeInputToXML(const QString& type, voDataModelItem *item,
+                       QXmlStreamWriter *stream);
+  void writeTableSettingsToXML(voDataModelItem *item, QXmlStreamWriter *stream);
+  void loadTreeHeatmapFromXML(QXmlStreamReader *stream);
+  void loadTreeFromXML(QXmlStreamReader *stream);
+  void loadTableFromXML(QXmlStreamReader *stream);
+  void loadAnalysisFromXML(QXmlStreamReader *stream);
+  QString readTreeFileNameFromXML(QXmlStreamReader *stream);
+  voDelimitedTextImportSettings readTableFromXML(QXmlStreamReader *stream,
+                                                 QString *fileName);
+
+  QMap<voInputFileDataObject *, voDelimitedTextImportSettings>
+    tableSettings;
 };
 
 #endif
