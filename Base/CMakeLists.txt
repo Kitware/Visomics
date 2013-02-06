@@ -26,6 +26,16 @@ SET(KIT_SRCS
   Analysis/voXCorrel.h
   Analysis/voGeigerModelFitting.cpp
   Analysis/voGeigerModelFitting.h
+  Analysis/voCustomAnalysis.cpp
+  Analysis/voCustomAnalysis.h
+  Analysis/voCustomAnalysisData.cpp
+  Analysis/voCustomAnalysisData.h
+  Analysis/voCustomAnalysisInformation.cpp
+  Analysis/voCustomAnalysisInformation.h
+  Analysis/voCustomAnalysisParameter.cpp
+  Analysis/voCustomAnalysisParameter.h
+  Analysis/voCustomAnalysisParameterField.cpp
+  Analysis/voCustomAnalysisParameterField.h
 
   Normalization/voNormalization.h
   Normalization/voLog2.cpp
@@ -126,6 +136,11 @@ SET(KIT_MOC_SRCS
   Analysis/voPLSStatistics.h
   Analysis/voXCorrel.h
   Analysis/voGeigerModelFitting.h
+  Analysis/voCustomAnalysis.h
+  Analysis/voCustomAnalysisData.h
+  Analysis/voCustomAnalysisInformation.h
+  Analysis/voCustomAnalysisParameter.h
+  Analysis/voCustomAnalysisParameterField.h
 
   Views/voCorrelationGraphView.h
   Views/voExtendedTableView.h

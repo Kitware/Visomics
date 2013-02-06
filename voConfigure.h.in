@@ -29,6 +29,7 @@
 #define Visomics_INSTALL_BIN_DIR "@Visomics_INSTALL_BIN_DIR@"
 #define Visomics_INSTALL_LIB_DIR "@Visomics_INSTALL_LIB_DIR@"
 #define Visomics_INSTALL_DATA_DIR "@Visomics_INSTALL_DATA_DIR@"
+#define Visomics_INSTALL_SCRIPTS_DIR "@Visomics_INSTALL_SCRIPTS_DIR@"
 #define Visomics_INSTALL_RSCRIPTS_DIR "@Visomics_INSTALL_RSCRIPTS_DIR@"
 #define Visomics_INSTALL_SHARE_DIR "@Visomics_INSTALL_SHARE_DIR@"
 

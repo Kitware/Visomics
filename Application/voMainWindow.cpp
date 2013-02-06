@@ -186,6 +186,13 @@ voMainWindow::voMainWindow(QWidget * newParent)
           d->DataBrowserWidget,
           SLOT(setActiveAnalysis(voAnalysis*)));
 
+  connect(voApplication::application()->analysisDriver(),
+          SIGNAL(addedCustomAnalysis(const QString&)),
+          this,
+          SLOT(onCustomAnalysisAdded(const QString&)));
+
+  this->loadAnalysisScripts();
+
   // Initialize status bar
   this->statusBar()->showMessage(tr(""), 2000);
 }
@@ -577,4 +584,42 @@ void voMainWindow::setViewActions(const QString& objectUuid, voView* newView)
   Q_UNUSED(objectUuid);
   d->ViewActionsToolBar->clear();
   d->ViewActionsToolBar->addActions(newView->actions());
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::loadAnalysisScripts()
+{
+  voApplication * app = voApplication::application();
+  QString scriptPath = app->homeDirectory() + "/" + Visomics_INSTALL_SCRIPTS_DIR;
+  QDir scriptDir(scriptPath);
+
+  QStringList filters;
+  filters << "*.xml";
+  QFileInfoList xmlFiles = scriptDir.entryInfoList(filters);
+
+  voAnalysisDriver *driver = voApplication::application()->analysisDriver();
+  foreach(QFileInfo xmlFileInfo, xmlFiles)
+    {
+    // make sure the corresponding R script exists
+    QString xmlFileName = xmlFileInfo.absoluteFilePath();
+    QString rScriptFileName = xmlFileName;
+    rScriptFileName.replace(".xml", ".R");
+    if (!scriptDir.exists(rScriptFileName))
+      {
+      qWarning() << xmlFileName << "exists but" << rScriptFileName << "does not";
+      continue;
+      }
+    driver->loadAnalysisFromScript(xmlFileName, rScriptFileName);
+    }
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::onCustomAnalysisAdded(const QString &analysisName)
+{
+  Q_D(voMainWindow);
+  QAction * action = new QAction(analysisName, this);
+  action->setEnabled(false);
+  d->AnalysisActionMapper.setMapping(action, analysisName);
+  connect(action, SIGNAL(triggered()), &d->AnalysisActionMapper, SLOT(map()));
+  d->menuAnalysis->addAction(action);
 }

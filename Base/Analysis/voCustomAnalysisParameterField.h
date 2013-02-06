@@ -18,10 +18,32 @@
 
 =========================================================================*/
 
-#ifndef __voTestConfigure_h
-#define __voTestConfigure_h
+#ifndef __voCustomAnalysisParameterField_h
+#define __voCustomAnalysisParameterField_h
 
-#define VISOMICS_DATA_DIR "@VisomicsData_DIR@"
-#define VISOMICS_SCRIPTS_DIR "@Visomics_SOURCE_DIR/scripts@"
+// Qt includes
+#include <QObject>
+
+class voCustomAnalysisParameterField : public QObject
+{
+  Q_OBJECT
+public:
+  typedef QObject Superclass;
+  voCustomAnalysisParameterField(QObject* newParent = 0);
+  virtual ~voCustomAnalysisParameterField();
+
+  QString name() const;
+  QString value() const;
+
+  void setName(const QString& name);
+  void setValue(const QString& value);
+
+protected:
+  QString fieldName;
+  QString fieldValue;
+
+private:
+  Q_DISABLE_COPY(voCustomAnalysisParameterField);
+};
 
 #endif

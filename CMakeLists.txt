@@ -53,7 +53,7 @@ SET(Visomics_KEGG_SERVER_PORT "8090" CACHE STRING "KEGG Server port")
 #
 SET(Visomics_MAJOR_VERSION 0)
 SET(Visomics_MINOR_VERSION 5)
-SET(Visomics_BUILD_VERSION 4)
+SET(Visomics_BUILD_VERSION 5)
 SET(Visomics_VERSION
     "${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}.${Visomics_BUILD_VERSION}")
 
@@ -64,6 +64,7 @@ SET(Visomics_INSTALL_BIN_DIR "bin")
 SET(Visomics_INSTALL_LIB_DIR "lib")
 SET(Visomics_INSTALL_INCLUDE_DIR "include/visomics-${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}")
 SET(Visomics_INSTALL_DATA_DIR "data")
+SET(Visomics_INSTALL_SCRIPTS_DIR "scripts")
 SET(Visomics_INSTALL_RSCRIPTS_DIR "share/R")
 SET(Visomics_INSTALL_SHARE_DIR "share")
 SET(Visomics_INSTALL_DOC_DIR "doc")
@@ -254,6 +255,15 @@ INSTALL(FILES ${r_scripts}
         DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR}
         COMPONENT Runtime
         RENAME GetRExternalPackages.R)
+
+set(custom_analysis_examples ${CMAKE_CURRENT_SOURCE_DIR}/scripts/examples)
+INSTALL(DIRECTORY ${custom_analysis_examples}
+        DESTINATION ${Visomics_INSTALL_SCRIPTS_DIR}
+        COMPONENT Runtime)
+set(custom_analysis_readme ${CMAKE_CURRENT_SOURCE_DIR}/scripts/README.txt)
+INSTALL(FILES ${custom_analysis_readme}
+        DESTINATION ${Visomics_INSTALL_SCRIPTS_DIR}
+        COMPONENT Runtime)
 
 #-----------------------------------------------------------------------------
 # Install sample dataset(s)

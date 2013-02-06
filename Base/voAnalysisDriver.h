@@ -47,10 +47,12 @@ public:
   bool doesInputMatchAnalysis(const QString& analysisName,
                               voDataModelItem* inputTarget, bool warnOnFail);
   int numberOfInputsForAnalysis(QString analysisName);
+  void loadAnalysisFromScript(const QString& xmlFileName, const QString& rScriptFileName);
 
 signals:
   void aboutToRunAnalysis(voAnalysis*);
   void analysisAddedToObjectModel(voAnalysis*);
+  void addedCustomAnalysis(const QString&);
 
 public slots:
   void runAnalysisForAllInputs(const QString& analysisName, bool acceptDefaultParameter = false);

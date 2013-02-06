@@ -39,6 +39,9 @@
 #include "voXCorrel.h"
 #include "voGeigerModelFitting.h"
 
+#include "voCustomAnalysis.h"
+#include "voCustomAnalysisInformation.h";
+
 //----------------------------------------------------------------------------
 class voAnalysisFactoryPrivate
 {
@@ -46,6 +49,7 @@ public:
   voQObjectFactory<voAnalysis> AnalysisFactory;
   QHash<QString, QString>      PrettyNameToNameMap;
   QHash<QString, QString>      NameToPrettyNameMap;
+  QHash<QString, voCustomAnalysisInformation*> customAnalysisNameToInfoMap;
 };
 
 //----------------------------------------------------------------------------
@@ -85,6 +89,19 @@ voAnalysis* voAnalysisFactory::createAnalysis(const QString& className)
   if (analysis)
     {
     analysis->setObjectName(d->NameToPrettyNameMap.value(className));
+    }
+  else if(d->customAnalysisNameToInfoMap.contains(className))
+    {
+    voCustomAnalysisInformation *info =
+      d->customAnalysisNameToInfoMap.value(className);
+    voCustomAnalysis *customAnalysis = new voCustomAnalysis(info);
+    customAnalysis->setObjectName(className);
+    customAnalysis->loadInformation(info);
+    return customAnalysis;
+    }
+  else
+    {
+    qCritical() << "unknown analysis:" << className;
     }
   return analysis;
 }
@@ -138,4 +155,14 @@ void voAnalysisFactory::registerAnalysis(const QString& analysisPrettyName)
   d->NameToPrettyNameMap.insert(analysisName, analysisPrettyName);
 
   d->AnalysisFactory.registerObject<AnalysisClassType>(analysisName);
+}
+
+//-----------------------------------------------------------------------------
+void voAnalysisFactory::addCustomAnalysis(voCustomAnalysisInformation *info)
+{
+  Q_D(voAnalysisFactory);
+  QString analysisName = info->name();
+  d->customAnalysisNameToInfoMap[analysisName] = info;
+  d->PrettyNameToNameMap.insert(analysisName, analysisName);
+  d->NameToPrettyNameMap.insert(analysisName, analysisName);
 }
