@@ -27,6 +27,7 @@
 
 class voAnalysisFactoryPrivate;
 class voAnalysis;
+class voCustomAnalysisInformation;
 
 class voAnalysisFactory
 {
@@ -46,6 +47,9 @@ public:
 
   /// Return list of registered analysis pretty names
   QStringList registeredAnalysisPrettyNames() const;
+
+  /// Register custom analysis with the factory
+  void addCustomAnalysis(voCustomAnalysisInformation *info);
 
 protected:
 

@@ -55,6 +55,8 @@ public slots:
   void about();
 
   void loadSampleDataset();
+  void loadAnalysisScripts();
+  void onCustomAnalysisAdded(const QString& analysisName);
 
 protected slots:
   void onAnalysisSelected(voAnalysis* analysis);
