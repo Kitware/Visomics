@@ -40,7 +40,7 @@
 #include "voGeigerModelFitting.h"
 
 #include "voCustomAnalysis.h"
-#include "voCustomAnalysisInformation.h";
+#include "voCustomAnalysisInformation.h"
 
 //----------------------------------------------------------------------------
 class voAnalysisFactoryPrivate
