@@ -54,4 +54,4 @@ install.missing.packages("preprocessCore", bioc.install)
 
 install.missing.packages(c("ape", "MASS", "mvtnorm", "msm", "subplex", "deSolve", "colorspace", "digest", "Rcpp", "coda"), cran.install)
 
-install.missing.packages("geiger", function(pkg) install.packages(pkgs = "PACKAGE_PATH/geiger_1.4-5.667.tar.gz", repos=NULL,dependencies=TRUE, type="source"))
+install.missing.packages("geiger", function(pkg) install.packages(pkgs = "PACKAGE_PATH/geiger_1.5-0.666.tar.gz", repos=NULL,dependencies=TRUE, type="source"))
