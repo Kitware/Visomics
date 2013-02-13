@@ -43,6 +43,7 @@
 #include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkTableToGraph.h>
+#include <vtkTree.h>
 
 // --------------------------------------------------------------------------
 // voCustomAnalysisPrivate methods
@@ -82,7 +83,7 @@ void voCustomAnalysis::loadInformation(voCustomAnalysisInformation *info)
   Q_D(voCustomAnalysis);
   d->Information = info;
   this->inputName = d->Information->input()->name();
-  this->inputType = d->Information->input()->name();
+  this->inputType = d->Information->input()->type();
 }
 
 // --------------------------------------------------------------------------
@@ -150,8 +151,10 @@ void voCustomAnalysis::setParameterInformation()
         }
       else if (field->name() == "description")
         {
-        this->parameterDescriptions.append(QString("<dt><b>%1:</b></dt>").arg(name));
-        this->parameterDescriptions.append(QString("<dd>%1</dd>").arg(field->value()));
+        this->parameterDescriptions.append(
+          QString("<dt><b>%1:</b></dt>").arg(parameterTitle));
+        this->parameterDescriptions.append(
+          QString("<dd>%1</dd>").arg(field->value()));
         }
       else if (field->name() == "min")
         {
@@ -203,7 +206,7 @@ void voCustomAnalysis::setParameterInformation()
       }
     else
       {
-      qCritical() << "Unsupported output type in voCustomAnalysis:" << type;
+      qCritical() << "Unsupported parameter type in voCustomAnalysis:" << type;
       }
     }
   this->parameterDescriptions.append("</dl>");
@@ -223,32 +226,64 @@ bool voCustomAnalysis::execute()
 {
   Q_D(voCustomAnalysis);
 
-  // Import data table locally
-  vtkSmartPointer<vtkExtendedTable> extendedTable = this->getInputTable();
-  if (!extendedTable)
+  d->RCalc->SetRoutput(0);
+  vtkSmartPointer<vtkExtendedTable> extendedTable;
+
+  if (this->inputType == "Table")
     {
-    qCritical() << "Input is Null";
+    extendedTable = this->getInputTable();
+    if (!extendedTable)
+      {
+      qCritical() << "Input Table is Null";
+      return false;
+      }
+
+    vtkSmartPointer<vtkTable> inputDataTable = extendedTable->GetData();
+
+    // Build ArrayData for input to R
+    vtkNew<vtkArrayData> RInputArrayData;
+      {
+      vtkSmartPointer<vtkArray> RInputArray;
+      voUtils::tableToArray(inputDataTable.GetPointer(), RInputArray);
+      RInputArrayData->AddArray(RInputArray.GetPointer());
+      }
+    d->RCalc->SetInputData(RInputArrayData.GetPointer());
+    d->RCalc->PutArray("0", this->inputName.toStdString().c_str());
+    }
+  else if (this->inputType == "Tree")
+    {
+    vtkTree* tree =
+      vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
+    if (!tree)
+      {
+      qCritical() << "Input Tree is Null";
+      return false;
+      }
+    d->RCalc->SetInputData(tree);
+    d->RCalc->PutTree(this->inputName.toStdString().c_str());
+    }
+  else
+    {
+    qCritical() << "Unsupported input type:" << this->inputType;
     return false;
     }
-
-  vtkSmartPointer<vtkTable> inputDataTable = extendedTable->GetData();
-
-  // Build ArrayData for input to R
-  vtkNew<vtkArrayData> RInputArrayData;
-    {
-    vtkSmartPointer<vtkArray> RInputArray;
-    voUtils::tableToArray(inputDataTable.GetPointer(), RInputArray);
-    RInputArrayData->AddArray(RInputArray.GetPointer());
-    }
-
-  d->RCalc->SetRoutput(0);
-  d->RCalc->SetInputData(RInputArrayData.GetPointer());
-  d->RCalc->PutArray("0", this->inputName.toStdString().c_str());
 
   foreach(voCustomAnalysisData *output, d->Information->outputs())
     {
     const char *outputName = output->name().toStdString().c_str();
-    d->RCalc->GetArray(outputName, outputName);
+    if (output->type() == "Table")
+      {
+      d->RCalc->GetArray(outputName, outputName);
+      }
+    else if(output->type() == "Tree")
+      {
+      d->RCalc->GetTree(outputName);
+      }
+    else
+      {
+      qCritical() << "Unsupported output type:" << output->type();
+      return false;
+      }
     }
 
   // replace each parameter in the script with its actual value
@@ -285,12 +320,12 @@ bool voCustomAnalysis::execute()
   d->RCalc->Update();
 
   // Get output(s) from R
+  vtkSmartPointer<vtkArrayData> outputArrayData =
+    vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
   foreach(voCustomAnalysisData *output, d->Information->outputs())
     {
     if (output->type() == "Table")
       {
-      vtkSmartPointer<vtkArrayData> outputArrayData =
-        vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
       if (!outputArrayData || !outputArrayData->GetArrayByName(output->name().toStdString().c_str()))
         {
         qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
@@ -321,7 +356,9 @@ bool voCustomAnalysis::execute()
       }
     else
       {
-      qCritical() << "Only table output is supported at the moment";
+      vtkTree * outputTree = vtkTree::SafeDownCast(d->RCalc->GetOutput());
+      this->setOutput(output->name(),
+                      new voDataObject(output->name(), outputTree));
       }
     }
   return true;
