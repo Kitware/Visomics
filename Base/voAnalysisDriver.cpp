@@ -571,12 +571,13 @@ void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
     outputData->setName(outputName.toString());
     outputData->setType(outputType.toString());
     analysisInformation->addOutput(outputData);
-    //outputs.insert(outputName.toString(), QVariant(outputValue));
-    if (!stream.readNextStartElement())
+    stream.readNext();
+    stream.readNextStartElement();
+    tagName = stream.name().toString();
+    if (tagName == "outputs" || tagName == "parameters")
       {
       break;
       }
-    tagName = stream.name().toString();
     }
 
   // parse parameter information (if any)
