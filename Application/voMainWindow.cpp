@@ -591,6 +591,10 @@ void voMainWindow::loadAnalysisScripts()
 {
   voApplication * app = voApplication::application();
   QString scriptPath = app->homeDirectory() + "/" + Visomics_INSTALL_SCRIPTS_DIR;
+  if (!app->isInstalled())
+    {
+    scriptPath = QLatin1String(Visomics_SOURCE_DIR) + "/" + Visomics_INSTALL_SCRIPTS_DIR;
+    }
   QDir scriptDir(scriptPath);
 
   QStringList filters;

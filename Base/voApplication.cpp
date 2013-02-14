@@ -117,6 +117,7 @@ QString voApplicationPrivate::discoverHomeDirectory()
   if (binDir.dirName().endsWith(".app"))
     {
     binDir.cdUp();
+    binDir.cdUp();
     }
   return binDir.canonicalPath();
 }
