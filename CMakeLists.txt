@@ -232,6 +232,12 @@ FOREACH(header voConfigure.h voTestConfigure.h)
     )
 ENDFOREACH()
 
+configure_file(
+  ${CMAKE_SOURCE_DIR}/Utilities/GetRExternalPackages.R.in
+  ${CMAKE_BINARY_DIR}/GetRExternalPackages.R
+  @ONLY
+)
+
 #-----------------------------------------------------------------------------
 # Include directories
 #

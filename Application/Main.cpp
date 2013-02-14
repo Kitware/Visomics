@@ -76,7 +76,7 @@ void checkRPrerequisites(void * data)
     return;
     }
 
-  QString rscriptFilePath = QLatin1String(Visomics_SOURCE_DIR) + "/Utilities/GetRExternalPackages.R";
+  QString rscriptFilePath = app->homeDirectory() + "/GetRExternalPackages.R";
   if(app->isInstalled())
     {
     rscriptFilePath = app->homeDirectory() + "/" + Visomics_INSTALL_RSCRIPTS_DIR + "/GetRExternalPackages.R";
