@@ -275,7 +275,7 @@ IF(BUILD_TESTING)
     ${VisomicsData_DIR}/Data/treeData/anolisDataAppended.csv
     )
   INSTALL(FILES ${datasets} DESTINATION ${Visomics_INSTALL_DATA_DIR} COMPONENT Runtime)
-  INSTALL(FILES ${VisomicsData_DIR}/ThirdParty/RPackages/geiger_1.4-5.667.tar.gz
+  INSTALL(FILES ${VisomicsData_DIR}/ThirdParty/RPackages/geiger_1.5-0.666.tar.gz
           DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR} COMPONENT Runtime)
 ENDIF()
 
