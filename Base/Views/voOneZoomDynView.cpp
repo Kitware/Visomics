@@ -22,6 +22,7 @@
 #include <QDebug>
 #include <QList>
 #include <QFile>
+#include <QFileInfo>
 #include <QTextStream>
 
 
@@ -87,6 +88,20 @@ QString voOneZoomDynView::stringify(const voDataObject& dataObject)
     }
   file.close(); // when your done.
 
+  //Massage the leaf node labels so Wikipedia linking works more reliably.
+  if (!treeString.contains("_"))
+    {
+    if (treeString.contains(" "))
+      {
+      treeString.replace(QString(" "), QString("_"));
+      }
+    else
+      {
+      QFileInfo fileInfo(file);
+      QString nameToAppend = fileInfo.baseName();
+      treeString.replace(QRegExp("([a-zA-Z]+)"), QString("%1_\\1").arg(nameToAppend));
+      }
+    }
 
   return treeString;
 }
