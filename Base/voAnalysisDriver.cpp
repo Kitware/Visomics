@@ -74,7 +74,7 @@ voAnalysisDriver::voAnalysisDriver(QObject* newParent):
   analysisNameToInputTypes.insert(
     "Fold Change", QStringList() << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
-    "GeigerTreeModelFitting", QStringList() << "vtkTree" << "vtkExtendedTable");
+    "Geiger Tree Model Fitting", QStringList() << "vtkTree" << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
     "Hierarchical Clustering", QStringList() << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
@@ -91,6 +91,8 @@ voAnalysisDriver::voAnalysisDriver(QObject* newParent):
     "PLS", QStringList() << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
     "T-Test", QStringList() << "vtkExtendedTable");
+  analysisNameToInputTypes.insert(
+    "Tree Drop Tip", QStringList() << "vtkTree" << "vtkExtendedTable");
 }
 
 // --------------------------------------------------------------------------

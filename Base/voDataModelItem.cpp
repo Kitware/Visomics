@@ -31,6 +31,7 @@
 #include "voDataObject.h"
 #include "voInputFileDataObject.h"
 #include "voTableDataObject.h"
+#include "voOutputDataObject.h"
 #include "voView.h"
 
 // --------------------------------------------------------------------------
@@ -186,6 +187,10 @@ int voDataModelItem::typeFromDataObject(voDataObject * newDataObject)
     return voDataModelItem::InputType;
     }
   else if (dynamic_cast<voTableDataObject*>(newDataObject))
+    {
+    return voDataModelItem::OutputType;
+    }
+  else if (dynamic_cast<voOutputDataObject*>(newDataObject))
     {
     return voDataModelItem::OutputType;
     }
