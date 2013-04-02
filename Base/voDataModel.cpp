@@ -558,3 +558,33 @@ QString voDataModel::generateUniqueName(QString desiredName)
 
   return uniqueName;
 }
+
+// --------------------------------------------------------------------------
+void voDataModel::listItems(const QString &type, QStringList *list,
+                            QStandardItem* parent) const
+{
+  if (!parent)
+    {
+    parent = this->invisibleRootItem();
+    }
+
+  for (int row = 0; row < this->rowCount(parent->index()); ++row)
+    {
+    for (int col = 0; col < this->columnCount(parent->index()); ++col)
+      {
+      voDataModelItem *item =
+        dynamic_cast<voDataModelItem*>(
+        this->itemFromIndex(this->index(row, col, parent->index())));
+
+      if (item->dataObject() && item->dataObject()->type() == type)
+        {
+        *list << item->text();
+        }
+
+      if (this->hasChildren(item->index()))
+        {
+        this->listItems(type, list, item);
+        }
+      }
+    }
+}

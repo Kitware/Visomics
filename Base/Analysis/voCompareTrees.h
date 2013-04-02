@@ -18,43 +18,32 @@
 
 =========================================================================*/
 
-
-#ifndef __voTreeHeatmapView_h
-#define __voTreeHeatmapView_h
+#ifndef __voCompareTrees_h
+#define __voCompareTrees_h
 
 // Qt includes
 #include <QScopedPointer>
 
 // Visomics includes
-#include "voView.h"
+#include "voAnalysis.h"
 
-class voTreeHeatmapViewPrivate;
-class vtkTreeHeatmapItem;
-
-class voTreeHeatmapView : public voView
+class voCompareTrees : public voAnalysis
 {
   Q_OBJECT
 public:
-  typedef voView Superclass;
-  voTreeHeatmapView(QWidget * newParent = 0);
-  virtual ~voTreeHeatmapView();
-  vtkTreeHeatmapItem * getTreeHeatmapItem() const;
+  typedef voAnalysis Superclass;
+  voCompareTrees();
+  virtual ~voCompareTrees();
 
 protected:
-  void setupUi(QLayout * layout);
+  virtual void setOutputInformation();
+  virtual void setParameterInformation();
+  virtual QString parameterDescription()const;
 
-  virtual void setDataObjectListInternal(const QList<voDataObject*> dataObjects);
-
-  virtual void setDataObjectInternal(const voDataObject& dataObject);
-
-  void colorTreeForDifference();
-
-protected:
-  QScopedPointer<voTreeHeatmapViewPrivate> d_ptr;
+  virtual bool execute();
 
 private:
-  Q_DECLARE_PRIVATE(voTreeHeatmapView);
-  Q_DISABLE_COPY(voTreeHeatmapView);
+  Q_DISABLE_COPY(voCompareTrees);
 };
 
 #endif

@@ -38,6 +38,8 @@ SET(KIT_SRCS
   Analysis/voCustomAnalysisParameterField.h
   Analysis/voTreeDropTip.cpp
   Analysis/voTreeDropTip.h
+  Analysis/voCompareTrees.cpp
+  Analysis/voCompareTrees.h
 
   Normalization/voNormalization.h
   Normalization/voLog2.cpp
@@ -140,6 +142,7 @@ SET(KIT_MOC_SRCS
   Analysis/voPLSStatistics.h
   Analysis/voXCorrel.h
   Analysis/voGeigerModelFitting.h
+  Analysis/voCompareTrees.h
   Analysis/voCustomAnalysis.h
   Analysis/voCustomAnalysisData.h
   Analysis/voCustomAnalysisInformation.h

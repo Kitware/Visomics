@@ -39,6 +39,7 @@
 #include "voXCorrel.h"
 #include "voGeigerModelFitting.h"
 #include "voTreeDropTip.h"
+#include "voCompareTrees.h"
 
 #include "voCustomAnalysis.h"
 #include "voCustomAnalysisInformation.h"
@@ -75,6 +76,7 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voXCorrel>("Cross Correlation");
   this->registerAnalysis<voGeigerModelFitting>("Geiger Tree Model Fitting");
   this->registerAnalysis<voTreeDropTip>("Tree Drop Tip");
+  this->registerAnalysis<voCompareTrees>("Compare Trees");
 }
 
 

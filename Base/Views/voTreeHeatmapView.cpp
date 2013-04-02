@@ -29,6 +29,8 @@
 
 // VTK includes
 #include <QVTKWidget.h>
+#include <vtkDatasetAttributes.h>
+#include <vtkDoubleArray.h>
 #include <vtkGraph.h>
 #include <vtkLookupTable.h>
 #include <vtkRenderer.h>
@@ -157,6 +159,7 @@ void voTreeHeatmapView::setDataObjectListInternal(const QList<voDataObject*> dat
       }
     }
 
+  this->colorTreeForDifference();
   d->ContextView->GetRenderWindow()->SetMultiSamples(0);
   d->ContextView->Render();
 }
@@ -174,6 +177,19 @@ void voTreeHeatmapView::setDataObjectInternal(const voDataObject& dataObject)
     }
 
   d->TreeItem->SetTree(tree);
+  this->colorTreeForDifference();
   d->ContextView->GetRenderWindow()->SetMultiSamples(0);
   d->ContextView->Render();
+}
+
+// --------------------------------------------------------------------------
+void voTreeHeatmapView::colorTreeForDifference()
+{
+  Q_D(voTreeHeatmapView);
+  vtkDataArray *differenceArray =
+    d->TreeItem->GetTree()->GetVertexData()->GetArray("differences");
+  if (differenceArray)
+    {
+    d->TreeItem->SetTreeColorArray("differences");
+    }
 }
