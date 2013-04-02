@@ -115,6 +115,11 @@ void voView::setDataObjectList(QList<voDataObject*> dataObjectList)
                 << "- Failed to setDataObjects - dataObject list is NULL";
     return;
     }
+  if (dataObjectList.size() == 1)
+    {
+    d->DataObject = dataObjectList[0];
+    this->setDataObjectInternal(*(d->DataObject));
+    }
   d->DataObjectList = dataObjectList;
   this->setDataObjectListInternal(dataObjectList);
 }
