@@ -407,13 +407,13 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
     voInputFileDataObject * treeObject =
       new voInputFileDataObject(fileName, tree);
 
-    this->createTreeHeatmapItem(treeHeatmapName, treeObject, tableObject);
+    this->createTreeHeatmapItem(treeHeatmapName,dynamic_cast<voDataObject*>(treeObject),dynamic_cast<voDataObject*>(tableObject));
     }
 
   // multiple trees
   else
     {
-    QList<voInputFileDataObject *> treeObjects;
+    QList<voDataObject *> treeObjects;
     for (unsigned int i = 0; i < forest->GetNumberOfPieces(); i++)
       {
       vtkTree * tree =  vtkTree::SafeDownCast( forest->GetPieceAsDataObject(i));
@@ -423,11 +423,11 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
         }
 
       QString displayName = QString("tree-%1").arg(QString::number(i));
-      voInputFileDataObject * treeObject = new voInputFileDataObject(displayName, tree);
+      voDataObject * treeObject = new voDataObject(displayName, tree);
       treeObjects << treeObject;
       }
 
-    this->createTreeHeatmapItem(treeHeatmapName, treeObjects, tableObject);
+    this->createTreeHeatmapItem(treeHeatmapName, treeObjects,dynamic_cast<voDataObject*>(tableObject));
     }
 }
 
@@ -451,19 +451,30 @@ bool voIOManager::treeAndTableMatch(vtkTree *tree, vtkTable *table)
   return true;
 }
 
+
 // --------------------------------------------------------------------------
 void voIOManager::createTreeHeatmapItem(QString name,
-                                        voInputFileDataObject * treeObject,
-                                        voInputFileDataObject * tableObject)
+                                        voDataModelItem * parent,
+                                        voDataObject * treeObject,
+                                        voDataObject * tableObject)
 {
   voDataModel * model = voApplication::application()->dataModel();
 
   // create a new item for our TreeHeatmap
   voDataObject * emptyDataObject = new voDataObject(name, NULL);
-  voDataModelItem * newItem = model->addDataObject(emptyDataObject);
+  voDataModelItem * newItem;
+  if (parent)
+    {
+    newItem = model->addDataObjectAsChild(emptyDataObject,parent);
+    }
+  else
+    {
+    newItem = model->addDataObject(emptyDataObject);
+    }
 
   // create a DataModelItem for our tree
   voDataModelItem * treeItem = model->addDataObjectAsChild(treeObject, newItem);
+  treeItem->setType(voDataModelItem::InputType);
   treeItem->setRawViewType("voTreeHeatmapView");
   newItem->addChildItem(treeItem);
 
@@ -482,8 +493,16 @@ void voIOManager::createTreeHeatmapItem(QString name,
 
 // --------------------------------------------------------------------------
 void voIOManager::createTreeHeatmapItem(QString name,
-                                        QList<voInputFileDataObject *> treeObjects,
-                                        voInputFileDataObject * tableObject)
+                                        voDataObject * treeObject,
+                                        voDataObject * tableObject)
+{
+  createTreeHeatmapItem(name,NULL,treeObject,tableObject);
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::createTreeHeatmapItem(QString name,
+                                        QList<voDataObject *> treeObjects,
+                                        voDataObject * tableObject)
 {
   voDataModel * model = voApplication::application()->dataModel();
 
@@ -494,7 +513,7 @@ void voIOManager::createTreeHeatmapItem(QString name,
   // create a DataModelItem for each of our trees
   for (int i = 0; i < treeObjects.size(); ++i)
     {
-    voInputFileDataObject * treeObject = treeObjects[i];
+    voDataObject * treeObject = treeObjects[i];
     voDataModelItem * treeItem = model->addDataObjectAsChild(treeObject, newItem);
     treeItem->setRawViewType("voTreeHeatmapView");
     newItem->addChildItem(treeItem);
@@ -1106,10 +1125,11 @@ void voIOManager::loadAnalysisFromXML(QXmlStreamReader *stream)
 void voIOManager::convertTableToExtended(vtkTable *table,
                                          vtkExtendedTable *extendedTable)
 {
+  extendedTable->SetInputDataTable(table);
   // column meta data: the names of each array in the input table
   vtkNew<vtkTable> columnMetaData;
   vtkNew<vtkStringArray> columnNames;
-  for(int i = 0; i < table->GetNumberOfColumns(); ++i)
+  for(int i = 1; i < table->GetNumberOfColumns(); ++i)
     {
     columnNames->InsertNextValue(table->GetColumn(i)->GetName());
     }

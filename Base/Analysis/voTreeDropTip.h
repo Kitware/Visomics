@@ -28,6 +28,11 @@
 #include "voAnalysis.h"
 
 class voTreeDropTipPrivate;
+class vtkTree;
+class vtkTable;
+class vtkSelection;
+class vtkQStringList;
+class vtkIdTypeArray;
 
 class voTreeDropTip : public voAnalysis
 {
@@ -43,6 +48,10 @@ protected:
   virtual QString parameterDescription()const;
 
   virtual bool execute();
+  bool removeInternalBranch(vtkTree * tree, vtkIdTypeArray * selArray, vtkIdType parentId);
+  bool getTipSelection(vtkTree * tree, vtkTable * inputDataTable,vtkSelection * sel, QStringList tipNameList);
+  bool getSelectionByTipNames(vtkTree * tree, vtkTable * inputDataTable, vtkSelection * sel);
+  bool getSelectionByDataFiltering(vtkTree *tree, vtkTable * inputDataTable, vtkSelection * sel);
 
 protected:
   QScopedPointer<voTreeDropTipPrivate> d_ptr;

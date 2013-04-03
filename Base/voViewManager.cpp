@@ -121,7 +121,7 @@ void voViewManager::createView(const QString& objectUuid)
       return;
       }
  }
-
+/*
   //Specially case for tree rendering for the output  of
   //the "TreeDropTip" analysis: attach the input table of the analysis
   //to the output tree item, so that the heatmap can be visulized on
@@ -145,7 +145,7 @@ void voViewManager::createView(const QString& objectUuid)
         }
       }
     }
-
+*/
 
   // Check if view has already been instantiated
   voView * view = 0;
