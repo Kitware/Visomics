@@ -338,12 +338,12 @@ voTreeDropTip::~voTreeDropTip()
 // --------------------------------------------------------------------------
 void voTreeDropTip::setOutputInformation()
 {
-  this->addOutputType("treeAfterDropTip", "vtkTree" ,
+  this->addOutputType("pruned_tree", "vtkTree" ,
     "","",
-    "voTreeHeatmapView", "Subtree output");
-  this->addOutputType("tableAfterDropTip", "vtkExtendedTable" ,
+    "voTreeHeatmapView", "pruned tree");
+  this->addOutputType("pruned_table", "vtkExtendedTable" ,
     "","",
-    "voExtendedTableView", "Subtable output");
+    "voExtendedTableView", "pruned table");
 }
 
 // --------------------------------------------------------------------------
@@ -430,10 +430,10 @@ bool voTreeDropTip::execute()
       return false;
       }
 
-    this->setOutput("treeAfterDropTip", new voOutputDataObject("treeAfterDropTip", outTree));
+    this->setOutput("pruned_tree", new voOutputDataObject("pruned_tree", outTree));
     vtkNew<vtkExtendedTable> outputTable;
     voIOManager::convertTableToExtended(table.GetPointer(), outputTable.GetPointer());
-    this->setOutput("tableAfterDropTip", new voTableDataObject("tableAfterDropTip", outputTable.GetPointer()));
+    this->setOutput("pruned_table", new voTableDataObject("pruned_table", outputTable.GetPointer()));
 
     return true;
     }

@@ -29,6 +29,7 @@
 #include "voView.h"
 #include "voViewFactory.h"
 #include "voViewManager.h"
+#include "voIOManager.h"
 
 
 // --------------------------------------------------------------------------
@@ -120,32 +121,7 @@ void voViewManager::createView(const QString& objectUuid)
       qCritical() << "voViewManager - Failed to create view: dataObjectList is NULL";
       return;
       }
- }
-/*
-  //Specially case for tree rendering for the output  of
-  //the "TreeDropTip" analysis: attach the input table of the analysis
-  //to the output tree item, so that the heatmap can be visulized on
-  //the output extracted subtree.
-  voDataModelItem * containerDataModelItem = dynamic_cast<voDataModelItem*> (dataModelItem->parent());
-  if (containerDataModelItem)
-    {
-    if ((containerDataModelItem->text()).contains("Tree Drop Tip"))
-      {
-      voDataModelItem *  parentDataModelItem = dynamic_cast<voDataModelItem *> (containerDataModelItem->parent());
-      QList<voDataModelItem*> childItems = parentDataModelItem->childItems();
-
-      for (int i = 0; i< childItems.size(); i++)
-        {
-        voDataModelItem * childItem = childItems[i];
-        if (childItem->dataObject()->type() == "vtkExtendedTable")
-          {
-          dataObjectList.append(childItem->dataObject());
-          break;
-          }
-        }
-      }
     }
-*/
 
   // Check if view has already been instantiated
   voView * view = 0;
