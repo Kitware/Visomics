@@ -36,6 +36,8 @@ SET(KIT_SRCS
   Analysis/voCustomAnalysisParameter.h
   Analysis/voCustomAnalysisParameterField.cpp
   Analysis/voCustomAnalysisParameterField.h
+  Analysis/voTreeDropTip.cpp
+  Analysis/voTreeDropTip.h
 
   Normalization/voNormalization.h
   Normalization/voLog2.cpp
@@ -106,6 +108,8 @@ SET(KIT_SRCS
   voKEGGUtils.cpp
   voKEGGUtils.h
   voQObjectFactory.h
+  voOutputDataObject.cpp
+  voOutputDataObject.h
   voRegistry.cpp
   voRegistry.h
   voTableDataObject.cpp
@@ -141,6 +145,8 @@ SET(KIT_MOC_SRCS
   Analysis/voCustomAnalysisInformation.h
   Analysis/voCustomAnalysisParameter.h
   Analysis/voCustomAnalysisParameterField.h
+  Analysis/voTreeDropTip.h
+
 
   Views/voCorrelationGraphView.h
   Views/voExtendedTableView.h
@@ -170,6 +176,7 @@ SET(KIT_MOC_SRCS
   voDynView.h
   voJavascriptBridge.h
   voInputFileDataObject.h
+  voOutputDataObject.h
   voTableDataObject.h
   voView.h
   voViewManager.h

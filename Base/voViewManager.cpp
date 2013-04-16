@@ -98,11 +98,10 @@ void voViewManager::createView(const QString& objectUuid)
 
 
   QList<voDataObject*> dataObjectList;
+  voDataObject * dataObject = dataModelItem->dataObject();
   QList<voDataModelItem*> childItems = dataModelItem->childItems();
   if (childItems.empty())
     {
-    voDataObject * dataObject;
-    dataObject = dataModelItem->dataObject();
     if (!dataObject)
       {
       qCritical() << "voViewManager - Failed to create view: dataObject is NULL";
@@ -121,8 +120,32 @@ void voViewManager::createView(const QString& objectUuid)
       qCritical() << "voViewManager - Failed to create view: dataObjectList is NULL";
       return;
       }
-    }
+ }
+/*
+  //Specially case for tree rendering for the output  of
+  //the "TreeDropTip" analysis: attach the input table of the analysis
+  //to the output tree item, so that the heatmap can be visulized on
+  //the output extracted subtree.
+  voDataModelItem * containerDataModelItem = dynamic_cast<voDataModelItem*> (dataModelItem->parent());
+  if (containerDataModelItem)
+    {
+    if ((containerDataModelItem->text()).contains("Tree Drop Tip"))
+      {
+      voDataModelItem *  parentDataModelItem = dynamic_cast<voDataModelItem *> (containerDataModelItem->parent());
+      QList<voDataModelItem*> childItems = parentDataModelItem->childItems();
 
+      for (int i = 0; i< childItems.size(); i++)
+        {
+        voDataModelItem * childItem = childItems[i];
+        if (childItem->dataObject()->type() == "vtkExtendedTable")
+          {
+          dataObjectList.append(childItem->dataObject());
+          break;
+          }
+        }
+      }
+    }
+*/
 
   // Check if view has already been instantiated
   voView * view = 0;
@@ -149,8 +172,8 @@ void voViewManager::createView(const QString& objectUuid)
 
   // Associate view with the dataModelItem
   if (dataModelItem->type() == voDataModelItem::InputType ||
-      dataModelItem->type() == voDataModelItem::OutputType ||
-      dataModelItem->type() == voDataModelItem::ViewType)
+    dataModelItem->type() == voDataModelItem::OutputType ||
+    dataModelItem->type() == voDataModelItem::ViewType)
     {
     dataModelItem->setData(QVariant(QMetaType::VoidStar, &view), voDataModelItem::ViewVoidStarRole);
     }

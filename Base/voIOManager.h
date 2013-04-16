@@ -63,10 +63,12 @@ public:
 
   static bool writeDataObjectToFile(vtkDataObject * dataObject, const QString& fileName);
 
-  void createTreeHeatmapItem(QString name, voInputFileDataObject * treeObject,
-                             voInputFileDataObject * tableObject);
-  void createTreeHeatmapItem(QString name, QList<voInputFileDataObject *> forest,
-                             voInputFileDataObject * tableObject);
+  void createTreeHeatmapItem(QString name, voDataModelItem * parent, voDataObject * treeObject,
+                             voDataObject * tableObject);
+  void createTreeHeatmapItem(QString name, voDataObject * treeObject,
+                             voDataObject * tableObject);
+  void createTreeHeatmapItem(QString name, QList<voDataObject *> forest,
+                             voDataObject * tableObject);
 
   void saveState(const QString& fileName);
   void loadState(const QString& fileName);

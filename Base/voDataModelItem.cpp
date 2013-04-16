@@ -31,6 +31,7 @@
 #include "voDataObject.h"
 #include "voInputFileDataObject.h"
 #include "voTableDataObject.h"
+#include "voOutputDataObject.h"
 #include "voView.h"
 
 // --------------------------------------------------------------------------
@@ -58,6 +59,7 @@ voDataModelItemPrivate::voDataModelItemPrivate(voDataModelItem& object):q_ptr(&o
   this->Type = voDataModelItem::Unspecified;
   this->Column = -1;
   q->setData(QVariant(QUuid::createUuid().toString()), voDataModelItem::UuidRole);
+  q->setText("");
 }
 
 // --------------------------------------------------------------------------
@@ -79,7 +81,6 @@ voDataModelItem::voDataModelItem(voDataObject * newDataObject, int newColumn):
   d->Column = newColumn;
 
   Qt::ItemFlags flags(Qt::ItemIsEnabled | Qt::ItemIsUserCheckable);
-
   switch(d->Column)
     {
     case voDataModel::NameColumn:
@@ -186,6 +187,10 @@ int voDataModelItem::typeFromDataObject(voDataObject * newDataObject)
     return voDataModelItem::InputType;
     }
   else if (dynamic_cast<voTableDataObject*>(newDataObject))
+    {
+    return voDataModelItem::OutputType;
+    }
+  else if (dynamic_cast<voOutputDataObject*>(newDataObject))
     {
     return voDataModelItem::OutputType;
     }

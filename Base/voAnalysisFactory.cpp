@@ -38,6 +38,7 @@
 #include "voTTest.h"
 #include "voXCorrel.h"
 #include "voGeigerModelFitting.h"
+#include "voTreeDropTip.h"
 
 #include "voCustomAnalysis.h"
 #include "voCustomAnalysisInformation.h"
@@ -72,7 +73,8 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voPLSStatistics>("PLS");
   this->registerAnalysis<voTTest>("T-Test");
   this->registerAnalysis<voXCorrel>("Cross Correlation");
-  this->registerAnalysis<voGeigerModelFitting>("GeigerTreeModelFitting");
+  this->registerAnalysis<voGeigerModelFitting>("Geiger Tree Model Fitting");
+  this->registerAnalysis<voTreeDropTip>("Tree Drop Tip");
 }
 
 

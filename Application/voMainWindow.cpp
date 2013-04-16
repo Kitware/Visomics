@@ -327,13 +327,16 @@ void voMainWindow::makeTreeHeatmap()
   voDataModelItem * secondItem = dynamic_cast<voDataModelItem*>
     (dataModel->itemFromIndex(selection.indexes()[1]));
 
-  voInputFileDataObject* treeObject = NULL;
-  voInputFileDataObject* tableObject = NULL;
+  voDataObject* treeObject = NULL;
+  voDataObject* tableObject = NULL;
 
+  voDataModelItem * treeItem = NULL;
+  voDataModelItem * tableItem = NULL;
   // tree is 1st, table is 2nd
   if (firstItem->dataObject()->type() == "vtkTree")
     {
-    treeObject = dynamic_cast<voInputFileDataObject*>(firstItem->dataObject());
+    treeObject = dynamic_cast<voDataObject*>(firstItem->dataObject());
+    treeItem = firstItem;
     if (!treeObject)
       {
       qCritical() << "Expected vtkTree, found NULL";
@@ -341,7 +344,8 @@ void voMainWindow::makeTreeHeatmap()
       return;
       }
 
-    tableObject = dynamic_cast<voInputFileDataObject*>(secondItem->dataObject());
+    tableObject = dynamic_cast<voDataObject*>(secondItem->dataObject());
+    tableItem = secondItem;
     if (!tableObject)
       {
       qCritical() << "Expected vtkExtendedTable, found NULL";
@@ -361,7 +365,8 @@ void voMainWindow::makeTreeHeatmap()
   // table is 1st, tree is 2nd
   else if (firstItem->dataObject()->type() == "vtkExtendedTable")
     {
-    tableObject = dynamic_cast<voInputFileDataObject*>(firstItem->dataObject());
+    tableObject = dynamic_cast<voDataObject*>(firstItem->dataObject());
+    tableItem = firstItem;
     if (!tableObject)
       {
       qCritical() << "Expected vtkExtendedTable, found NULL";
@@ -370,7 +375,8 @@ void voMainWindow::makeTreeHeatmap()
       }
 
     treeObject =
-      dynamic_cast<voInputFileDataObject*>(secondItem->dataObject());
+      dynamic_cast<voDataObject*>(secondItem->dataObject());
+    treeItem = secondItem;
     if (!treeObject)
       {
       qCritical() << "Expected vtkTree, found NULL";
@@ -393,18 +399,31 @@ void voMainWindow::makeTreeHeatmap()
     }
 
   // create the new grouped entry and remove the old items
-  QStandardItem *firstParent =
-    dataModel->itemFromIndex(dataModel->parent(dataModel->indexFromItem(firstItem)));
-  QStandardItem *secondParent =
-    dataModel->itemFromIndex(dataModel->parent(dataModel->indexFromItem(secondItem)));
+  QStandardItem * treeParent =
+    dataModel->itemFromIndex(dataModel->parent(dataModel->indexFromItem(treeItem)));
+  QStandardItem *tableParent =
+    dataModel->itemFromIndex(dataModel->parent(dataModel->indexFromItem(tableItem)));
 
-  QString treeHeatmapName =
-    QString("%1 TreeHeatmap").arg(QFileInfo(treeObject->fileName()).baseName());
+
+  QString treeHeatmapName;
+  voDataModelItem * parentItem;
+  voInputFileDataObject * t = dynamic_cast<voInputFileDataObject *>(treeObject);
+  if (t)
+    {// input file data
+    treeHeatmapName = QString("%1 TreeHeatmap").arg(QFileInfo(t->fileName()).baseName());
+    parentItem = NULL;
+    }
+  else
+    { // output data
+    parentItem = dynamic_cast<voDataModelItem *> (treeParent); //the tree container item
+    treeHeatmapName = QString("%1 TreeHeatmap").arg(treeObject->name());
+    }
+  dataModel->removeObject(treeItem, treeParent);
+  dataModel->removeObject(tableItem, tableParent);
   voApplication::application()->ioManager()->createTreeHeatmapItem(
-    treeHeatmapName, treeObject, tableObject);
+    treeHeatmapName, parentItem,  treeObject, tableObject);
 
-  dataModel->removeObject(firstItem, firstParent);
-  dataModel->removeObject(secondItem, secondParent);
+
 
   this->makeTreeHeatmapDialogClosed();
 }
