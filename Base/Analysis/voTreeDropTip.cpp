@@ -111,7 +111,7 @@ bool voTreeDropTip::getTipSelection(vtkTree * tree, vtkTable * inputDataTable, v
     for ( vtkIdType i = 0; i< nodeNames->GetNumberOfValues() ; i++)
       {
       QString curTip = QString(nodeNames->GetValue(i).c_str());
-      if  (!tipNameList.contains(curTip))
+      if  ( !curTip.isEmpty() && !tipNameList.contains(curTip))
         {
         removalTipNameList.append(curTip);
         }
