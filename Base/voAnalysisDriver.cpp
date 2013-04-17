@@ -38,6 +38,7 @@
 #include "voCustomAnalysisInformation.h"
 #include "voDataModelItem.h"
 #include "voDataObject.h"
+#include "voViewManager.h"
 
 // --------------------------------------------------------------------------
 class voAnalysisDriverPrivate
@@ -145,6 +146,8 @@ void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem*
     return;
     }
   voAnalysis * analysis = this->createAnalysis(analysisName);
+  voView * currentView = voApplication::application()->viewManager()->getView(inputTarget->uuid());
+  analysis->setView(currentView);
   if (!analysis)
     {
     return;
