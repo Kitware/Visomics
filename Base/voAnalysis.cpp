@@ -36,6 +36,7 @@
 #include "voDataObject.h"
 #include "voInputFileDataObject.h"
 #include "voIOManager.h"
+#include "voView.h"
 
 // VTK includes
 #include <vtkDataObject.h>
@@ -58,6 +59,7 @@ public:
   void init();
 
   QString Uuid;
+  voView* AnalysisView;
 
   QList<QExplicitlySharedDataPointer<voDataObject> > InputDataObjects;
   QHash<QString, QString> OutputInformation;
@@ -100,6 +102,7 @@ void voAnalysisPrivate::init()
   this->OutputDirectory = QLatin1String(".");
   this->WriteOutputsToFilesEnabled = false;
   this->VariantManager = new QtVariantPropertyManager(q);
+  this->AnalysisView = NULL;
 }
 
 // --------------------------------------------------------------------------
@@ -128,6 +131,22 @@ QString voAnalysis::uuid()const
   Q_D(const voAnalysis);
   return d->Uuid;
 }
+
+// --------------------------------------------------------------------------
+voView * voAnalysis::getView()const
+{
+  Q_D(const voAnalysis);
+  return d->AnalysisView;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::setView(voView * view)
+{
+  Q_D(voAnalysis);
+  d->AnalysisView = view;
+}
+
+// --------------------------------------------------------------------------
 
 namespace
 {

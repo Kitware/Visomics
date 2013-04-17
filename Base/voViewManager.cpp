@@ -188,6 +188,22 @@ void voViewManager::deleteView(voView * view)
   d->UuidToViewMap.remove(uuidFound);
 }
 
+// --------------------------------------------------------------------------
+voView * voViewManager::getView(const QString& uuid)
+{
+  Q_D(voViewManager);
+
+  voView * view = 0;
+  if (d->UuidToViewMap.contains(uuid))
+    {
+    view = d->UuidToViewMap.value(uuid);
+    Q_ASSERT(view);
+    return view;
+    }
+   return NULL;
+}
+
+// --------------------------------------------------------------------------
 void voViewManager::deleteView(const QString& uuid)
 {
   Q_D(voViewManager);

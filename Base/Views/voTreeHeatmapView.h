@@ -29,6 +29,7 @@
 #include "voView.h"
 
 class voTreeHeatmapViewPrivate;
+class vtkTreeHeatmapItem;
 
 class voTreeHeatmapView : public voView
 {
@@ -37,6 +38,7 @@ public:
   typedef voView Superclass;
   voTreeHeatmapView(QWidget * newParent = 0);
   virtual ~voTreeHeatmapView();
+  vtkTreeHeatmapItem * getTreeHeatmapItem() const;
 
 protected:
   void setupUi(QLayout * layout);

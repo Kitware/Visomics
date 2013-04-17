@@ -35,6 +35,7 @@ public:
   virtual ~voViewManager();
 
   void deleteView(voView * view);
+  voView * getView(const QString& objectUuid);
 
 public slots:
 

@@ -38,6 +38,7 @@ class voAnalysisPrivate;
 class voDataObject;
 class vtkDataObject;
 class vtkExtendedTable;
+class voView;
 
 class voAnalysis : public QObject
 {
@@ -53,6 +54,8 @@ public:
   voDataObject * input(int i = 0) const;
 
   void removeAllInputs();
+  virtual  voView * getView() const;
+  void setView(voView * view);
 
 
 
