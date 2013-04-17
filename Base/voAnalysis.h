@@ -54,7 +54,7 @@ public:
   voDataObject * input(int i = 0) const;
 
   void removeAllInputs();
-  voView * getView() const;
+  virtual  voView * getView() const;
   void setView(voView * view);
 
 

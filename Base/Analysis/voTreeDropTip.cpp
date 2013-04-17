@@ -34,6 +34,7 @@
 #include "voOutputDataObject.h"
 #include "voIOManager.h"
 #include "voUtils.h"
+#include "voTreeHeatmapView.h"
 
 
 // VTK includes
@@ -51,6 +52,7 @@
 #include <vtkDataSetAttributes.h>
 #include <vtkInformation.h>
 #include <vtkAdjacentVertexIterator.h>
+#include <vtkTreeHeatmapItem.h>
 // --------------------------------------------------------------------------
 // voTreeDropTipPrivate methods
 
@@ -58,6 +60,135 @@
 class voTreeDropTipPrivate
 {
 };
+
+
+// voTreeDropTip methods
+
+// --------------------------------------------------------------------------
+voTreeDropTip::voTreeDropTip():
+  Superclass(), d_ptr(new voTreeDropTipPrivate)
+{
+}
+
+// --------------------------------------------------------------------------
+voTreeDropTip::~voTreeDropTip()
+{
+}
+
+
+// --------------------------------------------------------------------------
+void voTreeDropTip::setOutputInformation()
+{
+  this->addOutputType("pruned_tree", "vtkTree" ,
+    "","",
+    "voTreeHeatmapView", "pruned tree");
+  this->addOutputType("pruned_table", "vtkExtendedTable" ,
+    "","",
+    "voExtendedTableView", "pruned table");
+}
+
+// --------------------------------------------------------------------------
+void voTreeDropTip::setParameterInformation()
+{
+  QList<QtProperty*> DropTip_parameters;
+
+  DropTip_parameters << this->addEnumParameter("selection_method", tr("Select tips to be removed by"), (QStringList()<<"Tip Names"<<"Data Filter"<<"Tree Collapsing"), "Tip Names");
+  DropTip_parameters << this->addStringParameter("input_string", tr("Line editor"), "[tipName1, tipName2] or [awesomeness<2,island=\"Cuba\"]");
+  DropTip_parameters << this->addEnumParameter("invert_selection", tr("Invert selection"), (QStringList()<<"No"<<"Yes"), "No");
+
+  this->addParameterGroup("DropTip parameters", DropTip_parameters);
+}
+
+// --------------------------------------------------------------------------
+QString voTreeDropTip::parameterDescription()const
+{
+  return QString("<dl>"
+    "<dt><b>Select tips to be removed by: </b>:</dt>"
+    "<dd>Choose the method for the tip selection."
+    " \"Tip Names\" requires you to list the tip "
+    "names in the line editor below;\"Data Filter\" requires"
+    " you to list the thresholding criteria in the line editor below.</dd>"
+    "<dt><b> Line editor </b>:</dt>"
+    "<dd> Input the tips names or the data filtering criteria.</dd>"
+    "<dt><b>Invert selection </b>:</dt>"
+    "<dd> Invert the tip selection. If \"Yes\", The selected tips are to be kept.</dd>"
+    "</dl>");
+}
+
+
+// --------------------------------------------------------------------------
+bool voTreeDropTip::execute()
+{
+  // Import tree and assiciated traits table
+  vtkTree* tree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
+  if (!tree)
+    {
+    qCritical() << "Input tree is Null";
+    return false;
+    }
+
+  vtkExtendedTable* extendedTable = vtkExtendedTable::SafeDownCast(
+    this->input(1)->dataAsVTKDataObject());
+
+  vtkNew<vtkTable> table;
+  if (extendedTable)
+    {
+    table->DeepCopy(extendedTable->GetInputData());
+    }
+  else
+    {
+    qCritical()<<"Input Table is Null";
+    }
+
+
+
+  // obtain selected tips into a vtkSelection object
+  QString selection_method = this->enumParameter("selection_method");
+
+  vtkNew<vtkSelection> selectedTips;
+  bool SUCCESS = false;
+  if (selection_method == "Tip Names")
+    {
+    SUCCESS = this->getSelectionByTipNames(tree, table.GetPointer(), selectedTips.GetPointer());
+    }
+  else if (selection_method == "Data Filter")
+    {
+    SUCCESS = this->getSelectionByDataFiltering(tree, table.GetPointer(), selectedTips.GetPointer());
+    }
+  else if (selection_method == "Tree Collapsing")
+    {
+    SUCCESS = this->getSelectionByPrunedTree(tree, table.GetPointer(),selectedTips.GetPointer());
+    }
+
+  if (SUCCESS)
+    {
+    vtkNew<vtkExtractSelectedTree> extractSelectedTreeFilter;
+
+    extractSelectedTreeFilter->SetInputData(0, tree);
+    extractSelectedTreeFilter->SetInputData(1, selectedTips.GetPointer());
+    extractSelectedTreeFilter->Update();
+
+    vtkTree * outTree = vtkTree::SafeDownCast(extractSelectedTreeFilter->GetOutput());
+
+    if(!outTree)
+      {
+      qCritical() << QObject::tr("extracted tree is not valid");
+      return false;
+      }
+
+    this->setOutput("pruned_tree", new voOutputDataObject("pruned_tree", outTree));
+    vtkNew<vtkExtendedTable> outputTable;
+    voIOManager::convertTableToExtended(table.GetPointer(), outputTable.GetPointer());
+    this->setOutput("pruned_table", new voTableDataObject("pruned_table", outputTable.GetPointer()));
+
+    return true;
+    }
+  else
+    {
+    qCritical() << QObject::tr("selected tips are not valid");
+    return false;
+    }
+}
 
 // --------------------------------------------------------------------------
 bool voTreeDropTip::removeInternalBranch(vtkTree * tree, vtkIdTypeArray * selArray, vtkIdType currentId)
@@ -321,127 +452,29 @@ bool voTreeDropTip::getSelectionByDataFiltering(vtkTree *tree, vtkTable * inputD
 }
 
 // --------------------------------------------------------------------------
-// voTreeDropTip methods
-
-// --------------------------------------------------------------------------
-voTreeDropTip::voTreeDropTip():
-  Superclass(), d_ptr(new voTreeDropTipPrivate)
+bool voTreeDropTip::getSelectionByPrunedTree(vtkTree *tree, vtkTable * inputDataTable, vtkSelection * sel)
 {
-}
-
-// --------------------------------------------------------------------------
-voTreeDropTip::~voTreeDropTip()
-{
-}
-
-
-// --------------------------------------------------------------------------
-void voTreeDropTip::setOutputInformation()
-{
-  this->addOutputType("pruned_tree", "vtkTree" ,
-    "","",
-    "voTreeHeatmapView", "pruned tree");
-  this->addOutputType("pruned_table", "vtkExtendedTable" ,
-    "","",
-    "voExtendedTableView", "pruned table");
-}
-
-// --------------------------------------------------------------------------
-void voTreeDropTip::setParameterInformation()
-{
-  QList<QtProperty*> DropTip_parameters;
-
-  DropTip_parameters << this->addEnumParameter("selection_method", tr("Select tips to be removed by"), (QStringList()<<"Tip Names"<<"Data Filter"), "Tip Names");
-  DropTip_parameters << this->addStringParameter("input_string", tr("Line editor"), "[tipName1, tipName2] or [awesomeness<2,island=\"Cuba\"]");
-  DropTip_parameters << this->addEnumParameter("invert_selection", tr("Invert selection"), (QStringList()<<"No"<<"Yes"), "No");
-
-  this->addParameterGroup("DropTip parameters", DropTip_parameters);
-}
-
-// --------------------------------------------------------------------------
-QString voTreeDropTip::parameterDescription()const
-{
-  return QString("<dl>"
-    "<dt><b>Select tips to be removed by: </b>:</dt>"
-    "<dd>Choose the method for the tip selection."
-    " \"Tip Names\" requires you to list the tip "
-    "names in the line editor below;\"Data Filter\" requires"
-    " you to list the thresholding criteria in the line editor below.</dd>"
-    "<dt><b> Line editor </b>:</dt>"
-    "<dd> Input the tips names or the data filtering criteria.</dd>"
-    "<dt><b>Invert selection </b>:</dt>"
-    "<dd> Invert the tip selection. If \"Yes\", The selected tips are to be kept.</dd>"
-    "</dl>");
-}
-
-
-// --------------------------------------------------------------------------
-bool voTreeDropTip::execute()
-{
-  Q_D(voTreeDropTip);
-  // Import tree and assiciated traits table
-  vtkTree* tree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
-  if (!tree)
+  QStringList tipNameList;
+  voTreeHeatmapView * view =  dynamic_cast<voTreeHeatmapView* > (this->getView());
+  vtkTreeHeatmapItem * treeViewItem = NULL;
+  vtkTree * prunedTree = NULL;
+  if (view )
     {
-    qCritical() << "Input tree is Null";
-    return false;
-    }
-
-  vtkExtendedTable* extendedTable = vtkExtendedTable::SafeDownCast(
-    this->input(1)->dataAsVTKDataObject());
-
-  vtkNew<vtkTable> table;
-  if (extendedTable)
-    {
-    table->DeepCopy(extendedTable->GetInputData());
-    }
-  else
-    {
-    qCritical()<<"Input Table is Null";
-    }
-
-  // obtain selected tips into a vtkSelection object
-  QString selection_method = this->enumParameter("selection_method");
-
-  vtkNew<vtkSelection> selectedTips;
-  bool SUCCESS = false;
-  if (selection_method == "Tip Names")
-    {
-    SUCCESS = this->getSelectionByTipNames(tree, table.GetPointer(), selectedTips.GetPointer());
-    }
-  else if (selection_method == "Data Filter")
-    {
-    SUCCESS = this->getSelectionByDataFiltering(tree, table.GetPointer(), selectedTips.GetPointer());
-    }
-
-  if (SUCCESS)
-    {
-    vtkNew<vtkExtractSelectedTree> extractSelectedTreeFilter;
-
-    extractSelectedTreeFilter->SetInputData(0, tree);
-    extractSelectedTreeFilter->SetInputData(1, selectedTips.GetPointer());
-    extractSelectedTreeFilter->Update();
-
-    vtkTree * outTree = vtkTree::SafeDownCast(extractSelectedTreeFilter->GetOutput());
-
-    if(!outTree)
+    treeViewItem = view->getTreeHeatmapItem();
+    prunedTree = treeViewItem->GetPrunedTree();
+    vtkStringArray * prunedNodeNames = vtkStringArray::SafeDownCast(prunedTree->GetVertexData()->GetAbstractArray("node name"));
+    vtkStringArray * originalNodeNames = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray("node name"));
+    for ( vtkIdType i = 0; i< originalNodeNames->GetNumberOfValues(); ++i)
       {
-      qCritical() << QObject::tr("extracted tree is not valid");
-      return false;
+      if (tree->IsLeaf(i))
+        {
+        if (prunedNodeNames->LookupValue(originalNodeNames->GetValue(i)) < 0 )
+          {
+          tipNameList.append(QString(originalNodeNames->GetValue(i).c_str()));
+          }
+        }
       }
-
-    this->setOutput("pruned_tree", new voOutputDataObject("pruned_tree", outTree));
-    vtkNew<vtkExtendedTable> outputTable;
-    voIOManager::convertTableToExtended(table.GetPointer(), outputTable.GetPointer());
-    this->setOutput("pruned_table", new voTableDataObject("pruned_table", outputTable.GetPointer()));
-
-    return true;
-    }
-  else
-    {
-    qCritical() << QObject::tr("selected tips are not valid");
-    return false;
     }
 
-
+  return (getTipSelection(tree, inputDataTable,sel, tipNameList));
 }

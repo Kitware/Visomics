@@ -79,6 +79,12 @@ voTreeHeatmapView::~voTreeHeatmapView()
 }
 
 // --------------------------------------------------------------------------
+vtkTreeHeatmapItem * voTreeHeatmapView::getTreeHeatmapItem() const
+{
+  Q_D(const voTreeHeatmapView);
+  return d->TreeItem;
+}
+// --------------------------------------------------------------------------
 void voTreeHeatmapView::setupUi(QLayout *layout)
 {
   Q_D(voTreeHeatmapView);
