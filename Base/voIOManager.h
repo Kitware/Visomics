@@ -70,12 +70,13 @@ public:
   void createTreeHeatmapItem(QString name, QList<voDataObject *> forest,
                              voDataObject * tableObject);
 
-  void saveState(const QString& fileName);
-  void loadState(const QString& fileName);
+  void saveWorkflow(const QString& fileName);
+  void loadWorkflow(const QString& fileName);
 
 protected:
   bool treeAndTableMatch(vtkTree *tree, vtkTable *table);
   void writeItemToXML(QStandardItem* parent, QXmlStreamWriter *stream);
+  void writeAnalysesToXML(QXmlStreamWriter *stream);
   void writeAnalysisToXML(voDataModelItem *item, QXmlStreamWriter *stream);
   void writeTreeHeatmapToXML(voDataModelItem *item, QXmlStreamWriter *stream);
   void writeInputToXML(const QString& type, voDataModelItem *item,

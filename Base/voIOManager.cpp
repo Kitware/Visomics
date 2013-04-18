@@ -549,7 +549,7 @@ bool voIOManager::writeDataObjectToFile(vtkDataObject * dataObject, const QStrin
 }
 
 // --------------------------------------------------------------------------
-void voIOManager::saveState(const QString& fileName)
+void voIOManager::saveWorkflow(const QString& fileName)
 {
   QFile file(fileName);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -561,12 +561,13 @@ void voIOManager::saveState(const QString& fileName)
   QXmlStreamWriter stream(&file);
   stream.setAutoFormatting(true);
   stream.writeStartDocument();
-  stream.writeStartElement("state");
+  stream.writeStartElement("workflow");
 
   QStandardItem *parent = NULL;
   this->writeItemToXML(parent, &stream);
+  this->writeAnalysesToXML(&stream);
 
-  stream.writeEndElement(); //state
+  stream.writeEndElement(); //workflow
   stream.writeEndDocument();
 }
 
@@ -591,7 +592,7 @@ void voIOManager::writeItemToXML(QStandardItem* parent,
 
       if (item->data(voDataModelItem::IsAnalysisContainerRole).toBool())
         {
-        this->writeAnalysisToXML(item, stream);
+        continue; // we record analyses later during a separate step.
         }
 
       else if (item->type() == voDataModelItem::InputType)
@@ -630,6 +631,17 @@ void voIOManager::writeItemToXML(QStandardItem* parent,
         this->writeItemToXML(item, stream);
         }
       }
+    }
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::writeAnalysesToXML(QXmlStreamWriter *stream)
+{
+  voDataModel * dataModel = voApplication::application()->dataModel();
+  const QList<voDataModelItem *> analyses = dataModel->analyses();
+  foreach (voDataModelItem *item, analyses)
+    {
+    this->writeAnalysisToXML(item, stream);
     }
 }
 
@@ -814,7 +826,7 @@ void voIOManager::writeTableSettingsToXML(voDataModelItem *item,
 }
 
 // --------------------------------------------------------------------------
-void voIOManager::loadState(const QString& fileName)
+void voIOManager::loadWorkflow(const QString& fileName)
 {
   QFile file(fileName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
