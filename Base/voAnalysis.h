@@ -115,6 +115,8 @@ public:
   void initializeParameterInformation(
     const QHash<QString, QVariant>& parameters = AvoidParserBugWithGcc420());
 
+  void updateDynamicParameters();
+
   void setParameterValues(const QHash<QString, QVariant>& parameters);
 
   QSet<QtVariantProperty*> topLevelParameterGroups()const;
@@ -131,6 +133,7 @@ public:
   virtual QString parameterDescription()const;
 
   vtkSmartPointer<vtkExtendedTable> getInputTable() const;
+  vtkSmartPointer<vtkExtendedTable> getInputTable(int i) const;
 
   QtVariantProperty*  updateEnumParameter(const QString& id,
                                           const QStringList& choices,

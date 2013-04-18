@@ -104,16 +104,6 @@ voAnalysisParameterDialog::voAnalysisParameterDialog(voAnalysis * analysis, QWid
   d->AnalysisParameterEditor->clear();
   d->AnalysisParameterEditor->setFactoryForManager(analysis->propertyManager(), variantFactory);
 
-  typedef QPair<QString, QString> DynamicPropertyType;
-  foreach(const DynamicPropertyType dynamicProp, analysis->dynamicParameters())
-    {
-    QString type = dynamicProp.first;
-    QString label = dynamicProp.second;
-    QStringList choices;
-    voApplication::application()->dataModel()->listItems(type, &choices);
-    analysis->updateEnumParameter(label, choices);
-    }
-
   foreach(QtProperty* prop, analysis->topLevelParameterGroups())
     {
     d->AnalysisParameterEditor->addProperty(prop);

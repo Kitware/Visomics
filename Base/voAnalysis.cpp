@@ -898,21 +898,59 @@ QtVariantProperty*  voAnalysis::addBooleanParameter(const QString& id, const QSt
 }
 
 // --------------------------------------------------------------------------
+void voAnalysis::updateDynamicParameters()
+{
+  typedef QPair<QString, QString> DynamicPropertyType;
+  foreach(const DynamicPropertyType dynamicProp, this->dynamicParameters())
+    {
+    QString type = dynamicProp.first;
+    QString label = dynamicProp.second;
+    QStringList choices;
+    voApplication::application()->dataModel()->listItems(type, &choices);
+    this->updateEnumParameter(label, choices);
+    }
+}
+
+// --------------------------------------------------------------------------
 vtkSmartPointer<vtkExtendedTable> voAnalysis::getInputTable() const
 {
-  vtkSmartPointer<vtkExtendedTable> extendedTable =
-    vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  Q_D(const voAnalysis);
+
+  vtkSmartPointer<vtkExtendedTable> extendedTable;
+
+  for(int i = 0; i < d->InputDataObjects.size(); ++i)
+    {
+    extendedTable = this->getInputTable(i);
+    if (extendedTable)
+      {
+      return extendedTable;
+      }
+    }
+  return NULL;
+}
+
+vtkSmartPointer<vtkExtendedTable> voAnalysis::getInputTable(int i) const
+{
+  Q_D(const voAnalysis);
+
+  vtkSmartPointer<vtkExtendedTable> extendedTable;
+  voDataObject *inputDataObject = d->InputDataObjects.at(i).data();
+
+  extendedTable =
+    vtkExtendedTable::SafeDownCast(inputDataObject->dataAsVTKDataObject());
   if (extendedTable)
     {
     return extendedTable;
     }
+
   vtkTable *table =
-    vtkTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+    vtkTable::SafeDownCast(inputDataObject->dataAsVTKDataObject());
   if (table)
     {
     extendedTable = vtkSmartPointer<vtkExtendedTable>::New();
     voIOManager::convertTableToExtended(table, extendedTable.GetPointer());
     return extendedTable;
     }
+
   return NULL;
 }
