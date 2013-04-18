@@ -46,10 +46,7 @@ protected:
 
   virtual bool execute();
 
-protected:
   QScopedPointer<voCustomAnalysisPrivate> d_ptr;
-  QString inputName;
-  QString inputType;
   QString parameterDescriptions;
 
 private:

@@ -29,14 +29,17 @@
 #include "voCustomAnalysis.h"
 #include "voCustomAnalysisInformation.h"
 #include "voDataObject.h"
+#include "voInputFileDataObject.h"
 #include "voTableDataObject.h"
 #include "voUtils.h"
 #include "vtkExtendedTable.h"
 
 // VTK includes
 #include <vtkArrayData.h>
+#include <vtkCompositeDataIterator.h>
 #include <vtkDoubleArray.h>
 #include <vtkGraph.h>
+#include <vtkMultiPieceDataSet.h>
 #include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
@@ -82,8 +85,6 @@ void voCustomAnalysis::loadInformation(voCustomAnalysisInformation *info)
 {
   Q_D(voCustomAnalysis);
   d->Information = info;
-  this->inputName = d->Information->input()->name();
-  this->inputType = d->Information->input()->type();
 }
 
 // --------------------------------------------------------------------------
@@ -100,11 +101,15 @@ void voCustomAnalysis::setOutputInformation()
     QString type = output->type();
     if (type == "Table")
       {
-      this->addOutputType(name, "vtkTable", "voTableView", name);
+      this->addOutputType(name, "vtkTable",
+                          "", "",
+                          "voTableView", name);
       }
     else if (type == "Tree")
       {
-      this->addOutputType(name, "vtkTree", "voTreeHeatmapView", name);
+      this->addOutputType(name, "vtkTree",
+                          "", "",
+                          "voTreeHeatmapView", name);
       }
     else
       {
@@ -227,45 +232,64 @@ bool voCustomAnalysis::execute()
   Q_D(voCustomAnalysis);
 
   d->RCalc->SetRoutput(0);
+
   vtkSmartPointer<vtkExtendedTable> extendedTable;
+  vtkNew<vtkMultiPieceDataSet> composite;
+  bool multiInput = false;
 
-  if (this->inputType == "Table")
+  if (d->Information->inputs().size() > 1)
     {
-    extendedTable = this->getInputTable();
-    if (!extendedTable)
+    multiInput = true;
+    composite->SetNumberOfPieces(d->Information->inputs().size());
+    }
+
+  int itr = 0;
+  foreach(voCustomAnalysisData *input, d->Information->inputs())
+    {
+    if (input->type() == "Table")
       {
-      qCritical() << "Input Table is Null";
+      extendedTable = this->getInputTable(itr);
+      vtkTable *table = extendedTable->GetInputData();
+      d->RCalc->PutTable(input->name().toStdString().c_str());
+      if (multiInput)
+        {
+        composite->SetPiece(itr, table);
+        }
+      else
+        {
+        d->RCalc->SetInputData(table);
+        }
+      }
+
+    else if(input->type() == "Tree")
+      {
+      vtkTree* tree =
+        vtkTree::SafeDownCast(this->input(itr)->dataAsVTKDataObject());
+      if (!tree)
+        {
+        qCritical() << "Input Tree is Null";
+        return false;
+        }
+      d->RCalc->PutTree(input->name().toStdString().c_str());
+      if (multiInput)
+        {
+        composite->SetPiece(itr, tree);
+        }
+      else
+        {
+        d->RCalc->SetInputData(tree);
+        }
+      }
+    else
+      {
+      qCritical() << "Unsupported input type:" << input->type();
       return false;
       }
-
-    vtkSmartPointer<vtkTable> inputDataTable = extendedTable->GetData();
-
-    // Build ArrayData for input to R
-    vtkNew<vtkArrayData> RInputArrayData;
-      {
-      vtkSmartPointer<vtkArray> RInputArray;
-      voUtils::tableToArray(inputDataTable.GetPointer(), RInputArray);
-      RInputArrayData->AddArray(RInputArray.GetPointer());
-      }
-    d->RCalc->SetInputData(RInputArrayData.GetPointer());
-    d->RCalc->PutArray("0", this->inputName.toStdString().c_str());
+    ++itr;
     }
-  else if (this->inputType == "Tree")
+  if (multiInput)
     {
-    vtkTree* tree =
-      vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
-    if (!tree)
-      {
-      qCritical() << "Input Tree is Null";
-      return false;
-      }
-    d->RCalc->SetInputData(tree);
-    d->RCalc->PutTree(this->inputName.toStdString().c_str());
-    }
-  else
-    {
-    qCritical() << "Unsupported input type:" << this->inputType;
-    return false;
+    d->RCalc->SetInputData(composite.GetPointer());
     }
 
   foreach(voCustomAnalysisData *output, d->Information->outputs())
@@ -273,7 +297,7 @@ bool voCustomAnalysis::execute()
     const char *outputName = output->name().toStdString().c_str();
     if (output->type() == "Table")
       {
-      d->RCalc->GetArray(outputName, outputName);
+      d->RCalc->GetTable(outputName);
       }
     else if(output->type() == "Tree")
       {
@@ -307,7 +331,7 @@ bool voCustomAnalysis::execute()
       }
     else if (type == "String")
       {
-      parameterValue = this->stringParameter(name);
+      parameterValue = QString("\"%1\"").arg(this->stringParameter(name));
       }
     else
       {
@@ -316,49 +340,59 @@ bool voCustomAnalysis::execute()
     script.replace(name, parameterValue);
     }
 
-  d->RCalc->SetRscript(script.toStdString().c_str());
+  d->RCalc->SetRscript(script.toLatin1());
   d->RCalc->Update();
 
   // Get output(s) from R
-  vtkSmartPointer<vtkArrayData> outputArrayData =
-    vtkArrayData::SafeDownCast(d->RCalc->GetOutput());
-  foreach(voCustomAnalysisData *output, d->Information->outputs())
+  if (multiInput)
     {
-    if (output->type() == "Table")
+    vtkMultiPieceDataSet * outData =
+      vtkMultiPieceDataSet::SafeDownCast(d->RCalc->GetOutput());
+    if(!outData)
       {
-      if (!outputArrayData || !outputArrayData->GetArrayByName(output->name().toStdString().c_str()))
-        {
-        qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
-        return false;
-        }
-
-      // Get row labels
-      vtkNew<vtkStringArray> rowLabels;
-      voUtils::addCounterLabels(
-        extendedTable->GetRowMetaDataOfInterestAsString(),
-        rowLabels.GetPointer(), false);
-
-      // Extract output table
-      vtkNew<vtkTable> outputTable;
-        {
-        voUtils::arrayToTable(outputArrayData->GetArrayByName(output->name().toStdString().c_str()),
-                              outputTable.GetPointer());
-        for (vtkIdType c = 0;c < outputTable->GetNumberOfColumns(); ++c)
-          {
-          outputTable->GetColumn(c)->SetName(rowLabels->GetValue(c));
-          }
-        voUtils::insertColumnIntoTable(outputTable.GetPointer(),
-                                       0, rowLabels.GetPointer());
-        }
-
-      this->setOutput(output->name(),
-        new voTableDataObject(output->name(), outputTable.GetPointer(), true));
+      qCritical() << QObject::tr("Fatal error running analysis");
+      return false;
       }
-    else
+
+    vtkCompositeDataIterator* iter = outData->NewIterator();
+    itr = 0;
+    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
+         iter->GoToNextItem())
       {
-      vtkTree * outputTree = vtkTree::SafeDownCast(d->RCalc->GetOutput());
-      this->setOutput(output->name(),
-                      new voDataObject(output->name(), outputTree));
+      voCustomAnalysisData *output = d->Information->outputs().at(itr);
+      if (output->type() == "Table")
+        {
+        vtkTable *outputTable =
+          vtkTable::SafeDownCast(iter->GetCurrentDataObject());
+        this->setOutput(output->name(),
+          new voTableDataObject(output->name(), outputTable, true));
+        }
+      else // tree is the only other possibility atm
+        {
+        vtkTree *outputTree = vtkTree::SafeDownCast(iter->GetCurrentDataObject());
+        this->setOutput(output->name(),
+                        new voInputFileDataObject(output->name(), outputTree));
+        }
+      ++itr;
+      }
+    iter->Delete();
+    }
+  else
+    {
+    foreach(voCustomAnalysisData *output, d->Information->outputs())
+      {
+      if (output->type() == "Table")
+        {
+        vtkTable * outputTable = vtkTable::SafeDownCast(d->RCalc->GetOutput());
+        this->setOutput(output->name(),
+                        new voTableDataObject(output->name(), outputTable));
+        }
+      else
+        {
+        vtkTree * outputTree = vtkTree::SafeDownCast(d->RCalc->GetOutput());
+        this->setOutput(output->name(),
+                        new voDataObject(output->name(), outputTree));
+        }
       }
     }
   return true;

@@ -55,15 +55,21 @@ void voCustomAnalysisInformation::setScript(const QString& script)
 }
 
 // --------------------------------------------------------------------------
-voCustomAnalysisData * voCustomAnalysisInformation::input() const
+voCustomAnalysisData * voCustomAnalysisInformation::input(int i) const
 {
-  return this->analysisInput;
+  return this->inputsList.at(i);
 }
 
 // --------------------------------------------------------------------------
 voCustomAnalysisData * voCustomAnalysisInformation::output(int i) const
 {
   return this->outputsList.at(i);
+}
+
+// --------------------------------------------------------------------------
+QList<voCustomAnalysisData *> voCustomAnalysisInformation::inputs() const
+{
+  return this->inputsList;
 }
 
 // --------------------------------------------------------------------------
@@ -85,9 +91,9 @@ QList<voCustomAnalysisParameter *> voCustomAnalysisInformation::parameters() con
 }
 
 // --------------------------------------------------------------------------
-void voCustomAnalysisInformation::setInput(voCustomAnalysisData * input)
+void voCustomAnalysisInformation::addInput(voCustomAnalysisData * input)
 {
-  this->analysisInput = input;
+  this->inputsList.append(input);
 }
 
 // --------------------------------------------------------------------------

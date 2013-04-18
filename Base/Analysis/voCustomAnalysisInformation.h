@@ -38,7 +38,8 @@ public:
 
   QString name() const;
   QString script() const;
-  voCustomAnalysisData * input() const;
+  voCustomAnalysisData * input(int i) const;
+  QList<voCustomAnalysisData *> inputs() const;
   voCustomAnalysisData * output(int i) const;
   QList<voCustomAnalysisData *> outputs() const;
   voCustomAnalysisParameter * parameter(int i) const;
@@ -46,14 +47,14 @@ public:
 
   void setName(const QString& name);
   void setScript(const QString& script);
-  void setInput(voCustomAnalysisData * input);
+  void addInput(voCustomAnalysisData * input);
   void addOutput(voCustomAnalysisData * input);
   void addParameter(voCustomAnalysisParameter * parameter);
 
 protected:
   QString analysisName;
   QString analysisScript;
-  voCustomAnalysisData *analysisInput;
+  QList<voCustomAnalysisData *> inputsList;
   QList<voCustomAnalysisData *> outputsList;
   QList<voCustomAnalysisParameter *> parametersList;
 
