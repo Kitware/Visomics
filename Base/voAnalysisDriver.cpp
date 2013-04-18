@@ -175,6 +175,7 @@ void voAnalysisDriver::runAnalysis(const QString& analysisName,
     }
 
   analysis->initializeParameterInformation();
+  analysis->updateDynamicParameters();
   analysis->setParameterValues(parameters);
   analysis->setAcceptDefaultParameterValues(true);
   this->runAnalysis(analysis, inputTarget);
@@ -267,6 +268,7 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
 
   // Initialize parameter
   analysis->initializeParameterInformation();
+  analysis->updateDynamicParameters();
 
   emit this->aboutToRunAnalysis(analysis);
   if (analysis->abortExecution())
@@ -533,21 +535,40 @@ void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
   analysisInformation->setName(analysisName.toString());
   analysisInformation->setScript(scriptContents);
 
-  // get input name & type
+  // get name & type for each input
   stream.readNextStartElement();  // input
   QString tagName = stream.name().toString();
-  if (tagName != "input")
+  if (tagName != "inputs")
     {
-    qCritical() << "expected input, found " << tagName;
+    qCritical() << "expected inputs, found " << tagName << "(" << rScriptFileName << ")";
     return;
     }
-  QStringRef inputName = stream.attributes().value("name");
-  QStringRef inputType = stream.attributes().value("type");
-  voCustomAnalysisData *inputData =
-    new voCustomAnalysisData(analysisInformation);
-  inputData->setName(inputName.toString());
-  inputData->setType(inputType.toString());
-  analysisInformation->setInput(inputData);
+
+  stream.readNextStartElement(); //input
+  tagName = stream.name().toString();
+  while (tagName != "inputs" && !stream.atEnd())
+    {
+    if (tagName != "input")
+      {
+      qCritical() << "expected input, found " << tagName;
+      return;
+      }
+
+    voCustomAnalysisData *inputData =
+      new voCustomAnalysisData(analysisInformation);
+    QStringRef inputName = stream.attributes().value("name");
+    QStringRef inputType = stream.attributes().value("type");
+    inputData->setName(inputName.toString());
+    inputData->setType(inputType.toString());
+    analysisInformation->addInput(inputData);
+    stream.readNext();
+    stream.readNextStartElement();
+    tagName = stream.name().toString();
+    if (tagName == "inputs" || tagName == "outputs")
+      {
+      break;
+      }
+    }
 
   // get name & type for each output
   stream.readNext();
@@ -637,23 +658,26 @@ void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
       }
     }
 
-  // record what type of input this analysis expects
-  QString realInputType;
-  if (analysisInformation->input()->type() == "Table")
+  // record what type of input(s) this analysis expects
+  QStringList inputTypes;
+  voCustomAnalysisData *analysisInput;
+  foreach(analysisInput, analysisInformation->inputs())
     {
-    realInputType = "vtkExtendedTable";
+    if (analysisInput->type() == "Table")
+      {
+      inputTypes << "vtkExtendedTable";
+      }
+    else if(analysisInput->type() == "Tree")
+      {
+      inputTypes << "vtkTree";
+      }
+    else
+      {
+      qCritical() << "unrecognized input type:" << analysisInput->type();
+      return;
+      }
     }
-  else if(analysisInformation->input()->type() == "Tree")
-    {
-    realInputType = "vtkTree";
-    }
-  else
-    {
-    qCritical() << "unrecognized input type:" << analysisInformation->input()->type();
-    return;
-    }
-  analysisNameToInputTypes.insert(
-    analysisInformation->name(), QStringList() << realInputType);
+  analysisNameToInputTypes.insert(analysisInformation->name(), inputTypes);
 
   // register this new analysis with our factory.
   voAnalysisFactory * analysisFactory =
