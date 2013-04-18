@@ -115,8 +115,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionHelpAbout, SIGNAL(triggered()), this, SLOT(about()));
   connect(d->actionLoadSampleDataset, SIGNAL(triggered()), this, SLOT(loadSampleDataset()));
   connect(d->actionViewErrorLog, SIGNAL(triggered()), this, SLOT(onViewErrorLogActionTriggered()));
-  connect(d->actionFileSaveState, SIGNAL(triggered()), this, SLOT(onFileSaveStateActionTriggered()));
-  connect(d->actionFileLoadState, SIGNAL(triggered()), this, SLOT(onFileLoadStateActionTriggered()));
+  connect(d->actionFileSaveWorkflow, SIGNAL(triggered()), this, SLOT(onFileSaveWorkflowActionTriggered()));
+  connect(d->actionFileLoadWorkflow, SIGNAL(triggered()), this, SLOT(onFileLoadWorkflowActionTriggered()));
   connect(d->actionFileMakeTreeHeatmap, SIGNAL(triggered()),
           this, SLOT(onFileMakeTreeHeatmapActionTriggered()));
 
@@ -267,7 +267,7 @@ void voMainWindow::onFileOpenActionTriggered()
           }
         if (extension == "xml")
           {
-          voApplication::application()->ioManager()->loadState(file);
+          voApplication::application()->ioManager()->loadWorkflow(file);
           }
         }
       else
@@ -469,21 +469,21 @@ void voMainWindow::onViewErrorLogActionTriggered()
 }
 
 // --------------------------------------------------------------------------
-void voMainWindow::onFileSaveStateActionTriggered()
+void voMainWindow::onFileSaveWorkflowActionTriggered()
 {
   QString fileName =
-    QFileDialog::getSaveFileName(this, tr("Save State"), "",
+    QFileDialog::getSaveFileName(this, tr("Save Workflow"), "",
                                  tr(".xml file (*.xml)"));
-  voApplication::application()->ioManager()->saveState(fileName);
+  voApplication::application()->ioManager()->saveWorkflow(fileName);
 }
 
 // --------------------------------------------------------------------------
-void voMainWindow::onFileLoadStateActionTriggered()
+void voMainWindow::onFileLoadWorkflowActionTriggered()
 {
   QString fileName =
-    QFileDialog::getOpenFileName(this, tr("Save State"), "",
+    QFileDialog::getOpenFileName(this, tr("Load Workflow"), "",
                                  tr(".xml file (*.xml)"));
-  voApplication::application()->ioManager()->loadState(fileName);
+  voApplication::application()->ioManager()->loadWorkflow(fileName);
 }
 
 // --------------------------------------------------------------------------

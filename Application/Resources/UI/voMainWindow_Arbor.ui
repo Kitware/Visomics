@@ -32,8 +32,8 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionFileOpen"/>
-    <addaction name="actionFileSaveState"/>
-    <addaction name="actionFileLoadState"/>
+    <addaction name="actionFileSaveWorkflow"/>
+    <addaction name="actionFileLoadWorkflow"/>
     <addaction name="actionFileMakeTreeHeatmap"/>
     <addaction name="actionFileExit"/>
    </widget>
@@ -194,20 +194,20 @@
     <string>Ctrl+Q</string>
    </property>
   </action>
-  <action name="actionFileSaveState">
+  <action name="actionFileSaveWorkflow">
    <property name="text">
-    <string>Save State</string>
+    <string>Save Workflow</string>
    </property>
    <property name="statusTip">
-    <string>Save the current state</string>
+    <string>Save the current workflow</string>
    </property>
   </action>
-  <action name="actionFileLoadState">
+  <action name="actionFileLoadWorkflow">
    <property name="text">
-    <string>Load State</string>
+    <string>Load Workflow</string>
    </property>
    <property name="statusTip">
-    <string>Load the current state</string>
+    <string>Load the current workflow</string>
    </property>
   </action>
   <action name="actionHelpAbout">
