@@ -125,15 +125,25 @@ void voTreeHeatmapView::setDataObjectListInternal(const QList<voDataObject*> dat
       qCritical() << "voTreeHeatmapView - Failed to setDataObject - vtkExtendedTable data is expected !";
       return;
       }
-    d->TreeItem->SetTree(Tree);
-    d->TreeItem->SetTable(Table->GetInputData());
+
+    // I think this check is safe for now, as we have no way to change what tree
+    // is the input to a particular view.
+    if (d->TreeItem->GetTree()->GetNumberOfVertices() == 0)
+      {
+      // making a copy of the Tree so that the TreeHeatmap & Dendrogram no longer
+      // share a single input data source
+      vtkSmartPointer<vtkTree> treeCopy = vtkSmartPointer<vtkTree>::New();
+      treeCopy->DeepCopy(Tree);
+      d->TreeItem->SetTree(treeCopy);
+      }
+    if (d->TreeItem->GetTable() != Table->GetInputData())
+      {
+      d->TreeItem->SetTable(Table->GetInputData());
+      }
     }
   else
     {
     // one of our dataObjects must have been deleted...
-    d->TreeItem->SetTable(NULL);
-    d->TreeItem->SetTree(NULL);
-
     // first check if we have ANY data left
     if (dataObjects.size() == 0)
       {
@@ -144,7 +154,12 @@ void voTreeHeatmapView::setDataObjectListInternal(const QList<voDataObject*> dat
     if (Tree)
       {
       // do we have a tree?
-      d->TreeItem->SetTree(Tree);
+      if (d->TreeItem->GetTree() != Tree)
+        {
+        // is it different from the one we're already drawing?
+        d->TreeItem->SetTree(Tree);
+        }
+      d->TreeItem->SetTable(NULL);
       }
     else
       {
@@ -155,7 +170,12 @@ void voTreeHeatmapView::setDataObjectListInternal(const QList<voDataObject*> dat
         qCritical() << "voTreeHeatmapView - Failed to setDataObjectListInternal - Neither tree or table were found !";
         return;
         }
-      d->TreeItem->SetTable(Table->GetInputData());
+      if (d->TreeItem->GetTable() != Table->GetInputData())
+        {
+        // and is it different from the one we're already drawing?
+        d->TreeItem->SetTable(Table->GetInputData());
+        }
+      d->TreeItem->SetTree(NULL);
       }
     }
 
@@ -176,7 +196,10 @@ void voTreeHeatmapView::setDataObjectInternal(const voDataObject& dataObject)
     return;
     }
 
-  d->TreeItem->SetTree(tree);
+  if (d->TreeItem->GetTree() != tree)
+    {
+    d->TreeItem->SetTree(tree);
+    }
   this->colorTreeForDifference();
   d->ContextView->GetRenderWindow()->SetMultiSamples(0);
   d->ContextView->Render();

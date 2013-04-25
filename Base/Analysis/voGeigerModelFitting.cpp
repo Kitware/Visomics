@@ -34,7 +34,7 @@
 // VTK includes
 #include <vtkArrayData.h>
 #include <vtkCompositeDataIterator.h>
-#include <vtkMultiPieceDataSet.h>
+#include <vtkMultiBlockDataSet.h>
 #include <vtkNew.h>
 #include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
@@ -163,10 +163,10 @@ bool voGeigerModelFitting::execute()
   RCalc->RemoveAllGetVariables();
   RCalc->SetRoutput(0);
 
-  vtkNew<vtkMultiPieceDataSet> composite;
-  composite->SetNumberOfPieces(2);
-  composite->SetPiece(0, table);
-  composite->SetPiece(1, tree);
+  vtkNew<vtkMultiBlockDataSet> composite;
+  composite->SetNumberOfBlocks(2);
+  composite->SetBlock(0, table);
+  composite->SetBlock(1, tree);
   RCalc->AddInputData(0, composite.GetPointer());
 
   RCalc->PutTree("tree");
@@ -211,7 +211,7 @@ bool voGeigerModelFitting::execute()
 
   RCalc->Update();
 
-  vtkMultiPieceDataSet * outData = vtkMultiPieceDataSet::SafeDownCast(RCalc->GetOutput());
+  vtkMultiBlockDataSet * outData = vtkMultiBlockDataSet::SafeDownCast(RCalc->GetOutput());
   if(!outData)
     {
     qCritical() << QObject::tr("Fatal error in %1 R script").arg(this->objectName());
@@ -219,32 +219,14 @@ bool voGeigerModelFitting::execute()
     return false;
     }
 
-  vtkTable *outTable = 0;
-  vtkTree *outTree = 0;
-
-  int currentItem = 0;
-  vtkCompositeDataIterator* iter = outData->NewIterator();
-  for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-       iter->GoToNextItem())
-    {
-    if (currentItem == 0)
-      {
-      outTable = vtkTable::SafeDownCast(iter->GetCurrentDataObject());
-      }
-    else
-      {
-      outTree = vtkTree::SafeDownCast(iter->GetCurrentDataObject());
-      }
-    ++currentItem;
-    }
-  iter->Delete();
-
+  vtkTable *outTable = vtkTable::SafeDownCast(outData->GetBlock(0));
   if (!outTable)
     {
     qCritical() << QObject::tr("Error generating output table.");
     return false;
     }
 
+  vtkTree *outTree = vtkTree::SafeDownCast(outData->GetBlock(1));
   if (!outTree)
     {
     qCritical() << QObject::tr("Error generated output tree.");
