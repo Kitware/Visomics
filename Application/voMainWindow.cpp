@@ -498,20 +498,17 @@ void voMainWindow::loadSampleDataset()
 {
 #ifdef Visomics_BUILD_TESTING
   voApplication * app = voApplication::application();
-  QString file = app->homeDirectory() + "/" + Visomics_INSTALL_DATA_DIR + "/visomics-sample_liver.csv";
+  QString treeFile = app->homeDirectory() + "/" + Visomics_INSTALL_DATA_DIR + "/anolis.phy";
+  QString tableFile = app->homeDirectory() + "/" + Visomics_INSTALL_DATA_DIR + "/anolisDataAppended.csv";
   if (!app->isInstalled())
     {
-    file = QString(VISOMICS_DATA_DIR) + "/Data/sample/visomics-sample_liver.csv";
+    treeFile = QString(VISOMICS_DATA_DIR) + "/Data/treeData/anolis.phy";
+    tableFile = QString(VISOMICS_DATA_DIR) + "/Data/treeData/anolisDataAppended.csv";
     }
-  voDelimitedTextImportSettings defaultSettings;
-  defaultSettings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes, 3);
-  voDelimitedTextImportDialog dialog(this, defaultSettings);
-  dialog.setFileName(file);
-  int status = dialog.exec();
-  if (status == voDelimitedTextImportDialog::Accepted)
-    {
-    voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
-    }
+  voDelimitedTextImportSettings settings;
+
+  voApplication::application()->ioManager()->loadPhyloTreeDataSet(treeFile, tableFile, settings);
+
 #else
   qWarning() << "Sample dataset not available !";
 #endif
