@@ -93,7 +93,9 @@ voAnalysisDriver::voAnalysisDriver(QObject* newParent):
   analysisNameToInputTypes.insert(
     "T-Test", QStringList() << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
-    "Tree Drop Tip", QStringList() << "vtkTree" << "vtkExtendedTable");
+    "Tree Drop Tip", QStringList() << "vtkTree");
+  analysisNameToInputTypes.insert(
+    "Tree Drop Tip With Data", QStringList() << "vtkTree" << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
     "Compare Trees", QStringList() << "vtkTree");
 }
