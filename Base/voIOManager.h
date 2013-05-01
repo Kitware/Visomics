@@ -38,10 +38,20 @@ class vtkExtendedTable;
 class vtkTable;
 class vtkTree;
 
+#ifdef USE_MONGO
+  namespace mongo
+    {
+    class DBClientConnection;
+    };
+#endif
+
 class voIOManager
 {
 public:
   typedef voIOManager Self;
+
+  voIOManager();
+  ~voIOManager();
 
   static bool readCSVFileIntoTable(const QString& fileName, vtkTable * outputTable,
                                    const voDelimitedTextImportSettings& settings = voDelimitedTextImportSettings(), const bool haveHeaders = false);
@@ -70,11 +80,28 @@ public:
   void createTreeHeatmapItem(QString name, QList<voDataObject *> forest,
                              voDataObject * tableObject);
 
-  void saveWorkflow(const QString& fileName);
-  void loadWorkflow(const QString& fileName);
+  void saveWorkflowToFile(const QString& fileName);
+  void loadWorkflowFromFile(const QString& fileName);
+
+  #ifdef USE_MONGO
+  bool connectToMongo(const QString& hostName);
+
+  bool saveWorkflowToMongo(const QString& hostName,
+                           const QString& databaseName,
+                           const QString& collectionName,
+                           const QString& workflowName);
+
+  void loadWorkflowFromMongo(const QString& databaseName,
+                             const QString& collectionName,
+                             const QString& workflowName);
+
+  QStringList listMongoWorkflows(const QString& databaseName,
+                                 const QString& collectionName);
+  #endif
 
 protected:
   bool treeAndTableMatch(vtkTree *tree, vtkTable *table);
+  void loadWorkflow(QXmlStreamReader *stream);
   void writeItemToXML(QStandardItem* parent, QXmlStreamWriter *stream);
   void writeAnalysesToXML(QXmlStreamWriter *stream);
   void writeAnalysisToXML(voDataModelItem *item, QXmlStreamWriter *stream);
@@ -92,6 +119,13 @@ protected:
 
   QMap<voInputFileDataObject *, voDelimitedTextImportSettings>
     tableSettings;
+
+  #ifdef USE_MONGO
+  bool mongoWorkflowAlreadyExists(const QString& queryTarget,
+                                  const QString& workflowName);
+  mongo::DBClientConnection *MongoConnection;
+  #endif
+
 };
 
 #endif

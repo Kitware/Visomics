@@ -2,6 +2,7 @@
 // Qt includes
 #include <QAbstractButton>
 #include <QAction>
+#include <QComboBox>
 #include <QDebug>
 #include <QDesktopWidget>
 #include <QFileDialog>
@@ -9,6 +10,7 @@
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QPushButton>
 #include <QStatusBar>
 #include <QSignalMapper>
 #include <QToolBar>
@@ -39,6 +41,10 @@
 #include "voInputFileDataObject.h"
 #include "voIOManager.h"
 #include "voMainWindow.h"
+#ifdef USE_MONGO
+  #include "voMongoLoadDialog.h"
+  #include "voMongoSaveDialog.h"
+#endif
 #include "voStartupView.h"
 #ifdef Visomics_BUILD_TESTING
 # include "voTestConfigure.h"
@@ -62,6 +68,10 @@ public:
   bool AnalysisParametersPrevShown; // Remembers previous user-selected state of widget
 
   ctkErrorLogWidget  ErrorLogWidget;
+  #ifdef USE_MONGO
+  voMongoLoadDialog *mongoLoadDialog;
+  voMongoSaveDialog *mongoSaveDialog;
+  #endif
 };
 
 // --------------------------------------------------------------------------
@@ -83,11 +93,22 @@ voMainWindow::voMainWindow(QWidget * newParent)
   Q_D(voMainWindow);
 
   d->setupUi(this);
- 
+
 #ifdef USE_ARBOR_BRAND
   this->setWindowTitle(QString("Arbor %1").arg(Visomics_VERSION));
 #else
   this->setWindowTitle(QString("Visomics %1").arg(Visomics_VERSION));
+#endif
+
+#ifdef USE_MONGO
+  d->mongoLoadDialog = new voMongoLoadDialog(this);
+  d->mongoLoadDialog->hide();
+
+  d->mongoSaveDialog = new voMongoSaveDialog(this);
+  d->mongoSaveDialog->hide();
+
+  connect(d->mongoLoadDialog->connectButton(), SIGNAL(clicked()),
+          this, SLOT(connectToMongoForLoadWorkflow()));
 #endif
 
   d->ErrorLogWidget.setErrorLogModel(voApplication::application()->errorLogModel());
@@ -119,6 +140,15 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionFileLoadWorkflow, SIGNAL(triggered()), this, SLOT(onFileLoadWorkflowActionTriggered()));
   connect(d->actionFileMakeTreeHeatmap, SIGNAL(triggered()),
           this, SLOT(onFileMakeTreeHeatmapActionTriggered()));
+
+#ifdef USE_MONGO
+  QAction *saveToDB = new QAction("Save Workflow to MongoDB", this);
+  QAction *loadFromDB = new QAction("Load Workflow from MongoDB", this);
+  d->menuFile->insertAction(d->actionFileLoadWorkflow, saveToDB);
+  d->menuFile->insertAction(d->actionFileMakeTreeHeatmap, loadFromDB);
+  connect(saveToDB, SIGNAL(triggered()), this, SLOT(onFileSaveWorkflowToMongoActionTriggered()));
+  connect(loadFromDB, SIGNAL(triggered()), this, SLOT(onFileLoadWorkflowFromMongoActionTriggered()));
+#endif
 
   // Populate Analysis menu
   voAnalysisFactory* analysisFactory = voApplication::application()->analysisFactory();
@@ -267,7 +297,7 @@ void voMainWindow::onFileOpenActionTriggered()
           }
         if (extension == "xml")
           {
-          voApplication::application()->ioManager()->loadWorkflow(file);
+          voApplication::application()->ioManager()->loadWorkflowFromFile(file);
           }
         }
       else
@@ -474,7 +504,7 @@ void voMainWindow::onFileSaveWorkflowActionTriggered()
   QString fileName =
     QFileDialog::getSaveFileName(this, tr("Save Workflow"), "",
                                  tr(".xml file (*.xml)"));
-  voApplication::application()->ioManager()->saveWorkflow(fileName);
+  voApplication::application()->ioManager()->saveWorkflowToFile(fileName);
 }
 
 // --------------------------------------------------------------------------
@@ -483,8 +513,68 @@ void voMainWindow::onFileLoadWorkflowActionTriggered()
   QString fileName =
     QFileDialog::getOpenFileName(this, tr("Load Workflow"), "",
                                  tr(".xml file (*.xml)"));
-  voApplication::application()->ioManager()->loadWorkflow(fileName);
+  voApplication::application()->ioManager()->loadWorkflowFromFile(fileName);
 }
+
+#ifdef USE_MONGO
+// --------------------------------------------------------------------------
+void voMainWindow::onFileSaveWorkflowToMongoActionTriggered()
+{
+  Q_D(voMainWindow);
+  d->mongoSaveDialog->show();
+  int status = d->mongoSaveDialog->exec();
+  if (status == voMongoSaveDialog::Accepted)
+    {
+    voApplication::application()->ioManager()->saveWorkflowToMongo(
+      d->mongoSaveDialog->GetHost(), d->mongoSaveDialog->GetDatabase(),
+      d->mongoSaveDialog->GetCollection(), d->mongoSaveDialog->GetWorkflow());
+    }
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::onFileLoadWorkflowFromMongoActionTriggered()
+{
+  Q_D(voMainWindow);
+  d->mongoLoadDialog->show();
+  int status = d->mongoLoadDialog->exec();
+  if (status == voMongoLoadDialog::Accepted)
+    {
+    voApplication::application()->ioManager()->loadWorkflowFromMongo(
+      d->mongoLoadDialog->GetDatabase(), d->mongoLoadDialog->GetCollection(),
+      d->mongoLoadDialog->GetWorkflow());
+    }
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::connectToMongoForLoadWorkflow()
+{
+  Q_D(voMainWindow);
+
+  voIOManager *ioManager = voApplication::application()->ioManager();
+
+  bool connected = ioManager->connectToMongo(d->mongoLoadDialog->GetHost());
+  if (!connected)
+    {
+    d->mongoLoadDialog->connectionFailed();
+    return;
+    }
+
+  //populate select box
+  QStringList workflowNames =
+    ioManager->listMongoWorkflows(d->mongoLoadDialog->GetDatabase(),
+                                  d->mongoLoadDialog->GetCollection());
+
+  d->mongoLoadDialog->workflowBox()->clear();
+  d->mongoLoadDialog->workflowBox()->addItems(workflowNames);
+  d->mongoLoadDialog->workflowBox()->setEnabled(true);
+
+  if (workflowNames.size() > 0)
+    {
+    d->mongoLoadDialog->enableOkButton();
+    }
+}
+
+#endif
 
 // --------------------------------------------------------------------------
 void voMainWindow::about()
