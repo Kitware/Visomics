@@ -51,6 +51,7 @@ public:
   voDataModelItem*              SelectedDataObject;
   QHash<QString, unsigned int>  NameCountMap;
   voAnalysis*                   ActiveAnalysis;
+  QList<voDataModelItem*>       Analyses;
 };
 
 #endif

@@ -48,8 +48,12 @@ public slots:
   void onFileOpenActionTriggered();
   void onCloseActionTriggered();
   void onViewErrorLogActionTriggered();
-  void onFileSaveStateActionTriggered();
-  void onFileLoadStateActionTriggered();
+  void onFileSaveWorkflowActionTriggered();
+  void onFileLoadWorkflowActionTriggered();
+#ifdef USE_MONGO
+  void onFileSaveWorkflowToMongoActionTriggered();
+  void onFileLoadWorkflowFromMongoActionTriggered();
+#endif
   void onFileMakeTreeHeatmapActionTriggered();
 
   void about();
@@ -67,6 +71,10 @@ protected slots:
   void setViewActions(const QString& objectUuid, voView* newView);
   void makeTreeHeatmap();
   void makeTreeHeatmapDialogClosed();
+
+#ifdef USE_MONGO
+  void connectToMongoForLoadWorkflow();
+#endif
 
 protected:
   QScopedPointer<voMainWindowPrivate> d_ptr;

@@ -17,41 +17,40 @@
   limitations under the License.
 
 =========================================================================*/
-
-#ifndef __voCustomAnalysis_h
-#define __voCustomAnalysis_h
+#ifndef __voMongoLoadDialog_h
+#define __voMongoLoadDialog_h
 
 // Qt includes
-#include <QScopedPointer>
+#include <QDialog>
+class QComboBox;
 
-// Visomics includes
-#include "voAnalysis.h"
+class voMongoLoadDialogPrivate;
 
-class voCustomAnalysisInformation;
-class voCustomAnalysisPrivate;
-
-class voCustomAnalysis : public voAnalysis
+class voMongoLoadDialog : public QDialog
 {
   Q_OBJECT
 public:
-  typedef voAnalysis Superclass;
-  voCustomAnalysis(QObject* newParent = 0);
-  virtual ~voCustomAnalysis();
-  void loadInformation(voCustomAnalysisInformation *info);
+  typedef QDialog Superclass;
+
+  voMongoLoadDialog(QWidget* newParent = 0);
+  virtual ~voMongoLoadDialog();
+
+  const QString GetHost();
+  const QString GetDatabase();
+  const QString GetCollection();
+  const QString GetWorkflow();
+  QPushButton* connectButton();
+  QComboBox*  workflowBox();
+
+  void enableOkButton();
+  void connectionFailed();
 
 protected:
-  virtual void setOutputInformation();
-  virtual void setParameterInformation();
-  virtual QString parameterDescription()const;
-
-  virtual bool execute();
-
-  QScopedPointer<voCustomAnalysisPrivate> d_ptr;
-  QString parameterDescriptions;
+  QScopedPointer<voMongoLoadDialogPrivate> d_ptr;
 
 private:
-  Q_DECLARE_PRIVATE(voCustomAnalysis);
-  Q_DISABLE_COPY(voCustomAnalysis);
+  Q_DECLARE_PRIVATE(voMongoLoadDialog);
+  Q_DISABLE_COPY(voMongoLoadDialog);
 };
 
 #endif

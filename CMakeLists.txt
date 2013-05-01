@@ -48,6 +48,16 @@ MARK_AS_ADVANCED(Visomics_SUPERBUILD)
 SET(Visomics_KEGG_SERVER_HOSTNAME "visomics.kitware.com" CACHE STRING "KEGG Server hostname")
 SET(Visomics_KEGG_SERVER_PORT "8090" CACHE STRING "KEGG Server port")
 
+option(USE_MONGO "Build Visomics with MongoDB support" OFF)
+if(USE_MONGO)
+  find_library(MongoDB_LIBRARY mongoclient)
+  find_path(MongoDB_INCLUDE_DIR mongo)
+  find_package(Boost COMPONENTS thread filesystem system REQUIRED)
+  include_directories(${MongoDB_INCLUDE_DIR} ${Boost_INCLUDE_DIRS})
+  set(MongoDB_LIBRARIES ${MongoDB_LIBRARY} ${Boost_LIBRARIES})
+  add_definitions(-DUSE_MONGO)
+endif()
+
 #-----------------------------------------------------------------------------
 # Visomics version number.  An even minor number corresponds to releases.
 #

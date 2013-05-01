@@ -19,6 +19,7 @@
 =========================================================================*/
 
 // Qt includes
+#include <QComboBox>
 #include <QDialogButtonBox>
 #include <QLabel>
 #include <QPushButton>
@@ -31,6 +32,8 @@
 // Visomics includes
 #include "voAnalysis.h"
 #include "voAnalysisParameterDialog.h"
+#include "voApplication.h"
+#include "voDataModel.h"
 
 class voAnalysisParameterDialogPrivate
 {

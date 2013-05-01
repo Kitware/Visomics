@@ -47,6 +47,8 @@ protected:
 
   virtual void setDataObjectInternal(const voDataObject& dataObject);
 
+  void colorTreeForDifference();
+
 protected:
   QScopedPointer<voTreeHeatmapViewPrivate> d_ptr;
 

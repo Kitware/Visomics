@@ -32,7 +32,10 @@
 #include <QtVariantProperty>
 
 // Visomics include
+#include "voApplication.h"
 #include "voAnalysis.h"
+#include "voDataModel.h"
+#include "voDataModelItem.h"
 #include "voDataObject.h"
 #include "voInputFileDataObject.h"
 #include "voIOManager.h"
@@ -43,6 +46,7 @@
 #include <vtkExtendedTable.h>
 #include <vtkSmartPointer.h>
 #include <vtkTable.h>
+#include <vtkTree.h>
 
 // --------------------------------------------------------------------------
 class voAnalysisPrivate
@@ -68,6 +72,8 @@ public:
   QHash<QString, QString> OutputViewPrettyName;
   QHash<QString, QString> OutputRawViewPrettyName;
   QHash<QString, QExplicitlySharedDataPointer<voDataObject> > OutputDataObjects;
+  QSet<QPair<QString, QString> > DynamicParameters;
+  QHash<QString, QString> DynamicParameterValues;
 
   bool OutputInformationInitialized;
   bool ParameterInformationInitialized;
@@ -623,10 +629,17 @@ QSet<QtVariantProperty*> voAnalysis::topLevelParameterGroups()const
 }
 
 // --------------------------------------------------------------------------
+QSet<QPair<QString, QString> > voAnalysis::dynamicParameters()const
+{
+  Q_D(const voAnalysis);
+  return d->DynamicParameters;
+}
+
+// --------------------------------------------------------------------------
 int voAnalysis::parameterCount()const
 {
   Q_D(const voAnalysis);
-  return d->VariantManager->properties().count();
+  return d->VariantManager->properties().count() + d->DynamicParameters.count();
 }
 
 // --------------------------------------------------------------------------
@@ -678,6 +691,13 @@ QtVariantProperty* voAnalysis::parameter(const QString& id)const
 }
 
 // --------------------------------------------------------------------------
+QString voAnalysis::dynamicParameter(const QString& label)const
+{
+  Q_D(const voAnalysis);
+  return d->DynamicParameterValues[label];
+}
+
+// --------------------------------------------------------------------------
 QString voAnalysis::enumParameter(const QString& id)const
 {
   QtVariantProperty * prop = this->parameter(id);
@@ -710,6 +730,40 @@ QtVariantProperty* voAnalysis::addEnumParameter(const QString& id, const QString
 }
 
 // --------------------------------------------------------------------------
+QtVariantProperty* voAnalysis::updateEnumParameter(const QString& id,
+                                                   const QStringList& choices,
+                                                   const QString& value)
+{
+  Q_ASSERT(!id.isEmpty());
+  Q_ASSERT(!choices.isEmpty());
+  Q_ASSERT(value.isEmpty() || choices.contains(value));
+
+  Q_D(voAnalysis);
+
+  // check if this property has already been added
+  QtVariantProperty *param = NULL;
+  foreach(QtProperty* prop, d->VariantManager->properties())
+    {
+    if (prop->propertyName() == id)
+      {
+      param = dynamic_cast<QtVariantProperty*>(prop);
+      break;
+      }
+    }
+
+  if (!param)
+    {
+    param = d->VariantManager->addProperty(QtVariantPropertyManager::enumTypeId(), id);
+    param->setPropertyId(id);
+    }
+
+  param->setAttribute(QLatin1String("enumNames"), choices);
+  param->setValue(choices.indexOf(value));
+
+  return param;
+}
+
+// --------------------------------------------------------------------------
 QString voAnalysis::stringParameter(const QString& id)const
 {
   QtVariantProperty * prop = this->parameter(id);
@@ -732,6 +786,34 @@ QtVariantProperty*  voAnalysis::addStringParameter(const QString& id, const QStr
   param->setValue(value);
 
   return param;
+}
+
+// --------------------------------------------------------------------------
+vtkTree* voAnalysis::treeParameter(const QString& label)const
+{
+  QString treeName = this->enumParameter(label);
+  qDebug() << "Selected tree:" << treeName;
+
+  voDataModelItem* treeItem =
+    voApplication::application()->dataModel()->findItemWithText(treeName);
+  Q_ASSERT(treeItem);
+
+  vtkTree *tree =
+    vtkTree::SafeDownCast(treeItem->dataObject()->dataAsVTKDataObject());
+
+  return tree;
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::addTreeParameter(const QString& label)
+{
+  Q_D(voAnalysis);
+
+  QPair<QString, QString> pair;
+  pair.first = "vtkTree";
+  pair.second = label;
+
+  d->DynamicParameters << pair;
 }
 
 // --------------------------------------------------------------------------
@@ -816,21 +898,59 @@ QtVariantProperty*  voAnalysis::addBooleanParameter(const QString& id, const QSt
 }
 
 // --------------------------------------------------------------------------
+void voAnalysis::updateDynamicParameters()
+{
+  typedef QPair<QString, QString> DynamicPropertyType;
+  foreach(const DynamicPropertyType dynamicProp, this->dynamicParameters())
+    {
+    QString type = dynamicProp.first;
+    QString label = dynamicProp.second;
+    QStringList choices;
+    voApplication::application()->dataModel()->listItems(type, &choices);
+    this->updateEnumParameter(label, choices);
+    }
+}
+
+// --------------------------------------------------------------------------
 vtkSmartPointer<vtkExtendedTable> voAnalysis::getInputTable() const
 {
-  vtkSmartPointer<vtkExtendedTable> extendedTable =
-    vtkExtendedTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+  Q_D(const voAnalysis);
+
+  vtkSmartPointer<vtkExtendedTable> extendedTable;
+
+  for(int i = 0; i < d->InputDataObjects.size(); ++i)
+    {
+    extendedTable = this->getInputTable(i);
+    if (extendedTable)
+      {
+      return extendedTable;
+      }
+    }
+  return NULL;
+}
+
+vtkSmartPointer<vtkExtendedTable> voAnalysis::getInputTable(int i) const
+{
+  Q_D(const voAnalysis);
+
+  vtkSmartPointer<vtkExtendedTable> extendedTable;
+  voDataObject *inputDataObject = d->InputDataObjects.at(i).data();
+
+  extendedTable =
+    vtkExtendedTable::SafeDownCast(inputDataObject->dataAsVTKDataObject());
   if (extendedTable)
     {
     return extendedTable;
     }
+
   vtkTable *table =
-    vtkTable::SafeDownCast(this->input()->dataAsVTKDataObject());
+    vtkTable::SafeDownCast(inputDataObject->dataAsVTKDataObject());
   if (table)
     {
     extendedTable = vtkSmartPointer<vtkExtendedTable>::New();
     voIOManager::convertTableToExtended(table, extendedTable.GetPointer());
     return extendedTable;
     }
+
   return NULL;
 }

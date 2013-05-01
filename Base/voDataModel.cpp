@@ -146,6 +146,7 @@ voDataModel::~voDataModel()
 voDataModelItem* voDataModel::addContainer(const QString& containerName,
                                            QStandardItem* parent)
 {
+  Q_D(voDataModel);
   Q_ASSERT(!containerName.isEmpty());
   if (containerName.isEmpty())
     {
@@ -161,6 +162,8 @@ voDataModelItem* voDataModel::addContainer(const QString& containerName,
     }
 
   parent->appendRow(containerItem);
+
+  d->Analyses.push_back(containerItem);
 
   return containerItem;
 }
@@ -203,6 +206,7 @@ voDataModelItem* voDataModel::addOutput(voDataObject * newDataObject, QStandardI
   voDataModelItem * newItem = this->addDataObjectAsChild(newDataObject, parent);
   if (!rawViewPrettyName.isEmpty())
     {
+    newItem->setText(""); // keep this item from stepping on its own toes.
     QString uniqueText = this->generateUniqueName(rawViewPrettyName);
     newItem->setText(uniqueText);
     }
@@ -287,9 +291,18 @@ const QList<voDataModelItem*>& voDataModel::selectedInputObjects() const
 }
 
 // --------------------------------------------------------------------------
+const QList<voDataModelItem*>& voDataModel::analyses() const
+{
+  Q_D(const voDataModel);
+  return d->Analyses;
+}
+
+// --------------------------------------------------------------------------
 bool voDataModel::removeObject(voDataModelItem *objectToRemove,
                                QStandardItem* parent)
 {
+  Q_D(voDataModel);
+
   if (!parent)
     {
     parent = this->invisibleRootItem();
@@ -303,6 +316,12 @@ bool voDataModel::removeObject(voDataModelItem *objectToRemove,
           this->itemFromIndex(this->index(row, col, parent->index())));
       if (item == objectToRemove)
         {
+        // remove it from the list of analyses (if appropriate)
+        if(item->type() == voDataModelItem::ContainerType)
+          {
+          d->Analyses.removeAll(item);
+          }
+
         emit this->objectRemoved(objectToRemove->uuid());
         this->removeRow(row, parent->index());
         if (parent != this->invisibleRootItem())
@@ -557,4 +576,34 @@ QString voDataModel::generateUniqueName(QString desiredName)
     }
 
   return uniqueName;
+}
+
+// --------------------------------------------------------------------------
+void voDataModel::listItems(const QString &type, QStringList *list,
+                            QStandardItem* parent) const
+{
+  if (!parent)
+    {
+    parent = this->invisibleRootItem();
+    }
+
+  for (int row = 0; row < this->rowCount(parent->index()); ++row)
+    {
+    for (int col = 0; col < this->columnCount(parent->index()); ++col)
+      {
+      voDataModelItem *item =
+        dynamic_cast<voDataModelItem*>(
+        this->itemFromIndex(this->index(row, col, parent->index())));
+
+      if (item->dataObject() && item->dataObject()->type() == type)
+        {
+        *list << item->text();
+        }
+
+      if (this->hasChildren(item->index()))
+        {
+        this->listItems(type, list, item);
+        }
+      }
+    }
 }

@@ -18,92 +18,102 @@
 
 =========================================================================*/
 
-#include "voCustomAnalysisInformation.h"
+// Visomics includes
+#include "ui_voMongoLoadDialog.h"
+#include "voMongoLoadDialog.h"
+
+// Qt includes
+#include <QComboBox>
+
+class voMongoLoadDialogPrivate : public Ui_voMongoLoadDialog
+{
+
+public:
+  typedef Ui_voMongoLoadDialog Superclass;
+  void setupUi(QDialog *widget);
+};
 
 // --------------------------------------------------------------------------
-voCustomAnalysisInformation::voCustomAnalysisInformation(QObject* newParent): Superclass(newParent)
+// voMongoLoadDialogPrivate methods
+
+
+// --------------------------------------------------------------------------
+void voMongoLoadDialogPrivate::setupUi(QDialog *widget)
+{
+  this->Superclass::setupUi(widget);
+}
+
+// --------------------------------------------------------------------------
+// voMongoLoadDialog methods
+
+// --------------------------------------------------------------------------
+voMongoLoadDialog::voMongoLoadDialog(QWidget* newParent) :
+  Superclass(newParent), d_ptr(new voMongoLoadDialogPrivate())
+{
+  Q_D(voMongoLoadDialog);
+  d->setupUi(this);
+  d->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+}
+
+// --------------------------------------------------------------------------
+voMongoLoadDialog::~voMongoLoadDialog()
 {
 }
 
 // --------------------------------------------------------------------------
-voCustomAnalysisInformation::~voCustomAnalysisInformation()
+const QString voMongoLoadDialog::GetHost()
 {
+  Q_D(voMongoLoadDialog);
+  return d->hostInput->text();
 }
 
 // --------------------------------------------------------------------------
-QString voCustomAnalysisInformation::name() const
+const QString voMongoLoadDialog::GetDatabase()
 {
-  return this->analysisName;
+  Q_D(voMongoLoadDialog);
+  return d->databaseInput->text();
 }
 
 // --------------------------------------------------------------------------
-void voCustomAnalysisInformation::setName(const QString& name)
+const QString voMongoLoadDialog::GetCollection()
 {
-  this->analysisName = name;
+  Q_D(voMongoLoadDialog);
+  return d->collectionInput->text();
 }
 
 // --------------------------------------------------------------------------
-QString voCustomAnalysisInformation::script() const
+const QString voMongoLoadDialog::GetWorkflow()
 {
-  return this->analysisScript;
+  Q_D(voMongoLoadDialog);
+  return d->workflowBox->currentText();
 }
 
 // --------------------------------------------------------------------------
-void voCustomAnalysisInformation::setScript(const QString& script)
+QPushButton* voMongoLoadDialog::connectButton()
 {
-  this->analysisScript = script;
+  Q_D(voMongoLoadDialog);
+  return d->connectButton;
 }
 
 // --------------------------------------------------------------------------
-voCustomAnalysisData * voCustomAnalysisInformation::input(int i) const
+QComboBox* voMongoLoadDialog::workflowBox()
 {
-  return this->inputsList.at(i);
+  Q_D(voMongoLoadDialog);
+  return d->workflowBox;
 }
 
 // --------------------------------------------------------------------------
-voCustomAnalysisData * voCustomAnalysisInformation::output(int i) const
+void voMongoLoadDialog::enableOkButton()
 {
-  return this->outputsList.at(i);
+  Q_D(voMongoLoadDialog);
+  d->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
 }
 
 // --------------------------------------------------------------------------
-QList<voCustomAnalysisData *> voCustomAnalysisInformation::inputs() const
+void voMongoLoadDialog::connectionFailed()
 {
-  return this->inputsList;
-}
-
-// --------------------------------------------------------------------------
-QList<voCustomAnalysisData *> voCustomAnalysisInformation::outputs() const
-{
-  return this->outputsList;
-}
-
-// --------------------------------------------------------------------------
-voCustomAnalysisParameter * voCustomAnalysisInformation::parameter(int i) const
-{
-  return this->parametersList.at(i);
-}
-
-// --------------------------------------------------------------------------
-QList<voCustomAnalysisParameter *> voCustomAnalysisInformation::parameters() const
-{
-  return this->parametersList;
-}
-
-// --------------------------------------------------------------------------
-void voCustomAnalysisInformation::addInput(voCustomAnalysisData * input)
-{
-  this->inputsList.append(input);
-}
-
-// --------------------------------------------------------------------------
-void voCustomAnalysisInformation::addOutput(voCustomAnalysisData * output)
-{
-  this->outputsList.append(output);
-}
-
-// --------------------------------------------------------------------------
-void voCustomAnalysisInformation::addParameter(voCustomAnalysisParameter * parameter)
-{
-  this->parametersList.append(parameter);
+  Q_D(voMongoLoadDialog);
+  d->workflowBox->clear();
+  d->workflowBox->setEnabled(false);
+  d->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }

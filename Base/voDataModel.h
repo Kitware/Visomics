@@ -82,6 +82,10 @@ public:
 
   QString generateUniqueName(QString desiredName);
 
+  void listItems(const QString &type, QStringList *list, QStandardItem* parent = 0)const;
+
+  const QList<voDataModelItem*>& analyses() const;
+
 public slots:
   void setActiveAnalysis(voAnalysis* analysis);
 

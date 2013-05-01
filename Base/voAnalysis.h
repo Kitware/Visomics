@@ -39,6 +39,7 @@ class voDataObject;
 class vtkDataObject;
 class vtkExtendedTable;
 class voView;
+class vtkTree;
 
 class voAnalysis : public QObject
 {
@@ -114,9 +115,12 @@ public:
   void initializeParameterInformation(
     const QHash<QString, QVariant>& parameters = AvoidParserBugWithGcc420());
 
+  void updateDynamicParameters();
+
   void setParameterValues(const QHash<QString, QVariant>& parameters);
 
   QSet<QtVariantProperty*> topLevelParameterGroups()const;
+  QSet<QPair<QString, QString> > dynamicParameters()const;
 
   int parameterCount()const;
 
@@ -129,6 +133,11 @@ public:
   virtual QString parameterDescription()const;
 
   vtkSmartPointer<vtkExtendedTable> getInputTable() const;
+  vtkSmartPointer<vtkExtendedTable> getInputTable(int i) const;
+
+  QtVariantProperty*  updateEnumParameter(const QString& id,
+                                          const QStringList& choices,
+                                          const QString& value = QString());
 
 signals:
 
@@ -144,6 +153,7 @@ protected:
   void addParameterGroup(const QString& label, const QList<QtProperty*> parameters);
 
   QtVariantProperty* parameter(const QString& id)const;
+  QString dynamicParameter(const QString& label)const;
 
   QString enumParameter(const QString& id)const;
 
@@ -171,6 +181,9 @@ protected:
   bool booleanParameter(const QString& id)const;
 
   QtVariantProperty*  addBooleanParameter(const QString& id, const QString& label, bool value);
+
+  void addTreeParameter(const QString& label);
+  vtkTree* treeParameter(const QString& label)const;
 
 protected:
   QScopedPointer<voAnalysisPrivate> d_ptr;

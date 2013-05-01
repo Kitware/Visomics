@@ -21,6 +21,8 @@
 // Qt includes
 #include <QDebug>
 #include <QFileInfo>
+#include <QMainWindow>
+#include <QMessageBox>
 #include <QStandardItem>
 #include <QXmlStreamWriter>
 
@@ -55,6 +57,25 @@
 #include <vtkGraphLayoutView.h>
 #include <vtkTree.h>
 
+// --------------------------------------------------------------------------
+voIOManager::voIOManager()
+{
+  #ifdef USE_MONGO
+  this->MongoConnection = NULL;
+  #endif
+}
+
+// --------------------------------------------------------------------------
+voIOManager::~voIOManager()
+{
+  #ifdef USE_MONGO
+  if (this->MongoConnection != NULL)
+    {
+    delete this->MongoConnection;
+    this->MongoConnection = NULL;
+    }
+  #endif
+}
 
 // --------------------------------------------------------------------------
 bool voIOManager::readCSVFileIntoTable(const QString& fileName, vtkTable * outputTable, const voDelimitedTextImportSettings& settings, const bool haveHeaders)
@@ -549,7 +570,7 @@ bool voIOManager::writeDataObjectToFile(vtkDataObject * dataObject, const QStrin
 }
 
 // --------------------------------------------------------------------------
-void voIOManager::saveState(const QString& fileName)
+void voIOManager::saveWorkflowToFile(const QString& fileName)
 {
   QFile file(fileName);
   if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
@@ -561,12 +582,13 @@ void voIOManager::saveState(const QString& fileName)
   QXmlStreamWriter stream(&file);
   stream.setAutoFormatting(true);
   stream.writeStartDocument();
-  stream.writeStartElement("state");
+  stream.writeStartElement("workflow");
 
   QStandardItem *parent = NULL;
   this->writeItemToXML(parent, &stream);
+  this->writeAnalysesToXML(&stream);
 
-  stream.writeEndElement(); //state
+  stream.writeEndElement(); //workflow
   stream.writeEndDocument();
 }
 
@@ -591,7 +613,7 @@ void voIOManager::writeItemToXML(QStandardItem* parent,
 
       if (item->data(voDataModelItem::IsAnalysisContainerRole).toBool())
         {
-        this->writeAnalysisToXML(item, stream);
+        continue; // we record analyses later during a separate step.
         }
 
       else if (item->type() == voDataModelItem::InputType)
@@ -630,6 +652,17 @@ void voIOManager::writeItemToXML(QStandardItem* parent,
         this->writeItemToXML(item, stream);
         }
       }
+    }
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::writeAnalysesToXML(QXmlStreamWriter *stream)
+{
+  voDataModel * dataModel = voApplication::application()->dataModel();
+  const QList<voDataModelItem *> analyses = dataModel->analyses();
+  foreach (voDataModelItem *item, analyses)
+    {
+    this->writeAnalysisToXML(item, stream);
     }
 }
 
@@ -814,7 +847,7 @@ void voIOManager::writeTableSettingsToXML(voDataModelItem *item,
 }
 
 // --------------------------------------------------------------------------
-void voIOManager::loadState(const QString& fileName)
+void voIOManager::loadWorkflowFromFile(const QString& fileName)
 {
   QFile file(fileName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -823,45 +856,51 @@ void voIOManager::loadState(const QString& fileName)
     return;
   }
 
+  QXmlStreamReader stream(&file);
+  this->loadWorkflow(&stream);
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::loadWorkflow(QXmlStreamReader *stream)
+{
   voDataModel * model = voApplication::application()->dataModel();
   model->clear();
   model->setColumnCount(1);
 
-  QXmlStreamReader stream(&file);
-  while (!stream.atEnd())
+  while (!stream->atEnd())
     {
     QString attribute = "";
-    stream.readNext();
-    if (stream.isStartElement())
+    stream->readNext();
+    if (stream->isStartElement())
       {
-      QString name = stream.name().toString();
+      QString name = stream->name().toString();
       if (name == "input")
         {
-        QStringRef type = stream.attributes().value("type");
+        QStringRef type = stream->attributes().value("type");
         if (type == "")
           {
           qCritical() << "empty type attribute encountered!";
           }
         else if (type == "TreeHeatmap")
           {
-          this->loadTreeHeatmapFromXML(&stream);
+          this->loadTreeHeatmapFromXML(stream);
           }
         else if (type == "Tree")
           {
-          this->loadTreeFromXML(&stream);
+          this->loadTreeFromXML(stream);
           }
         else if (type == "Table")
           {
-          this->loadTableFromXML(&stream);
+          this->loadTableFromXML(stream);
           }
         }
       else if(name == "analysis")
         {
-        this->loadAnalysisFromXML(&stream);
+        this->loadAnalysisFromXML(stream);
         }
       }
     }
-  if (stream.hasError())
+  if (stream->hasError())
     {
     // do error handling
     }
@@ -1164,3 +1203,183 @@ void voIOManager::convertTableToExtended(vtkTable *table,
   voUtils::setTableColumnNames(extendedTable->GetData(),
     extendedTable->GetColumnMetaDataOfInterestAsString());
 }
+
+#ifdef USE_MONGO
+#include "mongo/client/dbclient.h"
+#include "mongo/bson/bson.h"
+
+// --------------------------------------------------------------------------
+bool voIOManager::saveWorkflowToMongo(const QString& hostName,
+                                      const QString& databaseName,
+                                      const QString& collectionName,
+                                      const QString& workflowName)
+{
+  if (!this->connectToMongo(hostName))
+    {
+    // error message is handled within the subroutine.
+    return false;
+    }
+
+  QString queryTarget = databaseName + "." + collectionName;
+
+  bool updateExisting = false;
+  if (this->mongoWorkflowAlreadyExists(queryTarget, workflowName))
+    {
+    QMessageBox msgBox;
+    msgBox.addButton(QMessageBox::Yes);
+    msgBox.addButton(QMessageBox::No);
+    msgBox.setText(QString("Workflow \"%1\" already exists.").arg(workflowName));
+    msgBox.setInformativeText("Would you like to overwrite the existing workflow?");
+    msgBox.setDefaultButton(QMessageBox::No);
+    msgBox.setIcon(QMessageBox::Question);
+    int selection = msgBox.exec();
+    if(selection == QMessageBox::Yes)
+      {
+      updateExisting = true;
+      }
+    else
+      {
+      return false;
+      }
+    }
+
+  // generate a QString representation of the current workflow
+  QString workflow;
+  QXmlStreamWriter stream(&workflow);
+  stream.setAutoFormatting(true);
+  stream.writeStartDocument();
+  stream.writeStartElement("workflow");
+
+  QStandardItem *parent = NULL;
+  this->writeItemToXML(parent, &stream);
+  this->writeAnalysesToXML(&stream);
+
+  stream.writeEndElement(); //workflow
+  stream.writeEndDocument();
+
+  // record the new workflow in MongoDB
+  if (updateExisting)
+    {
+    mongo::BSONObj p1 = BSON("name" << workflowName.toStdString());
+    mongo::BSONObj p2 = BSON("$set" << BSON("text" << workflow.toStdString()));
+    this->MongoConnection->update(queryTarget.toStdString(), p1, p2);
+    }
+  else
+    {
+    mongo::BSONObj p = BSON("name" << workflowName.toStdString() <<
+                            "text" << workflow.toStdString());
+    this->MongoConnection->insert(queryTarget.toStdString(), p);
+    }
+
+  // make sure it's actually in the database now
+  if (!this->mongoWorkflowAlreadyExists(queryTarget, workflowName))
+    {
+    QMessageBox msgBox;
+    msgBox.setText("Could not save workflow to MongoDB.");
+    msgBox.setInformativeText("Make sure that you have write access to the database.");
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+    return false;
+    }
+
+  // inform the user of their success
+  QMessageBox msgBox;
+  msgBox.setText(
+    QString("Workflow \"%1\" successfully saved to MongoDB.").arg(workflowName));
+  msgBox.setStandardButtons(QMessageBox::Ok);
+  msgBox.setDefaultButton(QMessageBox::Ok);
+  msgBox.setIcon(QMessageBox::Information);
+  msgBox.exec();
+
+  return true;
+}
+
+// --------------------------------------------------------------------------
+void voIOManager::loadWorkflowFromMongo(const QString& databaseName,
+                                        const QString& collectionName,
+                                        const QString& workflowName)
+{
+  QString queryTarget = databaseName + "." + collectionName;
+
+  mongo::BSONObj p = BSON("name" << workflowName.toStdString());
+
+  std::auto_ptr<mongo::DBClientCursor> cursor =
+    this->MongoConnection->query(queryTarget.toStdString(), p);
+
+  QString workflow = cursor->next().getStringField("text");
+
+  QXmlStreamReader stream(workflow);
+  this->loadWorkflow(&stream);
+}
+
+// --------------------------------------------------------------------------
+bool voIOManager::connectToMongo(const QString& hostName)
+{
+  if (this->MongoConnection != NULL)
+    {
+    delete this->MongoConnection;
+    this->MongoConnection = NULL;
+    }
+
+  this->MongoConnection = new mongo::DBClientConnection();
+
+  try
+    {
+    this->MongoConnection->connect(hostName.toStdString());
+    }
+  catch(const mongo::DBException &e)
+    {
+    QMessageBox msgBox;
+    msgBox.setText("Could not connect to MongoDB.");
+    QString errorMsg = e.what();
+
+    // clean up redundant error message from MongoDB C++ driver...
+    errorMsg.remove("can't connect ");
+
+    msgBox.setInformativeText(errorMsg);
+    msgBox.setStandardButtons(QMessageBox::Ok);
+    msgBox.setDefaultButton(QMessageBox::Ok);
+    msgBox.setIcon(QMessageBox::Critical);
+    msgBox.exec();
+    return false;
+    }
+
+  return true;
+}
+
+// --------------------------------------------------------------------------
+bool voIOManager::mongoWorkflowAlreadyExists(const QString& queryTarget,
+                                             const QString& workflowName)
+{
+  mongo::BSONObj p = BSON("name" << workflowName.toStdString());
+
+  unsigned long long n =
+    this->MongoConnection->count(queryTarget.toStdString(), p);
+
+  if (n > 0)
+    {
+    return true;
+    }
+  return false;
+}
+
+// --------------------------------------------------------------------------
+QStringList voIOManager::listMongoWorkflows(const QString& databaseName,
+                                            const QString& collectionName)
+{
+  QStringList listOfWorkflows;
+  QString queryTarget = databaseName + "." + collectionName;
+
+  std::auto_ptr<mongo::DBClientCursor> cursor =
+    this->MongoConnection->query(queryTarget.toStdString(), mongo::BSONObj());
+
+  while (cursor->more())
+    {
+    listOfWorkflows.append(cursor->next().getStringField("name"));
+    }
+
+  return listOfWorkflows;
+}
+#endif

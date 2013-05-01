@@ -18,8 +18,8 @@
 
 =========================================================================*/
 
-#ifndef __voCustomAnalysis_h
-#define __voCustomAnalysis_h
+#ifndef __voCompareTrees_h
+#define __voCompareTrees_h
 
 // Qt includes
 #include <QScopedPointer>
@@ -27,17 +27,13 @@
 // Visomics includes
 #include "voAnalysis.h"
 
-class voCustomAnalysisInformation;
-class voCustomAnalysisPrivate;
-
-class voCustomAnalysis : public voAnalysis
+class voCompareTrees : public voAnalysis
 {
   Q_OBJECT
 public:
   typedef voAnalysis Superclass;
-  voCustomAnalysis(QObject* newParent = 0);
-  virtual ~voCustomAnalysis();
-  void loadInformation(voCustomAnalysisInformation *info);
+  voCompareTrees();
+  virtual ~voCompareTrees();
 
 protected:
   virtual void setOutputInformation();
@@ -46,12 +42,8 @@ protected:
 
   virtual bool execute();
 
-  QScopedPointer<voCustomAnalysisPrivate> d_ptr;
-  QString parameterDescriptions;
-
 private:
-  Q_DECLARE_PRIVATE(voCustomAnalysis);
-  Q_DISABLE_COPY(voCustomAnalysis);
+  Q_DISABLE_COPY(voCompareTrees);
 };
 
 #endif

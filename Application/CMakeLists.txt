@@ -17,6 +17,10 @@ set(KIT_SRCS
   voDelimitedTextPreviewModel.h
   voMainWindow.cpp
   voMainWindow.h
+  voMongoLoadDialog.cpp
+  voMongoLoadDialog.h
+  voMongoSaveDialog.cpp
+  voMongoSaveDialog.h
   voNormalizationWidget.cpp
   voNormalizationWidget.h
   voStartupView.cpp
@@ -42,6 +46,8 @@ set(KIT_MOC_SRCS
   voDelimitedTextPreview.h
   voDelimitedTextPreviewModel.h
   voMainWindow.h
+  voMongoLoadDialog.h
+  voMongoSaveDialog.h
   voNormalizationWidget.h
   voStartupView.h
   voViewStackedWidget.h
@@ -51,6 +57,8 @@ set(KIT_MOC_SRCS
 set(KIT_UI_FORMS
   Resources/UI/voDelimitedTextImportDialog.ui
   Resources/UI/voDelimitedTextImportWidget.ui
+  Resources/UI/voMongoLoadDialog.ui
+  Resources/UI/voMongoSaveDialog.ui
   )
 
 if(USE_ARBOR_BRAND)
@@ -127,7 +135,7 @@ set_target_properties(VisomicsApp PROPERTIES OUTPUT_NAME ${APP_NAME})
 
 # Add regular application
 add_executable(VisomicsApp-real Main.cpp)
-target_link_libraries(VisomicsApp-real VisomicsAppLib)
+target_link_libraries(VisomicsApp-real VisomicsAppLib ${MongoDB_LIBRARIES})
 set_target_properties(VisomicsApp-real PROPERTIES OUTPUT_NAME ${APP_NAME}-real)
 
 if(APPLE)
