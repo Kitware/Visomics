@@ -101,6 +101,7 @@ signals:
 
 protected:
   bool nameIsAvailable(QString desiredName, QStandardItem* parent);
+  void removeChildAnalyses(voDataModelItem *parent);
 
   QScopedPointer<voDataModelPrivate> d_ptr;
 
