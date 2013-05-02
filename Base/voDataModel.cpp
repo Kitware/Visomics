@@ -301,8 +301,6 @@ const QList<voDataModelItem*>& voDataModel::analyses() const
 bool voDataModel::removeObject(voDataModelItem *objectToRemove,
                                QStandardItem* parent)
 {
-  Q_D(voDataModel);
-
   if (!parent)
     {
     parent = this->invisibleRootItem();
@@ -316,11 +314,8 @@ bool voDataModel::removeObject(voDataModelItem *objectToRemove,
           this->itemFromIndex(this->index(row, col, parent->index())));
       if (item == objectToRemove)
         {
-        // remove it from the list of analyses (if appropriate)
-        if(item->type() == voDataModelItem::ContainerType)
-          {
-          d->Analyses.removeAll(item);
-          }
+        // remove all child analyses from our list
+        this->removeChildAnalyses(item);
 
         emit this->objectRemoved(objectToRemove->uuid());
         this->removeRow(row, parent->index());
@@ -350,6 +345,35 @@ bool voDataModel::removeObject(voDataModelItem *objectToRemove,
       }
     }
   return false;
+}
+
+// --------------------------------------------------------------------------
+void voDataModel::removeChildAnalyses(voDataModelItem *parent)
+{
+  Q_D(voDataModel);
+
+  for (int row = 0; row < this->rowCount(parent->index()); ++row)
+    {
+    for (int col = 0; col < this->columnCount(parent->index()); ++col)
+      {
+      voDataModelItem *item =
+        dynamic_cast<voDataModelItem*>(
+          this->itemFromIndex(this->index(row, col, parent->index())));
+      if (item->type() == voDataModelItem::ContainerType)
+        {
+        d->Analyses.removeAll(item);
+        }
+      if (this->hasChildren(item->index()))
+        {
+        this->removeChildAnalyses(item);
+        }
+      }
+    }
+
+  if (parent->type() == voDataModelItem::ContainerType)
+    {
+    d->Analyses.removeAll(parent);
+    }
 }
 
 // --------------------------------------------------------------------------

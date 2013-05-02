@@ -572,6 +572,10 @@ void voMainWindow::connectToMongoForLoadWorkflow()
     {
     d->mongoLoadDialog->enableOkButton();
     }
+  else
+    {
+    d->mongoLoadDialog->disableOkButton();
+    }
 }
 
 #endif
