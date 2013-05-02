@@ -29,7 +29,7 @@
 
 // VTK includes
 #include <QVTKWidget.h>
-#include <vtkDatasetAttributes.h>
+#include <vtkDataSetAttributes.h>
 #include <vtkDoubleArray.h>
 #include <vtkGraph.h>
 #include <vtkLookupTable.h>
