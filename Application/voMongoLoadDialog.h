@@ -43,6 +43,7 @@ public:
   QComboBox*  workflowBox();
 
   void enableOkButton();
+  void disableOkButton();
   void connectionFailed();
 
 protected:

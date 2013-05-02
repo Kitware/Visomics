@@ -52,7 +52,7 @@ voMongoLoadDialog::voMongoLoadDialog(QWidget* newParent) :
 {
   Q_D(voMongoLoadDialog);
   d->setupUi(this);
-  d->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
+  this->disableOkButton();
 }
 
 // --------------------------------------------------------------------------
@@ -107,6 +107,13 @@ void voMongoLoadDialog::enableOkButton()
 {
   Q_D(voMongoLoadDialog);
   d->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(true);
+}
+
+// --------------------------------------------------------------------------
+void voMongoLoadDialog::disableOkButton()
+{
+  Q_D(voMongoLoadDialog);
+  d->buttonBox->button(QDialogButtonBox::Ok)->setEnabled(false);
 }
 
 // --------------------------------------------------------------------------
