@@ -223,6 +223,22 @@ QVariant voDataModelItem::data(int role) const
 }
 
 // --------------------------------------------------------------------------
+void voDataModelItem::setDataObjectList(QList<voDataObject*> newDataObjectList)
+{
+// for ensemble data model item, pass the dataObjectList to the associated view
+  if (this->type() == voDataModelItem::InputType ||
+      this->type() == voDataModelItem::OutputType ||
+      this->type() == voDataModelItem::ViewType)
+    {
+    voView * view =
+        reinterpret_cast<voView*>(this->data(voDataModelItem::ViewVoidStarRole).value<void*>());
+    if (view)
+      {
+      view->setDataObjectList(newDataObjectList);
+      }
+    }
+}
+// --------------------------------------------------------------------------
 void voDataModelItem::setDataObject(voDataObject* newDataObject)
 {
   Q_D(voDataModelItem);

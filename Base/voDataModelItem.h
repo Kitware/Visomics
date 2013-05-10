@@ -78,6 +78,7 @@ public:
   QVariant data(int role = Qt::UserRole + 1) const;
 
   void setDataObject(voDataObject* newDataObject);
+  void setDataObjectList(QList<voDataObject*> newDataObjectList);
   voDataObject * dataObject() const;
   QList<voDataModelItem*>  childItems() const;
   void  addChildItem(voDataModelItem * childItem);
