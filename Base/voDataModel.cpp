@@ -314,8 +314,9 @@ bool voDataModel::removeObject(voDataModelItem *objectToRemove,
           this->itemFromIndex(this->index(row, col, parent->index())));
       if (item == objectToRemove)
         {
-        // remove all child analyses from our list
-        this->removeChildAnalyses(item);
+        // delete the views of this object's children,
+        // and remove all child analyses from our list
+        this->removeChildren(item);
 
         emit this->objectRemoved(objectToRemove->uuid());
         this->removeRow(row, parent->index());
@@ -348,7 +349,7 @@ bool voDataModel::removeObject(voDataModelItem *objectToRemove,
 }
 
 // --------------------------------------------------------------------------
-void voDataModel::removeChildAnalyses(voDataModelItem *parent)
+void voDataModel::removeChildren(voDataModelItem *parent)
 {
   Q_D(voDataModel);
 
@@ -365,8 +366,9 @@ void voDataModel::removeChildAnalyses(voDataModelItem *parent)
         }
       if (this->hasChildren(item->index()))
         {
-        this->removeChildAnalyses(item);
+        this->removeChildren(item);
         }
+      emit this->objectRemoved(item->uuid());
       }
     }
 
