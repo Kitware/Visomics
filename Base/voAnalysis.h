@@ -66,6 +66,10 @@ public:
                      const QString& rawViewType = QString(),
                      const QString& rawViewPrettyName = QString());
 
+  void addEnsembleOutputType(const QString& ensembleOutputName, const QString& outputType,
+                     const QString& rawViewType,
+                     const QString& rawViewPrettyName ,
+                     const QStringList childOutputNames);
   QString outputType(const QString& outputName) const;
 
   QString viewPrettyName(const QString& outputName, const QString& viewType);
@@ -74,12 +78,18 @@ public:
   int numberOfOutput();
 
   QStringList outputNames() const;
+  QStringList ensembleOutputNames() const;
+  QStringList childNameListOfEnsembleOutput(const QString ensembleOutputName) const;
 
   bool hasOutput(const QString& outputName) const;
+  bool hasEnsembleOutput(const QString& outputName) const;
 
+  int  getNumberOfEnsembleOutput();
+  void setEnsembleOutput(const QString& ensembleName, QList<voDataObject*> ensembleDataObjectList);
   void setOutput(const QString& outputName, voDataObject * dataObject);
 
   voDataObject * output(const QString& outputName) const;
+  voDataObject * ensembleOutput(const QString& outputName) const;
 
   bool hasOutputWithViewType(const QString& outputName, const QString& viewType) const;
 
@@ -90,6 +100,7 @@ public:
   bool hasOutputWithRawViewType(const QString& outputName, const QString& rawViewType) const;
 
   QString rawViewTypeForOutput(const QString& outputName)const;
+  QString rawViewTypeForEnsembleOutput(const QString& outputName)const;
 
   QString rawViewPrettyName(const QString& outputName, const QString& rawViewType);
   void setRawViewPrettyName(const QString& outputName, const QString& rawViewType, const QString& rawViewPrettyName);
@@ -143,6 +154,7 @@ signals:
 
   void outputSet(const QString& outputName, voDataObject* dataObject, voAnalysis* analysis);
 
+  void ensembleOutputSet(const QString& ensembleName, QList<voDataObject *> dataObjectList, voAnalysis* analysis);
 protected:
 
   virtual bool execute();

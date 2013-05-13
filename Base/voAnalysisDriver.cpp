@@ -93,7 +93,9 @@ voAnalysisDriver::voAnalysisDriver(QObject* newParent):
   analysisNameToInputTypes.insert(
     "T-Test", QStringList() << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
-    "Tree Drop Tip", QStringList() << "vtkTree" << "vtkExtendedTable");
+    "Tree Drop Tip", QStringList() << "vtkTree");
+  analysisNameToInputTypes.insert(
+    "Tree Drop Tip With Data", QStringList() << "vtkTree" << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
     "Compare Trees", QStringList() << "vtkTree");
 }
@@ -297,6 +299,8 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
   connect(analysis, SIGNAL(outputSet(const QString&, voDataObject*, voAnalysis*)),
     SLOT(onAnalysisOutputSet(const QString&,voDataObject*,voAnalysis*)));
 
+  connect(analysis, SIGNAL(ensembleOutputSet(const QString&, QList<voDataObject*>, voAnalysis*)),
+    SLOT(onAnalysisEnsembleOutputSet(const QString&, QList<voDataObject*>, voAnalysis*)));
   emit this->analysisAddedToObjectModel(analysis);
 
   qDebug() << " => Analysis" << analysis->objectName() << " DONE";
@@ -306,7 +310,6 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
 void voAnalysisDriver::runAnalysisForCurrentInput(
   const QString& analysisName, const QHash<QString, QVariant>& parameters)
 {
-  qDebug() << "runAnalysisForCurrentInput" << analysisName;
 
   voDataModel * model = voApplication::application()->dataModel();
   voDataModelItem * inputTarget = model->inputTargetForAnalysis(model->activeAnalysis());
@@ -346,8 +349,30 @@ void voAnalysisDriver::updateAnalysis(
     qCritical() << "Analysis failed to run " << analysis->objectName();
     return;
     }
+
 }
 
+// --------------------------------------------------------------------------
+void voAnalysisDriver::onAnalysisEnsembleOutputSet(
+  const QString& outputEnsembleName, QList<voDataObject*> dataObjectList, voAnalysis* analysis)
+{
+  if (outputEnsembleName.isEmpty() || dataObjectList.isEmpty() || !analysis)
+    {
+    return;
+    }
+
+  voDataModel * model = voApplication::application()->dataModel();
+
+  voDataModelItem * analysisContainer = model->itemForAnalysis(analysis);
+  Q_ASSERT(analysisContainer);
+
+  QList<voDataModelItem*> items =
+      model->findItemsWithRole(voDataModelItem::OutputNameRole, outputEnsembleName, analysisContainer);
+  foreach(voDataModelItem* item, items)
+    {
+    item->setDataObjectList(dataObjectList);
+    }
+}
 // --------------------------------------------------------------------------
 void voAnalysisDriver::onAnalysisOutputSet(
   const QString& outputName, voDataObject* dataObject, voAnalysis* analysis)
@@ -370,8 +395,73 @@ void voAnalysisDriver::onAnalysisOutputSet(
 }
 
 // --------------------------------------------------------------------------
+voDataModelItem *  voAnalysisDriver::addEnsembleOutputToObjectModel(const QString& outputName, voAnalysis * analysis, voDataModelItem* parent)
+{
+
+  voDataObject * dataObject = analysis->ensembleOutput(outputName);
+  if (!dataObject)// || dataObject->data().isNull())
+    {
+    qCritical() << QObject::tr("Analysis ran, but output [%1] is missing.").arg(outputName);
+    return NULL;
+    }
+
+  voDataModel * model = voApplication::application()->dataModel();
+  voDataModelItem * outputItem = NULL;
+  // Append output only if it is associated with a non-empty rawViewType
+  QString rawViewType = analysis->rawViewTypeForEnsembleOutput(outputName);
+
+  if (!rawViewType.isEmpty())
+    {
+    QString rawViewPrettyName = analysis->rawViewPrettyName(outputName, rawViewType);
+    outputItem =
+      model->addOutput(dataObject, parent, rawViewType, rawViewPrettyName);
+    outputItem->setData(outputName, voDataModelItem::OutputNameRole);
+
+    }
+
+    outputItem->setType(voDataModelItem::OutputType);
+
+  return outputItem;
+
+}
+// --------------------------------------------------------------------------
+voDataModelItem *  voAnalysisDriver::addOutputToObjectModel(const QString& outputName, voAnalysis * analysis, voDataModelItem* parent)
+{
+
+  voDataObject * dataObject = analysis->output(outputName);
+  if (!dataObject)// || dataObject->data().isNull())
+    {
+    qCritical() << QObject::tr("Analysis ran, but output [%1] is missing.").arg(outputName);
+    return NULL;
+    }
+
+  voDataModel * model = voApplication::application()->dataModel();
+  voDataModelItem * outputItem = NULL;
+  // Append output only if it is associated with a non-empty rawViewType
+  QString rawViewType = analysis->rawViewTypeForOutput(outputName);
+  if (!rawViewType.isEmpty())
+    {
+    QString rawViewPrettyName = analysis->rawViewPrettyName(outputName, rawViewType);
+    outputItem =
+      model->addOutput(dataObject, parent, rawViewType, rawViewPrettyName);
+    outputItem->setData(outputName, voDataModelItem::OutputNameRole);
+    }
+
+  foreach(const QString& viewType, analysis->viewTypesForOutput(outputName))
+    {
+    if (viewType.isEmpty()) { continue; }
+    QString viewPrettyName = analysis->viewPrettyName(outputName, viewType);
+    outputItem =
+      model->addView(viewType, viewPrettyName, dataObject, parent);
+    outputItem->setData(outputName, voDataModelItem::OutputNameRole);
+    }
+
+  return outputItem;
+
+}
+// --------------------------------------------------------------------------
 void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
-                                                voDataModelItem* insertLocation)
+  voDataModelItem* insertLocation)
 {
   if (!analysis || !insertLocation)
     {
@@ -382,54 +472,40 @@ void voAnalysisDriver::addAnalysisToObjectModel(voAnalysis * analysis,
 
   // Analysis container
   voDataModelItem * analysisContainer =
-      model->addContainer(model->getNextName(analysis->objectName()), insertLocation);
+    model->addContainer(model->getNextName(analysis->objectName()), insertLocation);
   analysisContainer->setData(QVariant(analysis->uuid()), voDataModelItem::UuidRole);
   analysisContainer->setData(QVariant(true), voDataModelItem::IsAnalysisContainerRole);
   analysisContainer->setData(QVariant(QMetaType::VoidStar, &analysis), voDataModelItem::AnalysisVoidStarRole);
 
-  // Outputs container
-  voDataModelItem * outputsContainer = analysisContainer;
-//      model->addContainer(QObject::tr("outputs"), analysisContainer);
 
-  // Views container
-  voDataModelItem * viewContainer = analysisContainer;
-//      model->addContainer(QObject::tr("views"), analysisContainer);
-
-  // Loop over outputs
-  foreach(const QString& outputName, analysis->outputNames())
+  QStringList singleOutputNames = analysis->outputNames();
+  // process ensemble output first
+  foreach (const QString & ensembleOutputName, analysis->ensembleOutputNames())
     {
-    voDataObject * dataObject = analysis->output(outputName);
-    if (!dataObject || dataObject->data().isNull())
-      {
-      qCritical() << QObject::tr("Analysis ran, but output [%1] is missing.").arg(outputName);
-      continue;
-      }
+    voDataModelItem * ensembleOutputItem = addEnsembleOutputToObjectModel(ensembleOutputName, analysis, analysisContainer);
 
-    // Append output only if it is associated with a non-empty rawViewType
-    QString rawViewType = analysis->rawViewTypeForOutput(outputName);
-    if (!rawViewType.isEmpty())
+    QStringList childOutputNames = analysis->childNameListOfEnsembleOutput(ensembleOutputName);
+    for (int i = 0; i < childOutputNames.size(); i++)
       {
-      QString rawViewPrettyName = analysis->rawViewPrettyName(outputName, rawViewType);
-      voDataModelItem * outputItem =
-          model->addOutput(dataObject, outputsContainer, rawViewType, rawViewPrettyName);
-      outputItem->setData(outputName, voDataModelItem::OutputNameRole);
+      QString childOutputName = childOutputNames[i];
+      // add child outputs under the ensemble output
+      voDataModelItem * childItem = addOutputToObjectModel(childOutputName, analysis, ensembleOutputItem);
+      singleOutputNames.removeAll(childOutputName);
+      ensembleOutputItem->addChildItem(childItem);
       }
+    }
 
-    foreach(const QString& viewType, analysis->viewTypesForOutput(outputName))
-      {
-      if (viewType.isEmpty()) { continue; }
-      QString viewPrettyName = analysis->viewPrettyName(outputName, viewType);
-      voDataModelItem * viewItem =
-          model->addView(viewType, viewPrettyName, dataObject, viewContainer);
-      viewItem->setData(outputName, voDataModelItem::OutputNameRole);
-      }
+  // Loop over non-ensemble outputs
+  foreach(const QString& outputName, singleOutputNames)
+    {
+    addOutputToObjectModel(outputName, analysis, analysisContainer);
     }
 }
 
 // --------------------------------------------------------------------------
 bool voAnalysisDriver::doesInputMatchAnalysis(const QString& analysisName,
-                                              voDataModelItem* inputTarget,
-                                              bool warnOnFail)
+  voDataModelItem* inputTarget,
+  bool warnOnFail)
 {
   if (analysisName.isEmpty())
     {
@@ -451,7 +527,7 @@ bool voAnalysisDriver::doesInputMatchAnalysis(const QString& analysisName,
       }
     // Special case to allow chained analyses
     if (expectedInputType == "vtkExtendedTable" &&
-        providedInputType == "vtkTable")
+      providedInputType == "vtkTable")
       {
       return true;
       }
@@ -491,7 +567,7 @@ bool voAnalysisDriver::doesInputMatchAnalysis(const QString& analysisName,
       return false;
       }
     }
-    return true;
+  return true;
 }
 
 // --------------------------------------------------------------------------
@@ -507,21 +583,21 @@ int voAnalysisDriver::numberOfInputsForAnalysis(QString analysisName)
 
 // --------------------------------------------------------------------------
 void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
-                                              const QString& rScriptFileName)
+  const QString& rScriptFileName)
 {
   QFile file(xmlFileName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-  {
+    {
     qCritical() << "Could not open " << xmlFileName << " for reading!";
     return;
-  }
+    }
 
   QFile scriptFile(rScriptFileName);
   if (!scriptFile.open(QIODevice::ReadOnly | QIODevice::Text))
-  {
+    {
     qCritical() << "Could not open " << rScriptFileName << " for reading!";
     return;
-  }
+    }
   QTextStream textStream(&scriptFile);
   QString scriptContents = textStream.readAll();
   scriptFile.close();

@@ -67,11 +67,13 @@ public:
 
   QList<QExplicitlySharedDataPointer<voDataObject> > InputDataObjects;
   QHash<QString, QString> OutputInformation;
+  QHash<QString, QStringList> EnsembleOutputInformation;// <ensembel ouput name, a list of child output names>
   QHash<QString, QString> OutputViewInformation;
   QHash<QString, QString> OutputRawView;
   QHash<QString, QString> OutputViewPrettyName;
   QHash<QString, QString> OutputRawViewPrettyName;
   QHash<QString, QExplicitlySharedDataPointer<voDataObject> > OutputDataObjects;
+  QHash<QString, QExplicitlySharedDataPointer<voDataObject> > EnsembleOutputDataObjects;
   QSet<QPair<QString, QString> > DynamicParameters;
   QHash<QString, QString> DynamicParameterValues;
 
@@ -214,6 +216,45 @@ void voAnalysis::removeAllInputs()
   d->InputDataObjects.clear();
 }
 
+
+// --------------------------------------------------------------------------
+void voAnalysis::addEnsembleOutputType(const QString& ensembleOutputName, const QString& outputType,
+                               const QString& rawViewType, const QString& rawViewPrettyName,
+                               const QStringList childOutputNames)
+{
+  Q_D(voAnalysis);
+  const char* className = this->metaObject()->className();
+  checkForLeadingOrTrailingSpaces(className, "addOutputType", "rawViewPrettyName", rawViewPrettyName);
+
+  checkForSpaces(className, "addEnsembleOutputType", "outputName", ensembleOutputName);
+  checkForSpaces(className, "addEnsembleOutputType", "outputType", outputType);
+  checkForSpaces(className, "addEnsembleOutputType", "rawViewType", rawViewType);
+
+  if (checkIfEmpty(className, "addEnsembleOutputType", "outputName", ensembleOutputName) ||
+      checkIfEmpty(className, "addEnsembleOutputType", "outputType", outputType))
+    {
+    return;
+    }
+
+  if (this->hasEnsembleOutput(ensembleOutputName))
+    {
+    return;
+    }
+
+  d->EnsembleOutputInformation.insert(ensembleOutputName, childOutputNames);
+
+  if (!rawViewType.isEmpty())
+    {
+    d->OutputRawView.insert(ensembleOutputName, rawViewType);
+
+    if (!rawViewPrettyName.isEmpty())
+      {
+      d->OutputRawViewPrettyName.insert(ensembleOutputName + rawViewType, rawViewPrettyName);
+      }
+    }
+
+}
+
 // --------------------------------------------------------------------------
 void voAnalysis::addOutputType(const QString& outputName, const QString& outputType,
                                const QString& viewType, const QString& viewPrettyName,
@@ -275,6 +316,7 @@ QString voAnalysis::outputType(const QString& outputName) const
   return d->OutputInformation.value(outputName);
 }
 
+
 // --------------------------------------------------------------------------
 QString voAnalysis::viewPrettyName(const QString& outputName, const QString& viewType)
 {
@@ -326,10 +368,53 @@ QStringList voAnalysis::outputNames()const
 }
 
 // --------------------------------------------------------------------------
+QStringList voAnalysis::ensembleOutputNames()const
+{
+  Q_D(const voAnalysis);
+  QStringList names = d->EnsembleOutputInformation.keys();
+  names.sort();
+  return names;
+}
+
+// --------------------------------------------------------------------------
+QStringList voAnalysis::childNameListOfEnsembleOutput(const QString ensembleOutputName)const
+{
+  Q_D(const voAnalysis);
+  QStringList names = d->EnsembleOutputInformation.value(ensembleOutputName);
+  return names;
+}
+// --------------------------------------------------------------------------
 bool voAnalysis::hasOutput(const QString& outputName)const
 {
   Q_D(const voAnalysis);
   return d->OutputInformation.contains(outputName);
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysis::hasEnsembleOutput(const QString& outputName)const
+{
+  Q_D(const voAnalysis);
+  return d->EnsembleOutputInformation.contains(outputName);
+}
+
+// --------------------------------------------------------------------------
+int voAnalysis::getNumberOfEnsembleOutput()
+{
+  Q_D(const voAnalysis);
+  return d->EnsembleOutputInformation.size();
+}
+
+// --------------------------------------------------------------------------
+void voAnalysis::setEnsembleOutput(const QString& ensembleName, QList<voDataObject*>ensembleDataObjectList)
+{//ensemble output item contains a list of child items, each of which contains a dataobject
+  Q_D(voAnalysis);
+
+  //create an empty ensemble data Object
+  voDataObject * ensembleDataObject = new voDataObject(ensembleName,NULL);
+
+  d->EnsembleOutputDataObjects.insert(ensembleName, QExplicitlySharedDataPointer<voDataObject>(ensembleDataObject));
+
+  emit this->ensembleOutputSet(ensembleName, ensembleDataObjectList, this);
 }
 
 // --------------------------------------------------------------------------
@@ -350,6 +435,17 @@ void voAnalysis::setOutput(const QString& outputName, voDataObject * dataObject)
   d->OutputDataObjects.insert(outputName, QExplicitlySharedDataPointer<voDataObject>(dataObject));
 
   emit this->outputSet(outputName, dataObject, this);
+}
+
+// --------------------------------------------------------------------------
+voDataObject * voAnalysis::ensembleOutput(const QString& outputName) const
+{
+  Q_D(const voAnalysis);
+  if (!this->hasEnsembleOutput(outputName))
+    {
+    return 0;
+    }
+  return d->EnsembleOutputDataObjects.value(outputName).data();
 }
 
 // --------------------------------------------------------------------------
@@ -414,6 +510,17 @@ bool voAnalysis::hasOutputWithRawViewType(const QString& outputName, const QStri
 }
 
 // --------------------------------------------------------------------------
+QString voAnalysis::rawViewTypeForEnsembleOutput(const QString& outputName)const
+{
+  Q_D(const voAnalysis);
+  if (!this->hasEnsembleOutput(outputName))
+    {
+    return QString();
+    }
+   // rawView types for ensemble output is stored in outputRawView
+  return d->OutputRawView.value(outputName, /*defaultValue=*/ QString());
+}
+// --------------------------------------------------------------------------
 QString voAnalysis::rawViewTypeForOutput(const QString& outputName)const
 {
   Q_D(const voAnalysis);
@@ -465,7 +572,9 @@ void voAnalysis::removeAllOutputs()
 {
   Q_D(voAnalysis);
   d->OutputDataObjects.clear();
+  d->EnsembleOutputDataObjects.clear();
   d->OutputInformation.clear();
+  d->EnsembleOutputInformation.clear();
   d->OutputViewInformation.clear();
   d->OutputRawView.clear();
   d->OutputViewPrettyName.clear();

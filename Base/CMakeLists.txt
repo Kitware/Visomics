@@ -40,6 +40,8 @@ SET(KIT_SRCS
   Analysis/voTreeDropTip.h
   Analysis/voCompareTrees.cpp
   Analysis/voCompareTrees.h
+  Analysis/voTreeDropTipWithoutData.cpp
+  Analysis/voTreeDropTipWithoutData.h
 
   Normalization/voNormalization.h
   Normalization/voLog2.cpp
@@ -149,6 +151,7 @@ SET(KIT_MOC_SRCS
   Analysis/voCustomAnalysisParameter.h
   Analysis/voCustomAnalysisParameterField.h
   Analysis/voTreeDropTip.h
+  Analysis/voTreeDropTipWithoutData.h
 
 
   Views/voCorrelationGraphView.h

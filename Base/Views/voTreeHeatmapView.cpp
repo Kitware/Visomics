@@ -125,10 +125,9 @@ void voTreeHeatmapView::setDataObjectListInternal(const QList<voDataObject*> dat
       qCritical() << "voTreeHeatmapView - Failed to setDataObject - vtkExtendedTable data is expected !";
       return;
       }
-
-    // I think this check is safe for now, as we have no way to change what tree
-    // is the input to a particular view.
-    if (d->TreeItem->GetTree()->GetNumberOfVertices() == 0)
+    //If there is a real change in the tree (# of vertices), update the tree, otherwise, just leave it there,
+    //so that expanding/collapsing interactions results could be kept on the view.
+    if (d->TreeItem->GetTree()->GetNumberOfVertices() != Tree->GetNumberOfVertices())
       {
       // making a copy of the Tree so that the TreeHeatmap & Dendrogram no longer
       // share a single input data source

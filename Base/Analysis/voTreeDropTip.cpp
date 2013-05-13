@@ -79,12 +79,23 @@ voTreeDropTip::~voTreeDropTip()
 // --------------------------------------------------------------------------
 void voTreeDropTip::setOutputInformation()
 {
-  this->addOutputType("pruned_tree", "vtkTree" ,
+
+  QString treeName("pruned_tree");
+  QString tableName("pruned_table");
+  this->addOutputType(treeName, "vtkTree" ,
     "","",
     "voTreeHeatmapView", "pruned tree");
-  this->addOutputType("pruned_table", "vtkExtendedTable" ,
+
+  this->addOutputType(tableName, "vtkExtendedTable" ,
     "","",
     "voExtendedTableView", "pruned table");
+
+  QStringList childOutputNames;
+  childOutputNames << treeName <<tableName;
+  this->addEnsembleOutputType("pruned_tree_heatmap", "ensemble_object",
+    "voTreeHeatmapView", "pruned tree heatmap visualization",
+   childOutputNames);
+
 }
 
 // --------------------------------------------------------------------------
@@ -120,12 +131,16 @@ QString voTreeDropTip::parameterDescription()const
 bool voTreeDropTip::execute()
 {
   // Import tree and assiciated traits table
-  vtkTree* tree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
-  if (!tree)
+  vtkTree* inputTree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
+  if (!inputTree)
     {
     qCritical() << "Input tree is Null";
     return false;
     }
+
+
+  vtkNew<vtkTree> tree;
+  tree->DeepCopy(inputTree);
 
   vtkExtendedTable* extendedTable = vtkExtendedTable::SafeDownCast(
     this->input(1)->dataAsVTKDataObject());
@@ -149,22 +164,22 @@ bool voTreeDropTip::execute()
   bool SUCCESS = false;
   if (selection_method == "Tip Names")
     {
-    SUCCESS = this->getSelectionByTipNames(tree, table.GetPointer(), selectedTips.GetPointer());
+    SUCCESS = this->getSelectionByTipNames(tree.GetPointer(), table.GetPointer(), selectedTips.GetPointer());
     }
   else if (selection_method == "Data Filter")
     {
-    SUCCESS = this->getSelectionByDataFiltering(tree, table.GetPointer(), selectedTips.GetPointer());
+    SUCCESS = this->getSelectionByDataFiltering(tree.GetPointer(), table.GetPointer(), selectedTips.GetPointer());
     }
   else if (selection_method == "Tree Collapsing")
     {
-    SUCCESS = this->getSelectionByPrunedTree(tree, table.GetPointer(),selectedTips.GetPointer());
+    SUCCESS = this->getSelectionByPrunedTree(tree.GetPointer(), table.GetPointer(),selectedTips.GetPointer());
     }
 
   if (SUCCESS)
     {
     vtkNew<vtkExtractSelectedTree> extractSelectedTreeFilter;
 
-    extractSelectedTreeFilter->SetInputData(0, tree);
+    extractSelectedTreeFilter->SetInputData(0, tree.GetPointer());
     extractSelectedTreeFilter->SetInputData(1, selectedTips.GetPointer());
     extractSelectedTreeFilter->Update();
 
@@ -176,10 +191,17 @@ bool voTreeDropTip::execute()
       return false;
       }
 
-    this->setOutput("pruned_tree", new voOutputDataObject("pruned_tree", outTree));
+    voOutputDataObject * outTreeDataObject =  new voOutputDataObject("pruned_tree", outTree);
+    this->setOutput("pruned_tree", outTreeDataObject);
     vtkNew<vtkExtendedTable> outputTable;
     voIOManager::convertTableToExtended(table.GetPointer(), outputTable.GetPointer());
-    this->setOutput("pruned_table", new voTableDataObject("pruned_table", outputTable.GetPointer()));
+    voTableDataObject * outTableDataObject = new voTableDataObject("pruned_table", outputTable.GetPointer());
+    this->setOutput("pruned_table", outTableDataObject);
+
+    //for updating the analysis, need to set the object list to the ensemble data model item
+    QList<voDataObject*> objectList;
+    objectList << outTreeDataObject << outTableDataObject;
+    this->setEnsembleOutput("pruned_tree_heatmap", objectList);
 
     return true;
     }
@@ -241,10 +263,13 @@ bool voTreeDropTip::getTipSelection(vtkTree * tree, vtkTable * inputDataTable, v
     {// input list is the keep list
     for ( vtkIdType i = 0; i< nodeNames->GetNumberOfValues() ; i++)
       {
-      QString curTip = QString(nodeNames->GetValue(i).c_str());
-      if  ( !curTip.isEmpty() && !tipNameList.contains(curTip))
+      if (tree->IsLeaf(i))
         {
-        removalTipNameList.append(curTip);
+        QString curTip = QString(nodeNames->GetValue(i).c_str());
+        if  ( !curTip.isEmpty() && !tipNameList.contains(curTip))
+          {
+          removalTipNameList.append(curTip);
+          }
         }
       }
     }
@@ -312,6 +337,7 @@ bool voTreeDropTip::getSelectionByTipNames(vtkTree * tree, vtkTable * inputDataT
     qWarning() << QObject::tr("Invalid paramater, could not parse input tip name list");
     return false;
     }
+
 
   return (this->getTipSelection(tree, inputDataTable, sel, tipNameList));
 }

@@ -66,11 +66,15 @@ public slots:
 protected slots:
 
   void onAnalysisOutputSet(const QString& outputName, voDataObject* dataObject, voAnalysis* analysis);
+  void onAnalysisEnsembleOutputSet(const QString& outputEnsembleName,QList<voDataObject*> dataObjectList, voAnalysis* analysis);
+
 
 protected:
   void runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget);
   voAnalysis * createAnalysis(const QString& analysisName);
 
+  static voDataModelItem * addEnsembleOutputToObjectModel(const QString& outputName, voAnalysis * analysis, voDataModelItem* parent);
+  static voDataModelItem * addOutputToObjectModel(const QString& outputName, voAnalysis * analysis, voDataModelItem* parent);
   static void addAnalysisToObjectModel(voAnalysis * analysis, voDataModelItem* insertLocation);
 
 protected:
