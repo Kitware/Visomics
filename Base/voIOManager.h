@@ -31,6 +31,7 @@
 class QStandardItem;
 class QXmlStreamReader;
 class QXmlStreamWriter;
+class QNetworkReply;
 class voDataModelItem;
 class voInputFileDataObject;
 class vtkDataObject;
@@ -99,6 +100,9 @@ public:
                                  const QString& collectionName);
   #endif
 
+  void loadTreeFromOpenTreeDB(const QString& hostURL,
+                             const QString& ottolID,
+                             const QString& maxDepth);
 protected:
   bool treeAndTableMatch(vtkTree *tree, vtkTable *table);
   void loadWorkflow(QXmlStreamReader *stream);

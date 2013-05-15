@@ -32,6 +32,7 @@
      <string>&amp;File</string>
     </property>
     <addaction name="actionFileOpen"/>
+    <addaction name="actionFileOpenTreeOfLife"/>
     <addaction name="actionFileSaveWorkflow"/>
     <addaction name="actionFileLoadWorkflow"/>
     <addaction name="actionFileMakeTreeHeatmap"/>
@@ -153,7 +154,7 @@
   </widget>
   <action name="actionFileOpen">
    <property name="icon">
-    <iconset resource="../ArborApp.qrc">
+    <iconset resource="../VisomicsApp.qrc">
      <normaloff>:/Icons/open.png</normaloff>:/Icons/open.png</iconset>
    </property>
    <property name="text">
@@ -173,7 +174,7 @@
   </action>
   <action name="actionFileClose">
    <property name="icon">
-    <iconset resource="../ArborApp.qrc">
+    <iconset resource="../VisomicsApp.qrc">
      <normaloff>:/Icons/close.png</normaloff>:/Icons/close.png</iconset>
    </property>
    <property name="text">
@@ -212,7 +213,7 @@
   </action>
   <action name="actionHelpAbout">
    <property name="icon">
-    <iconset resource="../ArborApp.qrc">
+    <iconset resource="../VisomicsApp.qrc">
      <normaloff>:/Icons/help.png</normaloff>:/Icons/help.png</iconset>
    </property>
    <property name="text">
@@ -260,6 +261,11 @@
     <string>Load Sample dataset (4Kb)</string>
    </property>
   </action>
+  <action name="actionFileOpenTreeOfLife">
+   <property name="text">
+    <string>Open Tree Of Life</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -275,7 +281,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="../ArborApp.qrc"/>
+  <include location="../VisomicsApp.qrc"/>
   <include location="../../../Base/Resources/ArborBase.qrc"/>
  </resources>
  <connections>

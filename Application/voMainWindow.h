@@ -54,6 +54,7 @@ public slots:
   void onFileSaveWorkflowToMongoActionTriggered();
   void onFileLoadWorkflowFromMongoActionTriggered();
 #endif
+  void onFileOpenTreeOfLifeActionTriggered();
   void onFileMakeTreeHeatmapActionTriggered();
 
   void about();
@@ -75,7 +76,6 @@ protected slots:
 #ifdef USE_MONGO
   void connectToMongoForLoadWorkflow();
 #endif
-
 protected:
   QScopedPointer<voMainWindowPrivate> d_ptr;
 

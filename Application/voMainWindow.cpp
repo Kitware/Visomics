@@ -45,6 +45,7 @@
   #include "voMongoLoadDialog.h"
   #include "voMongoSaveDialog.h"
 #endif
+#include "voOpenTreeLoadDialog.h"
 #include "voStartupView.h"
 #ifdef Visomics_BUILD_TESTING
 # include "voTestConfigure.h"
@@ -72,6 +73,7 @@ public:
   voMongoLoadDialog *mongoLoadDialog;
   voMongoSaveDialog *mongoSaveDialog;
   #endif
+  voOpenTreeLoadDialog *openTreeLoadDialog;
 };
 
 // --------------------------------------------------------------------------
@@ -110,6 +112,9 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->mongoLoadDialog->connectButton(), SIGNAL(clicked()),
           this, SLOT(connectToMongoForLoadWorkflow()));
 #endif
+  //load tree data from the opentreeoflife neo4j database
+  d->openTreeLoadDialog = new voOpenTreeLoadDialog(this);
+  d->openTreeLoadDialog->hide();
 
   d->ErrorLogWidget.setErrorLogModel(voApplication::application()->errorLogModel());
 
@@ -138,6 +143,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionViewErrorLog, SIGNAL(triggered()), this, SLOT(onViewErrorLogActionTriggered()));
   connect(d->actionFileSaveWorkflow, SIGNAL(triggered()), this, SLOT(onFileSaveWorkflowActionTriggered()));
   connect(d->actionFileLoadWorkflow, SIGNAL(triggered()), this, SLOT(onFileLoadWorkflowActionTriggered()));
+  connect(d->actionFileOpenTreeOfLife, SIGNAL(triggered()), this, SLOT(onFileOpenTreeOfLifeActionTriggered()));
   connect(d->actionFileMakeTreeHeatmap, SIGNAL(triggered()),
           this, SLOT(onFileMakeTreeHeatmapActionTriggered()));
 
@@ -149,6 +155,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(saveToDB, SIGNAL(triggered()), this, SLOT(onFileSaveWorkflowToMongoActionTriggered()));
   connect(loadFromDB, SIGNAL(triggered()), this, SLOT(onFileLoadWorkflowFromMongoActionTriggered()));
 #endif
+
 
   // Populate Analysis menu
   voAnalysisFactory* analysisFactory = voApplication::application()->analysisFactory();
@@ -516,6 +523,24 @@ void voMainWindow::onFileLoadWorkflowActionTriggered()
   voApplication::application()->ioManager()->loadWorkflowFromFile(fileName);
 }
 
+// --------------------------------------------------------------------------
+void voMainWindow::onFileOpenTreeOfLifeActionTriggered()
+{
+  Q_D(voMainWindow);
+  d->openTreeLoadDialog->show();
+  int status = d->openTreeLoadDialog->exec();
+
+  if (status == voOpenTreeLoadDialog::Accepted)
+    {
+    QString databaseURL = d->openTreeLoadDialog->GetHostURL();
+    QString ottolId = d->openTreeLoadDialog->GetOttolID();
+    QString maxDepth = d->openTreeLoadDialog->GetMaxDepth();
+    voApplication::application()->ioManager()->loadTreeFromOpenTreeDB(
+      databaseURL, ottolId, maxDepth);
+    }
+}
+
+
 #ifdef USE_MONGO
 // --------------------------------------------------------------------------
 void voMainWindow::onFileSaveWorkflowToMongoActionTriggered()
@@ -544,6 +569,8 @@ void voMainWindow::onFileLoadWorkflowFromMongoActionTriggered()
       d->mongoLoadDialog->GetWorkflow());
     }
 }
+
+
 
 // --------------------------------------------------------------------------
 void voMainWindow::connectToMongoForLoadWorkflow()
@@ -579,6 +606,7 @@ void voMainWindow::connectToMongoForLoadWorkflow()
 }
 
 #endif
+
 
 // --------------------------------------------------------------------------
 void voMainWindow::about()
