@@ -16,6 +16,9 @@
   <layout class="QGridLayout" name="gridLayout">
    <item row="1" column="1">
     <widget class="QLineEdit" name="hostURL">
+     <property name="toolTip">
+      <string>Open Tree Of Life database URL</string>
+     </property>
      <property name="text">
       <string>http://opentree-dev.bio.ku.edu:7474/db/data/ext/GoLS/graphdb/getDraftTreeForOttolID</string>
      </property>
@@ -31,7 +34,7 @@
    <item row="3" column="1" colspan="2">
     <widget class="QLineEdit" name="ottolID">
      <property name="text">
-      <string>770315</string>
+      <string>386191</string>
      </property>
     </widget>
    </item>
