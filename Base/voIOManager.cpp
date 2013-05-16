@@ -17,7 +17,7 @@
   limitations under the License.
 
 =========================================================================*/
-
+#include <unistd.h>
 // Qt includes
 #include <QDebug>
 #include <QFileInfo>
@@ -25,10 +25,16 @@
 #include <QMessageBox>
 #include <QStandardItem>
 #include <QXmlStreamWriter>
+#include <QErrorMessage>
 
 // QtPropertyBrowser includes
 #include <QtVariantPropertyManager>
 #include <QtVariantProperty>
+
+#include <QNetworkAccessManager>
+#include <QUrl>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 
 // Visomics includes
 #include "voAnalysis.h"
@@ -861,6 +867,63 @@ void voIOManager::loadWorkflowFromFile(const QString& fileName)
 }
 
 // --------------------------------------------------------------------------
+void voIOManager::loadTreeFromOpenTreeDB(const QString& hostURL,
+                                         const QString& ottolID,
+                                         const QString& maxDepth)
+{// download tree from opentreeoflife neo4j database
+  QUrl url(hostURL);
+
+  QNetworkRequest request;
+  request.setUrl(url);
+  request.setHeader(QNetworkRequest::ContentTypeHeader,"Application/json"); //Required!
+
+  QNetworkAccessManager *manager = new QNetworkAccessManager();
+
+  QNetworkReply *reply = manager->post(request,QString("{\"ottolID\":\"%1\", \"maxDepth\": %2}").arg(ottolID,maxDepth).toLatin1());
+
+  QEventLoop loop;
+  QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+  loop.exec();
+
+
+  // a newick tree is returned as the response
+  /* here is an example:
+  "{
+  "tree" : "(Homo_sapiens_ssp_Denisova:1.0E-22,Homo_sapiens_neanderthalensis:1.0E-22)Homo_sapiens"
+   }"
+  */
+  QByteArray replyBytes =  reply->readAll();
+  if (replyBytes.contains("tree") )
+    {
+    //trim the response to be a newicktree string
+    replyBytes.remove(0,14);//remove the header charactors  "{\n\"tree\" : \""
+    replyBytes.replace(QString("\"\n}"),QByteArray(";"));//tail
+
+    char * singleTreeBuffer = replyBytes.data();
+
+    vtkNew<vtkNewickTreeReader> treeReader;
+    vtkSmartPointer<vtkTree> tree = vtkSmartPointer<vtkTree>::New();
+    treeReader->ReadNewickTree(singleTreeBuffer, *tree);
+
+    //load the tree to the GUI
+    voDataModel * model = voApplication::application()->dataModel();
+    voInputFileDataObject * dataObject =
+      new voInputFileDataObject("OpenTreeOfLife", tree);
+    voDataModelItem * newItem = model->addDataObject(dataObject);
+    newItem->setRawViewType("voTreeHeatmapView");
+
+    model->setSelected(newItem);
+    }
+  else
+    {//error
+    qDebug()<< replyBytes;
+    QErrorMessage errorMessage;
+    errorMessage.showMessage("Failed to load the tree from OpenTreeOfLife database!");
+    errorMessage.exec();
+    }
+}
+
+// --------------------------------------------------------------------------
 void voIOManager::loadWorkflow(QXmlStreamReader *stream)
 {
   voDataModel * model = voApplication::application()->dataModel();
@@ -916,12 +979,12 @@ void voIOManager::loadTreeHeatmapFromXML(QXmlStreamReader *stream)
     qCritical() << "expected input, found " << name;
     return;
     }
- QString treeFile = this->readTreeFileNameFromXML(stream);
- if (treeFile == "")
-   {
-   qCritical() << "tree filename is empty string";
-   return;
-   }
+  QString treeFile = this->readTreeFileNameFromXML(stream);
+  if (treeFile == "")
+    {
+    qCritical() << "tree filename is empty string";
+    return;
+    }
 
   stream->readNext(); // </filename>
   stream->readNext(); // </input>

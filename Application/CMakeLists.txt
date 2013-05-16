@@ -21,6 +21,8 @@ set(KIT_SRCS
   voMongoLoadDialog.h
   voMongoSaveDialog.cpp
   voMongoSaveDialog.h
+  voOpenTreeLoadDialog.cpp
+  voOpenTreeLoadDialog.h
   voNormalizationWidget.cpp
   voNormalizationWidget.h
   voStartupView.cpp
@@ -48,6 +50,7 @@ set(KIT_MOC_SRCS
   voMainWindow.h
   voMongoLoadDialog.h
   voMongoSaveDialog.h
+  voOpenTreeLoadDialog.h
   voNormalizationWidget.h
   voStartupView.h
   voViewStackedWidget.h
@@ -59,6 +62,7 @@ set(KIT_UI_FORMS
   Resources/UI/voDelimitedTextImportWidget.ui
   Resources/UI/voMongoLoadDialog.ui
   Resources/UI/voMongoSaveDialog.ui
+  Resources/UI/voOpenTreeLoadDialog.ui
   )
 
 if(USE_ARBOR_BRAND)
