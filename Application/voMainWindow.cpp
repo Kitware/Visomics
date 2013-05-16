@@ -243,12 +243,12 @@ voMainWindow::~voMainWindow()
 void voMainWindow::onFileOpenActionTriggered()
 {
   QStringList files = QFileDialog::getOpenFileNames(
-    this, tr("Open table or tree"), "", tr("All files(*.*);;*.csv(*.csv);;*.phy(*.phy);;*.tre(*.tre)"));
+    this, tr("Open table or tree"), "", tr("All files(*.*);;*.csv(*.csv);;*.phy(*.phy);;*.tre(*.tre);;*.newick(*.newick);;*.tree(*.tree)"));
 
   files.sort();
 
   QStringList acceptedImageFileTypeList;
-  acceptedImageFileTypeList << "csv" << "phy" << "tre" << "xml";
+  acceptedImageFileTypeList << "csv" << "phy" << "tre" << "newick" << "tree" <<"xml";
 
   foreach(const QString& file, files)
     {
@@ -269,7 +269,7 @@ void voMainWindow::onFileOpenActionTriggered()
             voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
             }
           }
-        if (extension == "phy" || extension == "tre")
+        if (extension == "phy" || extension == "tre" || extension == "newick" || extension == "tree")
           {
             //open associated tree node data
             QString fileExt = "";
