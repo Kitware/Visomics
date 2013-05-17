@@ -373,6 +373,11 @@ bool voTreeDropTip::getSelectionByDataFiltering(vtkTree *tree, vtkTable * inputD
       bool conditionSatisfied = false;
       QRegExp rx("\\b(<|>|=)");
       int pos = rx.indexIn(condition, 0);
+      if (pos < 0)
+        {
+        qCritical()<<"Invalid condition syntax!";
+        return false;
+        }
       std::string colName = condition.left(pos).toStdString();
 
       bool STRING_CONDITION = false;
@@ -474,7 +479,15 @@ bool voTreeDropTip::getSelectionByDataFiltering(vtkTree *tree, vtkTable * inputD
       }
     } // end of "for each tip"
   // qDebug()<<"tipNameList"<<tipNameList;
-  return (getTipSelection(tree,inputDataTable,sel,tipNameList));
+  if (tipNameList.isEmpty())
+    {
+    qCritical()<<"No tip satifies the data filtering condition";
+    return false;
+    }
+  else
+    {
+    return (getTipSelection(tree,inputDataTable,sel,tipNameList));
+    }
 }
 
 // --------------------------------------------------------------------------
