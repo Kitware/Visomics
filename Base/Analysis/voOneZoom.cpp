@@ -78,18 +78,29 @@ QString voOneZoom::parameterDescription()const
 // --------------------------------------------------------------------------
 bool voOneZoom::execute()
 {
-  vtkTree* tree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
-  QString filename =  dynamic_cast<voInputFileDataObject *>(this->input(0))->fileName();
-  if (!tree)
+  voInputFileDataObject * obj = dynamic_cast<voInputFileDataObject*> (this->input(0));
+  if (obj)
     {
-    qCritical() << "Input tree is Null";
-    return false;
-    }
+     // Requires an input file type: feed the input file name to read in the newick
+     // format tree into the javascript
+    vtkTree* tree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
+    QString filename =  dynamic_cast<voInputFileDataObject *>(this->input(0))->fileName();
+    if (!tree)
+      {
+      qCritical() << "Input tree is Null";
+      return false;
+      }
 
-  //output both the vtkTree and the newick tree file name
-  voInputFileDataObject * outputDataObj = new voInputFileDataObject("newickTree", tree);
-  outputDataObj->setFileName(filename);
-  this->setOutput("newickTree", outputDataObj);
+    //output both the vtkTree and the newick tree file name
+    voInputFileDataObject * outputDataObj = new voInputFileDataObject("newickTree", tree);
+    outputDataObj->setFileName(filename);
+    this->setOutput("newickTree", outputDataObj);
+    }
+   else
+    {
+    // TO-DO
+    // Write out the output tree into a newick string and pass it to the OneZoom vis javascript
+    }
 
   return true;
 }
