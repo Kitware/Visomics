@@ -274,6 +274,8 @@ bool voTreeDropTip::getTipSelection(vtkTree * tree, vtkTable * inputDataTable, v
       }
     }
 
+
+
   vtkSmartPointer<vtkSelectionNode> selNode = vtkSmartPointer <vtkSelectionNode>::New() ;
   vtkSmartPointer<vtkIdTypeArray> selArr = vtkSmartPointer<vtkIdTypeArray>::New();
   // extract subtree using vtkExtractSelectedTree class

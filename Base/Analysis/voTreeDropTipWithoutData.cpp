@@ -114,13 +114,16 @@ QString voTreeDropTipWithoutData::parameterDescription()const
 bool voTreeDropTipWithoutData::execute()
 {
   // Import tree
-  vtkTree* tree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
-  if (!tree)
+  vtkTree* inputTree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
+  if (!inputTree)
     {
     qCritical() << "Input tree is Null";
     return false;
     }
 
+
+  vtkNew<vtkTree> tree;
+  tree->DeepCopy(inputTree);
   // obtain selected tips into a vtkSelection object
   QString selection_method = this->enumParameter("selection_method");
 
@@ -128,11 +131,11 @@ bool voTreeDropTipWithoutData::execute()
   bool SUCCESS = false;
   if (selection_method == "Tip Names")
     {
-    SUCCESS = this->getSelectionByTipNames(tree, selectedTips.GetPointer());
+    SUCCESS = this->getSelectionByTipNames(tree.GetPointer(), selectedTips.GetPointer());
     }
   else if (selection_method == "Tree Collapsing")
     {
-    SUCCESS = this->getSelectionByPrunedTree(tree,selectedTips.GetPointer());
+    SUCCESS = this->getSelectionByPrunedTree(tree.GetPointer(),selectedTips.GetPointer());
     }
 
   if (SUCCESS)
@@ -141,7 +144,7 @@ bool voTreeDropTipWithoutData::execute()
  //   t = clock();
     vtkNew<vtkExtractSelectedTree> extractSelectedTreeFilter;
 
-    extractSelectedTreeFilter->SetInputData(0, tree);
+    extractSelectedTreeFilter->SetInputData(0, tree.GetPointer());
     extractSelectedTreeFilter->SetInputData(1, selectedTips.GetPointer());
     extractSelectedTreeFilter->Update();
 
@@ -216,10 +219,13 @@ bool voTreeDropTipWithoutData::getTipSelection(vtkTree * tree, vtkSelection * se
     {// input list is the keep list
     for ( vtkIdType i = 0; i< nodeNames->GetNumberOfValues() ; i++)
       {
-      QString curTip = QString(nodeNames->GetValue(i).c_str());
-      if  ( !curTip.isEmpty() && !tipNameList.contains(curTip))
+      if (tree->IsLeaf(i))
         {
-        removalTipNameList.append(curTip);
+        QString curTip = QString(nodeNames->GetValue(i).c_str());
+        if  ( !curTip.isEmpty() && !tipNameList.contains(curTip))
+          {
+          removalTipNameList.append(curTip);
+          }
         }
       }
     }
