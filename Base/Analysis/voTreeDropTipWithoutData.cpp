@@ -99,11 +99,13 @@ QString voTreeDropTipWithoutData::parameterDescription()const
 {
   return QString("<dl>"
     "<dt><b>Select tips to be removed by: </b>:</dt>"
-    "<dd>Choose the method for the tip selection."
-    " \"Tip Names\" requires you to list the tip "
-    "names in the line editor below.</dd>"
+    "<dd>Choose the strategy for tip selection:"
+    " \"Tip Names\" requires listing the tip "
+    "names in the line editor below, separated by"
+    " \",\"; \"Tree Collapsing\" removes the collapsed "
+    " tips (replaced by the triangle) from the viewer.</dd>"
     "<dt><b> Line editor </b>:</dt>"
-    "<dd> Input the tips names or the data filtering criteria.</dd>"
+    "<dd> Input the list of tips names.</dd>"
     "<dt><b>Invert selection </b>:</dt>"
     "<dd> Invert the tip selection. If \"Yes\", The selected tips are to be kept.</dd>"
     "</dl>");
