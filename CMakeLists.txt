@@ -63,7 +63,7 @@ endif()
 #
 SET(Visomics_MAJOR_VERSION 0)
 SET(Visomics_MINOR_VERSION 5)
-SET(Visomics_BUILD_VERSION 5)
+SET(Visomics_BUILD_VERSION 7)
 SET(Visomics_VERSION
     "${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}.${Visomics_BUILD_VERSION}")
 
