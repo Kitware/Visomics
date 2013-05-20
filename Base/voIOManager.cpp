@@ -1209,9 +1209,9 @@ void voIOManager::loadAnalysisFromXML(QXmlStreamReader *stream)
       return;
       }
 
-    QStringRef parameterName = stream->attributes().value("name");
+    QString parameterName = stream->attributes().value("name").toString();
     QString parameterValue = stream->readElementText();
-    parameters.insert(parameterName.toString(), QVariant(parameterValue));
+    parameters.insert(parameterName, QVariant(parameterValue));
     stream->readNextStartElement();
     name = stream->name().toString();
     }
