@@ -17,7 +17,9 @@
   limitations under the License.
 
 =========================================================================*/
-#include <unistd.h>
+#ifdef HAVE_UNISTD_H
+  #include <unistd.h>
+#endif
 // Qt includes
 #include <QDebug>
 #include <QFileInfo>
