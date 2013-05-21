@@ -291,25 +291,12 @@ bool voTreeDropTip::getTipSelection(vtkTree * tree, vtkTable * inputDataTable, v
       {
       selArr->InsertNextValue(vertexId);
       }
-    else
-      {
-      qWarning()<< QObject::tr("Could not find the tip names in the tree:") << removalTipNameList[i];
-      return false;
-      }
 
     vtkIdType rowId = tableNames->LookupValue(removalTipNameList[i].toStdString().c_str());
     if (rowId >= 0)
       {
       inputDataTable->RemoveRow(rowId);
       }
-    else
-      {
-      qWarning()<< QObject::tr("Could not find the tip names in the table:") << removalTipNameList[i];
-      return false;
-      }
-
-
-
     }
 
   //remove vertices whoes children are in the selection list recursively
