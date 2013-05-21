@@ -197,6 +197,12 @@ ELSE()
   SET(KIT_resources Resources/VisomicsBase.qrc)
 ENDIF()
 
+include(CheckIncludeFile)
+CHECK_INCLUDE_FILE(unistd.h HAVE_UNISTD_H)
+if(HAVE_UNISTD_H)
+  add_definitions(-DHAVE_UNISTD_H)
+endif()
+
 INCLUDE_DIRECTORIES(
   ${CMAKE_CURRENT_SOURCE_DIR}
   ${CMAKE_CURRENT_BINARY_DIR}
