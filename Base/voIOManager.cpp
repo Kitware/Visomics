@@ -428,11 +428,6 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
     {
     vtkTree * tree =  vtkTree::SafeDownCast( forest->GetPieceAsDataObject(0));
 
-    if (!this->treeAndTableMatch(tree, extendedTable->GetInputData()))
-      {
-      return;
-      }
-
     voInputFileDataObject * treeObject =
       new voInputFileDataObject(fileName, tree);
 
@@ -446,11 +441,6 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
     for (unsigned int i = 0; i < forest->GetNumberOfPieces(); i++)
       {
       vtkTree * tree =  vtkTree::SafeDownCast( forest->GetPieceAsDataObject(i));
-      if (!this->treeAndTableMatch(tree, extendedTable->GetInputData()))
-        {
-        return;
-        }
-
       QString displayName = QString("tree-%1").arg(QString::number(i));
       voDataObject * treeObject = new voDataObject(displayName, tree);
       treeObjects << treeObject;
@@ -459,27 +449,6 @@ void voIOManager::loadPhyloTreeDataSet(const QString& fileName,
     this->createTreeHeatmapItem(treeHeatmapName, treeObjects,dynamic_cast<voDataObject*>(tableObject));
     }
 }
-
-// --------------------------------------------------------------------------
-bool voIOManager::treeAndTableMatch(vtkTree *tree, vtkTable *table)
-{
-  unsigned int NumberOfLeafNodes = 0;
-  for (vtkIdType vertex = 0; vertex < tree->GetNumberOfVertices(); ++vertex)
-    {
-    if (!tree->IsLeaf(vertex))
-      {
-      continue;
-      }
-    ++NumberOfLeafNodes;
-    }
-
-  if (table->GetNumberOfRows() != NumberOfLeafNodes )
-    {
-    return false;
-    }
-  return true;
-}
-
 
 // --------------------------------------------------------------------------
 void voIOManager::createTreeHeatmapItem(QString name,
