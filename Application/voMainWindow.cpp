@@ -455,10 +455,10 @@ void voMainWindow::makeTreeHeatmap()
     parentItem = dynamic_cast<voDataModelItem *> (treeParent); //the tree container item
     treeHeatmapName = QString("%1 TreeHeatmap").arg(treeObject->name());
     }
-  dataModel->removeObject(treeItem, treeParent);
-  dataModel->removeObject(tableItem, tableParent);
   voApplication::application()->ioManager()->createTreeHeatmapItem(
     treeHeatmapName, parentItem,  treeObject, tableObject);
+  dataModel->removeObject(treeItem, treeParent);
+  dataModel->removeObject(tableItem, tableParent);
 
 
 
