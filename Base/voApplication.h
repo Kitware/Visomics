@@ -61,7 +61,8 @@ public:
   /// Get application home directory
   QString homeDirectory()const;
 
-  QString rHome()const;
+  /// Get R home directory
+  QString rHome();
 
   voDataModel* dataModel()const;
 

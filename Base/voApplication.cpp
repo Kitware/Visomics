@@ -43,10 +43,12 @@
 #include "voViewFactory.h"
 
 // VTK includes
+#include <vtkFiltersStatisticsGnuRConfigure.h>
 #include <vtkSmartPointer.h>
 #include <vtkTable.h>
 
 // VTKSYS includes
+#include <vtksys/Process.h>
 #include <vtksys/SystemTools.hxx>
 
 // Convenient macro
@@ -64,6 +66,7 @@ public:
   QString discoverHomeDirectory();
 
   QString                HomeDirectory;
+  QString                RHomeDirectory;
   bool                   Initialized;
   bool                   ExitWhenDone;
   voDataModel            DataModel;
@@ -85,6 +88,7 @@ voApplicationPrivate::voApplicationPrivate()
 {
   this->Initialized = false;
   this->ExitWhenDone = false;
+  this->RHomeDirectory = "";
 }
 
 // --------------------------------------------------------------------------
@@ -195,9 +199,68 @@ QString voApplication::homeDirectory()const
 }
 
 // --------------------------------------------------------------------------
-QString voApplication::rHome()const
+QString voApplication::rHome()
 {
-  return vtksys::SystemTools::GetEnv("R_HOME");
+  Q_D(voApplication);
+  if (d->RHomeDirectory == "")
+    {
+    const char* path = vtksys::SystemTools::GetEnv("R_HOME");
+    if (path)
+      {
+      d->RHomeDirectory = path;
+      }
+    else
+      {
+      // If the R_HOME environment variable isn't already set,
+      // we attempt to set it up here by calling `R RHOME`
+      vtksysProcess* process = vtksysProcess_New();
+      std::vector<const char*> commandLine;
+      commandLine.push_back("R");
+      commandLine.push_back("RHOME");
+      commandLine.push_back(0);
+      vtksysProcess_SetCommand(process, &commandLine[0]);
+      vtksysProcess_Execute(process);
+
+      std::string newPath = "";
+      char* data;
+      int length;
+      int pipe;
+      do
+        {
+        pipe =  vtksysProcess_WaitForData(process, &data, &length, NULL);
+        switch (pipe)
+          {
+        case vtksysProcess_Pipe_STDOUT:
+          newPath.append(data, length);
+          break;
+
+        case vtksysProcess_Pipe_STDERR:
+          newPath.append(data, length);
+          break;
+          }
+        } while (pipe != vtksysProcess_Pipe_None);
+
+      vtksysProcess_Delete(process);
+      if (newPath.compare("") == 0)
+        {
+        newPath.append(VTK_R_HOME);
+        }
+      else
+        {
+        // remove trailing newline from vtksysProcess output
+        std::string whitespaces (" \t\f\v\n\r");
+        size_t found;
+        found=newPath.find_last_not_of(whitespaces);
+        if (found != std::string::npos)
+          {
+          newPath.erase(found+1);
+          }
+        }
+      d->RHomeDirectory = newPath.c_str();
+      }
+    }
+
+  return d->RHomeDirectory;
 }
 
 // --------------------------------------------------------------------------

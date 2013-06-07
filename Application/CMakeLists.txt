@@ -156,36 +156,12 @@ if(APPLE)
     COMPONENT Runtime
     )
 
-  # Make sure Qt plugins are properly installed
-  get_filename_component(qgif_plugin ${QT_QGIF_PLUGIN_RELEASE} NAME)
-  get_filename_component(qico_plugin ${QT_QICO_PLUGIN_RELEASE} NAME)
-  get_filename_component(qjpeg_plugin ${QT_QJPEG_PLUGIN_RELEASE} NAME)
-  get_filename_component(qmng_plugin ${QT_QMNG_PLUGIN_RELEASE} NAME)
-  get_filename_component(qsvg_plugin ${QT_QSVG_PLUGIN_RELEASE} NAME)
-  get_filename_component(qtiff_plugin ${QT_QTIFF_PLUGIN_RELEASE} NAME)
   set(plugin_path "${APP}/Contents/plugins/imageformats")
-  install(FILES ${QT_QGIF_PLUGIN_RELEASE}
-                ${QT_QICO_PLUGIN_RELEASE}
-                ${QT_QJPEG_PLUGIN_RELEASE}
-                ${QT_QMNG_PLUGIN_RELEASE}
-                ${QT_QSVG_PLUGIN_RELEASE}
-                ${QT_QTIFF_PLUGIN_RELEASE}
-          DESTINATION ${plugin_path}
-          COMPONENT Runtime
-    )
   install(FILES ${Visomics_SOURCE_DIR}/CMake/qt.conf
           DESTINATION "${APP}/Contents/Resources"
           COMPONENT Runtime
     )
 
-  # Setup the script that's run at install time
-  configure_file(
-    "${Visomics_SOURCE_DIR}/CMake/CompleteBundles.cmake.in"
-    "${Visomics_BINARY_DIR}/CompleteBundles.cmake"
-    @ONLY
-  )
-  install(SCRIPT "${Visomics_BINARY_DIR}/CompleteBundles.cmake"
-          COMPONENT Runtime)
 else(APPLE)
   # Install rules
   install(TARGETS VisomicsApp
@@ -196,7 +172,39 @@ else(APPLE)
     DESTINATION ${Visomics_INSTALL_LIB_DIR}
     COMPONENT Runtime
     )
+
+  # executables to fixup
+  set(APP "${Visomics_INSTALL_BIN_DIR}/${APP_NAME}"
+          "${Visomics_INSTALL_LIB_DIR}/${APP_NAME}-real"
+  )
+  set(plugin_path "plugins/imageformats")
 endif(APPLE)
+
+# Make sure Qt plugins are properly installed
+get_filename_component(qgif_plugin ${QT_QGIF_PLUGIN_RELEASE} NAME)
+get_filename_component(qico_plugin ${QT_QICO_PLUGIN_RELEASE} NAME)
+get_filename_component(qjpeg_plugin ${QT_QJPEG_PLUGIN_RELEASE} NAME)
+get_filename_component(qmng_plugin ${QT_QMNG_PLUGIN_RELEASE} NAME)
+get_filename_component(qsvg_plugin ${QT_QSVG_PLUGIN_RELEASE} NAME)
+get_filename_component(qtiff_plugin ${QT_QTIFF_PLUGIN_RELEASE} NAME)
+install(FILES ${QT_QGIF_PLUGIN_RELEASE}
+              ${QT_QICO_PLUGIN_RELEASE}
+              ${QT_QJPEG_PLUGIN_RELEASE}
+              ${QT_QMNG_PLUGIN_RELEASE}
+              ${QT_QSVG_PLUGIN_RELEASE}
+              ${QT_QTIFF_PLUGIN_RELEASE}
+        DESTINATION ${plugin_path}
+        COMPONENT Runtime
+)
+
+# Setup the script that's run at install time
+configure_file(
+  "${Visomics_SOURCE_DIR}/CMake/CompleteBundles.cmake.in"
+  "${Visomics_BINARY_DIR}/CompleteBundles.cmake"
+  @ONLY
+)
+install(SCRIPT "${Visomics_BINARY_DIR}/CompleteBundles.cmake"
+        COMPONENT Runtime)
 
 if(BUILD_TESTING)
   add_subdirectory(Testing)
