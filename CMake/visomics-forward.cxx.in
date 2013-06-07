@@ -18,67 +18,11 @@
 # define vtksys_SHARED_FORWARD_CONFIG_NAME CMAKE_INTDIR
 #endif
 
-// VTK includes
-#include <vtkFiltersStatisticsGnuRConfigure.h>
-
 // VTKSYS includes
-#include <vtksys/Process.h>
 #include <vtksys/SharedForward.h>
-#include <vtksys/SystemTools.hxx>
 
-// STD includes
-#include <string>
 
 int main(int argc, char* argv[])
 {
-  const char* path = getenv("R_HOME");
-  if (!path)
-    {
-    vtksysProcess* process = vtksysProcess_New();
-    std::vector<const char*> commandLine;
-    commandLine.push_back("R");
-    commandLine.push_back("RHOME");
-    commandLine.push_back(0);
-    vtksysProcess_SetCommand(process, &commandLine[0]);
-    vtksysProcess_Execute(process);
-
-    std::string newPath = "R_HOME=";
-    char* data;
-    int length;
-    int pipe;
-    do
-      {
-      pipe =  vtksysProcess_WaitForData(process, &data, &length, NULL);
-      switch (pipe)
-        {
-      case vtksysProcess_Pipe_STDOUT:
-        newPath.append(data, length);
-        break;
-
-      case vtksysProcess_Pipe_STDERR:
-        newPath.append(data, length);
-        break;
-        }
-      } while (pipe != vtksysProcess_Pipe_None);
-
-    vtksysProcess_Delete(process);
-    if (newPath.compare("R_HOME=") == 0)
-      {
-      newPath.append(VTK_R_HOME);
-      }
-    else
-      {
-      // remove trailing newline from vtksysProcess output
-      std::string whitespaces (" \t\f\v\n\r");
-      size_t found;
-      found=newPath.find_last_not_of(whitespaces);
-      if (found != std::string::npos)
-        {
-        newPath.erase(found+1);
-        }
-      }
-    putenv(const_cast<char*>(newPath.c_str()));
-    }
-
   return vtksys_shared_forward_to_real(argc, argv);
 }
