@@ -58,6 +58,12 @@ if(USE_MONGO)
   add_definitions(-DUSE_MONGO)
 endif()
 
+find_path(VisomicsData_DIR ThirdParty
+  PATHS
+    ${CMAKE_BINARY_DIR}/VisomicsData
+    ${CMAKE_BINARY_DIR}/../VisomicsData
+  DOC "Path to the VisomicsData directory")
+
 #-----------------------------------------------------------------------------
 # Visomics version number.  An even minor number corresponds to releases.
 #
