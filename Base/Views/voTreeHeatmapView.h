@@ -48,6 +48,10 @@ protected:
   virtual void setDataObjectInternal(const voDataObject& dataObject);
 
   void colorTreeForDifference();
+  virtual void centerData();
+  void scaleItem(double oldWidth, double oldHeight,
+                 double newWidth, double newHeight);
+  void resizeEvent(QResizeEvent *event);
 
 protected:
   QScopedPointer<voTreeHeatmapViewPrivate> d_ptr;
