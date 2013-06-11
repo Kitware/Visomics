@@ -30,24 +30,17 @@
 
 // VTK includes
 #include <QVTKWidget.h>
-#include <vtkContextItem.h>
 #include <vtkContextMouseEvent.h>
 #include <vtkContextScene.h>
 #include <vtkContextTransform.h>
 #include <vtkContextView.h>
 #include <vtkDataSetAttributes.h>
-#include <vtkDoubleArray.h>
-#include <vtkGraph.h>
-#include <vtkLookupTable.h>
-#include <vtkNew.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkSmartPointer.h>
-#include <vtkTextProperty.h>
 #include <vtkTransform2D.h>
 #include <vtkTree.h>
 #include <vtkTreeHeatmapItem.h>
-#include <vtkViewTheme.h>
 
 // --------------------------------------------------------------------------
 class voTreeHeatmapViewPrivate
