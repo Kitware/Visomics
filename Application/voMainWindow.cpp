@@ -324,8 +324,9 @@ void voMainWindow::onFileMakeTreeHeatmapActionTriggered()
   d->DataBrowserWidget->setSelectionMode(QAbstractItemView::MultiSelection);
 
   // display a non-modal dialog
-  QMessageBox* msgBox = new QMessageBox();
+  QMessageBox* msgBox = new QMessageBox(this);
   msgBox->setAttribute(Qt::WA_DeleteOnClose);
+  msgBox->setWindowFlags(Qt::Tool);
   msgBox->setInformativeText("Select the tree and the table that you'd like to combine.");
   msgBox->setStandardButtons(QMessageBox::Ok  |  QMessageBox::Cancel);
   msgBox->setDefaultButton(QMessageBox::Cancel);
