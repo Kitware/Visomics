@@ -54,6 +54,7 @@
      <string>&amp;View</string>
     </property>
     <addaction name="actionViewDataBrowser"/>
+    <addaction name="actionViewDataProperty"/>
     <addaction name="actionViewAnalysisParameters"/>
     <addaction name="separator"/>
     <addaction name="actionViewErrorLog"/>
@@ -103,6 +104,27 @@
         <bool>true</bool>
        </property>
       </widget>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <widget class="QDockWidget" name="DataPropertyDockWidget">
+   <property name="minimumSize">
+    <size>
+     <width>79</width>
+     <height>53</height>
+    </size>
+   </property>
+   <property name="windowTitle">
+    <string>Data Property</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>1</number>
+   </attribute>
+   <widget class="QWidget" name="DataPropertyDockWidgetContents">
+    <layout class="QVBoxLayout" name="verticalLayout_4">
+     <item>
+      <widget class="voDataPropertyWidget" name="DataPropertyWidget" native="true"/>
      </item>
     </layout>
    </widget>
@@ -266,6 +288,17 @@
     <string>Open Tree Of Life</string>
    </property>
   </action>
+  <action name="actionViewDataProperty">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Data Property</string>
+   </property>
+  </action>
  </widget>
  <customwidgets>
   <customwidget>
@@ -278,6 +311,11 @@
    <class>voDataBrowserWidget</class>
    <extends>QTreeView</extends>
    <header>voDataBrowserWidget.h</header>
+  </customwidget>
+  <customwidget>
+   <class>voDataPropertyWidget</class>
+   <extends>QWidget</extends>
+   <header>voDataPropertyWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>
@@ -346,6 +384,38 @@
     <hint type="destinationlabel">
      <x>-1</x>
      <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>DataPropertyDockWidget</sender>
+   <signal>visibilityChanged(bool)</signal>
+   <receiver>actionViewDataProperty</receiver>
+   <slot>setChecked(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>127</x>
+     <y>535</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>actionViewDataProperty</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>DataPropertyDockWidget</receiver>
+   <slot>setVisible(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>127</x>
+     <y>535</y>
     </hint>
    </hints>
   </connection>
