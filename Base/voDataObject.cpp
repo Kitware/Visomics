@@ -22,6 +22,9 @@
 #include <QDebug>
 #include <QUuid>
 #include <QVariant>
+#include <QtVariantProperty>
+#include <QtVariantPropertyManager>
+#include <QSet>
 
 // Visomics includes
 #include "voDataObject.h"
@@ -34,6 +37,7 @@ class voDataObjectPrivate
 public:
   voDataObjectPrivate();
 
+  QtVariantPropertyManager*       VariantPropertyManager;
   QString                        Name;
   QString                        Uuid;
   QVariant                       Data;
@@ -47,6 +51,7 @@ voDataObjectPrivate::voDataObjectPrivate()
 {
   qRegisterMetaType<vtkVariant>("vtkVariant");
   this->Uuid = QUuid::createUuid().toString();
+  this->VariantPropertyManager = new QtVariantPropertyManager();
 }
 
 // --------------------------------------------------------------------------
@@ -65,6 +70,23 @@ voDataObject::voDataObject(const QString& newName, const QVariant& newData, QObj
   Q_D(voDataObject);
   d->Name = newName;
   this->setData(newData);
+
+  //set properties
+  QtVariantProperty * nameProperty = d->VariantPropertyManager->addProperty(QVariant::String, "Name");
+  nameProperty->setValue(newName);
+
+  QString dataType;
+  if (this->isVTKDataObject())
+    {
+    dataType =  this->dataAsVTKDataObject()->GetClassName();
+    }
+  else
+    {
+    dataType = QLatin1String(d->Data.typeName());
+    }
+  QtVariantProperty * dataTypeProperty= d->VariantPropertyManager->addProperty(QVariant::String, "Data Type");
+  dataTypeProperty->setValue(dataType);
+
 }
 
 // --------------------------------------------------------------------------
@@ -74,6 +96,22 @@ voDataObject::voDataObject(const QString& newName, vtkDataObject * newData, QObj
   Q_D(voDataObject);
   d->Name = newName;
   this->setData(newData);
+
+  // set property "Data Type"
+  QtVariantProperty * nameProperty = d->VariantPropertyManager->addProperty(QVariant::String, "Name");
+  nameProperty->setValue(newName);
+
+  QString dataType;
+  if (this->isVTKDataObject())
+    {
+    dataType =  this->dataAsVTKDataObject()->GetClassName();
+    }
+  else
+    {
+    dataType = QLatin1String(d->Data.typeName());
+    }
+  QtVariantProperty * dataTypeProperty= d->VariantPropertyManager->addProperty(QVariant::String, "Data Type");
+  dataTypeProperty->setValue(dataType);
 }
 
 // --------------------------------------------------------------------------
@@ -95,6 +133,13 @@ voDataObject::~voDataObject()
 }
 
 // --------------------------------------------------------------------------
+QtVariantPropertyManager* voDataObject::variantPropertyManager()const
+{
+  Q_D(const voDataObject);
+  return d->VariantPropertyManager;
+}
+
+// --------------------------------------------------------------------------
 QString voDataObject::name()const
 {
   Q_D(const voDataObject);
@@ -106,6 +151,17 @@ void voDataObject::setName(const QString& newName)
 {
   Q_D(voDataObject);
   d->Name = newName;
+
+  //set property "Name"
+  QSet<QtProperty*> displayProperties = d->VariantPropertyManager->properties();
+  foreach(QtProperty * prop, displayProperties)
+    {
+    QtVariantProperty * variantProp = dynamic_cast<QtVariantProperty*> (prop);
+    if (variantProp->propertyName() == "Name")
+      {
+       variantProp->setValue(newName);
+      }
+    }
 }
 
 // --------------------------------------------------------------------------
@@ -142,6 +198,26 @@ void voDataObject::setData(const QVariant& newData)
   Q_D(voDataObject);
   d->Data = newData;
   this->setProperty("data", newData);
+ 
+  // set the property "Data Type"
+  QString dataType;
+  if (this->isVTKDataObject())
+    {
+    dataType =  this->dataAsVTKDataObject()->GetClassName();
+    }
+  else
+    {
+    dataType = QLatin1String(d->Data.typeName());
+    }
+  QSet<QtProperty*> displayProperties = d->VariantPropertyManager->properties();
+  foreach(QtProperty * prop, displayProperties)
+    {
+    QtVariantProperty * variantProp = dynamic_cast<QtVariantProperty*> (prop);
+    if (variantProp->propertyName() == "Data Type")
+      {
+       variantProp->setValue(dataType);
+      }
+    }
 }
 
 // --------------------------------------------------------------------------

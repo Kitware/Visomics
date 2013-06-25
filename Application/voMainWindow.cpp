@@ -184,6 +184,11 @@ voMainWindow::voMainWindow(QWidget * newParent)
   d->DataBrowserWidget->setSelectionModel(dataModel->selectionModel());
 
   // By default, hide the dock widget
+//  d->DataPropertyDockWidget->setVisible(false);
+  // ... and disable the associated action
+//  d->actionViewDataProperty->setEnabled(false);
+
+  // By default, hide the dock widget
   d->AnalysisParameterDockWidget->setVisible(false);
   // ... and disable the associated action
   d->actionViewAnalysisParameters->setEnabled(false);
@@ -222,6 +227,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
           SIGNAL(analysisAddedToObjectModel(voAnalysis*)),
           d->DataBrowserWidget,
           SLOT(setActiveAnalysis(voAnalysis*)));
+
 
   connect(voApplication::application()->analysisDriver(),
           SIGNAL(addedCustomAnalysis(const QString&)),
@@ -481,10 +487,14 @@ void voMainWindow::makeTreeHeatmapDialogClosed()
 //-----------------------------------------------------------------------------
 void voMainWindow::onCloseActionTriggered()
 {
+  Q_D(voMainWindow);
   voDataModelItem* objectToRemove =
     voApplication::application()->dataModel()->selectedObject();
 
   voApplication::application()->dataModel()->removeObject(objectToRemove);
+
+  //remove associated properties
+  d->DataPropertyWidget->clear();
 }
 
 //-----------------------------------------------------------------------------
@@ -650,6 +660,14 @@ void voMainWindow::onInputSelected(voDataModelItem* inputTarget)
   Q_D(voMainWindow);
 
   voAnalysisDriver *driver = voApplication::application()->analysisDriver();
+
+ //enable the data property panel
+  d->DataPropertyDockWidget->setVisible(true);
+  d->DataPropertyWidget->setVisible(true);
+  d->actionViewDataProperty->setEnabled(true);
+
+ //pass the selection objects to the DataPropertyWidget
+  d->DataPropertyWidget->setPropertyDataModelItem(inputTarget);
 
   for (int i = 0; i < d->menuAnalysis->actions().size(); ++i)
     {

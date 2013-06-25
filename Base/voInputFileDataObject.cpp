@@ -20,6 +20,10 @@
 
 // Qt includes
 #include <QFileInfo>
+#include <QVariant>
+#include <QtVariantProperty>
+#include <QtVariantPropertyManager>
+#include <QSet>
 
 // Visomics includes
 #include "voInputFileDataObject.h"
@@ -63,6 +67,19 @@ voInputFileDataObject::voInputFileDataObject(const QString& fileName,
   this->setName(QFileInfo(fileName).baseName());
   this->setData(newData);
   d->FileName = fileName;
+
+  //set property  "FileName"
+  QtVariantPropertyManager* variantPropertyManager = this->variantPropertyManager();
+  QtVariantProperty * nameProperty=   variantPropertyManager->addProperty(QVariant::String,"Name");
+  nameProperty->setValue(QFileInfo(fileName).baseName());
+
+  QString dataType = newData->GetClassName();
+  QtVariantProperty * dataTypeProperty= variantPropertyManager
+->addProperty(QVariant::String, "Data Type");
+  dataTypeProperty->setValue(dataType);
+
+  QtVariantProperty * fileNameProperty =   variantPropertyManager->addProperty(QVariant::String,"File Name");
+  fileNameProperty->setValue(fileName);
 }
 
 // --------------------------------------------------------------------------
@@ -83,4 +100,16 @@ void voInputFileDataObject::setFileName(const QString& newFileName)
 {
   Q_D(voInputFileDataObject);
   d->FileName = newFileName;
+
+  //set property "Name"
+  QtVariantPropertyManager* VariantPropertyManager = this->variantPropertyManager();
+  QSet<QtProperty*> displayProperties = VariantPropertyManager->properties();
+  foreach(QtProperty * prop, displayProperties)
+    {
+    QtVariantProperty * variantProp = dynamic_cast<QtVariantProperty*> (prop);
+    if (variantProp->propertyName() == "File Name")
+      {
+       variantProp->setValue(newFileName);
+      }
+    }
 }
