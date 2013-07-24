@@ -106,6 +106,7 @@ bool voIOManager::readCSVFileIntoTable(const QString& fileName, vtkTable * outpu
   reader->SetUseStringDelimiter(
         settings.value(voDelimitedTextImportSettings::UseStringDelimiter).toBool());
   reader->SetHaveHeaders(haveHeaders);
+  reader->DetectNumericColumnsOn();
 
   // Read data
   reader->Update();
