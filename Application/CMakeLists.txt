@@ -177,8 +177,8 @@ else(APPLE)
     )
 
   # executables to fixup
-  set(APP "${Visomics_INSTALL_BIN_DIR}/${APP_NAME}"
-          "${Visomics_INSTALL_LIB_DIR}/${APP_NAME}-real"
+  set(APP "${Visomics_INSTALL_BIN_DIR}/${APP_NAME}${CMAKE_EXECUTABLE_SUFFIX}"
+          "${Visomics_INSTALL_LIB_DIR}/${APP_NAME}-real${CMAKE_EXECUTABLE_SUFFIX}"
   )
   set(plugin_path "plugins/imageformats")
 endif(APPLE)
