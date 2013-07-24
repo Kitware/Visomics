@@ -7,6 +7,8 @@ set(KIT_SRCS
   voAnalysisParameterEditorWidget.h
   voDataBrowserWidget.cpp
   voDataBrowserWidget.h
+  voDataPropertyWidget.cpp
+  voDataPropertyWidget.h
   voDelimitedTextImportDialog.cpp
   voDelimitedTextImportDialog.h
   voDelimitedTextImportWidget.cpp
@@ -43,6 +45,7 @@ set(KIT_MOC_SRCS
   voAnalysisParameterDialog.h
   voAnalysisParameterEditorWidget.h
   voDataBrowserWidget.h
+  voDataPropertyWidget.h
   voDelimitedTextImportDialog.h
   voDelimitedTextImportWidget.h
   voDelimitedTextPreview.h

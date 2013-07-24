@@ -34,6 +34,7 @@
 class QVariant;
 class voDataObjectPrivate;
 class vtkDataObject;
+class QtVariantPropertyManager;
 
 class voDataObject : public QObject, public QSharedData
 {
@@ -47,8 +48,11 @@ public:
   voDataObject(const QString& newName, vtkDataObject * newData, QObject* newParent = 0);
   virtual ~voDataObject();
 
+  QtVariantPropertyManager* variantPropertyManager() const;
+
   QString name()const;
   void setName(const QString& newName);
+
 
   QString type()const;
 
