@@ -63,4 +63,6 @@ void voViewStackedWidget::addView(const QString& /*objectUuid*/, voView * newVie
     viewIndex = this->addWidget(newView);
     }
   this->setCurrentIndex(viewIndex);
+
+  newView->centerData();
 }

@@ -52,6 +52,8 @@ public:
   void saveScreenshot(const QString& fileName);
   void saveScreenshot(const QString& fileName, const QSize& size);
 
+  virtual void centerData() {}
+
 protected slots:
   void onSaveScreenshotActionTriggered();
 
