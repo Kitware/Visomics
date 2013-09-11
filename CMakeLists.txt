@@ -265,7 +265,8 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 #-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(ThirdParty/CTK)
 INCLUDE_DIRECTORIES(ThirdParty/CTK)
-
+#-----------------------------------------------------------------------------
+include_directories(ThirdParty/JsonCpp)
 #-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(Base)
 ADD_SUBDIRECTORY(Application)
