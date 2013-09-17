@@ -35,6 +35,7 @@
 #include <vtkContextTransform.h>
 #include <vtkContextView.h>
 #include <vtkDataSetAttributes.h>
+#include <vtkDendrogramItem.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkSmartPointer.h>
@@ -209,7 +210,7 @@ void voTreeHeatmapView::colorTreeForDifference()
     d->TreeItem->GetTree()->GetVertexData()->GetArray("differences");
   if (differenceArray)
     {
-    d->TreeItem->SetTreeColorArray("differences");
+    d->TreeItem->GetDendrogram()->SetColorArray("differences");
     }
 }
 

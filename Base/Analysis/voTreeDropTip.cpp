@@ -40,6 +40,7 @@
 // VTK includes
 #include <vtkArrayData.h>
 #include <vtkIdTypeArray.h>
+#include <vtkDendrogramItem.h>
 #include <vtkDoubleArray.h>
 #include <vtkNew.h>
 #include <vtkSmartPointer.h>
@@ -492,7 +493,7 @@ bool voTreeDropTip::getSelectionByPrunedTree(vtkTree *tree, vtkTable * inputData
   if (view )
     {
     treeViewItem = view->getTreeHeatmapItem();
-    prunedTree = treeViewItem->GetPrunedTree();
+    prunedTree = treeViewItem->GetDendrogram()->GetPrunedTree();
     vtkStringArray * prunedNodeNames = vtkStringArray::SafeDownCast(prunedTree->GetVertexData()->GetAbstractArray("node name"));
     vtkStringArray * originalNodeNames = vtkStringArray::SafeDownCast(tree->GetVertexData()->GetAbstractArray("node name"));
     for ( vtkIdType i = 0; i< originalNodeNames->GetNumberOfValues(); ++i)
