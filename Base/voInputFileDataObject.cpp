@@ -64,22 +64,54 @@ voInputFileDataObject::voInputFileDataObject(const QString& fileName,
   Superclass(newParent), d_ptr(new voInputFileDataObjectPrivate)
 {
   Q_D(voInputFileDataObject);
-  this->setName(QFileInfo(fileName).baseName());
   this->setData(newData);
-  d->FileName = fileName;
 
-  //set property  "FileName"
-  QtVariantPropertyManager* variantPropertyManager = this->variantPropertyManager();
-  QtVariantProperty * nameProperty=   variantPropertyManager->addProperty(QVariant::String,"Name");
-  nameProperty->setValue(QFileInfo(fileName).baseName());
+  bool fileExists = QFileInfo(fileName).exists();
+  if (fileExists)
+    {
+    d->FileName = fileName;
+    }
 
+  QtVariantPropertyManager* variantPropertyManager =
+    this->variantPropertyManager();
+
+  // set name and property "Name"
   QString dataType = newData->GetClassName();
-  QtVariantProperty * dataTypeProperty= variantPropertyManager
-->addProperty(QVariant::String, "Data Type");
+  QtVariantProperty * nameProperty =
+    variantPropertyManager->addProperty(QVariant::String,"Name");
+  if (!fileExists)
+    {
+    this->setName(fileName);
+    nameProperty->setValue(fileName);
+    }
+  else if (dataType == "vtkTree")
+    {
+    this->setName("Tree");
+    nameProperty->setValue("Tree");
+    }
+  else if (dataType == "vtkExtendedTable")
+    {
+    this->setName("Table");
+    nameProperty->setValue("Table");
+    }
+  else
+    {
+    this->setName("Input Data");
+    nameProperty->setValue("Input Data");
+    }
+
+  // set property "Data Type"
+  QtVariantProperty * dataTypeProperty =
+    variantPropertyManager->addProperty(QVariant::String, "Data Type");
   dataTypeProperty->setValue(dataType);
 
-  QtVariantProperty * fileNameProperty =   variantPropertyManager->addProperty(QVariant::String,"File Name");
-  fileNameProperty->setValue(fileName);
+  if (fileExists)
+    {
+    // set property "File Name"
+    QtVariantProperty * fileNameProperty =
+      variantPropertyManager->addProperty(QVariant::String,"File Name");
+    fileNameProperty->setValue(fileName);
+    }
 }
 
 // --------------------------------------------------------------------------
