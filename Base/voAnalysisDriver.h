@@ -26,10 +26,31 @@
 #include <QMap>
 #include <QHash>
 
+class QUrl;
+
 class voAnalysis;
 class voDataModelItem;
 class voDataObject;
 class voAnalysisDriverPrivate;
+
+class voAnalysisTask : public QObject
+{
+  Q_OBJECT
+public:
+  voAnalysisTask(voAnalysis *analysis, voDataModelItem* insertLocation);
+  voAnalysis *analysis() { return m_analysis; };
+  voDataModelItem* insertLocation() { return m_insertLocation; };
+  bool run();
+
+signals:
+  void complete();
+  void error(const QString &errorString);
+
+
+private:
+  voAnalysis *m_analysis;
+  voDataModelItem* m_insertLocation;
+};
 
 class voAnalysisDriver : public QObject
 {
@@ -53,6 +74,7 @@ signals:
   void aboutToRunAnalysis(voAnalysis*);
   void analysisAddedToObjectModel(voAnalysis*);
   void addedCustomAnalysis(const QString&);
+  void urlRequired(QUrl *);
 
 public slots:
   void runAnalysisForAllInputs(const QString& analysisName, bool acceptDefaultParameter = false);
@@ -62,6 +84,8 @@ public slots:
 
   void updateAnalysis(
     voAnalysis * analysis, const QHash<QString, QVariant>& parameters);
+
+  void updateRemoteAnalysisUrl(QUrl * url);
 
 protected slots:
 
@@ -84,6 +108,13 @@ protected:
 private:
   Q_DECLARE_PRIVATE(voAnalysisDriver);
   Q_DISABLE_COPY(voAnalysisDriver);
+
+private slots:
+  void analysisComplete();
+  void analysisError(const QString &errorString);
+  void provideRemoteAnalysisUrl(QUrl *url);
+  void onInvalidCredentials();
+  void onAnalysisSubmitted();
 };
 
 #endif

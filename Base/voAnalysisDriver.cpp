@@ -26,6 +26,8 @@
 #include <QMainWindow>
 #include <QTextStream>
 #include <QXmlStreamReader>
+#include <QtGui/QMessageBox>
+#include <QtCore/QUrl>
 
 // QtPropertyBrowser includes
 #include <QtVariantPropertyManager>
@@ -39,6 +41,8 @@
 #include "voDataModelItem.h"
 #include "voDataObject.h"
 #include "voViewManager.h"
+#include "voRemoteCustomAnalysis.h"
+
 
 // --------------------------------------------------------------------------
 class voAnalysisDriverPrivate
@@ -46,6 +50,8 @@ class voAnalysisDriverPrivate
 public:
   voAnalysisDriverPrivate();
   virtual ~voAnalysisDriverPrivate();
+
+  QUrl remoteAnalysisUrl;
 };
 
 // --------------------------------------------------------------------------
@@ -183,6 +189,18 @@ void voAnalysisDriver::runAnalysis(const QString& analysisName,
   this->runAnalysis(analysis, inputTarget);
 }
 
+voAnalysisTask::voAnalysisTask(voAnalysis *analysis, voDataModelItem* insertLocation)
+  : m_analysis(analysis), m_insertLocation(insertLocation)
+{
+  connect(m_analysis, SIGNAL(complete()), this, SIGNAL(complete()));
+  connect(m_analysis, SIGNAL(error(const QString&)), this, SIGNAL(error(const QString&)));
+}
+
+bool voAnalysisTask::run()
+{
+  return m_analysis->run();
+}
+
 // --------------------------------------------------------------------------
 void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget)
 {
@@ -196,8 +214,6 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
     qWarning() << "Failed to runAnalysis - InputTarget is NULL";
     return;
     }
-
-  QScopedPointer<voAnalysis> analysisScopedPtr(analysis);
 
   // Reset abort execution flag
   analysis->setAbortExecution(false);
@@ -278,23 +294,48 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
     return;
     }
 
-  bool ret = analysis->run();
-  if (!ret)
-    {
-    qCritical() << "Analysis failed to run " << analysis->objectName();
-    return;
-    }
+  voDataModelItem *insertLocation;
 
   if (childItemForSingleInput == NULL)
     {
-    voAnalysisDriver::addAnalysisToObjectModel(
-      analysisScopedPtr.take(), inputTarget);
+    insertLocation  = inputTarget;
     }
   else
     {
-    voAnalysisDriver::addAnalysisToObjectModel(
-      analysisScopedPtr.take(), childItemForSingleInput);
+    insertLocation = childItemForSingleInput;
     }
+
+  voAnalysisTask *task  = new voAnalysisTask(analysis, insertLocation);
+
+  connect(task, SIGNAL(complete()), 
+      this, SLOT(analysisComplete()));
+  connect(task, SIGNAL(error(const QString&)),
+      this, SLOT(analysisError(const QString&)));
+
+  // If we are dealing with remote analysis we need to connect up the extra
+  // signals.
+  voRemoteCustomAnalysis *remoteAnalysis
+    = qobject_cast<voRemoteCustomAnalysis *>(analysis);
+  if (remoteAnalysis) 
+    {
+    connect(remoteAnalysis, SIGNAL(urlRequired(QUrl *)),
+            this, SLOT(provideRemoteAnalysisUrl(QUrl *)));
+    connect(remoteAnalysis, SIGNAL(invalidCredentials()),
+            this, SLOT(onInvalidCredentials()));
+    connect(remoteAnalysis, SIGNAL(analysisSubmitted()),
+            this, SLOT(onAnalysisSubmitted()));
+    }
+
+  bool ret = task->run();
+}
+
+void voAnalysisDriver::analysisComplete()
+{
+  voAnalysisTask *task = qobject_cast<voAnalysisTask*>(sender());
+  voAnalysis *analysis = task->analysis();
+
+  voAnalysisDriver::addAnalysisToObjectModel(
+      analysis, task->insertLocation());
 
   connect(analysis, SIGNAL(outputSet(const QString&, voDataObject*, voAnalysis*)),
     SLOT(onAnalysisOutputSet(const QString&,voDataObject*,voAnalysis*)));
@@ -304,6 +345,31 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
   emit this->analysisAddedToObjectModel(analysis);
 
   qDebug() << " => Analysis" << analysis->objectName() << " DONE";
+
+  delete task;
+
+  QApplication::restoreOverrideCursor();
+}
+
+void voAnalysisDriver::analysisError(const QString &errorString) {
+  Q_D(voAnalysisDriver);
+
+  // Clear cached connection detail in case they are the problem.
+  d->remoteAnalysisUrl.clear();
+
+  voAnalysisTask *task = qobject_cast<voAnalysisTask*>(sender());
+
+  // If a message was provided display it, otherwise the user may have just
+  // cancelled the analysis.
+  if (!errorString.isEmpty())
+    {
+    QMessageBox::critical(voApplication::application()->mainWindow(),
+        "Analysis Error", errorString,  QMessageBox::Ok);
+    }
+  task->analysis()->deleteLater();
+  delete task;
+
+  QApplication::restoreOverrideCursor();
 }
 
 // --------------------------------------------------------------------------
@@ -760,4 +826,44 @@ void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
     voApplication::application()->analysisFactory();
   analysisFactory->addCustomAnalysis(analysisInformation);
   emit this->addedCustomAnalysis(analysisInformation->name());
+}
+
+void voAnalysisDriver::provideRemoteAnalysisUrl(QUrl *url)
+{
+  Q_D(voAnalysisDriver);
+
+  if (d->remoteAnalysisUrl.isEmpty())
+    {
+    // Request url from main window
+    emit urlRequired(url);
+
+    // Cache the result
+    d->remoteAnalysisUrl = *url;
+    }
+  else
+    {
+    *url = d->remoteAnalysisUrl;
+    }
+}
+
+void voAnalysisDriver::updateRemoteAnalysisUrl(QUrl * url)
+{
+  Q_D(voAnalysisDriver);
+  d->remoteAnalysisUrl = *url;
+}
+
+void voAnalysisDriver::onInvalidCredentials()
+{
+  Q_D(voAnalysisDriver);
+  // invalidate the cached url
+  d->remoteAnalysisUrl.clear();
+
+  // Tell the user
+  QMessageBox::critical(voApplication::application()->mainWindow(),
+      "Authentication error", "Invalid username or password",  QMessageBox::Ok);
+}
+
+void voAnalysisDriver::onAnalysisSubmitted()
+{
+  QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 }

@@ -43,6 +43,7 @@
 #include "voCompareTrees.h"
 
 #include "voCustomAnalysis.h"
+#include "voRemoteCustomAnalysis.h"
 #include "voCustomAnalysisInformation.h"
 
 //----------------------------------------------------------------------------
@@ -100,7 +101,7 @@ voAnalysis* voAnalysisFactory::createAnalysis(const QString& className)
     {
     voCustomAnalysisInformation *info =
       d->customAnalysisNameToInfoMap.value(className);
-    voCustomAnalysis *customAnalysis = new voCustomAnalysis(info);
+    voRemoteCustomAnalysis *customAnalysis = new voRemoteCustomAnalysis(info);
     customAnalysis->setObjectName(className);
     customAnalysis->loadInformation(info);
     return customAnalysis;
