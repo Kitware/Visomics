@@ -397,3 +397,8 @@ bool voCustomAnalysis::execute()
     }
   return true;
 }
+
+voCustomAnalysisInformation *voCustomAnalysis::information() const
+{
+  return d_ptr->Information;
+}
