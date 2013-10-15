@@ -1,0 +1,17 @@
+<analysis name="Early-burst model fitting">
+  <inputs>
+    <input name="input_tree" type="Tree"/>
+    <input name="input_table" type="Table"/>
+  </inputs>
+  <outputs>
+    <output name="EB_tree" type="Tree"/>
+    <output name="EB_table" type="Table"/>
+  </outputs>
+  <parameters>
+    <parameter name="column_name" type="String">
+      <title>Data Column Name</title>
+      <description>The name of the data table column that should be used for the model fitting.</description>
+      <default>SVL</default>
+    </parameter>
+  </parameters>
+</analysis>
