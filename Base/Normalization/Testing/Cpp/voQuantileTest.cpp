@@ -131,69 +131,69 @@ bool compareTable(vtkTable * table1, vtkTable * table2)
   return true;
   }
 }
-//-----------------------------------------------------------------------------
-int voQuantileTest(int /*argc*/, char * /*argv*/ [])
-{
-  //-----------------------------------------------------------------------------
-  // Test Normalization::applyQuantile(vtkTable* table, ...)
-  //-----------------------------------------------------------------------------
-
-  // Input
-
-  vtkNew<vtkTable> quantileNormalizationInput;
-  for (float i = 1.0; i <= 15.0;)
-    {
-    vtkNew<vtkDoubleArray> quantileNormalizationInputArray;
-    for(int j = 0; j < 3; j++)
-      {
-      quantileNormalizationInputArray->InsertNextValue(i);
-      i += 1.0;
-      }
-    quantileNormalizationInput->AddColumn(quantileNormalizationInputArray.GetPointer());
-    }
-  /* quantileNormalizationInput:
-  +------+------+------+------+------+
-  | 1    | 4    | 7    | 10   | 13   |
-  | 2    | 5    | 8    | 11   | 14   |
-  | 3    | 6    | 9    | 12   | 15   |
-  +------+------+------+------+------+
-  */
-
-  // Expected output
-  vtkNew<vtkTable> quantileNormalizationExpectedOutput;
-  for (int i = 0; i < 15;)
-    {
-    vtkNew<vtkDoubleArray> quantileNormalizationExpectedOutputArray;
-    for(float j = 7.0; j <= 9.0; j+=1.0)
-      {
-      quantileNormalizationExpectedOutputArray->InsertNextValue(j);
-      i++;
-      }
-    quantileNormalizationExpectedOutput->AddColumn(quantileNormalizationExpectedOutputArray.GetPointer());
-    }
-  /* quantileNormalizationExpectedOutput:
-  +------+------+------+------+------+
-  | 7    | 7    | 7    | 7    | 7    |
-  | 8    | 8    | 8    | 8    | 8    |
-  | 9    | 9    | 9    | 9    | 9    |
-  +------+------+------+------+------+
-  */
-
-  Normalization::applyQuantile(quantileNormalizationInput.GetPointer(), QHash<int, QVariant>());
-
-  if (!compareTable(quantileNormalizationInput.GetPointer(), quantileNormalizationExpectedOutput.GetPointer()))
-    {
-    // Tables are expected to be equals
-    std::cerr << "Line " << __LINE__ << " - "
-              << "Problem with quantileNormalization()" << std::endl;
-
-    std::cerr << "Updated quantileNormalizationInput:" << std::endl;
-    quantileNormalizationInput->Dump();
-
-    std::cerr << "quantileNormalizationExpectedOutput:" << std::endl;
-    quantileNormalizationExpectedOutput->Dump();
-    return EXIT_FAILURE;
-    }
-
-  return EXIT_SUCCESS;
-}
+////-----------------------------------------------------------------------------
+//int voQuantileTest(int /*argc*/, char * /*argv*/ [])
+//{
+//  //-----------------------------------------------------------------------------
+//  // Test Normalization::applyQuantile(vtkTable* table, ...)
+//  //-----------------------------------------------------------------------------
+//
+//  // Input
+//
+//  vtkNew<vtkTable> quantileNormalizationInput;
+//  for (float i = 1.0; i <= 15.0;)
+//    {
+//    vtkNew<vtkDoubleArray> quantileNormalizationInputArray;
+//    for(int j = 0; j < 3; j++)
+//      {
+//      quantileNormalizationInputArray->InsertNextValue(i);
+//      i += 1.0;
+//      }
+//    quantileNormalizationInput->AddColumn(quantileNormalizationInputArray.GetPointer());
+//    }
+//  /* quantileNormalizationInput:
+//  +------+------+------+------+------+
+//  | 1    | 4    | 7    | 10   | 13   |
+//  | 2    | 5    | 8    | 11   | 14   |
+//  | 3    | 6    | 9    | 12   | 15   |
+//  +------+------+------+------+------+
+//  */
+//
+//  // Expected output
+//  vtkNew<vtkTable> quantileNormalizationExpectedOutput;
+//  for (int i = 0; i < 15;)
+//    {
+//    vtkNew<vtkDoubleArray> quantileNormalizationExpectedOutputArray;
+//    for(float j = 7.0; j <= 9.0; j+=1.0)
+//      {
+//      quantileNormalizationExpectedOutputArray->InsertNextValue(j);
+//      i++;
+//      }
+//    quantileNormalizationExpectedOutput->AddColumn(quantileNormalizationExpectedOutputArray.GetPointer());
+//    }
+//  /* quantileNormalizationExpectedOutput:
+//  +------+------+------+------+------+
+//  | 7    | 7    | 7    | 7    | 7    |
+//  | 8    | 8    | 8    | 8    | 8    |
+//  | 9    | 9    | 9    | 9    | 9    |
+//  +------+------+------+------+------+
+//  */
+//
+//  Normalization::applyQuantile(quantileNormalizationInput.GetPointer(), QHash<int, QVariant>());
+//
+//  if (!compareTable(quantileNormalizationInput.GetPointer(), quantileNormalizationExpectedOutput.GetPointer()))
+//    {
+//    // Tables are expected to be equals
+//    std::cerr << "Line " << __LINE__ << " - "
+//              << "Problem with quantileNormalization()" << std::endl;
+//
+//    std::cerr << "Updated quantileNormalizationInput:" << std::endl;
+//    quantileNormalizationInput->Dump();
+//
+//    std::cerr << "quantileNormalizationExpectedOutput:" << std::endl;
+//    quantileNormalizationExpectedOutput->Dump();
+//    return EXIT_FAILURE;
+//    }
+//
+//  return EXIT_SUCCESS;
+//}

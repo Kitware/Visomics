@@ -26,18 +26,9 @@
 #include "voAnalysisFactory.h"
 #include "voQObjectFactory.h"
 
-#include "voANOVAStatistics.h"
-#include "voFoldChange.h"
-#include "voHierarchicalClustering.h"
 #include "voKEGGCompounds.h"
 #include "voKEGGPathway.h"
-#include "voKMeansClustering.h"
 #include "voOneZoom.h"
-#include "voPCAStatistics.h"
-#include "voPLSStatistics.h"
-#include "voTTest.h"
-#include "voXCorrel.h"
-#include "voGeigerModelFitting.h"
 #include "voTreeDropTip.h"
 #include "voTreeDropTipWithoutData.h"
 #include "voCompareTrees.h"
@@ -65,18 +56,9 @@ public:
 //----------------------------------------------------------------------------
 voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
 {
-  this->registerAnalysis<voANOVAStatistics>("ANOVA");
-  this->registerAnalysis<voFoldChange>("Fold Change");
-  this->registerAnalysis<voHierarchicalClustering>("Hierarchical Clustering");
   this->registerAnalysis<voKEGGCompounds>("KEGG Compounds");
   this->registerAnalysis<voKEGGPathway>("KEGG Pathway");
-  this->registerAnalysis<voKMeansClustering>("KMeans Clustering");
   this->registerAnalysis<voOneZoom>("OneZoom Visualization");
-  this->registerAnalysis<voPCAStatistics>("PCA");
-  this->registerAnalysis<voPLSStatistics>("PLS");
-  this->registerAnalysis<voTTest>("T-Test");
-  this->registerAnalysis<voXCorrel>("Cross Correlation");
-  this->registerAnalysis<voGeigerModelFitting>("Geiger Tree Model Fitting");
   this->registerAnalysis<voTreeDropTip>("Tree Drop Tip With Data");
   this->registerAnalysis<voTreeDropTipWithoutData>("Tree Drop Tip");
   this->registerAnalysis<voCompareTrees>("Compare Trees");

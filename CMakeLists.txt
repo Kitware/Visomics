@@ -113,7 +113,6 @@ INCLUDE(${QT_USE_FILE})
 #
 set(VTK_LIBRARIES
     vtkChartsCore
-    vtkFiltersStatisticsGnuR
     vtkIOInfovis
     vtkRenderingFreeTypeOpenGL # remove this eventually; when VTK is fixed
     vtkViewsContext2D
@@ -251,12 +250,6 @@ FOREACH(header voConfigure.h voTestConfigure.h)
     )
 ENDFOREACH()
 
-configure_file(
-  ${CMAKE_SOURCE_DIR}/Utilities/GetRExternalPackages.R.in
-  ${CMAKE_BINARY_DIR}/GetRExternalPackages.R
-  @ONLY
-)
-
 #-----------------------------------------------------------------------------
 # Include directories
 #
@@ -270,17 +263,6 @@ include_directories(ThirdParty/JsonCpp)
 #-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(Base)
 ADD_SUBDIRECTORY(Application)
-
-#-----------------------------------------------------------------------------
-# R scripts
-#
-set(r_scripts
-  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/GetRExternalPackages.installed.R
-  )
-INSTALL(FILES ${r_scripts}
-        DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR}
-        COMPONENT Runtime
-        RENAME GetRExternalPackages.R)
 
 set(custom_analysis_examples ${CMAKE_CURRENT_SOURCE_DIR}/scripts/examples)
 INSTALL(DIRECTORY ${custom_analysis_examples}

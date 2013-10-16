@@ -2,30 +2,12 @@
 PROJECT(VisomicsBase)
 
 SET(KIT_SRCS
-  Analysis/voFoldChange.cpp
-  Analysis/voFoldChange.h
-  Analysis/voANOVAStatistics.cpp
-  Analysis/voANOVAStatistics.h
-  Analysis/voHierarchicalClustering.h
-  Analysis/voHierarchicalClustering.cpp
   Analysis/voKEGGCompounds.h
   Analysis/voKEGGCompounds.cpp
   Analysis/voKEGGPathway.h
   Analysis/voKEGGPathway.cpp
-  Analysis/voKMeansClustering.cpp
-  Analysis/voKMeansClustering.h
   Analysis/voOneZoom.cpp
   Analysis/voOneZoom.h
-  Analysis/voPCAStatistics.cpp
-  Analysis/voPCAStatistics.h
-  Analysis/voTTest.cpp
-  Analysis/voTTest.h
-  Analysis/voPLSStatistics.cpp
-  Analysis/voPLSStatistics.h
-  Analysis/voXCorrel.cpp
-  Analysis/voXCorrel.h
-  Analysis/voGeigerModelFitting.cpp
-  Analysis/voGeigerModelFitting.h
   Analysis/voCustomAnalysis.cpp
   Analysis/voCustomAnalysis.h
   Analysis/voCustomAnalysisData.cpp
@@ -46,7 +28,6 @@ SET(KIT_SRCS
   Analysis/voRemoteCustomAnalysis.h
   Normalization/voNormalization.h
   Normalization/voLog2.cpp
-  Normalization/voQuantile.cpp
 
   Views/voCorrelationGraphView.cpp
   Views/voCorrelationGraphView.h
@@ -133,18 +114,9 @@ SET(KIT_SRCS
   )
 
 SET(KIT_MOC_SRCS
-  Analysis/voFoldChange.h
-  Analysis/voANOVAStatistics.h
-  Analysis/voHierarchicalClustering.h
   Analysis/voKEGGCompounds.h
   Analysis/voKEGGPathway.h
-  Analysis/voKMeansClustering.h
   Analysis/voOneZoom.h
-  Analysis/voPCAStatistics.h
-  Analysis/voTTest.h
-  Analysis/voPLSStatistics.h
-  Analysis/voXCorrel.h
-  Analysis/voGeigerModelFitting.h
   Analysis/voCompareTrees.h
   Analysis/voCustomAnalysis.h
   Analysis/voCustomAnalysisData.h

@@ -19,14 +19,6 @@
 ###########################################################################
 
 #-----------------------------------------------------------------------------
-# GNU R
-#-----------------------------------------------------------------------------
-# Note :GNU R is should be provided at configuration time. For example:
-#       cmake <OTHER_OPTIONS> -DR_COMMAND:FILEPATH=/path/to/R-2.11.1/bin/R ../Visomics
-
-find_package(R REQUIRED)
-
-#-----------------------------------------------------------------------------
 # Git protocol option
 #-----------------------------------------------------------------------------
 
@@ -65,7 +57,6 @@ endif()
 include(CMakeExternals/VTK.cmake)
 include(CMakeExternals/QtPropertyBrowser.cmake)
 include(CMakeExternals/VisomicsData.cmake)
-include(CMakeExternals/RExternalPackages.cmake)
 #include(CMakeExternals/CTK.cmake)
 
 #-----------------------------------------------------------------------------

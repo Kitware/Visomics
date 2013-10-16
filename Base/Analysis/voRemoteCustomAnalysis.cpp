@@ -46,7 +46,6 @@
 #include <vtkGraph.h>
 #include <vtkMultiPieceDataSet.h>
 #include <vtkNew.h>
-#include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>

@@ -41,7 +41,6 @@
 #include <vtkGraph.h>
 #include <vtkMultiPieceDataSet.h>
 #include <vtkNew.h>
-#include <vtkRCalculatorFilter.h>
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <vtkTable.h>
@@ -55,7 +54,6 @@
 class voCustomAnalysisPrivate
 {
 public:
-  vtkSmartPointer<vtkRCalculatorFilter> RCalc;
   voCustomAnalysisInformation *Information;
 };
 
@@ -71,7 +69,6 @@ voCustomAnalysis::voCustomAnalysis(QObject* newParent):
     this->setParent(newParent);
     }
   Q_D(voCustomAnalysis);
-  d->RCalc = vtkSmartPointer<vtkRCalculatorFilter>::New();
   d->Information = NULL;
 }
 
@@ -229,172 +226,6 @@ QString voCustomAnalysis::parameterDescription()const
 // --------------------------------------------------------------------------
 bool voCustomAnalysis::execute()
 {
-  Q_D(voCustomAnalysis);
-
-  d->RCalc->SetRoutput(0);
-
-  vtkSmartPointer<vtkExtendedTable> extendedTable;
-  vtkNew<vtkMultiPieceDataSet> composite;
-  bool multiInput = false;
-
-  if (d->Information->inputs().size() > 1)
-    {
-    multiInput = true;
-    composite->SetNumberOfPieces(d->Information->inputs().size());
-    }
-
-  int itr = 0;
-  foreach(voCustomAnalysisData *input, d->Information->inputs())
-    {
-    if (input->type() == "Table")
-      {
-      extendedTable = this->getInputTable(itr);
-      vtkTable *table = extendedTable->GetInputData();
-      d->RCalc->PutTable(input->name().toStdString().c_str());
-      if (multiInput)
-        {
-        composite->SetPiece(itr, table);
-        }
-      else
-        {
-        d->RCalc->SetInputData(table);
-        }
-      }
-
-    else if(input->type() == "Tree")
-      {
-      vtkTree* tree =
-        vtkTree::SafeDownCast(this->input(itr)->dataAsVTKDataObject());
-      if (!tree)
-        {
-        qCritical() << "Input Tree is Null";
-        return false;
-        }
-      d->RCalc->PutTree(input->name().toStdString().c_str());
-      if (multiInput)
-        {
-        composite->SetPiece(itr, tree);
-        }
-      else
-        {
-        d->RCalc->SetInputData(tree);
-        }
-      }
-    else
-      {
-      qCritical() << "Unsupported input type:" << input->type();
-      return false;
-      }
-    ++itr;
-    }
-  if (multiInput)
-    {
-    d->RCalc->SetInputData(composite.GetPointer());
-    }
-
-  foreach(voCustomAnalysisData *output, d->Information->outputs())
-    {
-    const char *outputName = output->name().toStdString().c_str();
-    if (output->type() == "Table")
-      {
-      d->RCalc->GetTable(outputName);
-      }
-    else if(output->type() == "Tree")
-      {
-      d->RCalc->GetTree(outputName);
-      }
-    else
-      {
-      qCritical() << "Unsupported output type:" << output->type();
-      return false;
-      }
-    }
-
-  // replace each parameter in the script with its actual value
-  QString script = d->Information->script();
-  foreach(voCustomAnalysisParameter *parameter, d->Information->parameters())
-    {
-    QString type = parameter->type();
-    QString name = parameter->name();
-    QString parameterValue;
-    if (type == "Integer")
-      {
-      parameterValue = QString::number(this->integerParameter(name));
-      }
-    else if (type == "Double")
-      {
-      parameterValue = QString::number(this->doubleParameter(name));
-      }
-    else if (type == "Enum")
-      {
-      parameterValue = this->enumParameter(name);
-      }
-    else if (type == "String")
-      {
-      parameterValue = QString("\"%1\"").arg(this->stringParameter(name));
-      }
-    else
-      {
-      qCritical() << "Unsupported parameter type in voCustomAnalysis:" << type;
-      }
-    script.replace(name, parameterValue);
-    }
-
-  d->RCalc->SetRscript(script.toLatin1());
-  d->RCalc->Update();
-
-  // Get output(s) from R
-  if (multiInput)
-    {
-    vtkMultiPieceDataSet * outData =
-      vtkMultiPieceDataSet::SafeDownCast(d->RCalc->GetOutput());
-    if(!outData)
-      {
-      qCritical() << QObject::tr("Fatal error running analysis");
-      return false;
-      }
-
-    vtkCompositeDataIterator* iter = outData->NewIterator();
-    itr = 0;
-    for (iter->InitTraversal(); !iter->IsDoneWithTraversal();
-         iter->GoToNextItem())
-      {
-      voCustomAnalysisData *output = d->Information->outputs().at(itr);
-      if (output->type() == "Table")
-        {
-        vtkTable *outputTable =
-          vtkTable::SafeDownCast(iter->GetCurrentDataObject());
-        this->setOutput(output->name(),
-          new voTableDataObject(output->name(), outputTable, true));
-        }
-      else // tree is the only other possibility atm
-        {
-        vtkTree *outputTree = vtkTree::SafeDownCast(iter->GetCurrentDataObject());
-        this->setOutput(output->name(),
-                        new voInputFileDataObject(output->name(), outputTree));
-        }
-      ++itr;
-      }
-    iter->Delete();
-    }
-  else
-    {
-    foreach(voCustomAnalysisData *output, d->Information->outputs())
-      {
-      if (output->type() == "Table")
-        {
-        vtkTable * outputTable = vtkTable::SafeDownCast(d->RCalc->GetOutput());
-        this->setOutput(output->name(),
-                        new voTableDataObject(output->name(), outputTable));
-        }
-      else
-        {
-        vtkTree * outputTree = vtkTree::SafeDownCast(d->RCalc->GetOutput());
-        this->setOutput(output->name(),
-                        new voDataObject(output->name(), outputTree));
-        }
-      }
-    }
   return true;
 }
 
