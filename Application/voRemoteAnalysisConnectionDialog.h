@@ -17,8 +17,8 @@
   limitations under the License.
 
 =========================================================================*/
-#ifndef __voMongoSaveDialog_h
-#define __voMongoSaveDialog_h
+#ifndef __voRemoteAnalysisConnectionDialog_h
+#define __voRemoteAnalysisConnectionDialog_h
 
 // Qt includes
 #include <QDialog>
