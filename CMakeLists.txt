@@ -114,6 +114,7 @@ INCLUDE(${QT_USE_FILE})
 set(VTK_LIBRARIES
     vtkChartsCore
     vtkFiltersStatisticsGnuR
+    vtkIOExport
     vtkIOInfovis
     vtkRenderingFreeTypeOpenGL # remove this eventually; when VTK is fixed
     vtkViewsContext2D

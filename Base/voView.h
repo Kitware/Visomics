@@ -49,13 +49,13 @@ public:
 
   virtual QList<QAction*> actions();
 
-  void saveScreenshot(const QString& fileName);
+  virtual void saveScreenshot(const QString& fileName);
   void saveScreenshot(const QString& fileName, const QSize& size);
 
   virtual void centerData() {}
 
 protected slots:
-  void onSaveScreenshotActionTriggered();
+  virtual void onSaveScreenshotActionTriggered();
 
 protected:
   virtual void setupUi(QLayout * layout) = 0;

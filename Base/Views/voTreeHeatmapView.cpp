@@ -19,14 +19,19 @@
 =========================================================================*/
 
 // Qt includes
+#include <QAction>
 #include <QDebug>
+#include <QDesktopServices>
+#include <QFileDialog>
 #include <QLayout>
 #include <QResizeEvent>
 
 // Visomics includes
 #include "voDataObject.h"
 #include "voTreeHeatmapView.h"
+#include "voUtils.h"
 #include "vtkExtendedTable.h"
+
 
 // VTK includes
 #include <QVTKWidget.h>
@@ -36,6 +41,7 @@
 #include <vtkContextView.h>
 #include <vtkDataSetAttributes.h>
 #include <vtkDendrogramItem.h>
+#include <vtkGL2PSExporter.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include <vtkSmartPointer.h>
@@ -320,3 +326,59 @@ void voTreeHeatmapView::resizeEvent(QResizeEvent *event)
     }
 }
 
+// --------------------------------------------------------------------------
+QList<QAction*> voTreeHeatmapView::actions()
+{
+  QList<QAction*> actionList;
+
+  QAction * saveScreenshotAction =
+      new QAction(QIcon(":/Icons/saveScreenshot.png"), "Save screenshot", this);
+  saveScreenshotAction->setToolTip("Save the current view to disk.");
+  connect(saveScreenshotAction, SIGNAL(triggered()),
+          this, SLOT(onSaveScreenshotActionTriggered()));
+  actionList << saveScreenshotAction;
+
+  return actionList;
+}
+
+// --------------------------------------------------------------------------
+void voTreeHeatmapView::onSaveScreenshotActionTriggered()
+{
+  QString defaultFileName =
+    QDesktopServices::storageLocation(QDesktopServices::DesktopLocation)
+    + "/" + voUtils::cleanString(this->objectName()) + ".svg";
+
+  QString fileName = QFileDialog::getSaveFileName(
+        0, tr("Save screenshot..."), defaultFileName, "Image (*.svg *.png)");
+  if(fileName.isEmpty())
+    {
+    return;
+    }
+  this->saveScreenshot(fileName);
+}
+
+// --------------------------------------------------------------------------
+void voTreeHeatmapView::saveScreenshot(const QString& fileName)
+{
+  Q_D(voTreeHeatmapView);
+  if (fileName.endsWith(".png"))
+    {
+    this->Superclass::saveScreenshot(fileName);
+    return;
+    }
+
+  vtkNew<vtkGL2PSExporter> exporter;
+  exporter->SetRenderWindow(d->ContextView->GetRenderWindow());
+  exporter->SetFileFormatToSVG();
+  exporter->UsePainterSettings();
+  exporter->CompressOff();
+  exporter->SetTitle(this->objectName().toStdString().c_str());
+  exporter->DrawBackgroundOn();
+
+  QFileInfo fileInfo(fileName);
+  QString fileNameWithoutExt = fileInfo.dir().absolutePath() +
+    QString("/") + fileInfo.baseName();
+
+  exporter->SetFilePrefix(fileNameWithoutExt.toStdString().c_str());
+  exporter->Write();
+}

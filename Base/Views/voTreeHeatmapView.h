@@ -40,6 +40,9 @@ public:
   virtual ~voTreeHeatmapView();
   vtkTreeHeatmapItem * getTreeHeatmapItem() const;
 
+  virtual QList<QAction*> actions();
+  virtual void saveScreenshot(const QString& fileName);
+
 protected:
   void setupUi(QLayout * layout);
 
@@ -52,6 +55,9 @@ protected:
   void scaleItem(double oldWidth, double oldHeight,
                  double newWidth, double newHeight);
   void resizeEvent(QResizeEvent *event);
+
+protected slots:
+  virtual void onSaveScreenshotActionTriggered();
 
 protected:
   QScopedPointer<voTreeHeatmapViewPrivate> d_ptr;
