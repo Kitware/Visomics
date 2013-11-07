@@ -60,7 +60,7 @@ def execute(inputs, outputs, script):
 
     output_dataobjects = []
 
-    if len(inputs) > 1:
+    if len(outputs) > 1:
         iter = output.NewIterator();
         iter.InitTraversal()
         while not iter.IsDoneWithTraversal():
