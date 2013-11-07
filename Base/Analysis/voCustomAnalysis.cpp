@@ -170,7 +170,7 @@ void voCustomAnalysis::setParameterInformation()
         }
       else if (field->name() == "default")
         {
-        if (type == "String")
+        if (type == "String" || type == "Range")
           {
           defaultValue = QVariant(field->value());
           }
@@ -198,7 +198,7 @@ void voCustomAnalysis::setParameterInformation()
         parameter->name(), parameterTitle,
         minValue.toDouble(), maxValue.toDouble(), defaultValue.toDouble());
       }
-    else if (type == "String")
+    else if (type == "String" || type == "Range")
       {
       custom_parameters << this->addStringParameter(
         parameter->name(), parameterTitle, defaultValue.toString());
