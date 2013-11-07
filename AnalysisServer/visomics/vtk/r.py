@@ -24,20 +24,39 @@ def execute(inputs, outputs, script):
     rcalc.SetRscript(script)
 
     readers = []
-
+    input_tables = []
+    input_trees = []
     for name, type, value in inputs:
 
         if type == 'Table':
-            rcalc.PutTable(name)
+            input_tables.append(name)
             input = vtk.vtkTableReader()
         elif type == 'Tree':
-            rcalc.PutTree(name)
+            input_trees.append(name)
             input = vtk.vtkTreeReader()
 
         input.SetInputString(value)
         input.SetReadFromInputString(1)
 
         readers.append(input)
+
+    names = vtk.vtkStringArray()
+    names.SetNumberOfComponents(1)
+    names.SetNumberOfTuples(len(input_tables))
+    index = 0
+    for name in input_tables:
+        names.SetValue(index, name)
+        index += 1
+    rcalc.PutTables(names)
+
+    names = vtk.vtkStringArray()
+    names.SetNumberOfComponents(1)
+    names.SetNumberOfTuples(len(input_trees))
+    index = 0
+    for name in input_trees:
+        names.SetValue(index, name)
+        index += 1
+    rcalc.PutTrees(names)
 
     # Multi inputs
     if len(inputs) > 1:
@@ -48,16 +67,36 @@ def execute(inputs, outputs, script):
 
     rcalc.AddInputConnection(input.GetOutputPort())
 
+    output_tables = []
+    output_trees = []
     for o in outputs:
         if o['type'] == 'Table':
-            rcalc.GetTable(o['name'])
+            output_tables.append(o['name'])
         elif o['type'] == 'Tree':
-            rcalc.GetTree(o['name'])
+            output_trees.append(o['name'])
+
+    names = vtk.vtkStringArray()
+    names.SetNumberOfComponents(1)
+    names.SetNumberOfTuples(len(output_tables))
+    index = 0
+    for name in output_tables:
+        names.SetValue(index, name)
+        index += 1
+    rcalc.GetTables(names)
+
+    names = vtk.vtkStringArray()
+    names.SetNumberOfComponents(1)
+    names.SetNumberOfTuples(len(output_trees))
+    index = 0
+    for name in output_trees:
+        names.SetValue(index, name)
+        index += 1
+    rcalc.GetTrees(names)
 
     rcalc.Update()
 
     output = rcalc.GetOutput()
-
+    print str(output)
     output_dataobjects = []
 
     if len(outputs) > 1:
