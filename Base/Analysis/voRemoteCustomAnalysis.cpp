@@ -110,40 +110,47 @@ bool voRemoteCustomAnalysis::execute()
 
 
     vtkDataObject *data;
+    vtkDataWriter *writer;
+    std::string type;
 
     if (input->type() == "Table")
       {
-      inputValue["type"] = "Table";
+      type = "Table";
       extendedTable = this->getInputTable(index);
       data = extendedTable->GetInputData();
-      vtkNew<vtkTableWriter> writer;
-      writer->SetWriteToOutputString(1);
-      writer->SetInputData(data);
-      writer->Update();
-      inputValue["data"] = writer->GetOutputStdString();
+      writer = vtkTableWriter::New();
       }
     else if(input->type() == "Tree")
       {
+      type = "Tree";
       data =
         vtkTree::SafeDownCast(this->input(index)->dataAsVTKDataObject());
-
-      vtkNew<vtkTreeWriter> writer;
-      writer->SetWriteToOutputString(1);
-      writer->SetInputData(data);
-      writer->Update();
-      inputValue["type"] = "Tree";
-      inputValue["data"] = writer->GetOutputStdString();
-
       if (!data)
         {
         emit error("Input Tree is Null");
         return false;
         }
+      writer = vtkTreeWriter::New();
       }
     else
       {
       emit error(tr("Unsupported input type: %s").arg(input->type()));
       return false;
+      }
+
+    if (writer)
+      {
+      writer->SetWriteToOutputString(1);
+      writer->SetInputData(data);
+      writer->SetFileTypeToBinary();
+      writer->Update();
+
+      QByteArray base64 = QByteArray(reinterpret_cast<char*>(writer->GetBinaryOutputString()),
+                                     writer->GetOutputStringLength()).toBase64();
+
+      inputValue["data"] = base64.constData();
+      inputValue["type"] = type;
+      writer->Delete();
       }
     ++index;
     }
@@ -353,12 +360,15 @@ void voRemoteCustomAnalysis::handleResultReply(QNetworkReply *reply)
     std::string type = output["type"].asString();
     QString name = QString::fromStdString(output["name"].asString());
     std::string inputString = output["data"].asString();
+    QByteArray raw = QByteArray::fromRawData(inputString.c_str(), inputString.size());
+    QByteArray binary = QByteArray::fromBase64(raw);
 
     if (type == "Table")
       {
+
       vtkNew<vtkTableReader> reader;
+      reader->SetBinaryInputString(binary.data(), binary.size());
       reader->SetReadFromInputString(1);
-      reader->SetInputString(inputString);
       reader->Update();
 
       this->setOutput(name,
@@ -372,7 +382,7 @@ void voRemoteCustomAnalysis::handleResultReply(QNetworkReply *reply)
       reader->Update();
 
       this->setOutput(name,
-              new voInputFileDataObject(name, reader->GetOutput()));
+              new voDataObject(name, reader->GetOutput()));
       }
     else
       {

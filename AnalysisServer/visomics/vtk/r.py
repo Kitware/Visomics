@@ -2,6 +2,8 @@
 import vtkwithexceptions as vtk
 import json
 import os
+import base64
+import tempfile
 
 from celery import Celery
 from celery import task, current_task
@@ -35,7 +37,8 @@ def execute(inputs, outputs, script):
             input_trees.append(name)
             input = vtk.vtkTreeReader()
 
-        input.SetInputString(value)
+        data_value = base64.b64decode(value)
+        input.SetBinaryInputString(data_value, len(data_value))
         input.SetReadFromInputString(1)
 
         readers.append(input)
@@ -123,11 +126,19 @@ def execute(inputs, outputs, script):
         elif output['type'] == 'Tree':
             writer = vtk.vtkTreeWriter()
 
-        writer.SetWriteToOutputString(1)
+        tmp = tempfile.mktemp()
+
+        writer.SetFileName(tmp)
+        writer.SetFileTypeToBinary()
         writer.SetInputData(dataobject)
         writer.Update()
 
-        data = writer.GetOutputString()
+        with open(tmp, 'r') as fp:
+            data = fp.read()
+
+        os.remove(tmp)
+
+        data = base64.b64encode(data)
 
         output_json['output'].append({'name': output['name'], 'type': output['type'], 'data': data})
 
