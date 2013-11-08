@@ -160,7 +160,13 @@ void voTableView::setDataObjectInternal(const voDataObject& dataObject)
   for (vtkIdType dataCol = colOffset; dataCol < num_cols; ++dataCol)
     {
     int modelCol = static_cast<int>(dataCol - colOffset);
-    d->Model.setHeaderData(modelCol, Qt::Horizontal, QString(table->GetColumnName(dataCol)));
+
+    QString columnName(table->GetColumnName(dataCol));
+    // unkown is used to encode columns with no name
+    if (columnName == "unknown")
+      columnName = "";
+
+    d->Model.setHeaderData(modelCol, Qt::Horizontal, columnName);
     for (vtkIdType r = 0; r < num_rows; ++r)
       {
       QStandardItem* item = new QStandardItem();
