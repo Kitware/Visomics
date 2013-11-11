@@ -1,0 +1,40 @@
+<analysis name="Fold Change">
+  <inputs>
+    <input name="input_table" type="Table"/>
+  </inputs>
+  <outputs>
+    <output name="foldChange" type="Table"/>
+    <output name="foldChangePlot" type="Table"
+            viewType="voHorizontalBarView"/>
+  </outputs>
+  <parameters>
+    <parameter name="mean_method" type="Enum">
+      <title>Initial Samples(s)</title>
+      <description>
+        &lt;dl&gt;
+          &lt;dd&gt;The type of average used to form each sample group.&lt;/dd&gt;
+        &lt;/dl&gt;
+      </description>
+      <option>Arithmetic</option>
+      <option>Geometric</option>
+    </parameter>
+    <parameter name="sample1_range" type="Range">
+      <title>Initial Samples(s)</title>
+      <description>
+        &lt;dl&gt;
+          &lt;dd&gt;A group of Experiments, specified by a range and/or list of column letters&lt;/dd&gt;
+        &lt;/dl&gt;
+      </description>
+      <default>A-C,F</default>
+    </parameter>
+    <parameter name="sample2_range" type="Range">
+     <title>Final Samples(s)</title>
+      <description>
+        &lt;dl&gt;
+          &lt;dd&gt;A group of Experiments, specified by a range and/or list of column letters&lt;/dd&gt;
+        &lt;/dl&gt;
+      </description>
+      <default>D,E,G-J</default>
+    </parameter>
+  </parameters>
+</analysis>
