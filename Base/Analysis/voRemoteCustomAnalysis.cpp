@@ -377,8 +377,8 @@ void voRemoteCustomAnalysis::handleResultReply(QNetworkReply *reply)
     else if (type == "Tree")
       {
       vtkNew<vtkTreeReader> reader;
+      reader->SetBinaryInputString(binary.data(), binary.size());
       reader->SetReadFromInputString(1);
-      reader->SetInputString(inputString);
       reader->Update();
 
       this->setOutput(name,
