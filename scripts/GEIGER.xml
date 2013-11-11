@@ -1,0 +1,33 @@
+<analysis name="Geiger Tree Model Fitting">
+  <inputs>
+    <input name="tree" type="Tree"/>
+    <input name="tableData" type="Table"/>
+  </inputs>
+  <outputs>
+    <output name="resultTree" type="Tree" viewType="voTreeHeatmapView"/>
+    <output name="resultTable" type="Table"/>
+  </outputs>
+
+  <parameters>
+    <parameter name="modelType" type="Enum">
+      <title>Model Type</title>
+      <description> 
+        &lt;dl&gt;
+        &lt;dd&gt;&lt;u&gt;Choose from the three existing models&lt;/u&gt;,OU(Ornstein-Uhlenbeck), BM(Brownian Motion), and EB(Early Burst) &lt;/dd&gt;
+        &lt;/dl&gt;
+      </description>
+      <option>OU</option>
+      <option>BM</option>
+      <option>EB</option>
+    </parameter>
+    <parameter name="selectedDataName" type="String">
+      <title>Data Column Name</title>
+      <description>
+        &lt;dl&gt;
+        &lt;dd&gt;Choose a data column to be used for the modeling fitting.&lt;br&gt;&lt;u&gt;Choose from the table data attached with the tree. &lt;/dd&gt;
+        &lt;/dl&gt;
+        </description>
+      <default>awesomeness</default>
+    </parameter>
+  </parameters>
+</analysis>
