@@ -59,6 +59,7 @@ private:
   Q_DISABLE_COPY(voRemoteCustomAnalysis);
 
   bool requestConnectionDetails();
+  void transferParameters(voDataObject *dataObject);
 
 private slots:
   void handleReply(QNetworkReply *);

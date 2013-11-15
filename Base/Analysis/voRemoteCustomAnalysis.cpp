@@ -371,8 +371,11 @@ void voRemoteCustomAnalysis::handleResultReply(QNetworkReply *reply)
       reader->SetReadFromInputString(1);
       reader->Update();
 
-      this->setOutput(name,
-                  new voTableDataObject(name, reader->GetOutput(), true));
+      voTableDataObject *dataObject = new voTableDataObject(name,
+                                                            reader->GetOutput(),
+                                                            true);
+      this->transferParameters(dataObject);
+      this->setOutput(name, dataObject);
       }
     else if (type == "Tree")
       {
@@ -381,8 +384,9 @@ void voRemoteCustomAnalysis::handleResultReply(QNetworkReply *reply)
       reader->SetReadFromInputString(1);
       reader->Update();
 
-      this->setOutput(name,
-              new voDataObject(name, reader->GetOutput()));
+      voDataObject *dataObject = new voDataObject(name, reader->GetOutput());
+      this->transferParameters(dataObject);
+      this->setOutput(name, dataObject);
       }
     else
       {
@@ -437,4 +441,15 @@ void voRemoteCustomAnalysis::provideCredentials(QNetworkReply *reply,
   auth->setUser(m_user);
   auth->setPassword(m_password);
   m_credentialsProvided = true;
+}
+
+void voRemoteCustomAnalysis::transferParameters(voDataObject *dataObject)
+{
+  foreach(voCustomAnalysisParameter *parameter, this->information()->parameters())
+    {
+    QString name = parameter->name();
+    std::string strName = name.toStdString();
+    QVariant value = this->parameter(name)->value();
+    dataObject->setProperty(strName.c_str(), value);
+    }
 }
