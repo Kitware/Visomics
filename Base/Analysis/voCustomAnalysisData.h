@@ -34,9 +34,11 @@ public:
 
   QString name() const;
   QString type() const;
+  QString viewType() const;
 
   void setName(const QString& name);
   void setType(const QString& type);
+  void setViewType(const QString& viewType);
 
   void setDataIsInput(bool b);
 
@@ -44,6 +46,7 @@ protected:
   QString dataName;
   QString dataType;
   bool isInput;
+  QString viewDataType;
 
 private:
   Q_DISABLE_COPY(voCustomAnalysisData);

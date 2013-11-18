@@ -307,7 +307,7 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
 
   voAnalysisTask *task  = new voAnalysisTask(analysis, insertLocation);
 
-  connect(task, SIGNAL(complete()), 
+  connect(task, SIGNAL(complete()),
       this, SLOT(analysisComplete()));
   connect(task, SIGNAL(error(const QString&)),
       this, SLOT(analysisError(const QString&)));
@@ -316,7 +316,7 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
   // signals.
   voRemoteCustomAnalysis *remoteAnalysis
     = qobject_cast<voRemoteCustomAnalysis *>(analysis);
-  if (remoteAnalysis) 
+  if (remoteAnalysis)
     {
     connect(remoteAnalysis, SIGNAL(urlRequired(QUrl *)),
             this, SLOT(provideRemoteAnalysisUrl(QUrl *)));
@@ -738,8 +738,10 @@ void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
       new voCustomAnalysisData(analysisInformation);
     QStringRef outputName = stream.attributes().value("name");
     QStringRef outputType = stream.attributes().value("type");
+    QStringRef outputViewType = stream.attributes().value("viewType");
     outputData->setName(outputName.toString());
     outputData->setType(outputType.toString());
+    outputData->setViewType(outputViewType.toString());
     analysisInformation->addOutput(outputData);
     stream.readNext();
     stream.readNextStartElement();

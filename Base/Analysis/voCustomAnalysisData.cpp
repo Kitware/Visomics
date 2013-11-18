@@ -43,6 +43,12 @@ QString voCustomAnalysisData::type() const
 }
 
 // --------------------------------------------------------------------------
+QString voCustomAnalysisData::viewType() const
+{
+  return this->viewDataType;
+}
+
+// --------------------------------------------------------------------------
 void voCustomAnalysisData::setName(const QString& name)
 {
   this->dataName = name;
@@ -53,6 +59,13 @@ void voCustomAnalysisData::setType(const QString& type)
 {
   this->dataType = type;
 }
+
+// --------------------------------------------------------------------------
+void voCustomAnalysisData::setViewType(const QString& type)
+{
+  this->viewDataType = type;
+}
+
 
 // --------------------------------------------------------------------------
 void voCustomAnalysisData::setDataIsInput(bool b)
