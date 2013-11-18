@@ -1,0 +1,28 @@
+<analysis name="ANOVA">
+  <inputs>
+    <input name="input_table" type="Table"/>
+  </inputs>
+  <outputs>
+    <output name="ANOVA_table" type="Table"/>
+    <output name="ANOVA_volcano" type="Table"
+            viewType="voVolcanoView"/>
+  </outputs>
+  <parameters>
+    <parameter name="sample1_range" type="Range">
+      <title>Sample Group 1</title>
+      <description>&lt;dl&gt;
+                 &lt;dd&gt;A group of Experiments, specified by a range and/or list of column letters.&lt;br&gt;
+                 &lt;u&gt;The groups MUST both be the same size&lt;/u&gt;, as only a balanced test is performed&lt;/dd&gt;
+                 &lt;/dl&gt;</description>
+      <default>A-C,F</default>
+    </parameter>
+    <parameter name="sample2_range" type="Range">
+     <title>Sample Group 2</title>
+      <description>&lt;dl&gt;
+                 &lt;dd&gt;A group of Experiments, specified by a range and/or list of column letters.&lt;br&gt;
+                 &lt;u&gt;The groups MUST both be the same size&lt;/u&gt;, as only a balanced test is performed&lt;/dd&gt;
+                 &lt;/dl&gt;</description>
+      <default>D,G-I</default>
+    </parameter>
+  </parameters>
+</analysis>
