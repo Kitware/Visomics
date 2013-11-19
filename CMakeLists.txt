@@ -264,14 +264,11 @@ include_directories(ThirdParty/JsonCpp)
 ADD_SUBDIRECTORY(Base)
 ADD_SUBDIRECTORY(Application)
 
-set(custom_analysis_examples ${CMAKE_CURRENT_SOURCE_DIR}/scripts/examples)
-INSTALL(DIRECTORY ${custom_analysis_examples}
-        DESTINATION ${Visomics_INSTALL_SCRIPTS_DIR}
+set(analysis_scripts ${CMAKE_CURRENT_SOURCE_DIR}/scripts)
+INSTALL(DIRECTORY ${analysis_scripts}
+        DESTINATION "."
         COMPONENT Runtime)
-set(custom_analysis_readme ${CMAKE_CURRENT_SOURCE_DIR}/scripts/README.txt)
-INSTALL(FILES ${custom_analysis_readme}
-        DESTINATION ${Visomics_INSTALL_SCRIPTS_DIR}
-        COMPONENT Runtime)
+
 
 #-----------------------------------------------------------------------------
 # Install sample dataset(s)
