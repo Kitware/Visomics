@@ -3,9 +3,11 @@
     <input name="input_table" type="Table"/>
   </inputs>
   <outputs>
-    <output name="ANOVA_table" type="Table"/>
+    <output name="ANOVA_table" type="Table" rawViewType="voTableView" 
+            rawViewPrettyName="Significance (Table)" />
     <output name="ANOVA_volcano" type="Table"
-            viewType="voVolcanoView"/>
+            viewType="voVolcanoView" viewPrettyName="Volcano Plot"
+            rawViewType="voTableView" rawViewPrettyName="Volcano Table"/>
   </outputs>
   <parameters>
     <parameter name="sample1_range" type="Range">

@@ -3,7 +3,9 @@
     <input name="input_table" type="Table"/>
   </inputs>
   <outputs>
-    <output name="cluster" type="Table" viewType="voKMeansClusteringDynView"/>
+    <output name="cluster" type="Table" viewType="voKMeansClusteringDynView"
+            viewPrettyName="Clusters (Dendogram)" rawViewType="voTableView"
+            rawViewPrettyName="Clusters (Table)"/>
   </outputs>
   <parameters>
     <parameter name="kmeans_centers" type="Integer">

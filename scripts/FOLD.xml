@@ -3,9 +3,10 @@
     <input name="input_table" type="Table"/>
   </inputs>
   <outputs>
-    <output name="foldChange" type="Table"/>
+    <output name="foldChange" type="Table"  rawViewType="voTableView"
+            rawViewPrettyName="Change (Table)"/>
     <output name="foldChangePlot" type="Table"
-            viewType="voHorizontalBarView"/>
+            viewType="voHorizontalBarView" viewPrettyName="Change (Plot)"/>
   </outputs>
   <parameters>
     <parameter name="mean_method" type="Enum">
