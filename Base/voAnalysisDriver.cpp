@@ -739,9 +739,15 @@ void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
     QStringRef outputName = stream.attributes().value("name");
     QStringRef outputType = stream.attributes().value("type");
     QStringRef outputViewType = stream.attributes().value("viewType");
+    QStringRef outputViewPrettyName = stream.attributes().value("viewPrettyName");
+    QStringRef outputRawViewType = stream.attributes().value("rawViewType");
+    QStringRef outputRawViewPrettyName = stream.attributes().value("rawViewPrettyName");
     outputData->setName(outputName.toString());
     outputData->setType(outputType.toString());
     outputData->setViewType(outputViewType.toString());
+    outputData->setViewPrettyName(outputViewPrettyName.toString());
+    outputData->setRawViewType(outputRawViewType.toString());
+    outputData->setRawViewPrettyName(outputRawViewPrettyName.toString());
     analysisInformation->addOutput(outputData);
     stream.readNext();
     stream.readNextStartElement();

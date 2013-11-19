@@ -35,10 +35,16 @@ public:
   QString name() const;
   QString type() const;
   QString viewType() const;
+  QString viewPrettyName() const;
+  QString rawViewType() const;
+  QString rawViewPrettyName() const;
 
   void setName(const QString& name);
   void setType(const QString& type);
   void setViewType(const QString& viewType);
+  void setViewPrettyName(const QString& prettyName);
+  void setRawViewType(const QString& viewType);
+  void setRawViewPrettyName(const QString& prettyName);
 
   void setDataIsInput(bool b);
 
@@ -47,6 +53,9 @@ protected:
   QString dataType;
   bool isInput;
   QString viewDataType;
+  QString prettyName;
+  QString rawViewDataType;
+  QString rawPrettyName;
 
 private:
   Q_DISABLE_COPY(voCustomAnalysisData);

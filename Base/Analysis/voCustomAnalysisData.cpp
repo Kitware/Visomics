@@ -49,6 +49,24 @@ QString voCustomAnalysisData::viewType() const
 }
 
 // --------------------------------------------------------------------------
+QString voCustomAnalysisData::viewPrettyName() const
+{
+  return this->prettyName;
+}
+
+// --------------------------------------------------------------------------
+QString voCustomAnalysisData::rawViewType() const
+{
+  return this->rawViewDataType;
+}
+
+// --------------------------------------------------------------------------
+QString voCustomAnalysisData::rawViewPrettyName() const
+{
+  return this->rawPrettyName;
+}
+
+// --------------------------------------------------------------------------
 void voCustomAnalysisData::setName(const QString& name)
 {
   this->dataName = name;
@@ -66,6 +84,23 @@ void voCustomAnalysisData::setViewType(const QString& type)
   this->viewDataType = type;
 }
 
+// --------------------------------------------------------------------------
+void voCustomAnalysisData::setViewPrettyName(const QString& name)
+{
+  this->prettyName = name;
+}
+
+// --------------------------------------------------------------------------
+void voCustomAnalysisData::setRawViewType(const QString& type)
+{
+  this->rawViewDataType = type;
+}
+
+// --------------------------------------------------------------------------
+void voCustomAnalysisData::setRawViewPrettyName(const QString& name)
+{
+  this->rawPrettyName = name;
+}
 
 // --------------------------------------------------------------------------
 void voCustomAnalysisData::setDataIsInput(bool b)

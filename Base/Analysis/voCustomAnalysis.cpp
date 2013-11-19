@@ -97,18 +97,21 @@ void voCustomAnalysis::setOutputInformation()
     QString name = output->name();
     QString type = output->type();
     QString viewType = output->viewType();
+    QString viewPrettyName = output->viewPrettyName();
+    QString rawViewType = output->rawViewType();
+    QString rawViewPrettyName = output->rawViewPrettyName();
 
     if (type == "Table")
       {
       this->addOutputType(name, "vtkTable",
-                          viewType, "",
-                          "voTableView", name);
+                          viewType, viewPrettyName,
+                          rawViewType, rawViewPrettyName);
       }
     else if (type == "Tree")
       {
       this->addOutputType(name, "vtkTree",
-                          viewType, "",
-                          "voTreeHeatmapView", name);
+                          viewType, viewPrettyName,
+                          rawViewType, rawViewPrettyName);
       }
     else
       {
