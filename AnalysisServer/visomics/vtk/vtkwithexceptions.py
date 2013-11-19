@@ -6,7 +6,6 @@ from functools import partial
 
 class ErrorEventException(StandardError):
     def __init__(self, obj, message):
-        print "message: "+ message
         super(ErrorEventException, self).__init__(message)
 
 def raise_exception_error_handler(obj, event_type, message):
@@ -25,7 +24,6 @@ class vtkModuleExceptionRaisingWrapper(types.ModuleType):
                 return cls
             class vtkClassExceptionRaisingWrapper(cls):
                 def __init__(self):
-                    print 'init'
                     try:
                         cls.__init__(self)
                     except AttributeError:
