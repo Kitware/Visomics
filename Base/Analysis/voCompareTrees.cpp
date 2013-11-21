@@ -92,7 +92,7 @@ bool voCompareTrees::execute()
   filter->SetInputDataObject(1, comparisonTree);
   filter->SetIdArrayName("node name");
   filter->SetComparisonArrayIsVertexData(true);
-  filter->SetComparisonArrayName("true node weight");
+  filter->SetComparisonArrayName("node weight");
   filter->SetOutputArrayName("differences");
   filter->Update();
 
