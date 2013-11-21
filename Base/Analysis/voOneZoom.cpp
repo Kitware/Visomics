@@ -102,5 +102,6 @@ bool voOneZoom::execute()
     // Write out the output tree into a newick string and pass it to the OneZoom vis javascript
     }
 
+  emit complete();
   return true;
 }
