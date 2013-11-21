@@ -42,7 +42,11 @@ CONFIGURE_FILE(
   @ONLY)
 SET(CPACK_PROJECT_CONFIG_FILE "${PROJECT_BINARY_DIR}/VisomicsCPackOptions.cmake")
 
-set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+if(APPLE)
+  set(CPACK_PACKAGING_INSTALL_PREFIX "/Applications")
+else()
+  set(CPACK_PACKAGING_INSTALL_PREFIX "/")
+endif()
 
 # -------------------------------------------------------------------------
 # Install Visomics
