@@ -119,6 +119,7 @@ set(VTK_LIBRARIES
     vtkRenderingFreeTypeOpenGL # remove this eventually; when VTK is fixed
     vtkViewsContext2D
     vtkViewsQt
+    vtkIOExport # for output to svg support
     )
 
 #-----------------------------------------------------------------------------
