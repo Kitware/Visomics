@@ -3,7 +3,7 @@ SET(KIT ${PROJECT_NAME}Normalization)
 
 CREATE_TEST_SOURCELIST(Tests ${KIT}CppTests.cpp
   voLog2Test.cpp
-  voQuantileTest.cpp
+#  voQuantileTest.cpp
   )
 
 SET(TestsToRun ${Tests})
@@ -19,4 +19,4 @@ MACRO(SIMPLE_TEST TESTNAME)
 ENDMACRO()
 
 SIMPLE_TEST(voLog2Test)
-SIMPLE_TEST(voQuantileTest)
+#SIMPLE_TEST(voQuantileTest)

@@ -46,7 +46,7 @@ foreach(app ${apps})
   fixup_bundle(
     "$ENV{DESTDIR}${CMAKE_INSTALL_PREFIX}/${app}"
     "${Qt_plugins}"
-    "@QT_LIBRARY_DIR@;@VTK_DIR@/lib"
+    "@QT_LIBRARY_DIR@;@QT_BINARY_DIR@;@VTK_DIR@/lib"
   )
 endforeach()
 

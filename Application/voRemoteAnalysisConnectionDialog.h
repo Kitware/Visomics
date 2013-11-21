@@ -17,39 +17,37 @@
   limitations under the License.
 
 =========================================================================*/
-
-#ifndef __voFoldChange_h
-#define __voFoldChange_h
+#ifndef __voRemoteAnalysisConnectionDialog_h
+#define __voRemoteAnalysisConnectionDialog_h
 
 // Qt includes
-#include <QScopedPointer>
+#include <QDialog>
 
-// Visomics includes
-#include "voAnalysis.h"
+class voRemoteAnalysisConnectionDialogPrivate;
 
-class voFoldChangePrivate;
-
-class voFoldChange : public voAnalysis
+class voRemoteAnalysisConnectionDialog : public QDialog
 {
   Q_OBJECT
 public:
-  typedef voAnalysis Superclass;
-  voFoldChange();
-  virtual ~voFoldChange();
+  typedef QDialog Superclass;
 
-protected:
-  virtual void setOutputInformation();
-  virtual void setParameterInformation();
-  virtual QString parameterDescription()const;
+  voRemoteAnalysisConnectionDialog(QWidget* newParent = 0);
+  virtual ~voRemoteAnalysisConnectionDialog();
 
-  virtual bool execute();
+  QString Url();
+  QString User();
+  QString Password();
 
-protected:
-  QScopedPointer<voFoldChangePrivate> d_ptr;
 
 private:
-  Q_DECLARE_PRIVATE(voFoldChange);
-  Q_DISABLE_COPY(voFoldChange);
+  QScopedPointer<voRemoteAnalysisConnectionDialogPrivate> d_ptr;
+  Q_DECLARE_PRIVATE(voRemoteAnalysisConnectionDialog);
+  Q_DISABLE_COPY(voRemoteAnalysisConnectionDialog);
+
+  void loadSettings();
+
+private slots:
+  void saveSettings();
 };
 
 #endif

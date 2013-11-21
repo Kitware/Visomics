@@ -63,7 +63,7 @@ endif()
 #
 SET(Visomics_MAJOR_VERSION 0)
 SET(Visomics_MINOR_VERSION 5)
-SET(Visomics_BUILD_VERSION 8)
+SET(Visomics_BUILD_VERSION 9)
 SET(Visomics_VERSION
     "${Visomics_MAJOR_VERSION}.${Visomics_MINOR_VERSION}.${Visomics_BUILD_VERSION}")
 
@@ -113,13 +113,11 @@ INCLUDE(${QT_USE_FILE})
 #
 set(VTK_LIBRARIES
     vtkChartsCore
-    vtkFiltersStatisticsGnuR
-    vtkIOExport
+    vtkIOExport # for output to svg support
     vtkIOInfovis
     vtkRenderingFreeTypeOpenGL # remove this eventually; when VTK is fixed
     vtkViewsContext2D
     vtkViewsQt
-    vtkIOExport # for output to svg support
     )
 
 #-----------------------------------------------------------------------------
@@ -253,12 +251,6 @@ FOREACH(header voConfigure.h voTestConfigure.h)
     )
 ENDFOREACH()
 
-configure_file(
-  ${CMAKE_SOURCE_DIR}/Utilities/GetRExternalPackages.R.in
-  ${CMAKE_BINARY_DIR}/GetRExternalPackages.R
-  @ONLY
-)
-
 #-----------------------------------------------------------------------------
 # Include directories
 #
@@ -267,30 +259,17 @@ INCLUDE_DIRECTORIES(${CMAKE_CURRENT_BINARY_DIR})
 #-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(ThirdParty/CTK)
 INCLUDE_DIRECTORIES(ThirdParty/CTK)
-
+#-----------------------------------------------------------------------------
+include_directories(ThirdParty/JsonCpp)
 #-----------------------------------------------------------------------------
 ADD_SUBDIRECTORY(Base)
 ADD_SUBDIRECTORY(Application)
 
-#-----------------------------------------------------------------------------
-# R scripts
-#
-set(r_scripts
-  ${CMAKE_CURRENT_SOURCE_DIR}/Utilities/GetRExternalPackages.installed.R
-  )
-INSTALL(FILES ${r_scripts}
-        DESTINATION ${Visomics_INSTALL_RSCRIPTS_DIR}
-        COMPONENT Runtime
-        RENAME GetRExternalPackages.R)
+set(analysis_scripts ${CMAKE_CURRENT_SOURCE_DIR}/scripts)
+INSTALL(DIRECTORY ${analysis_scripts}
+        DESTINATION "."
+        COMPONENT Runtime)
 
-set(custom_analysis_examples ${CMAKE_CURRENT_SOURCE_DIR}/scripts/examples)
-INSTALL(DIRECTORY ${custom_analysis_examples}
-        DESTINATION ${Visomics_INSTALL_SCRIPTS_DIR}
-        COMPONENT Runtime)
-set(custom_analysis_readme ${CMAKE_CURRENT_SOURCE_DIR}/scripts/README.txt)
-INSTALL(FILES ${custom_analysis_readme}
-        DESTINATION ${Visomics_INSTALL_SCRIPTS_DIR}
-        COMPONENT Runtime)
 
 #-----------------------------------------------------------------------------
 # Install sample dataset(s)

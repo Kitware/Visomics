@@ -24,7 +24,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>25</height>
+     <height>23</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -59,7 +59,14 @@
     <addaction name="separator"/>
     <addaction name="actionViewErrorLog"/>
    </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>&amp;Edit</string>
+    </property>
+    <addaction name="actionRemoteAnalysisSettings"/>
+   </widget>
    <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
    <addaction name="menuAnalysis"/>
    <addaction name="menu_View"/>
    <addaction name="menuHelp"/>
@@ -297,6 +304,11 @@
    </property>
    <property name="text">
     <string>Data Property</string>
+   </property>
+  </action>
+  <action name="actionRemoteAnalysisSettings">
+   <property name="text">
+    <string>Remote Analysis Settings</string>
    </property>
   </action>
  </widget>

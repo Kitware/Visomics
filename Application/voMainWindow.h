@@ -28,6 +28,7 @@ class QDockWidget;
 class QSplitter;
 class QTreeWidget;
 class QTableWidget;
+class QUrl;
 
 class voAnalysisPanel;
 class voAnalysis;
@@ -62,6 +63,11 @@ public slots:
   void loadSampleDataset();
   void loadAnalysisScripts();
   void onCustomAnalysisAdded(const QString& analysisName);
+  void provideRemoteAnalysisUrl(QUrl *url);
+  void onRemoteAnalysisSettingTriggered();
+
+signals:
+  void remoteAnalysisUrlUpdated(QUrl *url);
 
 protected slots:
   void onAnalysisSelected(voAnalysis* analysis);

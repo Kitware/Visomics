@@ -46,6 +46,8 @@ protected:
 
   virtual bool execute();
 
+  voCustomAnalysisInformation * information() const;
+
   QScopedPointer<voCustomAnalysisPrivate> d_ptr;
   QString parameterDescriptions;
 

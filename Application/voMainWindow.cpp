@@ -14,6 +14,7 @@
 #include <QStatusBar>
 #include <QSignalMapper>
 #include <QToolBar>
+#include <QUrl>
 
 // CTK includes
 #include <ctkErrorLogWidget.h>
@@ -53,6 +54,7 @@
 #include "voView.h"
 #include "voViewManager.h"
 #include "voViewStackedWidget.h"
+#include "voRemoteAnalysisConnectionDialog.h"
 
 
 // --------------------------------------------------------------------------
@@ -74,6 +76,8 @@ public:
   voMongoSaveDialog *mongoSaveDialog;
   #endif
   voOpenTreeLoadDialog *openTreeLoadDialog;
+  voRemoteAnalysisConnectionDialog *remoteAnalysisConnectionDialog;
+
 };
 
 // --------------------------------------------------------------------------
@@ -116,6 +120,9 @@ voMainWindow::voMainWindow(QWidget * newParent)
   d->openTreeLoadDialog = new voOpenTreeLoadDialog(this);
   d->openTreeLoadDialog->hide();
 
+  d->remoteAnalysisConnectionDialog = new voRemoteAnalysisConnectionDialog(this);
+  d->remoteAnalysisConnectionDialog->hide();
+
   d->ErrorLogWidget.setErrorLogModel(voApplication::application()->errorLogModel());
 
   d->ViewStackedWidget = new voViewStackedWidget(this);
@@ -146,6 +153,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionFileOpenTreeOfLife, SIGNAL(triggered()), this, SLOT(onFileOpenTreeOfLifeActionTriggered()));
   connect(d->actionFileMakeTreeHeatmap, SIGNAL(triggered()),
           this, SLOT(onFileMakeTreeHeatmapActionTriggered()));
+  connect(d->actionRemoteAnalysisSettings, SIGNAL(triggered()), this, SLOT(onRemoteAnalysisSettingTriggered()));
 
 #ifdef USE_MONGO
   QAction *saveToDB = new QAction("Save Workflow to MongoDB", this);
@@ -233,6 +241,16 @@ voMainWindow::voMainWindow(QWidget * newParent)
           SIGNAL(addedCustomAnalysis(const QString&)),
           this,
           SLOT(onCustomAnalysisAdded(const QString&)));
+
+  connect(voApplication::application()->analysisDriver(),
+          SIGNAL(urlRequired(QUrl *)),
+          this,
+          SLOT(provideRemoteAnalysisUrl(QUrl *)));
+
+  connect(this,
+          SIGNAL(remoteAnalysisUrlUpdated(QUrl *)),
+          voApplication::application()->analysisDriver(),
+          SLOT(updateRemoteAnalysisUrl(QUrl *)));
 
   this->loadAnalysisScripts();
 
@@ -783,4 +801,33 @@ void voMainWindow::onCustomAnalysisAdded(const QString &analysisName)
   d->AnalysisActionMapper.setMapping(action, analysisName);
   connect(action, SIGNAL(triggered()), &d->AnalysisActionMapper, SLOT(map()));
   d->menuAnalysis->addAction(action);
+}
+
+void voMainWindow::provideRemoteAnalysisUrl(QUrl *url)
+{
+  Q_D(voMainWindow);
+  d->remoteAnalysisConnectionDialog->show();
+
+  if (d->remoteAnalysisConnectionDialog->exec() == QDialog::Accepted)
+    {
+    url->setUrl(d->remoteAnalysisConnectionDialog->Url());
+    url->setUserName(d->remoteAnalysisConnectionDialog->User());
+    url->setPassword(d->remoteAnalysisConnectionDialog->Password());
+    }
+}
+
+void voMainWindow::onRemoteAnalysisSettingTriggered()
+{
+  Q_D(voMainWindow);
+  d->remoteAnalysisConnectionDialog->show();
+
+  if (d->remoteAnalysisConnectionDialog->exec() == QDialog::Accepted)
+    {
+    QUrl url;
+    url.setUrl(d->remoteAnalysisConnectionDialog->Url());
+    url.setUserName(d->remoteAnalysisConnectionDialog->User());
+    url.setPassword(d->remoteAnalysisConnectionDialog->Password());
+
+    emit remoteAnalysisUrlUpdated(&url);
+    }
 }

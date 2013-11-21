@@ -30,7 +30,7 @@
 #include "voUtils.h"
 
 // VTK includes
-#include <vtkIntArray.h>
+#include <vtkAbstractArray.h>
 #include <vtkTable.h>
 
 // --------------------------------------------------------------------------
@@ -70,10 +70,12 @@ QScriptValue scriptValueFromCluster(QScriptEngine* scriptEngine, vtkTable * clus
 {
   QScriptValue clusterChildren = scriptEngine->newArray();
   quint32 childCount = 0;
+
   for(vtkIdType cid = 1; cid < clusterTable->GetNumberOfColumns() ; ++cid)
     {
-    vtkIntArray * currentColumn = vtkIntArray::SafeDownCast(clusterTable->GetColumn(cid));
-    int currentValue = currentColumn->GetValue(0);
+
+    vtkAbstractArray * currentColumn = vtkAbstractArray::SafeDownCast(clusterTable->GetColumn(cid));
+    int currentValue = currentColumn->GetVariantValue(0).ToInt();
     if (currentValue == clusterId)
       {
       QScriptValue clusterChild = scriptEngine->newObject();

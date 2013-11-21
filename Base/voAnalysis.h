@@ -151,7 +151,8 @@ public:
                                           const QString& value = QString());
 
 signals:
-
+  void complete();
+  void error(const QString errorString);
   void outputSet(const QString& outputName, voDataObject* dataObject, voAnalysis* analysis);
 
   void ensembleOutputSet(const QString& ensembleName, QList<voDataObject *> dataObjectList, voAnalysis* analysis);

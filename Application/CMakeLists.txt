@@ -33,6 +33,7 @@ set(KIT_SRCS
   voViewTabWidget.h
   voViewStackedWidget.cpp
   voViewStackedWidget.h
+  voRemoteAnalysisConnectionDialog.cpp
   )
 if(USE_ARBOR_BRAND)
   set(KIT_SRCS  "${KIT_SRCS};voAboutDialog_Arbor.cpp;voAboutDialog_Arbor.h")
@@ -58,6 +59,7 @@ set(KIT_MOC_SRCS
   voStartupView.h
   voViewStackedWidget.h
   voViewTabWidget.h
+  voRemoteAnalysisConnectionDialog.h
   )
 
 set(KIT_UI_FORMS
@@ -66,6 +68,7 @@ set(KIT_UI_FORMS
   Resources/UI/voMongoLoadDialog.ui
   Resources/UI/voMongoSaveDialog.ui
   Resources/UI/voOpenTreeLoadDialog.ui
+  Resources/UI/voRemoteAnalysisConnectionDialog.ui
   )
 
 if(USE_ARBOR_BRAND)
