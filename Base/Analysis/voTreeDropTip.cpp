@@ -206,7 +206,7 @@ bool voTreeDropTip::execute()
     QList<voDataObject*> objectList;
     objectList << outTreeDataObject << outTableDataObject;
     this->setEnsembleOutput("pruned_tree_heatmap", objectList);
-
+    emit complete();
     return true;
     }
   else
