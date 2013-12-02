@@ -150,6 +150,13 @@ public:
                                           const QStringList& choices,
                                           const QString& value = QString());
 
+  enum
+    {
+    SUCCESS,
+    FAILURE,
+    PENDING
+    };
+
 signals:
   void complete();
   void error(const QString errorString);
@@ -158,7 +165,7 @@ signals:
   void ensembleOutputSet(const QString& ensembleName, QList<voDataObject *> dataObjectList, voAnalysis* analysis);
 protected:
 
-  virtual bool execute();
+  virtual int execute();
 
   virtual void setOutputInformation(){}
   virtual void setParameterInformation(){}

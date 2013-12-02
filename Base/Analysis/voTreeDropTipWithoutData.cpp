@@ -114,14 +114,14 @@ QString voTreeDropTipWithoutData::parameterDescription()const
 
 
 // --------------------------------------------------------------------------
-bool voTreeDropTipWithoutData::execute()
+int voTreeDropTipWithoutData::execute()
 {
   // Import tree
   vtkTree* inputTree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
   if (!inputTree)
     {
     qCritical() << "Input tree is Null";
-    return false;
+    return voAnalysis::FAILURE;
     }
 
 
@@ -158,17 +158,17 @@ bool voTreeDropTipWithoutData::execute()
     if(!outTree)
       {
       qCritical() << QObject::tr("extracted tree is not valid");
-      return false;
+      return voAnalysis::FAILURE;
       }
 
     this->setOutput("pruned_tree", new voOutputDataObject("pruned_tree", outTree));
 
-    return true;
+    return voAnalysis::SUCCESS;
     }
   else
     {
     qCritical() << QObject::tr("selected tips are not valid");
-    return false;
+    return voAnalysis::FAILURE;
     }
 }
 

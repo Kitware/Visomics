@@ -76,7 +76,7 @@ QString voOneZoom::parameterDescription()const
 }
 
 // --------------------------------------------------------------------------
-bool voOneZoom::execute()
+int voOneZoom::execute()
 {
   voInputFileDataObject * obj = dynamic_cast<voInputFileDataObject*> (this->input(0));
   if (obj)
@@ -88,7 +88,7 @@ bool voOneZoom::execute()
     if (!tree)
       {
       qCritical() << "Input tree is Null";
-      return false;
+      return voAnalysis::FAILURE;
       }
 
     //output both the vtkTree and the newick tree file name
@@ -102,5 +102,5 @@ bool voOneZoom::execute()
     // Write out the output tree into a newick string and pass it to the OneZoom vis javascript
     }
 
-  return true;
+  return voAnalysis::SUCCESS;
 }

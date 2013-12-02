@@ -134,14 +134,14 @@ QString voTreeDropTip::parameterDescription()const
 
 
 // --------------------------------------------------------------------------
-bool voTreeDropTip::execute()
+int voTreeDropTip::execute()
 {
   // Import tree and assiciated traits table
   vtkTree* inputTree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
   if (!inputTree)
     {
     qCritical() << "Input tree is Null";
-    return false;
+    return voAnalysis::FAILURE;
     }
 
 
@@ -194,7 +194,7 @@ bool voTreeDropTip::execute()
     if(!outTree)
       {
       qCritical() << QObject::tr("extracted tree is not valid");
-      return false;
+      return voAnalysis::FAILURE;
       }
 
     voOutputDataObject * outTreeDataObject =  new voOutputDataObject("pruned_tree", outTree);
@@ -208,12 +208,12 @@ bool voTreeDropTip::execute()
     QList<voDataObject*> objectList;
     objectList << outTreeDataObject << outTableDataObject;
     this->setEnsembleOutput("pruned_tree_heatmap", objectList);
-    return true;
+    return voAnalysis::SUCCESS;
     }
   else
     {
     qCritical() << QObject::tr("selected tips are not valid");
-    return false;
+    return voAnalysis::FAILURE;
     }
 }
 

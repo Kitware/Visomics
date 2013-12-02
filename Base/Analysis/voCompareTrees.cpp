@@ -69,14 +69,14 @@ QString voCompareTrees::parameterDescription()const
 }
 
 // --------------------------------------------------------------------------
-bool voCompareTrees::execute()
+int voCompareTrees::execute()
 {
   // Input tree
   vtkTree* inputTree =  vtkTree::SafeDownCast(this->input(0)->dataAsVTKDataObject());
   if (!inputTree)
     {
     qCritical() << "Input tree is Null";
-    return false;
+    return voAnalysis::FAILURE;
     }
 
   // Comparison tree
@@ -84,7 +84,7 @@ bool voCompareTrees::execute()
   if (!comparisonTree)
     {
     qCritical() << "Comparison tree is Null";
-    return false;
+    return voAnalysis::FAILURE;
     }
 
   vtkNew<vtkTreeDifferenceFilter> filter;
@@ -101,11 +101,11 @@ bool voCompareTrees::execute()
   if (outputTree.GetPointer() == NULL)
     {
     qCritical() << QObject::tr("Error generated output tree.");
-    return false;
+    return voAnalysis::FAILURE;
     }
 
   this->setOutput("outputTree",
     new voInputFileDataObject("outputTree", outputTree.GetPointer()));
 
-  return true;
+  return voAnalysis::SUCCESS;
 }

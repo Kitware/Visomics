@@ -29,7 +29,7 @@
         &lt;dd&gt;Choose a data column to be used for the modeling fitting.&lt;br&gt;&lt;u&gt;Choose from the table data attached with the tree. &lt;/dd&gt;
         &lt;/dl&gt;
         </description>
-      <default>awesomeness</default>
+      <default>SVL</default>
     </parameter>
   </parameters>
 </analysis>

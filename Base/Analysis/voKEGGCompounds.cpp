@@ -118,7 +118,7 @@ void voKEGGCompounds::setOutputInformation()
 }
 
 // --------------------------------------------------------------------------
-bool voKEGGCompounds::execute()
+int voKEGGCompounds::execute()
 {
   Q_D(voKEGGCompounds);
 
@@ -131,7 +131,7 @@ bool voKEGGCompounds::execute()
   if (!extendedTable)
     {
     qWarning() << "Input is Null";
-    return false;
+    return voAnalysis::FAILURE;
     }
   vtkStringArray* analyteNames = extendedTable->GetRowMetaDataOfInterestAsString();
 
@@ -152,14 +152,14 @@ bool voKEGGCompounds::execute()
     if(!voKEGGUtils::queryServer(compoundURL, &responseData))
       {
       // Error message already printed within voKEGGUtils::queryServer()
-      return false;
+      return voAnalysis::FAILURE;
       }
 
     QScriptValue responseSV;
     if(!voKEGGUtils::dataToJSON(responseData, &responseSV))
       {
       // Error message already printed within voKEGGUtils::dataToJSON()
-      return false;
+      return voAnalysis::FAILURE;
       }
 
     vtkNew<vtkStringArray> IDColumn;
@@ -171,7 +171,7 @@ bool voKEGGCompounds::execute()
       {
       qWarning() << "Error: Server returned" << responseSV.property("length").toInt32()
           << "results for" << analyteNames->GetNumberOfValues() << "queries";
-      return false;
+      return voAnalysis::FAILURE;
       }
     for (vtkIdType ctr = 0; ctr < analyteNames->GetNumberOfValues(); ++ctr)
       {
@@ -180,7 +180,7 @@ bool voKEGGCompounds::execute()
          d->sValToStr(compoundSV, "compound_name")) // Sanity check
         {
         qWarning() << "Error: Server returned out of order results";
-        return false;
+        return voAnalysis::FAILURE;
         }
       IDColumn->InsertNextValue(d->sValToStr(compoundSV, "compound_id").toStdString());
       titleColumn->InsertNextValue(d->sValToStrList(compoundSV, "compound_titles").join("; ").toStdString());
@@ -289,5 +289,5 @@ bool voKEGGCompounds::execute()
     }
   this->setOutput("pathway_ranking", new voTableDataObject("pathway_ranking", pathwayRankingTable.GetPointer()));
 
-  return true;
+  return voAnalysis::SUCCESS;
 }

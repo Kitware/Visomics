@@ -628,8 +628,8 @@ void voAnalysis::setWriteOutputsToFilesEnabled(bool enabled)
 bool voAnalysis::run()
 {
   Q_D(voAnalysis);
-  bool success = this->execute();
-  if (success)
+  int results = this->execute();
+  if (results == voAnalysis::SUCCESS)
     {
     emit complete();
     if ( d->WriteOutputsToFilesEnabled)
@@ -637,13 +637,17 @@ bool voAnalysis::run()
       this->writeOutputsToFiles(d->OutputDirectory);
       }
     }
-  return success;
+  else if (results == voAnalysis::FAILURE)
+    {
+    return false;
+    }
+  return true;
 }
 
 // --------------------------------------------------------------------------
-bool voAnalysis::execute()
+int voAnalysis::execute()
 {
-  return true;
+  return voAnalysis::SUCCESS;
 }
 
 // --------------------------------------------------------------------------

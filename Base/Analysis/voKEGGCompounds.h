@@ -40,7 +40,7 @@ public:
 protected:
   virtual void setOutputInformation();
 
-  virtual bool execute();
+  virtual int execute();
 
 protected:
   QScopedPointer<voKEGGCompoundsPrivate> d_ptr;

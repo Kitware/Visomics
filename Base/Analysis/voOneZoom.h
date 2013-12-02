@@ -40,7 +40,7 @@ protected:
   virtual void setParameterInformation();
   virtual QString parameterDescription()const;
 
-  virtual bool execute();
+  virtual int execute();
 
 private:
   Q_DISABLE_COPY(voOneZoom);

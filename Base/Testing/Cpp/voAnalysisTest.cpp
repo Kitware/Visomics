@@ -47,7 +47,7 @@ public:
   voCustomAnalysis():voAnalysis(){}
   virtual ~voCustomAnalysis(){}
 
-  virtual bool execute()
+  virtual int execute()
     {
     if (!this->input())
       {

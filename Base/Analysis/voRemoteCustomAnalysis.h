@@ -46,7 +46,7 @@ signals:
   void analysisSubmitted();
 
 protected:
-  virtual bool execute();
+  virtual int execute();
 
 private:
   QString m_taskId;

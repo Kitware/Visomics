@@ -44,7 +44,7 @@ protected:
   virtual void setParameterInformation();
   virtual QString parameterDescription()const;
 
-  virtual bool execute();
+  virtual int execute();
 
   voCustomAnalysisInformation * information() const;
 

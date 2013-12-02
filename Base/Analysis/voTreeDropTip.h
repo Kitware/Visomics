@@ -47,7 +47,7 @@ protected:
   virtual void setParameterInformation();
   virtual QString parameterDescription()const;
 
-  virtual bool execute();
+  virtual int execute();
 
   bool removeInternalBranch(vtkTree * tree, vtkIdTypeArray * selArray, vtkIdType parentId);
   bool getTipSelection(vtkTree * tree, vtkTable * inputDataTable,vtkSelection * sel, QStringList tipNameList);

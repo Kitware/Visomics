@@ -87,7 +87,7 @@ voRemoteCustomAnalysis::~voRemoteCustomAnalysis()
 {
 }
 // --------------------------------------------------------------------------
-bool voRemoteCustomAnalysis::execute()
+int voRemoteCustomAnalysis::execute()
 {
   // First request the connection details
   if (!this->requestConnectionDetails())
@@ -128,14 +128,14 @@ bool voRemoteCustomAnalysis::execute()
       if (!data)
         {
         emit error("Input Tree is Null");
-        return false;
+        return voAnalysis::FAILURE;
         }
       writer = vtkTreeWriter::New();
       }
     else
       {
       emit error(tr("Unsupported input type: %s").arg(input->type()));
-      return false;
+      return voAnalysis::FAILURE;
       }
 
     if (writer)
@@ -166,7 +166,7 @@ bool voRemoteCustomAnalysis::execute()
     if (output->type() != "Table" && output->type() != "Tree")
     {
     emit error(tr("Unsupported output type: %s").arg(output->type()));
-    return false;
+    return voAnalysis::FAILURE;
     }
 
     outputValue["name"] = output->name().toStdString();
@@ -216,7 +216,7 @@ bool voRemoteCustomAnalysis::execute()
     else
       {
       emit error(tr("Unsupported parameter type in voCustomAnalysis: %s").arg(type));
-      return false;
+      return voAnalysis::FAILURE;
       }
     script.replace(name, parameterValue);
     }
@@ -239,10 +239,10 @@ bool voRemoteCustomAnalysis::execute()
   if (reply->error() != QNetworkReply::NoError)
     {
     emit error(tr("POST error: %1").arg(reply->errorString()));
-    return false;
+    return voAnalysis::FAILURE;
     }
 
-  return true;
+  return voAnalysis::PENDING;
 }
 
 void voRemoteCustomAnalysis::handleReply(QNetworkReply *reply)

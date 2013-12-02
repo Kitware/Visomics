@@ -229,9 +229,9 @@ QString voCustomAnalysis::parameterDescription()const
 }
 
 // --------------------------------------------------------------------------
-bool voCustomAnalysis::execute()
+int voCustomAnalysis::execute()
 {
-  return true;
+  return voAnalysis::SUCCESS;
 }
 
 voCustomAnalysisInformation *voCustomAnalysis::information() const

@@ -107,7 +107,7 @@ QString voKEGGPathway::parameterDescription()const
 }
 
 // --------------------------------------------------------------------------
-bool voKEGGPathway::execute()
+int voKEGGPathway::execute()
 {
   //-------------------------------------------------------
   // Get and validate parameters
@@ -117,7 +117,7 @@ bool voKEGGPathway::execute()
   if (!pathwayID.startsWith("path:"))
     {
     qWarning() << "Pathway ID does not start with \"path:\"";
-    return false;
+    return voAnalysis::FAILURE;
     }
 
   // Import data table locally
@@ -125,7 +125,7 @@ bool voKEGGPathway::execute()
   if (!extendedTable)
     {
     qWarning() << "Input is Null";
-    return false;
+    return voAnalysis::FAILURE;
     }
 
   //-------------------------------------------------------
@@ -142,14 +142,14 @@ bool voKEGGPathway::execute()
     if(!voKEGGUtils::queryServer(graphURL, &responseData))
       {
       // Error message already printed within voKEGGUtils::queryServer()
-      return false;
+      return voAnalysis::FAILURE;
       }
 
     QScriptValue rawScriptValue;
     if(!voKEGGUtils::dataToJSON(responseData, &rawScriptValue))
       {
       // Error message already printed within voKEGGUtils::dataToJSON()
-      return false;
+      return voAnalysis::FAILURE;
       }
 
     QScriptValue pathwayScriptValue = rawScriptValue.property(0); // Only made 1 query
@@ -188,13 +188,13 @@ bool voKEGGPathway::execute()
       if(!voKEGGUtils::queryServer(compoundURL, &responseData))
         {
         // Error message already printed within voKEGGUtils::queryServer()
-        return false;
+        return voAnalysis::FAILURE;
         }
       QScriptValue responseSV;
       if(!voKEGGUtils::dataToJSON(responseData, &responseSV))
         {
         // Error message already printed within voKEGGUtils::dataToJSON()
-        return false;
+        return voAnalysis::FAILURE;
         }
       for (vtkIdType ctr = 0; ctr < analyteNames->GetNumberOfValues(); ++ctr)
         {
@@ -203,7 +203,7 @@ bool voKEGGPathway::execute()
            compoundSV.property("compound_name").toString()) // Sanity check
           {
           qWarning() << "Error: Server returned out of order results";
-          return false;
+          return voAnalysis::FAILURE;
           }
         for(int pathCtr = 0; pathCtr < compoundSV.property("compound_pathways").property("length").toInt32(); pathCtr++)
           {
@@ -290,18 +290,18 @@ bool voKEGGPathway::execute()
     if(!voKEGGUtils::queryServer(mapURL, &responseData))
       {
       // Error message already printed within voKEGGUtils::queryServer()
-      return false;
+      return voAnalysis::FAILURE;
       }
 
     if (!pixmap.loadFromData(responseData))
       {
       qWarning() << "Could not load PNG image";
-      return false;
+      return voAnalysis::FAILURE;
       }
     }
   this->setViewPrettyName("pathway_map", "voKEGGImageView",QString("Map (%1)").arg(this->stringParameter("pathway_id")));
   this->setOutput("pathway_map", new voDataObject("pathway_map", static_cast<QVariant>(pixmap)));
 
   //-------------------------------------------------------
-  return true;
+  return voAnalysis::SUCCESS;
 }
