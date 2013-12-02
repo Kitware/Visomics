@@ -163,7 +163,6 @@ bool voTreeDropTipWithoutData::execute()
 
     this->setOutput("pruned_tree", new voOutputDataObject("pruned_tree", outTree));
 
-    emit complete();
     return true;
     }
   else

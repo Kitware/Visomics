@@ -107,6 +107,5 @@ bool voCompareTrees::execute()
   this->setOutput("outputTree",
     new voInputFileDataObject("outputTree", outputTree.GetPointer()));
 
-  emit complete();
   return true;
 }
