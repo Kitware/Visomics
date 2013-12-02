@@ -88,8 +88,8 @@ void voTreeDropTipWithoutData::setParameterInformation()
 {
   QList<QtProperty*> DropTip_parameters;
 
-  DropTip_parameters << this->addEnumParameter("selection_method", tr("Select tips to be removed by"), (QStringList()<<"Tip Names"<<"Tree Collapsing"), "Tip Names");
-  DropTip_parameters << this->addStringParameter("input_string", tr("Line editor"), "[tipName1, tipName2] or [awesomeness<2,island=\"Cuba\"]");
+  DropTip_parameters << this->addEnumParameter("selection_method", tr("Select tips to be removed by"), (QStringList()<<"Tip Names"<<"SubTree Collapsing"), "Tip Names");
+  DropTip_parameters << this->addStringParameter("input_string", tr("Line editor"), "ahli,alayoni,alfaroi");
   DropTip_parameters << this->addEnumParameter("invert_selection", tr("Invert selection"), (QStringList()<<"No"<<"Yes"), "No");
 
   this->addParameterGroup("DropTip parameters", DropTip_parameters);
@@ -103,10 +103,10 @@ QString voTreeDropTipWithoutData::parameterDescription()const
     "<dd>Choose the strategy for tip selection:"
     " \"Tip Names\" requires listing the tip "
     "names in the line editor below, separated by"
-    " \",\"; \"Tree Collapsing\" removes the collapsed "
+    " \",\"; \"SubTree Collapsing\" removes the collapsed "
     " tips (replaced by the triangle) from the viewer.</dd>"
     "<dt><b> Line editor </b>:</dt>"
-    "<dd> Input the list of tips names.</dd>"
+    "<dd> Input the list of tips names, e.g. tipName1, tipName2, tipName3</dd>"
     "<dt><b>Invert selection </b>:</dt>"
     "<dd> Invert the tip selection. If \"Yes\", The selected tips are to be kept.</dd>"
     "</dl>");
@@ -247,7 +247,6 @@ bool voTreeDropTipWithoutData::getTipSelection(vtkTree * tree, vtkSelection * se
     else
       {
       qWarning()<< QObject::tr("Could not find the tip names in the tree:") << removalTipNameList[i];
-      return false;
       }
     }
 
@@ -278,7 +277,7 @@ bool voTreeDropTipWithoutData::getSelectionByTipNames(vtkTree * tree, vtkSelecti
 
   if(tipNameList.empty())
     {
-    qWarning() << QObject::tr("Invalid paramater, could not parse input tip name list");
+    qCritical() << QObject::tr("Invalid paramater, could not parse input tip name list");
     return false;
     }
 

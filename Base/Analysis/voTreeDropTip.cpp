@@ -104,8 +104,8 @@ void voTreeDropTip::setParameterInformation()
 {
   QList<QtProperty*> DropTip_parameters;
 
-  DropTip_parameters << this->addEnumParameter("selection_method", tr("Select tips to be removed by"), (QStringList()<<"Tip Names"<<"Data Filter"<<"Tree Collapsing"), "Tip Names");
-  DropTip_parameters << this->addStringParameter("input_string", tr("Line editor"), "[tipName1, tipName2] or [awesomeness<2,island=\"Cuba\"]");
+  DropTip_parameters << this->addEnumParameter("selection_method", tr("Select tips to be removed by"), (QStringList()<<"Tip Names"<<"Data Filter"<<"Tree Collapsing"), "Data Filter");
+  DropTip_parameters << this->addStringParameter("input_string", tr("Line editor"), "awesomeness<2,island=\"Cuba\"");
   DropTip_parameters << this->addEnumParameter("invert_selection", tr("Invert selection"), (QStringList()<<"No"<<"Yes"), "No");
 
   this->addParameterGroup("DropTip parameters", DropTip_parameters);
@@ -118,13 +118,15 @@ QString voTreeDropTip::parameterDescription()const
     "<dt><b>Select tips to be removed by: </b>:</dt>"
     "<dd>Choose the strategy for tip selection:"
     " \"Tip Names\" requires listing the tip "
-    "names in the line editor below, separated by"
-    " \",\"; \"Data Filter\" requires listing the"
-    " thresholding criteria in the line editor below;"
-    " \"Tree Collapsing\" removes the collapsed "
-    " tips (replaced by the triangle) from the viewer.</dd>"
+    "names;"
+    " \"Data Filter\" requires listing the"
+    " thresholding criteria;"
+    " \"Tree Collapsing\" removes the manually collapsed "
+    " tips (double click on internal node) from the viewer.</dd>"
     "<dt><b> Line editor </b>:</dt>"
-    "<dd> Input the tips names or the data filtering criteria.</dd>"
+    "<dd> Input tip names: e.g. tipName1, tipName2;"
+    " Input data filtering criteria: e.g."
+    " scalarAttribut>1.0,stringAttribute=\"abc\".</dd>"
     "<dt><b>Invert selection </b>:</dt>"
     "<dd> Invert the tip selection. If \"Yes\", The selected tips are to be kept.</dd>"
     "</dl>");
@@ -277,13 +279,18 @@ bool voTreeDropTip::getTipSelection(vtkTree * tree, vtkTable * inputDataTable, v
       }
     }
 
-
+if (removalTipNameList.size() == 0 )
+   {
+   qCritical() << QObject::tr("No selected tips are found. Please double check the inputs.");
+   return false;
+   }
 
   vtkSmartPointer<vtkSelectionNode> selNode = vtkSmartPointer <vtkSelectionNode>::New() ;
   vtkSmartPointer<vtkIdTypeArray> selArr = vtkSmartPointer<vtkIdTypeArray>::New();
   // extract subtree using vtkExtractSelectedTree class
   // remove rows from the table
   vtkStringArray *tableNames = vtkStringArray::SafeDownCast(inputDataTable->GetColumn(0));
+
   for (int i =0; i < removalTipNameList.size(); i++)
     {
     vtkIdType vertexId = nodeNames->LookupValue(removalTipNameList[i].toStdString().c_str());
@@ -296,6 +303,10 @@ bool voTreeDropTip::getTipSelection(vtkTree * tree, vtkTable * inputDataTable, v
     if (rowId >= 0)
       {
       inputDataTable->RemoveRow(rowId);
+      }
+    else
+      {
+      qWarning()<< QObject::tr("Could not find the tip names in the tree:") << removalTipNameList[i];
       }
     }
 
@@ -326,7 +337,7 @@ bool voTreeDropTip::getSelectionByTipNames(vtkTree * tree, vtkTable * inputDataT
 
   if(tipNameList.empty())
     {
-    qWarning() << QObject::tr("Invalid paramater, could not parse input tip name list");
+    qCritical() << QObject::tr("Invalid paramater, could not parse input tip name list");
     return false;
     }
 
@@ -349,7 +360,7 @@ bool voTreeDropTip::getSelectionByDataFiltering(vtkTree *tree, vtkTable * inputD
 
   if(conditionList.empty())
     {
-    qWarning() << QObject::tr("Invalid paramater, could not parse input condition list");
+    qCritical() << QObject::tr("Invalid paramater, could not parse input condition list");
     return false;
     }
 
