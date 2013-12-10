@@ -35,6 +35,7 @@
 #include "voDataObject.h"
 #include "voInputFileDataObject.h"
 #include "voTableDataObject.h"
+#include "voOutputDataObject.h"
 #include "voUtils.h"
 #include "vtkExtendedTable.h"
 #include "voCustomAnalysisInformation.h"
@@ -384,7 +385,7 @@ void voRemoteCustomAnalysis::handleResultReply(QNetworkReply *reply)
       reader->SetReadFromInputString(1);
       reader->Update();
 
-      voDataObject *dataObject = new voDataObject(name, reader->GetOutput());
+      voOutputDataObject *dataObject = new voOutputDataObject(name, reader->GetOutput());
       this->transferParameters(dataObject);
       this->setOutput(name, dataObject);
       }
