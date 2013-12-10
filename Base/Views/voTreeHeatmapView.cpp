@@ -217,6 +217,7 @@ void voTreeHeatmapView::colorTreeForDifference()
   if (differenceArray)
     {
     d->TreeItem->GetDendrogram()->SetColorArray("differences");
+    d->TreeItem->GetDendrogram()->SetLineWidth(2.0);
     }
 }
 
