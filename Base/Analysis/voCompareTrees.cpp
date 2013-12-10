@@ -23,7 +23,7 @@
 
 // Visomics includes
 #include "voCompareTrees.h"
-#include "voInputFileDataObject.h"
+#include "voOutputDataObject.h"
 #include "vtkExtendedTable.h"
 
 // VTK includes
@@ -48,8 +48,8 @@ voCompareTrees::~voCompareTrees()
 void voCompareTrees::setOutputInformation()
 {
   this->addOutputType("outputTree", "vtkTree",
-                      "voTreeHeatmapView", "Tree Difference",
-                      "", "");
+                      "", "",
+                      "voTreeHeatmapView", "Tree Difference");
 }
 
 // --------------------------------------------------------------------------
@@ -105,7 +105,7 @@ int voCompareTrees::execute()
     }
 
   this->setOutput("outputTree",
-    new voInputFileDataObject("outputTree", outputTree.GetPointer()));
+    new voOutputDataObject("outputTree", outputTree.GetPointer()));
 
   return voAnalysis::SUCCESS;
 }

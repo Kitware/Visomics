@@ -326,7 +326,7 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
             this, SLOT(onAnalysisSubmitted()));
     }
 
-  bool ret = task->run();
+  task->run();
 }
 
 void voAnalysisDriver::analysisComplete()
