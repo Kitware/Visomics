@@ -243,6 +243,7 @@ void voTreeHeatmapView::centerData()
   // as the transform involved should be an identity as this point.
   double itemSize[3];
   d->TreeItem->GetSize(itemSize);
+  itemSize[2] = 0.0;
   d->TransformItem->GetTransform()->MultiplyPoint(itemSize, itemSize);
 
   // get the size of the scene (measured in pixels).
