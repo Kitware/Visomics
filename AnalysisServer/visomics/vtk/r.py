@@ -109,6 +109,7 @@ def execute(inputs, outputs, script):
             dataobject = iter.GetCurrentDataObject()
             output_dataobjects.append(dataobject)
             iter.GoToNextItem()
+        iter.FastDelete()
     else:
         output_dataobjects.append(output)
 
