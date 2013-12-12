@@ -11,9 +11,7 @@
     <parameter name="kmeans_centers" type="Integer">
       <title>Number of clusters</title>
       <description>
-        &lt;dl&gt;
-          &lt;dd&gt;The value of &lt;i&gt;k&lt;/i&gt;: the number of clusters.&lt;/dd&gt;
-        &lt;/dl&gt;
+        The value of k: the number of clusters.
       </description>
       <min>2</min>
       <max>10</max>
@@ -22,9 +20,7 @@
     <parameter name="kmeans_iter_max" type="Integer">
      <title>Max. iteration</title>
       <description>
-        &lt;dl&gt;
-          &lt;dd&gt;A larger number of iterations will take longer, but be more likely to converge on a better solution.&lt;/dd&gt;
-        &lt;/dl&gt;
+        A larger number of iterations will take longer, but will be more likely to converge on a better solution.
       </description>
       <min>5</min>
       <max>50</max>
@@ -33,21 +29,17 @@
     <parameter name="kmeans_algorithm" type="Enum">
      <title>Algorithm</title>
       <description>
-        &lt;dl&gt;
-          &lt;dd&gt;The specific algorithm for the k-means method.&lt;/dd&gt;
-        &lt;/dl&gt;
+        The specific algorithm for the k-means method.
       </description>
       <option>Hartigan-Wong</option>
       <option>Lloyd</option>
       <option>Forgy</option>
-      <option>MacQueen</option> 
+      <option>MacQueen</option>
     </parameter>
     <parameter name="kmeans_number_of_random_start" type="Integer">
      <title>Number of random start</title>
       <description>
-        &lt;dl&gt;                 
-          &lt;dd&gt;Number of initially random cluster sets that the algorithm will attempt to refine. A larger number will take longer, but be more likely to converge on a better solution.&lt;/dd&gt;
-        &lt;/dl&gt;
+        Number of initially random cluster sets that the algorithm will attempt to refine. A larger number will take longer, but be more likely to converge on a better solution.
       </description>
       <min>1</min>
       <max>50</max>

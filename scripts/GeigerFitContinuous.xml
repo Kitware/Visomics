@@ -13,10 +13,8 @@
   <parameters>
     <parameter name="modelType" type="Enum">
       <title>Model Type</title>
-      <description> 
-        &lt;dl&gt;
-        &lt;dd&gt;&lt;u&gt;Choose from the three existing models&lt;/u&gt;,OU(Ornstein-Uhlenbeck), BM(Brownian Motion), and EB(Early Burst) &lt;/dd&gt;
-        &lt;/dl&gt;
+      <description>
+        Choose from the three existing models: OU(Ornstein-Uhlenbeck), BM(Brownian Motion), and EB(Early Burst)
       </description>
       <option>OU</option>
       <option>BM</option>
@@ -25,9 +23,7 @@
     <parameter name="selectedDataName" type="String">
       <title>Data Column Name</title>
       <description>
-        &lt;dl&gt;
-        &lt;dd&gt;Choose a data column to be used for the modeling fitting.&lt;br&gt;&lt;u&gt;Choose from the table data attached with the tree. &lt;/dd&gt;
-        &lt;/dl&gt;
+        Choose a column from the input table to be used for the model fitting.
         </description>
       <default>SVL</default>
     </parameter>
