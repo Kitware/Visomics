@@ -214,6 +214,10 @@ int voRemoteCustomAnalysis::execute()
 
       parameterValue = QString("c(%1)").arg(rangeString);
       }
+    else if (type == "Column")
+      {
+      parameterValue = this->columnParameter(name);
+      }
     else
       {
       emit error(tr("Unsupported parameter type in voCustomAnalysis: %s").arg(type));
