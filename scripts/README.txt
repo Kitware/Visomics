@@ -40,7 +40,7 @@ parameter tag attributes:
         parameters unique names so that no other part of your script is
         unintentionally modified.
   type: What type of parameter this is.  Currently supported types are
-        Integer, Double, String, and Enum.
+        Integer, Double, String, Enum, Range, and Column.
 
 parameter subtags:
 title:       what this parameter will be called within the GUI.
@@ -50,3 +50,4 @@ default:     The initial value for this parameter, before the user modifies it.
 min:         minimum value for this parameter (Integer & Double types only).
 max:         maximum value for this parameter (Integer & Double types only).
 option:      one of the available options for this parameter (Enum type only).
+table:       Only used for Column parameters.  Indicates which table to use.
