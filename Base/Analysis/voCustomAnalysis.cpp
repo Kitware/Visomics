@@ -144,6 +144,7 @@ void voCustomAnalysis::setParameterInformation()
     QString name = parameter->name();
     QString parameterTitle = "";
     QStringList enum_options;
+    int tableIndex = -1;
 
     QVariant minValue(VTK_INT_MIN);
     QVariant maxValue(VTK_INT_MAX);
@@ -186,6 +187,20 @@ void voCustomAnalysis::setParameterInformation()
         {
         enum_options << field->value();
         }
+      else if (field->name() == "table")
+        {
+        int index = 0;
+        // find the index of the table named by this parameter
+        foreach(voCustomAnalysisData *input, d->Information->inputs())
+          {
+          if (input->name() == field->value())
+            {
+            break;
+            }
+          ++index;
+          }
+        tableIndex = index;
+        }
       }
 
     // set up this parameter, based on what type it is
@@ -210,6 +225,10 @@ void voCustomAnalysis::setParameterInformation()
       {
       custom_parameters << this->addEnumParameter(
         parameter->name(), parameterTitle, enum_options);
+      }
+    else if (type == "Column")
+      {
+      this->addColumnParameter(parameter->name(), parameterTitle, tableIndex);
       }
     else
       {

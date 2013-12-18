@@ -131,7 +131,7 @@ public:
   void setParameterValues(const QHash<QString, QVariant>& parameters);
 
   QSet<QtVariantProperty*> topLevelParameterGroups()const;
-  QSet<QPair<QString, QString> > dynamicParameters()const;
+  QHash<QString, QStringList> dynamicParameters()const;
 
   int parameterCount()const;
 
@@ -147,6 +147,7 @@ public:
   vtkSmartPointer<vtkExtendedTable> getInputTable(int i) const;
 
   QtVariantProperty*  updateEnumParameter(const QString& id,
+                                          const QString& label,
                                           const QStringList& choices,
                                           const QString& value = QString());
 
@@ -202,8 +203,11 @@ protected:
 
   QtVariantProperty*  addBooleanParameter(const QString& id, const QString& label, bool value);
 
-  void addTreeParameter(const QString& label);
-  vtkTree* treeParameter(const QString& label)const;
+  void addTreeParameter(const QString& id, const QString& label);
+  vtkTree* treeParameter(const QString& id)const;
+
+  void addColumnParameter(const QString& id, const QString& label, int tableIndex);
+  QString columnParameter(const QString& id)const;
 
 protected:
   QScopedPointer<voAnalysisPrivate> d_ptr;

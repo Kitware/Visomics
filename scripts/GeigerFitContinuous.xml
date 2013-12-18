@@ -20,12 +20,12 @@
       <option>BM</option>
       <option>EB</option>
     </parameter>
-    <parameter name="selectedDataName" type="String">
-      <title>Data Column Name</title>
+    <parameter name="selectedDataName" type="Column">
+      <title>Data Column</title>
       <description>
         Choose a column from the input table to be used for the model fitting.
         </description>
-      <default>SVL</default>
+      <table>tableData</table>
     </parameter>
   </parameters>
 </analysis>

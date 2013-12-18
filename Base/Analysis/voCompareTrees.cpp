@@ -55,7 +55,7 @@ void voCompareTrees::setOutputInformation()
 // --------------------------------------------------------------------------
 void voCompareTrees::setParameterInformation()
 {
-  this->addTreeParameter("comparison tree");
+  this->addTreeParameter("comparison tree", "comparison tree");
 }
 
 // --------------------------------------------------------------------------

@@ -45,6 +45,7 @@
 #include <vtkDataObject.h>
 #include <vtkExtendedTable.h>
 #include <vtkSmartPointer.h>
+#include <vtkStringArray.h>
 #include <vtkTable.h>
 #include <vtkTree.h>
 
@@ -67,14 +68,14 @@ public:
 
   QList<QExplicitlySharedDataPointer<voDataObject> > InputDataObjects;
   QHash<QString, QString> OutputInformation;
-  QHash<QString, QStringList> EnsembleOutputInformation;// <ensembel ouput name, a list of child output names>
+  QHash<QString, QStringList> EnsembleOutputInformation;// <ensemble ouput name, a list of child output names>
   QHash<QString, QString> OutputViewInformation;
   QHash<QString, QString> OutputRawView;
   QHash<QString, QString> OutputViewPrettyName;
   QHash<QString, QString> OutputRawViewPrettyName;
   QHash<QString, QExplicitlySharedDataPointer<voDataObject> > OutputDataObjects;
   QHash<QString, QExplicitlySharedDataPointer<voDataObject> > EnsembleOutputDataObjects;
-  QSet<QPair<QString, QString> > DynamicParameters;
+  QHash<QString, QStringList> DynamicParameters;  // <parameter id, {label, type, [additional data]}>
   QHash<QString, QString> DynamicParameterValues;
 
   bool OutputInformationInitialized;
@@ -746,7 +747,7 @@ QSet<QtVariantProperty*> voAnalysis::topLevelParameterGroups()const
 }
 
 // --------------------------------------------------------------------------
-QSet<QPair<QString, QString> > voAnalysis::dynamicParameters()const
+QHash<QString, QStringList> voAnalysis::dynamicParameters()const
 {
   Q_D(const voAnalysis);
   return d->DynamicParameters;
@@ -848,6 +849,7 @@ QtVariantProperty* voAnalysis::addEnumParameter(const QString& id, const QString
 
 // --------------------------------------------------------------------------
 QtVariantProperty* voAnalysis::updateEnumParameter(const QString& id,
+                                                   const QString& label,
                                                    const QStringList& choices,
                                                    const QString& value)
 {
@@ -870,7 +872,7 @@ QtVariantProperty* voAnalysis::updateEnumParameter(const QString& id,
 
   if (!param)
     {
-    param = d->VariantManager->addProperty(QtVariantPropertyManager::enumTypeId(), id);
+    param = d->VariantManager->addProperty(QtVariantPropertyManager::enumTypeId(), label);
     param->setPropertyId(id);
     }
 
@@ -906,9 +908,9 @@ QtVariantProperty*  voAnalysis::addStringParameter(const QString& id, const QStr
 }
 
 // --------------------------------------------------------------------------
-vtkTree* voAnalysis::treeParameter(const QString& label)const
+vtkTree* voAnalysis::treeParameter(const QString& id)const
 {
-  QString treeName = this->enumParameter(label);
+  QString treeName = this->enumParameter(id);
   qDebug() << "Selected tree:" << treeName;
 
   voDataModelItem* treeItem =
@@ -922,15 +924,33 @@ vtkTree* voAnalysis::treeParameter(const QString& label)const
 }
 
 // --------------------------------------------------------------------------
-void voAnalysis::addTreeParameter(const QString& label)
+void voAnalysis::addTreeParameter(const QString& id, const QString& label)
 {
   Q_D(voAnalysis);
+  QStringList list;
+  list << label;
+  list << "vtkTree";
+  d->DynamicParameters[id] = list;
+}
 
-  QPair<QString, QString> pair;
-  pair.first = "vtkTree";
-  pair.second = label;
+// --------------------------------------------------------------------------
+QString voAnalysis::columnParameter(const QString& id)const
+{
+  QString column = this->enumParameter(id);
+  qDebug() << "Selected column:" << column;
+  return column;
+}
 
-  d->DynamicParameters << pair;
+// --------------------------------------------------------------------------
+void voAnalysis::addColumnParameter(const QString &id, const QString& label,
+                                    int tableIndex)
+{
+  Q_D(voAnalysis);
+  QStringList list;
+  list << label;
+  list << "Column";
+  list << QString::number(tableIndex);
+  d->DynamicParameters[id] = list;
 }
 
 // --------------------------------------------------------------------------
@@ -1017,14 +1037,34 @@ QtVariantProperty*  voAnalysis::addBooleanParameter(const QString& id, const QSt
 // --------------------------------------------------------------------------
 void voAnalysis::updateDynamicParameters()
 {
-  typedef QPair<QString, QString> DynamicPropertyType;
-  foreach(const DynamicPropertyType dynamicProp, this->dynamicParameters())
+  QHashIterator<QString, QStringList> itr(this->dynamicParameters());
+  while (itr.hasNext())
     {
-    QString type = dynamicProp.first;
-    QString label = dynamicProp.second;
+    itr.next();
+    QString id = itr.key();
+    QStringList data = itr.value();
+    QString label = data[0];
+    QString type = data[1];
+
     QStringList choices;
-    voApplication::application()->dataModel()->listItems(type, &choices);
-    this->updateEnumParameter(label, choices);
+    if (type == "vtkTree" || type == "vtkTable" || type == "vtkExtendedTable")
+      {
+      voApplication::application()->dataModel()->listItems(type, &choices);
+      }
+    else if (type == "Column")
+      {
+      int tableIndex = data[2].toInt();
+      vtkSmartPointer<vtkExtendedTable> table = this->getInputTable(tableIndex);
+      vtkStringArray *columnNames = table->GetColumnMetaDataOfInterestAsString();
+
+      for (unsigned int i = 0; i < columnNames->GetNumberOfTuples(); ++i)
+        {
+        std::string s = columnNames->GetValue(i);
+        choices << QString(s.c_str());
+        }
+      }
+
+    this->updateEnumParameter(id, label, choices);
     }
 }
 
@@ -1046,6 +1086,7 @@ vtkSmartPointer<vtkExtendedTable> voAnalysis::getInputTable() const
   return NULL;
 }
 
+// --------------------------------------------------------------------------
 vtkSmartPointer<vtkExtendedTable> voAnalysis::getInputTable(int i) const
 {
   Q_D(const voAnalysis);
