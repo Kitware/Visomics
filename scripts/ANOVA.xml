@@ -13,7 +13,7 @@
     <parameter name="sample1_range" type="Range">
       <title>Sample Group 1</title>
       <description>
-         A group of Experiments, specified by a range and/or list of column letters.
+         A group of Experiments, specified by a range and/or list of columns.
          The groups MUST both be the same size, as only a balanced test is performed.
       </description>
       <default>A-C,F</default>
@@ -22,7 +22,7 @@
     <parameter name="sample2_range" type="Range">
       <title>Sample Group 2</title>
       <description>
-      A group of Experiments, specified by a range and/or list of column letters.
+      A group of Experiments, specified by a range and/or list of columns.
       The groups MUST both be the same size, as only a balanced test is performed.
       </description>
       <default>D,G-I</default>
