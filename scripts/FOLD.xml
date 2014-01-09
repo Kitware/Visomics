@@ -23,6 +23,7 @@
         A group of Experiments, specified by a range and/or list of column letters.
       </description>
       <default>A-C,F</default>
+      <table>input_table</table>
     </parameter>
     <parameter name="sample2_range" type="Range">
      <title>Final Samples(s)</title>
@@ -30,6 +31,7 @@
         A group of Experiments, specified by a range and/or list of column letters.
       </description>
       <default>D,E,G-J</default>
+      <table>input_table</table>
     </parameter>
   </parameters>
 </analysis>

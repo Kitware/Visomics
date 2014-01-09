@@ -17,6 +17,7 @@
          The groups MUST both be the same size, as only a balanced test is performed.
       </description>
       <default>A-C,F</default>
+      <table>input_table</table>
     </parameter>
     <parameter name="sample2_range" type="Range">
       <title>Sample Group 2</title>
@@ -25,6 +26,7 @@
       The groups MUST both be the same size, as only a balanced test is performed.
       </description>
       <default>D,G-I</default>
+      <table>input_table</table>
     </parameter>
   </parameters>
 </analysis>
