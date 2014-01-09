@@ -10,7 +10,7 @@
   </outputs>
   <parameters>
     <parameter name="mean_method" type="Enum">
-      <title>Initial Samples(s)</title>
+      <title>Averaging Method</title>
       <description>
         The type of average used to form each sample group.
       </description>
