@@ -649,7 +649,7 @@ int voAnalysisDriver::numberOfInputsForAnalysis(QString analysisName)
 
 // --------------------------------------------------------------------------
 void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
-  const QString& rScriptFileName)
+  const QString& rScriptFileName, const QString &scriptType)
 {
   QFile file(xmlFileName);
   if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
@@ -676,6 +676,7 @@ void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
   QStringRef analysisName = stream.attributes().value("name");
   analysisInformation->setName(analysisName.toString());
   analysisInformation->setScript(scriptContents);
+  analysisInformation->setScriptType(scriptType);
 
   // get name & type for each input
   stream.readNextStartElement();  // input

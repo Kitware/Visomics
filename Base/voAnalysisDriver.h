@@ -68,7 +68,9 @@ public:
   bool doesInputMatchAnalysis(const QString& analysisName,
                               voDataModelItem* inputTarget, bool warnOnFail);
   int numberOfInputsForAnalysis(QString analysisName);
-  void loadAnalysisFromScript(const QString& xmlFileName, const QString& rScriptFileName);
+  void loadAnalysisFromScript(const QString& xmlFileName,
+                              const QString& rScriptFileName,
+                              const QString& scriptType);
 
 signals:
   void aboutToRunAnalysis(voAnalysis*);

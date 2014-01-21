@@ -779,16 +779,26 @@ void voMainWindow::loadAnalysisScripts()
   voAnalysisDriver *driver = voApplication::application()->analysisDriver();
   foreach(QFileInfo xmlFileInfo, xmlFiles)
     {
-    // make sure the corresponding R script exists
+    // make sure a corresponding script exists
     QString xmlFileName = xmlFileInfo.absoluteFilePath();
     QString rScriptFileName = xmlFileName;
+    QString pyScriptFileName = xmlFileName;
     rScriptFileName.replace(".xml", ".R");
-    if (!scriptDir.exists(rScriptFileName))
+    pyScriptFileName.replace(".xml", ".py");
+    if (scriptDir.exists(rScriptFileName))
       {
-      qWarning() << xmlFileName << "exists but" << rScriptFileName << "does not";
+      driver->loadAnalysisFromScript(xmlFileName, rScriptFileName, "R");
+      }
+    else if (scriptDir.exists(pyScriptFileName))
+      {
+      driver->loadAnalysisFromScript(xmlFileName, pyScriptFileName, "Python");
+      }
+    else
+      {
+      qWarning() << xmlFileName << "exists but neither" << rScriptFileName
+                 << "nor" << pyScriptFileName << "does";
       continue;
       }
-    driver->loadAnalysisFromScript(xmlFileName, rScriptFileName);
     }
 }
 

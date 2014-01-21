@@ -230,7 +230,20 @@ int voRemoteCustomAnalysis::execute()
 
   Json::StyledWriter writer;
   QString requestBody = QString::fromStdString(writer.write(taskRequest));
-  QString postUrl = m_baseUrl + "tasks/celery/visomics/vtk/r";
+  QString postUrl;
+  QString scriptType = this->information()->scriptType();
+  if (scriptType == "R")
+    {
+    postUrl = m_baseUrl + "tasks/celery/visomics/vtk/r";
+    }
+  else if (scriptType == "Python")
+    {
+    postUrl = m_baseUrl + "tasks/celery/visomics/vtk/python";
+    }
+  else
+    {
+    qDebug() << "unrecognized script type: " << scriptType;
+    }
 
   QUrl url(postUrl);
   QNetworkRequest request(url);

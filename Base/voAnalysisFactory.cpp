@@ -31,7 +31,6 @@
 #include "voOneZoom.h"
 #include "voTreeDropTip.h"
 #include "voTreeDropTipWithoutData.h"
-#include "voCompareTrees.h"
 
 #include "voCustomAnalysis.h"
 #include "voRemoteCustomAnalysis.h"
@@ -61,7 +60,6 @@ voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
   this->registerAnalysis<voOneZoom>("OneZoom Visualization");
   this->registerAnalysis<voTreeDropTip>("Tree Drop Tip With Data");
   this->registerAnalysis<voTreeDropTipWithoutData>("Tree Drop Tip");
-  this->registerAnalysis<voCompareTrees>("Compare Trees");
 }
 
 
