@@ -20,8 +20,6 @@ SET(KIT_SRCS
   Analysis/voCustomAnalysisParameterField.h
   Analysis/voTreeDropTip.cpp
   Analysis/voTreeDropTip.h
-  Analysis/voCompareTrees.cpp
-  Analysis/voCompareTrees.h
   Analysis/voTreeDropTipWithoutData.cpp
   Analysis/voTreeDropTipWithoutData.h
   Analysis/voRemoteCustomAnalysis.cpp
@@ -117,7 +115,6 @@ SET(KIT_MOC_SRCS
   Analysis/voKEGGCompounds.h
   Analysis/voKEGGPathway.h
   Analysis/voOneZoom.h
-  Analysis/voCompareTrees.h
   Analysis/voCustomAnalysis.h
   Analysis/voCustomAnalysisData.h
   Analysis/voCustomAnalysisInformation.h

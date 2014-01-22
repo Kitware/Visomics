@@ -25,6 +25,7 @@
 #include <QObject>
 #include <QModelIndex>
 
+class QItemSelection;
 class QItemSelectionModel;
 class voAnalysis;
 class voDataModel;
@@ -42,7 +43,8 @@ public:
 
 public slots:
 
-  void onCurrentRowChanged(const QModelIndex & current, const QModelIndex & previous);
+  void onSelectionChanged(const QItemSelection & current,
+                          const QItemSelection & previous);
 
 public:
 

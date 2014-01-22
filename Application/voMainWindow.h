@@ -23,6 +23,7 @@
 #include <QScopedPointer>
 #include <QMainWindow>
 #include <QMap>
+#include <QList>
 
 class QDockWidget;
 class QSplitter;
@@ -72,7 +73,7 @@ signals:
 protected slots:
   void onAnalysisSelected(voAnalysis* analysis);
   void onActiveAnalysisChanged(voAnalysis* analysis);
-  void onInputSelected(voDataModelItem* inputTarget);
+  void onInputSelected(QList<voDataModelItem*> inputTargets);
   void onAboutToRunAnalysis(voAnalysis* analysis);
 
   void setViewActions(const QString& objectUuid, voView* newView);

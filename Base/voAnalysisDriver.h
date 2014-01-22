@@ -60,15 +60,23 @@ public:
   voAnalysisDriver(QObject* newParent = 0);
   virtual ~voAnalysisDriver();
 
-  void runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool acceptDefaultParameter = false);
+  void runAnalysis(const QString& analysisName,
+                   QList<voDataModelItem*> inputTargets,
+                   bool acceptDefaultParameter = false);
 
-  void runAnalysis(const QString& analysisName, voDataModelItem* inputTarget,
+  void runAnalysis(const QString& analysisName,
+                   QList<voDataModelItem*> inputTargets,
                    const QHash<QString, QVariant>& parameters);
 
   bool doesInputMatchAnalysis(const QString& analysisName,
                               voDataModelItem* inputTarget, bool warnOnFail);
+  bool doesInputMatchAnalysis(const QString& analysisName,
+                              QList<voDataModelItem*> inputTargets,
+                              bool warnOnFail);
   int numberOfInputsForAnalysis(QString analysisName);
-  void loadAnalysisFromScript(const QString& xmlFileName, const QString& rScriptFileName);
+  void loadAnalysisFromScript(const QString& xmlFileName,
+                              const QString& rScriptFileName,
+                              const QString& scriptType);
 
 signals:
   void aboutToRunAnalysis(voAnalysis*);
@@ -94,7 +102,8 @@ protected slots:
 
 
 protected:
-  void runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget);
+  void runAnalysis(voAnalysis * analysis,
+                   QList<voDataModelItem*> inputTarget);
   voAnalysis * createAnalysis(const QString& analysisName);
 
   static voDataModelItem * addEnsembleOutputToObjectModel(const QString& outputName, voAnalysis * analysis, voDataModelItem* parent);

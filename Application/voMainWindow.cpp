@@ -191,6 +191,9 @@ voMainWindow::voMainWindow(QWidget * newParent)
   // Set selection model
   d->DataBrowserWidget->setSelectionModel(dataModel->selectionModel());
 
+  // Set selection mode to multi-select
+  d->DataBrowserWidget->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
   // By default, hide the dock widget
 //  d->DataPropertyDockWidget->setVisible(false);
   // ... and disable the associated action
@@ -209,8 +212,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(dataModel, SIGNAL(activeAnalysisChanged(voAnalysis*)),
           SLOT(onActiveAnalysisChanged(voAnalysis*)));
 
-  connect(dataModel, SIGNAL(inputSelected(voDataModelItem*)), this,
-          SLOT(onInputSelected(voDataModelItem*)));
+  connect(dataModel, SIGNAL(inputSelected(QList<voDataModelItem*>)), this,
+          SLOT(onInputSelected(QList<voDataModelItem*>)));
 
   connect(dataModel,
           SIGNAL(objectRemoved(const QString&)),
@@ -342,11 +345,6 @@ void voMainWindow::onFileOpenActionTriggered()
 // --------------------------------------------------------------------------
 void voMainWindow::onFileMakeTreeHeatmapActionTriggered()
 {
-  Q_D(voMainWindow);
-
-  // temporarily enable multi-select
-  d->DataBrowserWidget->setSelectionMode(QAbstractItemView::MultiSelection);
-
   // display a non-modal dialog
   QMessageBox* msgBox = new QMessageBox(this);
   msgBox->setAttribute(Qt::WA_DeleteOnClose);
@@ -497,9 +495,6 @@ void voMainWindow::makeTreeHeatmapDialogClosed()
 
   // clear the selection
   d->DataBrowserWidget->clearSelection();
-
-  // revert selection mode back to normal afterwards
-  d->DataBrowserWidget->setSelectionMode(QAbstractItemView::SingleSelection);
 }
 
 //-----------------------------------------------------------------------------
@@ -673,11 +668,13 @@ void voMainWindow::onAnalysisSelected(voAnalysis* analysis)
 }
 
 // --------------------------------------------------------------------------
-void voMainWindow::onInputSelected(voDataModelItem* inputTarget)
+void voMainWindow::onInputSelected(QList<voDataModelItem*> inputTargets)
 {
   Q_D(voMainWindow);
 
   voAnalysisDriver *driver = voApplication::application()->analysisDriver();
+
+  voDataModelItem *inputTarget = inputTargets.last();
 
  //enable the data property panel
   d->DataPropertyDockWidget->setVisible(true);
@@ -690,6 +687,12 @@ void voMainWindow::onInputSelected(voDataModelItem* inputTarget)
   for (int i = 0; i < d->menuAnalysis->actions().size(); ++i)
     {
     QAction *analysisAction = d->menuAnalysis->actions().at(i);
+    if (driver->doesInputMatchAnalysis(analysisAction->text(), inputTargets,
+                                       false))
+      {
+      analysisAction->setEnabled(true);
+      continue;
+      }
     if (driver->doesInputMatchAnalysis(analysisAction->text(), inputTarget,
                                        false))
       {
@@ -779,16 +782,26 @@ void voMainWindow::loadAnalysisScripts()
   voAnalysisDriver *driver = voApplication::application()->analysisDriver();
   foreach(QFileInfo xmlFileInfo, xmlFiles)
     {
-    // make sure the corresponding R script exists
+    // make sure a corresponding script exists
     QString xmlFileName = xmlFileInfo.absoluteFilePath();
     QString rScriptFileName = xmlFileName;
+    QString pyScriptFileName = xmlFileName;
     rScriptFileName.replace(".xml", ".R");
-    if (!scriptDir.exists(rScriptFileName))
+    pyScriptFileName.replace(".xml", ".py");
+    if (scriptDir.exists(rScriptFileName))
       {
-      qWarning() << xmlFileName << "exists but" << rScriptFileName << "does not";
+      driver->loadAnalysisFromScript(xmlFileName, rScriptFileName, "R");
+      }
+    else if (scriptDir.exists(pyScriptFileName))
+      {
+      driver->loadAnalysisFromScript(xmlFileName, pyScriptFileName, "Python");
+      }
+    else
+      {
+      qWarning() << xmlFileName << "exists but neither" << rScriptFileName
+                 << "nor" << pyScriptFileName << "does";
       continue;
       }
-    driver->loadAnalysisFromScript(xmlFileName, rScriptFileName);
     }
 }
 

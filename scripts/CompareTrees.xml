@@ -1,0 +1,10 @@
+<analysis name="Tree Comparison">
+  <inputs>
+    <input name="tree1" type="Tree"/>
+    <input name="tree2" type="Tree"/>
+  </inputs>
+  <outputs>
+    <output name="comparisonTree" type="Tree" rawViewType="voTreeHeatmapView"
+            rawViewPrettyName="comparison tree"/>
+  </outputs>
+</analysis>

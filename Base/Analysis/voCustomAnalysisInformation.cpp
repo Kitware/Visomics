@@ -55,6 +55,18 @@ void voCustomAnalysisInformation::setScript(const QString& script)
 }
 
 // --------------------------------------------------------------------------
+QString voCustomAnalysisInformation::scriptType() const
+{
+  return this->analysisScriptType;
+}
+
+// --------------------------------------------------------------------------
+void voCustomAnalysisInformation::setScriptType(const QString& scriptType)
+{
+  this->analysisScriptType = scriptType;
+}
+
+// --------------------------------------------------------------------------
 voCustomAnalysisData * voCustomAnalysisInformation::input(int i) const
 {
   return this->inputsList.at(i);

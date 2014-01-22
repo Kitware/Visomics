@@ -151,6 +151,7 @@ int voRemoteCustomAnalysis::execute()
 
       inputValue["data"] = base64.constData();
       inputValue["type"] = type;
+      inputValue["format"] = "vtk";
       writer->Delete();
       }
     ++index;
@@ -230,7 +231,20 @@ int voRemoteCustomAnalysis::execute()
 
   Json::StyledWriter writer;
   QString requestBody = QString::fromStdString(writer.write(taskRequest));
-  QString postUrl = m_baseUrl + "tasks/celery/visomics/vtk/r";
+  QString postUrl;
+  QString scriptType = this->information()->scriptType();
+  if (scriptType == "R")
+    {
+    postUrl = m_baseUrl + "tasks/celery/visomics/vtk/r";
+    }
+  else if (scriptType == "Python")
+    {
+    postUrl = m_baseUrl + "tasks/celery/visomics/vtk/python";
+    }
+  else
+    {
+    qDebug() << "unrecognized script type: " << scriptType;
+    }
 
   QUrl url(postUrl);
   QNetworkRequest request(url);
@@ -359,7 +373,7 @@ void voRemoteCustomAnalysis::handleResultReply(QNetworkReply *reply)
     }
 
   Json::Value outputs = root["result"]["output"];
-  for (int index=0; index<outputs.size(); index++)
+  for (unsigned int index = 0; index < outputs.size(); index++)
     {
     Json::Value output = outputs[index];
     std::string type = output["type"].asString();
@@ -368,7 +382,7 @@ void voRemoteCustomAnalysis::handleResultReply(QNetworkReply *reply)
     QByteArray raw = QByteArray::fromRawData(inputString.c_str(), inputString.size());
     QByteArray binary = QByteArray::fromBase64(raw);
 
-    if (type == "Table")
+    if (type == "Table" || type == "vtkTable")
       {
 
       vtkNew<vtkTableReader> reader;
@@ -382,7 +396,7 @@ void voRemoteCustomAnalysis::handleResultReply(QNetworkReply *reply)
       this->transferParameters(dataObject);
       this->setOutput(name, dataObject);
       }
-    else if (type == "Tree")
+    else if (type == "Tree" || type == "vtkTree")
       {
       vtkNew<vtkTreeReader> reader;
       reader->SetBinaryInputString(binary.data(), binary.size());
