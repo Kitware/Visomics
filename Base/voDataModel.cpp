@@ -21,6 +21,8 @@
 // Qt includes
 #include <QDebug>
 #include <QUuid>
+#include <QModelIndex>
+#include <QItemSelection>
 #include <QItemSelectionModel>
 
 // Visomics includes
@@ -46,41 +48,58 @@ voDataModelPrivate::~voDataModelPrivate()
 }
 
 // --------------------------------------------------------------------------
-void voDataModelPrivate::onCurrentRowChanged(const QModelIndex & current,
-                                             const QModelIndex & previous)
+void voDataModelPrivate::onSelectionChanged(const QItemSelection & current,
+                                            const QItemSelection & previous)
 {
+  Q_UNUSED(current);
   Q_UNUSED(previous);
   Q_Q(voDataModel);
 
   this->SelectedDataObject = 0;
 
-  // Handle case where we deleted the only input
-  if (current.row() == -1 && current.column() == -1)
+  // For some reason "current" only seems to contain the most recently
+  // selected items, not the entire list of selected items.
+  // To work around this, we use selectedIndexes() instead.
+  QModelIndexList selectedIndices = this->SelectionModel->selectedIndexes();
+
+  // Return early if nothing is selected.
+  if (selectedIndices.size() == 0)
     {
     return;
     }
 
-  voDataModelItem * item = dynamic_cast<voDataModelItem*>(q->itemFromIndex(current));
+  voDataModelItem * item = dynamic_cast<voDataModelItem*>
+    (q->itemFromIndex(selectedIndices.last()));
   Q_ASSERT(item);
-  if (!item)
+
+  // Clear & repopulate list of selected inputs
+  this->SelectedInputDataObjects.clear();
+  foreach(const QModelIndex& index, selectedIndices)
     {
-    return;
+    voDataModelItem * selectedItem
+        = dynamic_cast<voDataModelItem*>(q->itemFromIndex(index));
+    Q_ASSERT(selectedItem);
+    if (selectedItem->type() == voDataModelItem::InputType)
+      {
+      this->SelectedInputDataObjects << selectedItem;
+      }
     }
 
-  // Clear list
-  this->SelectedInputDataObjects.clear();
   voAnalysis * selectedAnalysis = 0;
 
   this->SelectedDataObject = item;
 
   if (item->type() == voDataModelItem::InputType)
     {
-    qDebug() << "onCurrentRowChanged - InputType" << item->dataObject()->name();
-    this->SelectedInputDataObjects << item;
+    qDebug() << "onSelectionChanged - InputType" << item->dataObject()->name();
     emit q->viewSelected(item->uuid());
-    emit q->inputSelected(item);
+
+    if (!this->SelectedInputDataObjects.contains(item))
+      {
+      this->SelectedInputDataObjects << item;
+      }
     }
-  else
+  else if (this->SelectedInputDataObjects.size() == 0)
     {
     // here we assume that any toplevel item is "InputType"
     voDataModelItem * childItem = item;
@@ -93,21 +112,27 @@ void voDataModelPrivate::onCurrentRowChanged(const QModelIndex & current,
 
   if(item->type() == voDataModelItem::OutputType)
     {
-    qDebug() << "onCurrentRowChanged - OutputType" << item->dataObject()->name();
-    this->SelectedInputDataObjects.clear();
+    qDebug() << "onSelectionChanged - OutputType" << item->dataObject()->name();
     this->SelectedInputDataObjects << item;
     emit q->viewSelected(item->uuid());
     }
   else if(item->type() == voDataModelItem::ViewType)
     {
-    qDebug() << "onCurrentRowChanged - viewType" << item->viewType();
+    qDebug() << "onSelectionChanged - viewType" << item->viewType();
     emit q->viewSelected(item->uuid());
     }
   else if(item->type() == voDataModelItem::ContainerType)
     {
     selectedAnalysis =
         reinterpret_cast<voAnalysis*>(item->data(voDataModelItem::AnalysisVoidStarRole).value<void*>());
-    qDebug() << "onCurrentRowChanged - ContainerType" << item->text() << "-" << selectedAnalysis;
+    qDebug() << "onSelectionChanged - ContainerType" << item->text() << "-" << selectedAnalysis;
+    }
+
+  // enable & disable the actions within the Analysis menu based on
+  // what is currently selected.
+  if (!this->SelectedInputDataObjects.empty())
+    {
+    emit q->inputSelected(this->SelectedInputDataObjects);
     }
 
   voAnalysis * activeAnalysis = q->analysisAboveItem(item);
@@ -128,8 +153,11 @@ voDataModel::voDataModel():Superclass(), d_ptr(new voDataModelPrivate(*this))
   Q_D(voDataModel);
   d->SelectionModel = new QItemSelectionModel(this);
   d->SelectionModel->reset();
-  connect(d->SelectionModel, SIGNAL(currentRowChanged(const QModelIndex &, const QModelIndex &)),
-          d, SLOT(onCurrentRowChanged(const QModelIndex &, const QModelIndex &)));
+  connect(
+    d->SelectionModel,
+    SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+    d,
+    SLOT(onSelectionChanged(const QItemSelection &, const QItemSelection &)));
 
   this->setColumnCount(1);
 }

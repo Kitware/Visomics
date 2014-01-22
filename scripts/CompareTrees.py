@@ -1,4 +1,4 @@
-# vtk is included above this scope
+import vtkwithexceptions as vtk
 
 def execute(inputs):
   tree1 = inputs["tree1"]
@@ -9,8 +9,8 @@ def execute(inputs):
   filter.SetInputDataObject(1, tree2)
 
   filter.SetIdArrayName("node name")
-  filter.SetComparisonArrayIsVertexData(False)
-  filter.SetComparisonArrayName("weight")
+  filter.SetComparisonArrayIsVertexData(True)
+  filter.SetComparisonArrayName("node weight")
   filter.SetOutputArrayName("differences")
 
   filter.Update()

@@ -102,8 +102,6 @@ voAnalysisDriver::voAnalysisDriver(QObject* newParent):
     "Tree Drop Tip", QStringList() << "vtkTree");
   analysisNameToInputTypes.insert(
     "Tree Drop Tip With Data", QStringList() << "vtkTree" << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
-    "Compare Trees", QStringList() << "vtkTree");
 }
 
 // --------------------------------------------------------------------------
@@ -124,11 +122,7 @@ void voAnalysisDriver::runAnalysisForAllInputs(const QString& analysisName, bool
 
   // Collect inputs
   QList<voDataModelItem*> targetInputs = model->selectedInputObjects();
-
-  foreach(voDataModelItem* targetInput, targetInputs)
-    {
-    this->runAnalysis(analysisName, targetInput, acceptDefaultParameter);
-    }
+  this->runAnalysis(analysisName, targetInputs, acceptDefaultParameter);
 }
 
 // --------------------------------------------------------------------------
@@ -148,32 +142,36 @@ voAnalysis * voAnalysisDriver::createAnalysis(const QString& analysisName)
 }
 
 // --------------------------------------------------------------------------
-void voAnalysisDriver::runAnalysis(const QString& analysisName, voDataModelItem* inputTarget, bool acceptDefaultParameter)
+void voAnalysisDriver::runAnalysis(const QString& analysisName,
+                                   QList<voDataModelItem*> inputTargets,
+                                   bool acceptDefaultParameter)
 {
-  if (!inputTarget)
+  if (inputTargets.empty())
     {
-    qWarning() << "Failed to runAnalysis - InputTarget is NULL";
+    qWarning() << "Failed to runAnalysis - InputTargets is empty";
     return;
     }
   voAnalysis * analysis = this->createAnalysis(analysisName);
-  voView * currentView = voApplication::application()->viewManager()->getView(inputTarget->uuid());
+  voView * currentView =
+    voApplication::application()->viewManager()->getView(
+      inputTargets.at(0)->uuid());
   analysis->setView(currentView);
   if (!analysis)
     {
     return;
     }
   analysis->setAcceptDefaultParameterValues(acceptDefaultParameter);
-  this->runAnalysis(analysis, inputTarget);
+  this->runAnalysis(analysis, inputTargets);
 }
 
 // --------------------------------------------------------------------------
 void voAnalysisDriver::runAnalysis(const QString& analysisName,
-                                   voDataModelItem* inputTarget,
+                                   QList<voDataModelItem*> inputTargets,
                                    const QHash<QString, QVariant>& parameters)
 {
-  if (!inputTarget)
+  if (inputTargets.empty())
     {
-    qWarning() << "Failed to runAnalysis - InputTarget is NULL";
+    qWarning() << "Failed to runAnalysis - InputTargets is empty";
     return;
     }
   voAnalysis * analysis = this->createAnalysis(analysisName);
@@ -186,7 +184,7 @@ void voAnalysisDriver::runAnalysis(const QString& analysisName,
   analysis->updateDynamicParameters();
   analysis->setParameterValues(parameters);
   analysis->setAcceptDefaultParameterValues(true);
-  this->runAnalysis(analysis, inputTarget);
+  this->runAnalysis(analysis, inputTargets);
 }
 
 voAnalysisTask::voAnalysisTask(voAnalysis *analysis, voDataModelItem* insertLocation)
@@ -202,16 +200,17 @@ bool voAnalysisTask::run()
 }
 
 // --------------------------------------------------------------------------
-void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* inputTarget)
+void voAnalysisDriver::runAnalysis(voAnalysis * analysis,
+                                   QList<voDataModelItem*> inputTargets)
 {
   if (!analysis)
     {
     qWarning() << "Failed to runAnalysis - Analysis is NULL";
     return;
     }
-  if (!inputTarget)
+  if (inputTargets.empty())
     {
-    qWarning() << "Failed to runAnalysis - InputTarget is NULL";
+    qWarning() << "Failed to runAnalysis - InputTargets is empty";
     return;
     }
 
@@ -229,40 +228,65 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
   QStringList expectedInputTypes = analysisNameToInputTypes.value(analysisName);
 
   voDataObject * dataObject = NULL;
-  voDataModelItem * childItemForSingleInput = NULL;
 
-  if ( expectedInputTypes.size() == 1  && inputTarget->childItems().size() > 0)
+  if ( expectedInputTypes.size() == 1  && inputTargets.size() == 1)
     {
-    // For most analyses, only one input is required.
-    // Nonetheless, for the convenience of our users, we'll handle the case
-    // where they passed in a group of inputs.
-    bool inputMatches = false;
-    for (int i = 0; i < inputTarget->childItems().size(); ++i)
+    // simplest case: 1 input required, 1 input provided
+    voDataModelItem *inputTarget = inputTargets.at(0);
+    if (!this->doesInputMatchAnalysis(analysisName, inputTarget, true))
       {
-      childItemForSingleInput =
-        dynamic_cast<voDataModelItem*>(inputTarget->child(i));
+      return;
+      }
+    }
 
-      if (this->doesInputMatchAnalysis(analysisName, childItemForSingleInput,
-                                       true))
+  else if ( expectedInputTypes.size() == 1  && inputTargets.size() > 1)
+    {
+    // 1 input required, multiple inputs provided.
+    // As a convenience to our users, we search over this list for
+    // any matches.
+    bool inputMatches = false;
+    foreach(voDataModelItem* inputTarget, inputTargets)
+      {
+      if (this->doesInputMatchAnalysis(analysisName, inputTarget, true))
         {
-        dataObject = childItemForSingleInput->dataObject();
+        dataObject = inputTarget->dataObject();
         inputMatches = true;
         break;
         }
-      childItemForSingleInput = NULL;
       }
     if (!inputMatches)
       {
       return;
       }
     }
-  else
+
+  else if (expectedInputTypes.size() > 1 && inputTargets.size() > 1)
     {
+    // multiple inputs required & multiple items provided
+    if (!this->doesInputMatchAnalysis(analysisName, inputTargets, true))
+      {
+      return;
+      }
+    }
+
+  else if (expectedInputTypes.size() > 1 && inputTargets.size() == 1)
+    {
+    // multiple inputs required but only one input selected.
+    // Here we check the children of the provided input to see
+    // if they match the requirements of the analysis.  This check
+    // is actually performed in the function called below.
+    voDataModelItem *inputTarget = inputTargets.at(0);
+    Q_ASSERT(inputTarget);
     if (!this->doesInputMatchAnalysis(analysisName, inputTarget, true))
       {
       return;
       }
-    dataObject = inputTarget->dataObject();
+    }
+
+  else
+    {
+    qDebug() << "unhandled case in voAnalysisDriver::runAnalysis";
+    return;
     }
 
   // At this point we've verified that our input is good.  Now we need
@@ -274,13 +298,27 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
     }
   else
     {
-    // Multiple input case.
-    for (int i = 0; i < expectedInputTypes.size(); i++)
+    if (inputTargets.size() > 1)
       {
-      voDataModelItem * childItem =
-        dynamic_cast<voDataModelItem*>(inputTarget->child(i));
-      dataObject = childItem->dataObject();
-      analysis->addInput(dataObject);
+      // multiple inputs selected by user.
+      foreach(voDataModelItem* inputTarget, inputTargets)
+        {
+        dataObject = inputTarget->dataObject();
+        analysis->addInput(dataObject);
+        }
+      }
+    else
+      {
+      // single input selected by user, but its children match
+      // what the analysis is looking for.
+      voDataModelItem* inputTarget = inputTargets.at(0);
+      for (int i = 0; i < expectedInputTypes.size(); i++)
+        {
+        voDataModelItem * childItem =
+          dynamic_cast<voDataModelItem*>(inputTarget->child(i));
+        dataObject = childItem->dataObject();
+        analysis->addInput(dataObject);
+        }
       }
     }
 
@@ -294,18 +332,7 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis, voDataModelItem* input
     return;
     }
 
-  voDataModelItem *insertLocation;
-
-  if (childItemForSingleInput == NULL)
-    {
-    insertLocation  = inputTarget;
-    }
-  else
-    {
-    insertLocation = childItemForSingleInput;
-    }
-
-  voAnalysisTask *task  = new voAnalysisTask(analysis, insertLocation);
+  voAnalysisTask *task  = new voAnalysisTask(analysis, inputTargets.at(0));
 
   connect(task, SIGNAL(complete()),
       this, SLOT(analysisComplete()));
@@ -387,7 +414,9 @@ void voAnalysisDriver::runAnalysisForCurrentInput(
   Q_ASSERT(newAnalysis);
   newAnalysis->initializeParameterInformation(parameters);
   newAnalysis->setAcceptDefaultParameterValues(true);
-  this->runAnalysis(newAnalysis, inputTarget);
+  QList<voDataModelItem*> inputTargets;
+  inputTargets << inputTarget;
+  this->runAnalysis(newAnalysis, inputTargets);
 }
 
 // --------------------------------------------------------------------------
@@ -634,6 +663,41 @@ bool voAnalysisDriver::doesInputMatchAnalysis(const QString& analysisName,
       }
     }
   return true;
+}
+
+// --------------------------------------------------------------------------
+bool voAnalysisDriver::doesInputMatchAnalysis(const QString& analysisName,
+  QList<voDataModelItem*> inputTargets, bool warnOnFail)
+{
+  if (analysisName.isEmpty())
+    {
+    qWarning() << "AnalysisName is empty";
+    return false;
+    }
+
+  QStringList expectedInputTypes = analysisNameToInputTypes.value(analysisName);
+  expectedInputTypes.sort();
+
+  QStringList providedInputTypes;
+  foreach(voDataModelItem *inputTarget, inputTargets)
+    {
+    Q_ASSERT(inputTarget);
+    providedInputTypes << inputTarget->dataObject()->type();
+    }
+  providedInputTypes.sort();
+
+  if (expectedInputTypes == providedInputTypes)
+    {
+    return true;
+    }
+
+  if (warnOnFail)
+    {
+    qWarning() << QObject::tr("Provided input types %1 do not match "
+      "expected input types %2").
+      arg(providedInputTypes.join(", ")).arg(expectedInputTypes.join(", "));
+    }
+  return false;
 }
 
 // --------------------------------------------------------------------------

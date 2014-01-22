@@ -1191,9 +1191,11 @@ void voIOManager::loadAnalysisFromXML(QXmlStreamReader *stream)
 
   voDataModel * model = voApplication::application()->dataModel();
   voDataModelItem *inputTarget = model->findItemWithText(parent);
+  QList<voDataModelItem*> inputTargets;
+  inputTargets << inputTarget;
 
   voAnalysisDriver *driver = voApplication::application()->analysisDriver();
-  driver->runAnalysis(type, inputTarget, parameters);
+  driver->runAnalysis(type, inputTargets, parameters);
 }
 
 // --------------------------------------------------------------------------
