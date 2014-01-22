@@ -1,13 +1,14 @@
 # import vtk wrapped version that will raise exceptions for error events
 import vtkwithexceptions as vtk
-import json
-import os
 import base64
+import os
 import tempfile
 
 from celery import Celery
 from celery import task, current_task
 from celery.result import AsyncResult
+
+from visomics.vtk.common import parse_json
 
 celery = Celery()
 celery.config_from_object('celeryconfig')
@@ -28,7 +29,7 @@ def execute(inputs, outputs, script):
     readers = []
     input_tables = []
     input_trees = []
-    for name, type, value in inputs:
+    for name, type, format, value in inputs:
 
         if type == 'Table':
             input_tables.append(name)
@@ -144,31 +145,3 @@ def execute(inputs, outputs, script):
         output_json['output'].append({'name': output['name'], 'type': output['type'], 'data': data})
 
     return output_json
-
-def parse_json(json_string):
-    job_descriptor = json.loads(json_string)
-
-    inputs = job_descriptor['inputs']
-
-    job = {'name': job_descriptor['name'],
-           'script': job_descriptor['script'],
-           'outputs': job_descriptor['outputs']}
-
-    parsed_inputs = []
-
-    for input in inputs:
-        type = input['type']
-        if not type:
-            raise Exception("Input is missing type property")
-
-        data = input['data']
-
-        name = input['name']
-        if not name:
-            raise Exception("Input is missing name property")
-
-        parsed_inputs.append((name, type, data))
-
-    job['inputs'] = parsed_inputs
-
-    return job

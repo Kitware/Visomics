@@ -1,6 +1,6 @@
-BROKER_URL = "mongodb://localhost/celery"
+BROKER_URL = "mongodb://arbor/celery"
 CELERY_RESULT_BACKEND = "mongodb"
 CELERY_MONGODB_BACKEND_SETTINGS = {
-    "host": "localhost",
+    "host": "arbor",
     "database": "celery"
 }

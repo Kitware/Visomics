@@ -1,9 +1,44 @@
 #!/usr/bin/env python
 
 import base64
+import json
 import os
 import tempfile
-import vtk
+
+# import vtk wrapped version that will raise exceptions for error events
+import vtkwithexceptions as vtk
+
+def parse_json(json_string):
+  job_descriptor = json.loads(json_string)
+
+  inputs = job_descriptor['inputs']
+
+  job = {'name': job_descriptor['name'],
+         'script': job_descriptor['script'],
+         'outputs': job_descriptor['outputs']}
+
+  parsed_inputs = []
+
+  for input in inputs:
+    type = input['type']
+    if not type:
+      raise Exception("Input is missing type property")
+
+    data = input['data']
+
+    name = input['name']
+    if not name:
+      raise Exception("Input is missing name property")
+
+    format = input['format']
+    if not format:
+      raise Exception("Input is missing format property")
+
+    parsed_inputs.append((name, type, format, data))
+
+  job['inputs'] = parsed_inputs
+
+  return job
 
 def SerializeVTKTable(table):
   tmp = tempfile.mktemp()
@@ -81,18 +116,18 @@ def VTKTableToCSV(table):
 def LoadInput(type, format, data):
   if type.lower() == "table":
     if format.lower() == "csv":
-      return util.CSVToVTKTable(data)
+      return CSVToVTKTable(data)
     elif format.lower() == "treestore":
       pass
     elif format.lower() == "vtk":
-      return util.DeserializeVTKTable(data)
+      return DeserializeVTKTable(data)
   elif type.lower() == "tree":
     if format.lower() == "newick":
-      return util.NewickToVTKTree(data)
+      return NewickToVTKTree(data)
     elif format.lower() == "treestore":
       pass
     elif format.lower() == "vtk":
-      return util.DeserializeVTKTree(data)
+      return DeserializeVTKTree(data)
 
 def SerializeOutput(object):
   if object.GetClassName() == "vtkTable":
