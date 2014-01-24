@@ -79,7 +79,8 @@ void voDataModelPrivate::onSelectionChanged(const QItemSelection & current,
     voDataModelItem * selectedItem
         = dynamic_cast<voDataModelItem*>(q->itemFromIndex(index));
     Q_ASSERT(selectedItem);
-    if (selectedItem->type() == voDataModelItem::InputType)
+    if (selectedItem->type() == voDataModelItem::InputType ||
+        selectedItem->type() == voDataModelItem::OutputType)
       {
       this->SelectedInputDataObjects << selectedItem;
       }
@@ -93,11 +94,6 @@ void voDataModelPrivate::onSelectionChanged(const QItemSelection & current,
     {
     qDebug() << "onSelectionChanged - InputType" << item->dataObject()->name();
     emit q->viewSelected(item->uuid());
-
-    if (!this->SelectedInputDataObjects.contains(item))
-      {
-      this->SelectedInputDataObjects << item;
-      }
     }
   else if (this->SelectedInputDataObjects.size() == 0)
     {
@@ -113,7 +109,6 @@ void voDataModelPrivate::onSelectionChanged(const QItemSelection & current,
   if(item->type() == voDataModelItem::OutputType)
     {
     qDebug() << "onSelectionChanged - OutputType" << item->dataObject()->name();
-    this->SelectedInputDataObjects << item;
     emit q->viewSelected(item->uuid());
     }
   else if(item->type() == voDataModelItem::ViewType)

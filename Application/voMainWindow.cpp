@@ -676,7 +676,7 @@ void voMainWindow::onInputSelected(QList<voDataModelItem*> inputTargets)
 
   voDataModelItem *inputTarget = inputTargets.last();
 
- //enable the data property panel
+  //enable the data property panel
   d->DataPropertyDockWidget->setVisible(true);
   d->DataPropertyWidget->setVisible(true);
   d->actionViewDataProperty->setEnabled(true);
@@ -691,30 +691,15 @@ void voMainWindow::onInputSelected(QList<voDataModelItem*> inputTargets)
                                        false))
       {
       analysisAction->setEnabled(true);
-      continue;
       }
-    if (driver->doesInputMatchAnalysis(analysisAction->text(), inputTarget,
-                                       false))
+    else if (driver->doesInputMatchAnalysis(analysisAction->text(), inputTarget,
+                                            false))
       {
       analysisAction->setEnabled(true);
       }
     else
       {
       analysisAction->setEnabled(false);
-      }
-    if (inputTarget->childItems().size() > 0)
-      {
-      for (int i = 0; i < inputTarget->childItems().size(); ++i)
-        {
-        voDataModelItem *childItemForSingleInput =
-          dynamic_cast<voDataModelItem*>(inputTarget->child(i));
-
-        if (driver->doesInputMatchAnalysis(analysisAction->text(),
-                                           childItemForSingleInput, false))
-          {
-          analysisAction->setEnabled(true);
-          }
-        }
       }
     }
 }
