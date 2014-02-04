@@ -56,7 +56,7 @@ endif()
 
 include(CMakeExternals/VTK.cmake)
 include(CMakeExternals/QtPropertyBrowser.cmake)
-include(CMakeExternals/VisomicsData.cmake)
+#include(CMakeExternals/VisomicsData.cmake)
 #include(CMakeExternals/CTK.cmake)
 
 #-----------------------------------------------------------------------------
