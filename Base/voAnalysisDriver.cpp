@@ -237,6 +237,7 @@ void voAnalysisDriver::runAnalysis(voAnalysis * analysis,
       {
       return;
       }
+    dataObject = inputTarget->dataObject();
     }
 
   else if ( expectedInputTypes.size() == 1  && inputTargets.size() > 1)
