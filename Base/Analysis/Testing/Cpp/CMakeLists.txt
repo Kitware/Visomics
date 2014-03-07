@@ -22,16 +22,6 @@ ENDMACRO()
 
 # commonAnalysisTests collects tests that use the same input sample data
 SET(commonAnalysisTests
-voANOVAStatistics
-voFoldChange
-voHierarchicalClustering
-voKEGGCompounds
-voKEGGPathway
-voKMeansClustering
-voPCAStatistics
-voPLSStatistics
-voTTest
-voXCorrel
 )
 
 FOREACH(analysisName ${commonAnalysisTests})
