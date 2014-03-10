@@ -12,6 +12,9 @@ SET(CTEST_CUSTOM_COVERAGE_EXCLUDE
 
   # Exclude files from the Testing directories
   ".*/Testing/.*"
+
+  # Exclude code in the ThirdParty directory
+  ".*/ThirdParty/.*"
   )
 
 # The following tests should not be run under valgrind
