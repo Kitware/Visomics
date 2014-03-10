@@ -52,13 +52,13 @@ public:
     if (!this->input())
       {
       //std::cerr << "There is no Data associated with the input." << std::endl;
-      return false;
+      return voAnalysis::FAILURE;
       }
     vtkTable* table =  vtkTable::SafeDownCast(this->input()->dataAsVTKDataObject());
     if (!table)
       {
       std::cerr << "Input is Null" << std::endl;
-      return false;
+      return voAnalysis::FAILURE;
       }
 
     Q_ASSERT(table->GetNumberOfColumns() == 1);
@@ -73,7 +73,7 @@ public:
     outputTable->AddColumn(outputArray.GetPointer());
     this->setOutput("output", new voDataObject("output", outputTable.GetPointer()));
 
-    return true;
+    return voAnalysis::SUCCESS;
     }
 
   virtual void setOutputInformation()
