@@ -41,6 +41,11 @@ else()
   set(KIT_SRCS  "${KIT_SRCS};voAboutDialog.cpp;voAboutDialog.h")
 endif()
 
+if (BUILD_TESTING)
+  list(APPEND KIT_SRCS voQtTesting.cpp voQtTesting.h)
+  include_directories(${QtTesting_INCLUDE_DIRS})
+endif()
+
 set(KIT_MOC_SRCS
   voAboutDialog.h
   voAnalysisParameterDialog.h
@@ -54,12 +59,13 @@ set(KIT_MOC_SRCS
   voMainWindow.h
   voMongoLoadDialog.h
   voMongoSaveDialog.h
-  voOpenTreeLoadDialog.h
   voNormalizationWidget.h
+  voOpenTreeLoadDialog.h
+  voQtTesting.h
+  voRemoteAnalysisConnectionDialog.h
   voStartupView.h
   voViewStackedWidget.h
   voViewTabWidget.h
-  voRemoteAnalysisConnectionDialog.h
   )
 
 set(KIT_UI_FORMS
@@ -144,8 +150,13 @@ add_dependencies(VisomicsApp VisomicsApp-real)
 set_target_properties(VisomicsApp PROPERTIES OUTPUT_NAME ${APP_NAME})
 
 # Add regular application
+set(QtTesting_LIB)
+if (BUILD_TESTING)
+  set(QtTesting_LIB "QtTesting")
+endif()
 add_executable(VisomicsApp-real Main.cpp)
-target_link_libraries(VisomicsApp-real VisomicsAppLib ${MongoDB_LIBRARIES})
+target_link_libraries(
+  VisomicsApp-real VisomicsAppLib ${QtTesting_LIB} ${MongoDB_LIBRARIES})
 set_target_properties(VisomicsApp-real PROPERTIES OUTPUT_NAME ${APP_NAME}-real)
 
 if(APPLE)

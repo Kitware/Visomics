@@ -57,6 +57,9 @@ endif()
 include(CMakeExternals/VTK.cmake)
 include(CMakeExternals/QtPropertyBrowser.cmake)
 include(CMakeExternals/VisomicsData.cmake)
+if(BUILD_TESTING)
+  include(CMakeExternals/QtTesting.cmake)
+endif()
 #include(CMakeExternals/CTK.cmake)
 
 #-----------------------------------------------------------------------------
@@ -115,6 +118,8 @@ ExternalProject_Add(${proj}
     -DVisomics_KEGG_SERVER_PORT=${Visomics_KEGG_SERVER_PORT}
     # QtPropertyBrowser
     -DQtPropertyBrowser_DIR:PATH=${QtPropertyBrowser_DIR}
+    # QtTesting
+    -DQtTesting_DIR:PATH=${QtTesting_DIR}
     # VisomicsData
     -DVisomicsData_DIR:PATH=${VisomicsData_DIR}
     # VTK
@@ -132,4 +137,5 @@ ExternalProject_Add(${proj}
     ${VisomicsData_DEPENDS}
     #${CTK_DEPENDS}
     ${VTK_DEPENDS}
+    ${QtTesting_DEPENDS}
   )

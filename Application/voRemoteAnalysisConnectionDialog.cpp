@@ -78,6 +78,7 @@ void voRemoteAnalysisConnectionDialog::loadSettings()
   QSettings settings("Kitware", "Visomics");
   d->url->setText(settings.value("url", "http://arbor.kitware.com/service").toString());
   d->user->setText(settings.value("user").toString());
+  d->password->setText(settings.value("password").toString());
 }
 
 void voRemoteAnalysisConnectionDialog::saveSettings()
@@ -86,4 +87,5 @@ void voRemoteAnalysisConnectionDialog::saveSettings()
   QSettings settings("Kitware", "Visomics");
   settings.setValue("url", d->url->text());
   settings.setValue("user", d->user->text());
+  settings.setValue("password", d->password->text());
 }

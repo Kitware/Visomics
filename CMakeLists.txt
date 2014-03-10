@@ -226,6 +226,15 @@ FIND_PACKAGE(QtPropertyBrowser REQUIRED)
 INCLUDE(${QtPropertyBrowser_USE_FILE})
 
 #-----------------------------------------------------------------------------
+# QtTesting
+#
+if (BUILD_TESTING)
+  set(QtTesting_EXPORTS_INCLUDED TRUE)
+  find_package(QtTesting REQUIRED)
+  #include(${QtTesting_USE_FILE})
+endif()
+
+#-----------------------------------------------------------------------------
 # VisomicsData
 #
 find_path(VisomicsData_DIR ThirdParty

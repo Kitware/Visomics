@@ -25,6 +25,8 @@
 #include <QMap>
 #include <QList>
 
+#include "voConfigure.h" // For Visomics_INSTALL_DATA_DIR, Visomics_VERSION, Visomics_BUILD_TESTING, USE_ARBOR_BRAND
+
 class QDockWidget;
 class QSplitter;
 class QTreeWidget;
@@ -56,12 +58,16 @@ public slots:
   void onFileSaveWorkflowToMongoActionTriggered();
   void onFileLoadWorkflowFromMongoActionTriggered();
 #endif
+#ifdef Visomics_BUILD_TESTING
+  void playTest(QString filename);
+#endif
   void onFileOpenTreeOfLifeActionTriggered();
   void onFileMakeTreeHeatmapActionTriggered();
 
   void about();
 
-  void loadSampleDataset();
+  void loadSampleTable();
+  void loadSampleTreeHeatmap();
   void loadAnalysisScripts();
   void onCustomAnalysisAdded(const QString& analysisName);
   void provideRemoteAnalysisUrl(QUrl *url);
