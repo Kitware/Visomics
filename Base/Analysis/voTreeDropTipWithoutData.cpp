@@ -161,6 +161,10 @@ int voTreeDropTipWithoutData::execute()
       return voAnalysis::FAILURE;
       }
 
+    unsigned int numFewerVertices =
+      tree.GetPointer()->GetNumberOfVertices() - outTree->GetNumberOfVertices();
+    qDebug() << "output tree has" << numFewerVertices
+             << "fewer vertices than the input tree.";
     this->setOutput("pruned_tree", new voOutputDataObject("pruned_tree", outTree));
 
     return voAnalysis::SUCCESS;

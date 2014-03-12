@@ -21,7 +21,6 @@
 
 // Visomics includes
 
-#include "voConfigure.h" // For Visomics_INSTALL_DATA_DIR, Visomics_VERSION, Visomics_BUILD_TESTING, USE_ARBOR_BRAND
 #ifdef USE_ARBOR_BRAND
   #include "ui_voMainWindow_Arbor.h"
   #include "voAboutDialog_Arbor.h"
@@ -49,7 +48,8 @@
 #include "voOpenTreeLoadDialog.h"
 #include "voStartupView.h"
 #ifdef Visomics_BUILD_TESTING
-# include "voTestConfigure.h"
+  #include "voTestConfigure.h"
+  #include "voQtTesting.h"
 #endif
 #include "voView.h"
 #include "voViewManager.h"
@@ -74,6 +74,9 @@ public:
   #ifdef USE_MONGO
   voMongoLoadDialog *mongoLoadDialog;
   voMongoSaveDialog *mongoSaveDialog;
+  #endif
+  #ifdef Visomics_BUILD_TESTING
+  voQtTesting *testRecorder;
   #endif
   voOpenTreeLoadDialog *openTreeLoadDialog;
   voRemoteAnalysisConnectionDialog *remoteAnalysisConnectionDialog;
@@ -116,6 +119,10 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->mongoLoadDialog->connectButton(), SIGNAL(clicked()),
           this, SLOT(connectToMongoForLoadWorkflow()));
 #endif
+#ifdef Visomics_BUILD_TESTING
+  d->testRecorder = new voQtTesting(this);
+  d->testRecorder->hide();
+#endif
   //load tree data from the opentreeoflife neo4j database
   d->openTreeLoadDialog = new voOpenTreeLoadDialog(this);
   d->openTreeLoadDialog->hide();
@@ -146,7 +153,8 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionFileClose, SIGNAL(triggered()), this, SLOT(onCloseActionTriggered()));
   connect(d->actionFileExit, SIGNAL(triggered()), this, SLOT(close()));
   connect(d->actionHelpAbout, SIGNAL(triggered()), this, SLOT(about()));
-  connect(d->actionLoadSampleDataset, SIGNAL(triggered()), this, SLOT(loadSampleDataset()));
+  connect(d->actionLoadSampleTable, SIGNAL(triggered()), this, SLOT(loadSampleTable()));
+  connect(d->actionLoadSampleTreeHeatmap, SIGNAL(triggered()), this, SLOT(loadSampleTreeHeatmap()));
   connect(d->actionViewErrorLog, SIGNAL(triggered()), this, SLOT(onViewErrorLogActionTriggered()));
   connect(d->actionFileSaveWorkflow, SIGNAL(triggered()), this, SLOT(onFileSaveWorkflowActionTriggered()));
   connect(d->actionFileLoadWorkflow, SIGNAL(triggered()), this, SLOT(onFileLoadWorkflowActionTriggered()));
@@ -162,6 +170,21 @@ voMainWindow::voMainWindow(QWidget * newParent)
   d->menuFile->insertAction(d->actionFileMakeTreeHeatmap, loadFromDB);
   connect(saveToDB, SIGNAL(triggered()), this, SLOT(onFileSaveWorkflowToMongoActionTriggered()));
   connect(loadFromDB, SIGNAL(triggered()), this, SLOT(onFileLoadWorkflowFromMongoActionTriggered()));
+#endif
+
+#ifdef Visomics_BUILD_TESTING
+  QAction *startRecordingTest = new QAction("Start recording test", this);
+  QAction *stopRecordingTest = new QAction("Stop recording test", this);
+  QAction *playTest = new QAction("Play test", this);
+  d->menuFile->insertAction(d->actionFileExit, startRecordingTest);
+  d->menuFile->insertAction(d->actionFileExit, stopRecordingTest);
+  d->menuFile->insertAction(d->actionFileExit, playTest);
+  connect(startRecordingTest, SIGNAL(triggered()),
+          d->testRecorder, SLOT(startRecording()));
+  connect(stopRecordingTest, SIGNAL(triggered()),
+          d->testRecorder, SLOT(stopRecording()));
+  connect(playTest, SIGNAL(triggered()),
+          d->testRecorder, SLOT(play()));
 #endif
 
 
@@ -631,6 +654,13 @@ void voMainWindow::connectToMongoForLoadWorkflow()
 
 #endif
 
+#ifdef Visomics_BUILD_TESTING
+void voMainWindow::playTest(QString filename)
+{
+  Q_D(voMainWindow);
+  d->testRecorder->playTest(filename);
+}
+#endif
 
 // --------------------------------------------------------------------------
 void voMainWindow::about()
@@ -640,7 +670,31 @@ void voMainWindow::about()
 }
 
 // --------------------------------------------------------------------------
-void voMainWindow::loadSampleDataset()
+void voMainWindow::loadSampleTable()
+{
+#ifdef Visomics_BUILD_TESTING
+  voApplication * app = voApplication::application();
+  QString file = app->homeDirectory() + "/" + Visomics_INSTALL_DATA_DIR + "/visomics-sample_liver.csv";
+  if (!app->isInstalled())
+    {
+    file = QString(VISOMICS_DATA_DIR) + "/Data/sample/visomics-sample_liver.csv";
+    }
+  voDelimitedTextImportSettings defaultSettings;
+  defaultSettings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes, 3);
+  voDelimitedTextImportDialog dialog(this, defaultSettings);
+  dialog.setFileName(file);
+  int status = dialog.exec();
+  if (status == voDelimitedTextImportDialog::Accepted)
+    {
+    voApplication::application()->ioManager()->openCSVFile(file, dialog.importSettings());
+    }
+#else
+  qWarning() << "Sample dataset not available !";
+#endif
+}
+
+// --------------------------------------------------------------------------
+void voMainWindow::loadSampleTreeHeatmap()
 {
 #ifdef Visomics_BUILD_TESTING
   voApplication * app = voApplication::application();

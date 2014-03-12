@@ -80,5 +80,11 @@ int main(int argc, char* argv[])
   callback.setCallbackData(&mainwindow);
   QTimer::singleShot(0, &callback, SLOT(invoke()));
 
+  if (argc > 1)
+    {
+    mainwindow.playTest(QString(argv[1]));
+    return 0;
+    }
+
   return app.exec();
 }

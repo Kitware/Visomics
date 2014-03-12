@@ -168,7 +168,8 @@
    <attribute name="toolBarBreak">
     <bool>false</bool>
    </attribute>
-   <addaction name="actionLoadSampleDataset"/>
+   <addaction name="actionLoadSampleTable"/>
+   <addaction name="actionLoadSampleTreeHeatmap"/>
   </widget>
   <widget class="QToolBar" name="ViewActionsToolBar">
    <property name="windowTitle">
@@ -282,12 +283,20 @@
     <string>Ctrl+Alt+E</string>
    </property>
   </action>
-  <action name="actionLoadSampleDataset">
+  <action name="actionLoadSampleTable">
    <property name="text">
-    <string>Load Sample Dataset</string>
+    <string>Load Sample Table</string>
    </property>
    <property name="toolTip">
-    <string>Load Sample dataset (4Kb)</string>
+    <string>Load Sample Table (4Kb)</string>
+   </property>
+  </action>
+  <action name="actionLoadSampleTreeHeatmap">
+   <property name="text">
+    <string>Load Sample TreeHeatmap</string>
+   </property>
+   <property name="toolTip">
+    <string>Load Sample TreeHeatmap (16Kb)</string>
    </property>
   </action>
   <action name="actionFileOpenTreeOfLife">

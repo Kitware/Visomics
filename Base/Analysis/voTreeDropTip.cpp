@@ -197,6 +197,11 @@ int voTreeDropTip::execute()
       return voAnalysis::FAILURE;
       }
 
+    unsigned int numFewerVertices =
+      tree.GetPointer()->GetNumberOfVertices() - outTree->GetNumberOfVertices();
+    qDebug() << "output tree has" << numFewerVertices
+             << "fewer vertices than the input tree.";
+
     voOutputDataObject * outTreeDataObject =  new voOutputDataObject("pruned_tree", outTree);
     this->setOutput("pruned_tree", outTreeDataObject);
     vtkNew<vtkExtendedTable> outputTable;

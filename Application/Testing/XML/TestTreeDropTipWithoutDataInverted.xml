@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<events>
+    <event widget="voMainWindow/DatasetsToolBar/1QToolButton1" command="activate" arguments=""/>
+    <event widget="voMainWindow/DataPropertyDockWidget/DataPropertyDockWidgetContents/DataPropertyWidget/1QtPropertyEditorView0" command="expand" arguments="0.0"/>
+    <event widget="voMainWindow/DataPropertyDockWidget/DataPropertyDockWidgetContents/DataPropertyWidget/1QtPropertyEditorView0" command="expand" arguments="1.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0,0"/>
+    <event widget="voMainWindow/menubar" command="activate" arguments="menuAnalysis"/>
+    <event widget="voMainWindow/menubar/menuAnalysis" command="activate" arguments="Tree Drop Tip"/>
+    <event widget="voMainWindow/1voAnalysisParameterDialog0/1QtGroupBoxPropertyBrowser0/1QGroupBox0/1QComboBox1" command="set_string" arguments="Yes"/>
+    <event widget="voMainWindow/1voAnalysisParameterDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0.0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.0.0.0.0,0"/>
+</events>
