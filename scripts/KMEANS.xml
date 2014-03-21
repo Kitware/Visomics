@@ -1,6 +1,6 @@
 <analysis name="KMeans Clustering">
   <inputs>
-    <input name="input_table" type="Table"/>
+    <input name="input_table" type="Table" metadata="false" />
   </inputs>
   <outputs>
     <output name="cluster" type="Table" viewType="voKMeansClusteringDynView"
