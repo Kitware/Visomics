@@ -768,6 +768,12 @@ void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
     QStringRef inputType = stream.attributes().value("type");
     inputData->setName(inputName.toString());
     inputData->setType(inputType.toString());
+    if (stream.attributes().hasAttribute("metadata") &&
+        QString::compare(stream.attributes().value("metadata").toString(),
+                         "false", Qt::CaseInsensitive) == 0)
+      {
+      inputData->setIncludeMetadata(false);
+      }
     analysisInformation->addInput(inputData);
     stream.readNext();
     stream.readNextStartElement();

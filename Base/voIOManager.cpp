@@ -131,6 +131,13 @@ bool voIOManager::readCSVFileIntoExtendedTable(const QString& fileName,
   Self::readCSVFileIntoTable(fileName, dataTable.GetPointer(), settings, true);
   Self::readCSVFileIntoTable(fileName, inputToExtendedTable.GetPointer(), settings, false);
   Self::fillExtendedTable(inputToExtendedTable.GetPointer(), outputTable, settings);
+
+  bool transpose = settings.value(voDelimitedTextImportSettings::Transpose).toBool();
+  if (transpose)
+    {
+    voUtils::transposeTable(dataTable.GetPointer());
+    }
+
   outputTable->SetInputDataTable(dataTable.GetPointer());
 
   return true;
