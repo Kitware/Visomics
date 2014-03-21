@@ -13,11 +13,13 @@ analysis tag attributes:
         Make sure that each custom R analysis has a unique name.
 
 input tag attributes:
-  name: This is the name of the R variable that represents the input of your
-        script.
-  type: What type of input your script requires.  Currently, the only supported
-        types of input are Table or Tree.
-Currently, only scripts with one input are supported.
+  name:     This is the name of the R variable that represents the input of your
+            script.
+  type:     What type of input your script requires.  Currently, the only
+            supported types of input are Table or Tree.
+  metadata: Set this attribute to "false" if you don't want a table's metadata
+            to be loaded as part of the input of the analysis.  Otherwise, the
+            whole table will be passed to the analysis (metadata and all).
 
 outputs tag
 This is simply a container tag for the outputs of your script.  Your script

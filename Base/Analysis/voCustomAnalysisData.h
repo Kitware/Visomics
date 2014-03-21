@@ -38,6 +38,7 @@ public:
   QString viewPrettyName() const;
   QString rawViewType() const;
   QString rawViewPrettyName() const;
+  bool includeMetadata() const;
 
   void setName(const QString& name);
   void setType(const QString& type);
@@ -46,12 +47,12 @@ public:
   void setRawViewType(const QString& viewType);
   void setRawViewPrettyName(const QString& prettyName);
 
-  void setDataIsInput(bool b);
+  void setIncludeMetadata(bool b);
 
 protected:
   QString dataName;
   QString dataType;
-  bool isInput;
+  bool dataIncludeMetadata;
   QString viewDataType;
   QString prettyName;
   QString rawViewDataType;

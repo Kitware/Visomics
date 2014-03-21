@@ -1,6 +1,6 @@
 <analysis name="Fold Change">
   <inputs>
-    <input name="input_table" type="Table"/>
+    <input name="input_table" type="Table" metadata="false" />
   </inputs>
   <outputs>
     <output name="foldChange" type="Table"  rawViewType="voTableView"

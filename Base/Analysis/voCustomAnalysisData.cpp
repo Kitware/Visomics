@@ -23,6 +23,7 @@
 // --------------------------------------------------------------------------
 voCustomAnalysisData::voCustomAnalysisData(QObject* newParent): Superclass(newParent)
 {
+  this->dataIncludeMetadata = true;
 }
 
 // --------------------------------------------------------------------------
@@ -67,6 +68,12 @@ QString voCustomAnalysisData::rawViewPrettyName() const
 }
 
 // --------------------------------------------------------------------------
+bool voCustomAnalysisData::includeMetadata() const
+{
+  return this->dataIncludeMetadata;
+}
+
+// --------------------------------------------------------------------------
 void voCustomAnalysisData::setName(const QString& name)
 {
   this->dataName = name;
@@ -103,7 +110,7 @@ void voCustomAnalysisData::setRawViewPrettyName(const QString& name)
 }
 
 // --------------------------------------------------------------------------
-void voCustomAnalysisData::setDataIsInput(bool b)
+void voCustomAnalysisData::setIncludeMetadata(bool b)
 {
-  this->isInput = b;
+  this->dataIncludeMetadata = b;
 }

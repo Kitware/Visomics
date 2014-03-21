@@ -118,7 +118,14 @@ int voRemoteCustomAnalysis::execute()
       {
       type = "Table";
       extendedTable = this->getInputTable(index);
-      data = extendedTable->GetInputData();
+      if (input->includeMetadata())
+        {
+        data = extendedTable->GetInputData();
+        }
+      else
+        {
+        data = extendedTable->GetData();
+        }
       writer = vtkTableWriter::New();
       }
     else if(input->type() == "Tree")
