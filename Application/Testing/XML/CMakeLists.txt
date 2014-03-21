@@ -10,8 +10,12 @@ function (add_GUI_test testName expectedOutput)
     "${expectedOutput}")
 endfunction()
 
+# custom analyses
 add_GUI_test(GeigerFitContinuous "")
 add_GUI_test(OneZoom "")
+add_GUI_test(ANOVA "")
+
+# built-in analyses
 add_GUI_test(TreeDropTip
   "output tree has 74 fewer vertices than the input tree.")
 add_GUI_test(TreeDropTipInverted

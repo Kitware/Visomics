@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<events>
+    <event widget="voMainWindow/DatasetsToolBar/1QToolButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow/voDelimitedTextImportDialog/buttonBox/1QPushButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow/menubar" command="activate" arguments="menuAnalysis"/>
+    <event widget="voMainWindow/menubar/menuAnalysis" command="activate" arguments="ANOVA"/>
+    <event widget="voMainWindow/1voAnalysisParameterDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow/voRemoteAnalysisConnectionDialog/buttonBox/1QPushButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow" command="pause" arguments="10000"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.0.0,0"/>
+</events>
