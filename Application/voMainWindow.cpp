@@ -41,10 +41,6 @@
 #include "voInputFileDataObject.h"
 #include "voIOManager.h"
 #include "voMainWindow.h"
-#ifdef USE_MONGO
-  #include "voMongoLoadDialog.h"
-  #include "voMongoSaveDialog.h"
-#endif
 #include "voOpenTreeLoadDialog.h"
 #include "voStartupView.h"
 #ifdef Visomics_BUILD_TESTING
@@ -71,10 +67,6 @@ public:
   bool AnalysisParametersPrevShown; // Remembers previous user-selected state of widget
 
   ctkErrorLogWidget  ErrorLogWidget;
-  #ifdef USE_MONGO
-  voMongoLoadDialog *mongoLoadDialog;
-  voMongoSaveDialog *mongoSaveDialog;
-  #endif
   #ifdef Visomics_BUILD_TESTING
   voQtTesting *testRecorder;
   #endif
@@ -109,16 +101,6 @@ voMainWindow::voMainWindow(QWidget * newParent)
   this->setWindowTitle(QString("Visomics %1").arg(Visomics_VERSION));
 #endif
 
-#ifdef USE_MONGO
-  d->mongoLoadDialog = new voMongoLoadDialog(this);
-  d->mongoLoadDialog->hide();
-
-  d->mongoSaveDialog = new voMongoSaveDialog(this);
-  d->mongoSaveDialog->hide();
-
-  connect(d->mongoLoadDialog->connectButton(), SIGNAL(clicked()),
-          this, SLOT(connectToMongoForLoadWorkflow()));
-#endif
 #ifdef Visomics_BUILD_TESTING
   d->testRecorder = new voQtTesting(this);
   d->testRecorder->hide();
@@ -162,15 +144,6 @@ voMainWindow::voMainWindow(QWidget * newParent)
   connect(d->actionFileMakeTreeHeatmap, SIGNAL(triggered()),
           this, SLOT(onFileMakeTreeHeatmapActionTriggered()));
   connect(d->actionRemoteAnalysisSettings, SIGNAL(triggered()), this, SLOT(onRemoteAnalysisSettingTriggered()));
-
-#ifdef USE_MONGO
-  QAction *saveToDB = new QAction("Save Workflow to MongoDB", this);
-  QAction *loadFromDB = new QAction("Load Workflow from MongoDB", this);
-  d->menuFile->insertAction(d->actionFileLoadWorkflow, saveToDB);
-  d->menuFile->insertAction(d->actionFileMakeTreeHeatmap, loadFromDB);
-  connect(saveToDB, SIGNAL(triggered()), this, SLOT(onFileSaveWorkflowToMongoActionTriggered()));
-  connect(loadFromDB, SIGNAL(triggered()), this, SLOT(onFileLoadWorkflowFromMongoActionTriggered()));
-#endif
 
 #ifdef Visomics_BUILD_TESTING
   QAction *startRecordingTest = new QAction("Start recording test", this);
@@ -586,73 +559,6 @@ void voMainWindow::onFileOpenTreeOfLifeActionTriggered()
       databaseURL, ottolId, maxDepth);
     }
 }
-
-
-#ifdef USE_MONGO
-// --------------------------------------------------------------------------
-void voMainWindow::onFileSaveWorkflowToMongoActionTriggered()
-{
-  Q_D(voMainWindow);
-  d->mongoSaveDialog->show();
-  int status = d->mongoSaveDialog->exec();
-  if (status == voMongoSaveDialog::Accepted)
-    {
-    voApplication::application()->ioManager()->saveWorkflowToMongo(
-      d->mongoSaveDialog->GetHost(), d->mongoSaveDialog->GetDatabase(),
-      d->mongoSaveDialog->GetCollection(), d->mongoSaveDialog->GetWorkflow());
-    }
-}
-
-// --------------------------------------------------------------------------
-void voMainWindow::onFileLoadWorkflowFromMongoActionTriggered()
-{
-  Q_D(voMainWindow);
-  d->mongoLoadDialog->show();
-  int status = d->mongoLoadDialog->exec();
-  if (status == voMongoLoadDialog::Accepted)
-    {
-    voApplication::application()->ioManager()->loadWorkflowFromMongo(
-      d->mongoLoadDialog->GetDatabase(), d->mongoLoadDialog->GetCollection(),
-      d->mongoLoadDialog->GetWorkflow());
-    }
-}
-
-
-
-// --------------------------------------------------------------------------
-void voMainWindow::connectToMongoForLoadWorkflow()
-{
-  Q_D(voMainWindow);
-
-  voIOManager *ioManager = voApplication::application()->ioManager();
-
-  bool connected = ioManager->connectToMongo(d->mongoLoadDialog->GetHost());
-  if (!connected)
-    {
-    d->mongoLoadDialog->connectionFailed();
-    return;
-    }
-
-  //populate select box
-  QStringList workflowNames =
-    ioManager->listMongoWorkflows(d->mongoLoadDialog->GetDatabase(),
-                                  d->mongoLoadDialog->GetCollection());
-
-  d->mongoLoadDialog->workflowBox()->clear();
-  d->mongoLoadDialog->workflowBox()->addItems(workflowNames);
-  d->mongoLoadDialog->workflowBox()->setEnabled(true);
-
-  if (workflowNames.size() > 0)
-    {
-    d->mongoLoadDialog->enableOkButton();
-    }
-  else
-    {
-    d->mongoLoadDialog->disableOkButton();
-    }
-}
-
-#endif
 
 #ifdef Visomics_BUILD_TESTING
 void voMainWindow::playTest(QString filename)

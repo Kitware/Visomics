@@ -54,10 +54,6 @@ public slots:
   void onViewErrorLogActionTriggered();
   void onFileSaveWorkflowActionTriggered();
   void onFileLoadWorkflowActionTriggered();
-#ifdef USE_MONGO
-  void onFileSaveWorkflowToMongoActionTriggered();
-  void onFileLoadWorkflowFromMongoActionTriggered();
-#endif
 #ifdef Visomics_BUILD_TESTING
   void playTest(QString filename);
 #endif
@@ -86,9 +82,6 @@ protected slots:
   void makeTreeHeatmap();
   void makeTreeHeatmapDialogClosed();
 
-#ifdef USE_MONGO
-  void connectToMongoForLoadWorkflow();
-#endif
 protected:
   QScopedPointer<voMainWindowPrivate> d_ptr;
 

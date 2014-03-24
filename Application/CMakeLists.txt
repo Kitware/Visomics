@@ -19,10 +19,6 @@ set(KIT_SRCS
   voDelimitedTextPreviewModel.h
   voMainWindow.cpp
   voMainWindow.h
-  voMongoLoadDialog.cpp
-  voMongoLoadDialog.h
-  voMongoSaveDialog.cpp
-  voMongoSaveDialog.h
   voOpenTreeLoadDialog.cpp
   voOpenTreeLoadDialog.h
   voNormalizationWidget.cpp
@@ -57,8 +53,6 @@ set(KIT_MOC_SRCS
   voDelimitedTextPreview.h
   voDelimitedTextPreviewModel.h
   voMainWindow.h
-  voMongoLoadDialog.h
-  voMongoSaveDialog.h
   voNormalizationWidget.h
   voOpenTreeLoadDialog.h
   voQtTesting.h
@@ -71,8 +65,6 @@ set(KIT_MOC_SRCS
 set(KIT_UI_FORMS
   Resources/UI/voDelimitedTextImportDialog.ui
   Resources/UI/voDelimitedTextImportWidget.ui
-  Resources/UI/voMongoLoadDialog.ui
-  Resources/UI/voMongoSaveDialog.ui
   Resources/UI/voOpenTreeLoadDialog.ui
   Resources/UI/voRemoteAnalysisConnectionDialog.ui
   )
@@ -155,8 +147,7 @@ if (BUILD_TESTING)
   set(QtTesting_LIB "QtTesting")
 endif()
 add_executable(VisomicsApp-real Main.cpp)
-target_link_libraries(
-  VisomicsApp-real VisomicsAppLib ${QtTesting_LIB} ${MongoDB_LIBRARIES})
+target_link_libraries( VisomicsApp-real VisomicsAppLib ${QtTesting_LIB})
 set_target_properties(VisomicsApp-real PROPERTIES OUTPUT_NAME ${APP_NAME}-real)
 
 if(APPLE)

@@ -39,13 +39,6 @@ class vtkExtendedTable;
 class vtkTable;
 class vtkTree;
 
-#ifdef USE_MONGO
-  namespace mongo
-    {
-    class DBClientConnection;
-    };
-#endif
-
 class voIOManager
 {
 public:
@@ -84,22 +77,6 @@ public:
   void saveWorkflowToFile(const QString& fileName);
   void loadWorkflowFromFile(const QString& fileName);
 
-  #ifdef USE_MONGO
-  bool connectToMongo(const QString& hostName);
-
-  bool saveWorkflowToMongo(const QString& hostName,
-                           const QString& databaseName,
-                           const QString& collectionName,
-                           const QString& workflowName);
-
-  void loadWorkflowFromMongo(const QString& databaseName,
-                             const QString& collectionName,
-                             const QString& workflowName);
-
-  QStringList listMongoWorkflows(const QString& databaseName,
-                                 const QString& collectionName);
-  #endif
-
   void loadTreeFromOpenTreeDB(const QString& hostURL,
                              const QString& ottolID,
                              const QString& maxDepth);
@@ -123,13 +100,6 @@ protected:
 
   QMap<voInputFileDataObject *, voDelimitedTextImportSettings>
     tableSettings;
-
-  #ifdef USE_MONGO
-  bool mongoWorkflowAlreadyExists(const QString& queryTarget,
-                                  const QString& workflowName);
-  mongo::DBClientConnection *MongoConnection;
-  #endif
-
 };
 
 #endif
