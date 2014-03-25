@@ -26,3 +26,4 @@ add_GUI_test(TreeDropTipWithoutData
   "output tree has 3 fewer vertices than the input tree.")
 add_GUI_test(TreeDropTipWithoutDataInverted
   "output tree has 178 fewer vertices than the input tree.")
+add_GUI_test(ReadWriteWorkflow "Tree Drop Tip With Data 2")
