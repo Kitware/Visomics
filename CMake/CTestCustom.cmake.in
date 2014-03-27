@@ -29,4 +29,6 @@ SET(CTEST_CUSTOM_WARNING_EXCEPTION
   "may be unsafe"
   "old-style cast"
   "The POSIX name for this item is deprecated"
+  # Superbuild
+  "commits behind, not connected"
   )
