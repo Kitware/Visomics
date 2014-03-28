@@ -77,6 +77,7 @@ voRemoteCustomAnalysis::voRemoteCustomAnalysis(QObject* newParent):
     m_networkManager(new QNetworkAccessManager(this))
 {
 
+  m_status = "";
   connect(m_networkManager,
           SIGNAL(authenticationRequired(QNetworkReply *, QAuthenticator *)),
           this,
@@ -332,16 +333,9 @@ void voRemoteCustomAnalysis::handleStatusReply(QNetworkReply *reply)
     return;
     }
 
-  std::string status = root["status"].asString();
+  m_status = root["status"].asString().c_str();
 
-  if (status == "FAILURE")
-    {
-    emit error(
-        tr("Remote R job failed:\n%1")
-          .arg(QString::fromStdString(root["message"].asString())));
-    return;
-    }
-  else if (status == "SUCCESS")
+  if (m_status == "FAILURE" || m_status == "SUCCESS")
     {
     QString resultUrl = tr("%1tasks/celery/%2/result").arg(m_baseUrl)
         .arg(m_taskId);
@@ -378,6 +372,16 @@ void voRemoteCustomAnalysis::handleResultReply(QNetworkReply *reply)
     emit error("Unable to parse JSON response");
     return;
     }
+
+  if (m_status == "FAILURE")
+    {
+    emit error(
+        tr("Remote R job failed:\n%1")
+          .arg(QString::fromStdString(root["result"].asString())));
+    return;
+    }
+  // otherwise we assume status is "SUCCESS", since this slot should
+  // not be connected on "PENDING".
 
   Json::Value outputs = root["result"]["output"];
   for (unsigned int index = 0; index < outputs.size(); index++)

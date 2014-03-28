@@ -22,6 +22,10 @@ def run(input):
 
 def execute(inputs, outputs, script):
 
+    # prepend some R code to the beginning of the script
+    # this allows us to capture useful error output information
+    script = "con <- file(\"/tmp/R_errors.txt\", \"w\")\nsink(con, type=\"message\")\n" + script
+
     # Setup the pipeline
     rcalc = vtk.vtkRCalculatorFilter()
     rcalc.SetRscript(script)
@@ -97,9 +101,14 @@ def execute(inputs, outputs, script):
         index += 1
     rcalc.GetTrees(names)
 
-    rcalc.Update()
+    try:
+        rcalc.Update()
+        output = rcalc.GetOutput()
+    except vtk.ErrorEventException:
+        f = file("/tmp/R_errors.txt", "r")
+        error_msg = f.read()
+        raise Exception(error_msg)
 
-    output = rcalc.GetOutput()
     print str(output)
     output_dataobjects = []
 

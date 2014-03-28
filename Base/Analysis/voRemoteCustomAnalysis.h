@@ -53,6 +53,7 @@ private:
   QString m_baseUrl;
   QString m_user;
   QString m_password;
+  QString m_status;
   bool m_credentialsProvided;
   QNetworkAccessManager *m_networkManager;
 
