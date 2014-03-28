@@ -16,6 +16,7 @@ add_GUI_test(FOLD "")
 add_GUI_test(GeigerFitContinuous "")
 add_GUI_test(KMEANS "")
 add_GUI_test(OneZoom "")
+add_GUI_test(XCorrel "")
 
 # built-in analyses
 add_GUI_test(TreeDropTip

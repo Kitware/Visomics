@@ -1,0 +1,21 @@
+<analysis name="Cross Correlation">
+  <inputs>
+    <input name="input_table" type="Table" />
+  </inputs>
+  <outputs>
+    <output name="correl" type="Table"
+            viewType="voHeatMapView" viewPrettyName="Correlation Heatmap"
+            rawViewType="voTableView" rawViewPrettyName="Correlation (Table)"/>
+  </outputs>
+  <parameters>
+    <parameter name="correlation_method" type="Enum">
+      <title>Correlation Method</title>
+      <description>
+        The correlation coefficient used.
+      </description>
+      <option>pearson</option>
+      <option>kendall</option>
+      <option>spearman</option>
+    </parameter>
+  </parameters>
+</analysis>
