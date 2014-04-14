@@ -1,7 +1,4 @@
 function (add_GUI_test testName expectedOutput)
-  if (NOT expectedOutput)
-    set(expectedOutput "Success =  true")
-  endif()
   add_test(
     NAME ${testName}
     COMMAND VisomicsApp ${CMAKE_CURRENT_SOURCE_DIR}/Test${testName}.xml
@@ -11,12 +8,12 @@ function (add_GUI_test testName expectedOutput)
 endfunction()
 
 # custom analyses
-add_GUI_test(ANOVA "")
-add_GUI_test(FOLD "")
-add_GUI_test(GeigerFitContinuous "")
-add_GUI_test(KMEANS "")
-add_GUI_test(OneZoom "")
-add_GUI_test(XCorrel "")
+add_GUI_test(ANOVA "0.73")
+add_GUI_test(FOLD "11.0")
+add_GUI_test(GeigerFitContinuous "Success =  true")
+add_GUI_test(KMEANS "Success =  true")
+add_GUI_test(OneZoom "Success =  true")
+add_GUI_test(XCorrel "0.160")
 
 # built-in analyses
 add_GUI_test(TreeDropTip

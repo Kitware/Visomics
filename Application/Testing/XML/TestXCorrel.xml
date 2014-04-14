@@ -1,19 +1,20 @@
 <?xml version="1.0"?>
 <events>
-    <event widget="voMainWindow/DatasetsToolBar/1QToolButton1" command="activate" arguments=""/>
-    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0"/>
-    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.1.0"/>
-    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.1.0,0"/>
+    <event widget="voMainWindow/DatasetsToolBar/1QToolButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow/voDelimitedTextImportDialog/ImportStepTabWidget/qt_tabwidget_stackedwidget/ImportTab/DelimitedTextImportWidget/RowsColumnsGroupBox/TransposeCheckBox" command="set_boolean" arguments="true"/>
+    <event widget="voMainWindow/voDelimitedTextImportDialog/buttonBox/1QPushButton0" command="activate" arguments=""/>
     <event widget="voMainWindow/menubar" command="activate" arguments="menuAnalysis"/>
     <event widget="voMainWindow/menubar/menuAnalysis" command="activate" arguments="Cross Correlation"/>
     <event widget="voMainWindow/1voAnalysisParameterDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments=""/>
     <event widget="voMainWindow/voRemoteAnalysisConnectionDialog/buttonBox/1QPushButton0" command="activate" arguments=""/>
     <event widget="voMainWindow" command="pause" arguments="5000"/>
-    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0.1.0"/>
-    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.1.0.0.0"/>
-    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0.1.0.0.0"/>
-    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.1.0.0.0.0.0"/>
-    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.1.0.0.0.0.0,0"/>
-    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.1.0.0.0.1.0"/>
-    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.1.0.0.0.1.0,0"/>
+    <event widget="voMainWindow" command="pause" arguments="5000"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.2.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.2.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.1.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.1.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.0.0,0"/>
+    <event widget="voMainWindow/1voViewStackedWidget0/Cross Correlation 1 | Correlation Table/1QTableView0" command="mousePress" arguments="1,1,0,49,10,/1:1"/>
+    <event widget="voMainWindow/1voViewStackedWidget0/Cross Correlation 1 | Correlation Table/1QTableView0" command="mouseRelease" arguments="1,0,0,49,10,/1:1"/>
 </events>

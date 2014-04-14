@@ -23,6 +23,7 @@
 #define __voTableView_h
 
 // Qt includes
+#include <QItemSelectionModel>
 #include <QStandardItemModel>
 
 // Visomics includes
@@ -47,6 +48,8 @@ public:
 
 protected slots:
   void onExportToCsvActionTriggered();
+  void printSelected(const QItemSelection &selected,
+                     const QItemSelection &deselected);
 
 protected:
   void setupUi(QLayout * layout);

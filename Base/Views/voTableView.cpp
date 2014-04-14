@@ -25,11 +25,11 @@
 #include <QFileDialog>
 #include <QTableView>
 #include <QLayout>
-#include <QStandardItemModel>
 #include <QWidget>
 #include <QHeaderView>
 
 // Visomics includes
+#include "voConfigure.h" // For Visomics_BUILD_TESTING
 #include "voDataObject.h"
 #include "voIOManager.h"
 #include "voTableDataObject.h"
@@ -115,6 +115,14 @@ void voTableView::setupUi(QLayout *layout)
   d->TableView->setModel(&d->Model);
 
   layout->addWidget(d->TableView);
+
+  #ifdef Visomics_BUILD_TESTING
+  connect(
+    d->TableView->selectionModel(),
+    SIGNAL(selectionChanged(const QItemSelection &, const QItemSelection &)),
+    this,
+    SLOT(printSelected(const QItemSelection &, const QItemSelection &)));
+  #endif
 }
 
 namespace
@@ -212,46 +220,16 @@ void voTableView::setDataObjectInternal(const voDataObject& dataObject)
   //this->Outputs["output"] = ot;
 }
 
+
 // --------------------------------------------------------------------------
-//void voTableView::selectedTable(vtkTable* table)
-//{
-//  vtkTable* t = vtkTable::SafeDownCast(this->input().data());
-//  if (!t)
-//    {
-//    return;
-//    }
+void voTableView::printSelected(const QItemSelection &selected,
+                                const QItemSelection &deselected)
+{
+  Q_UNUSED(deselected);
 
-//  QSet<vtkIdType> rows;
-//  QSet<vtkIdType> cols;
+  foreach(const QModelIndex& index, selected.indexes())
+    {
+    qDebug() << index.data().toString();
+    }
+}
 
-//  // Always select the first column (headers)
-//  cols << 0;
-
-//  const QModelIndexList selected = this->View->selectionModel()->selectedIndexes();
-//  if (selected.size() == 0)
-//    {
-//    table->ShallowCopy(t);
-//    return;
-//    }
-//  foreach (QModelIndex ind, selected)
-//    {
-//    cols << ind.row();
-//    rows << ind.column();
-//    }
-
-//  foreach (vtkIdType c, cols)
-//    {
-//    vtkAbstractArray* col = t->GetColumn(c);
-//    vtkAbstractArray* new_col = col->NewInstance();
-//    new_col->SetName(col->GetName());
-//    new_col->SetNumberOfTuples(rows.size());
-//    table->AddColumn(new_col);
-//    int ind = 0;
-//    foreach (vtkIdType r, rows)
-//      {
-//      new_col->InsertTuple(ind, r, col);
-//      ++ind;
-//      }
-//    new_col->Delete();
-//    }
-//}

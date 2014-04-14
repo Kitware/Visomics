@@ -15,4 +15,8 @@
     <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.0.0,0"/>
     <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.1.0"/>
     <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.1.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.0.0,0"/>
+    <event widget="voMainWindow/1voViewStackedWidget0/Fold Change 1 | Change (Table)/1QTableView0" command="mousePress" arguments="1,1,0,69,17,/0:1"/>
+    <event widget="voMainWindow/1voViewStackedWidget0/Fold Change 1 | Change (Table)/1QTableView0" command="mouseRelease" arguments="1,0,0,69,17,/0:1"/>
 </events>
