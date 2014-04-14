@@ -44,33 +44,15 @@ QString voCustomAnalysisData::type() const
 }
 
 // --------------------------------------------------------------------------
-QString voCustomAnalysisData::viewType() const
-{
-  return this->viewDataType;
-}
-
-// --------------------------------------------------------------------------
-QString voCustomAnalysisData::viewPrettyName() const
-{
-  return this->prettyName;
-}
-
-// --------------------------------------------------------------------------
-QString voCustomAnalysisData::rawViewType() const
-{
-  return this->rawViewDataType;
-}
-
-// --------------------------------------------------------------------------
-QString voCustomAnalysisData::rawViewPrettyName() const
-{
-  return this->rawPrettyName;
-}
-
-// --------------------------------------------------------------------------
 bool voCustomAnalysisData::includeMetadata() const
 {
   return this->dataIncludeMetadata;
+}
+
+// --------------------------------------------------------------------------
+QList< QPair< QString, QString> > voCustomAnalysisData::views() const
+{
+  return this->dataViews;
 }
 
 // --------------------------------------------------------------------------
@@ -86,27 +68,9 @@ void voCustomAnalysisData::setType(const QString& type)
 }
 
 // --------------------------------------------------------------------------
-void voCustomAnalysisData::setViewType(const QString& type)
+void voCustomAnalysisData::addView(const QString& name, const QString& type)
 {
-  this->viewDataType = type;
-}
-
-// --------------------------------------------------------------------------
-void voCustomAnalysisData::setViewPrettyName(const QString& name)
-{
-  this->prettyName = name;
-}
-
-// --------------------------------------------------------------------------
-void voCustomAnalysisData::setRawViewType(const QString& type)
-{
-  this->rawViewDataType = type;
-}
-
-// --------------------------------------------------------------------------
-void voCustomAnalysisData::setRawViewPrettyName(const QString& name)
-{
-  this->rawPrettyName = name;
+  this->dataViews.append(QPair<QString, QString>(name, type));
 }
 
 // --------------------------------------------------------------------------

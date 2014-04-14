@@ -65,6 +65,8 @@ public:
                      const QString& viewPrettyName = QString(),
                      const QString& rawViewType = QString(),
                      const QString& rawViewPrettyName = QString());
+  void addOutputView(const QString& outputName, const QString& viewType,
+                     const QString& viewPrettyName);
 
   void addEnsembleOutputType(const QString& ensembleOutputName, const QString& outputType,
                      const QString& rawViewType,

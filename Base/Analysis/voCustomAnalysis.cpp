@@ -96,10 +96,22 @@ void voCustomAnalysis::setOutputInformation()
     {
     QString name = output->name();
     QString type = output->type();
-    QString viewType = output->viewType();
-    QString viewPrettyName = output->viewPrettyName();
-    QString rawViewType = output->rawViewType();
-    QString rawViewPrettyName = output->rawViewPrettyName();
+
+    QString viewType = "";
+    QString viewPrettyName = "";
+    QString rawViewType = "";
+    QString rawViewPrettyName = "";
+    QList< QPair <QString, QString> > views = output->views();
+    if (views.size() > 0)
+      {
+      rawViewPrettyName = views.at(0).first;
+      rawViewType = views.at(0).second;
+      }
+    if (views.size() > 1)
+      {
+      viewPrettyName = views.at(1).first;
+      viewType = views.at(1).second;
+      }
 
     if (type == "Table")
       {
@@ -117,6 +129,17 @@ void voCustomAnalysis::setOutputInformation()
       {
       qCritical() << "Unsupported output type in voCustomAnalysis:" << type;
       }
+
+    if (views.size() > 2)
+      {
+      for (int i = 2; i < views.size(); ++i)
+        {
+        viewPrettyName = views.at(i).first;
+        viewType = views.at(i).second;
+        this->addOutputView(name, viewType, viewPrettyName);
+        }
+      }
+
     }
 }
 

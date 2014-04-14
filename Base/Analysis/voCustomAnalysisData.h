@@ -23,6 +23,7 @@
 
 // Qt includes
 #include <QObject>
+#include <QPair>
 
 class voCustomAnalysisData : public QObject
 {
@@ -39,13 +40,11 @@ public:
   QString rawViewType() const;
   QString rawViewPrettyName() const;
   bool includeMetadata() const;
+  QList< QPair< QString, QString> > views() const;
 
   void setName(const QString& name);
   void setType(const QString& type);
-  void setViewType(const QString& viewType);
-  void setViewPrettyName(const QString& prettyName);
-  void setRawViewType(const QString& viewType);
-  void setRawViewPrettyName(const QString& prettyName);
+  void addView(const QString& name, const QString& type);
 
   void setIncludeMetadata(bool b);
 
@@ -53,10 +52,7 @@ protected:
   QString dataName;
   QString dataType;
   bool dataIncludeMetadata;
-  QString viewDataType;
-  QString prettyName;
-  QString rawViewDataType;
-  QString rawPrettyName;
+  QList< QPair< QString, QString> > dataViews;
 
 private:
   Q_DISABLE_COPY(voCustomAnalysisData);

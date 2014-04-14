@@ -32,12 +32,16 @@
 #include <QVTKWidget.h>
 #include <vtkArcParallelEdgeStrategy.h>
 #include <vtkColorTransferFunction.h>
+#include <vtkDoubleArray.h>
 #include <vtkGraph.h>
 #include <vtkGraphLayoutView.h>
 #include <vtkLookupTable.h>
 #include <vtkNew.h>
 #include <vtkRenderedGraphRepresentation.h>
 #include <vtkSmartPointer.h>
+#include <vtkStringArray.h>
+#include <vtkTable.h>
+#include <vtkTableToGraph.h>
 #include <vtkTextProperty.h>
 #include <vtkViewTheme.h>
 
@@ -118,7 +122,55 @@ void voCorrelationGraphView::setDataObjectInternal(const voDataObject& dataObjec
 {
   Q_D(voCorrelationGraphView);
 
-  vtkGraph * graph = vtkGraph::SafeDownCast(dataObject.dataAsVTKDataObject());
+  vtkTable * table = vtkTable::SafeDownCast(dataObject.dataAsVTKDataObject());
+  if (!table)
+    {
+    qCritical() << "voHeatMapView - Failed to setDataObject - vtkTable data is expected !";
+    return;
+    }
+
+  vtkNew<vtkStringArray> columnNames;
+  for (vtkIdType c = 1; c < table->GetNumberOfColumns(); ++c)
+    {
+    columnNames->InsertNextValue(table->GetColumnName(c));
+    }
+
+  // Find high correlations to put in graph
+  vtkNew<vtkTable> sparse;
+  vtkNew<vtkStringArray> col1;
+  vtkNew<vtkStringArray> col2;
+  vtkNew<vtkDoubleArray> valueArr;
+  col1->SetName("Column 1");
+  col2->SetName("Column 2");
+  valueArr->SetName("Correlation");
+
+  vtkIdType numRows = table->GetNumberOfRows();
+  for (vtkIdType r = 0; r < numRows; ++r)
+    {
+    for (vtkIdType c = r+1; c < numRows; ++c)
+      {
+      double val = table->GetValue(r, c + 1).ToDouble();
+      if (qAbs(val) > 0.5)
+        {
+        col1->InsertNextValue(columnNames->GetValue(r));
+        col2->InsertNextValue(columnNames->GetValue(c));
+        valueArr->InsertNextValue(val);
+        }
+      }
+    }
+  sparse->AddColumn(col1.GetPointer());
+  sparse->AddColumn(col2.GetPointer());
+  sparse->AddColumn(valueArr.GetPointer());
+
+  // Build the graph
+  vtkNew<vtkTableToGraph> graphAlg;
+  graphAlg->SetInputData(sparse.GetPointer());
+  graphAlg->AddLinkVertex("Column 1");
+  graphAlg->AddLinkVertex("Column 2");
+  graphAlg->AddLinkEdge("Column 1", "Column 2");
+  graphAlg->Update();
+
+  vtkGraph * graph = graphAlg->GetOutput();
   if (!graph)
     {
     qCritical() << "voCorrelationGraphView - Failed to setDataObject - vtkGraph data is expected !";

@@ -4,10 +4,12 @@
     <input name="tableData" type="Table"/>
   </inputs>
   <outputs>
-    <output name="resultTree" type="Tree" rawViewType="voTreeHeatmapView"
-            rawViewPrettyName="fitted tree"/>
-    <output name="resultTable" type="Table" rawViewType="voTableView"
-            rawViewPrettyName="fitted modeling parameters"/>
+    <output name="resultTree" type="Tree">
+      <view type="voTreeHeatmapView" name="fitted tree"/>
+    </output>
+    <output name="resultTable" type="Table">
+      <view type="voTableView" name="fitted modeling parameters"/>
+    </output>
   </outputs>
 
   <parameters>

@@ -31,6 +31,13 @@ output tag attributes:
   type: What type of data this output is.  Currently, the only supported types
         of output are Table or Tree.
 
+An output, in turn, can contain any number of views.  These are represented
+by the <view> element.  The first view listed should be the "raw" view into
+the output data.
+view tag attributes:
+  name: The name of the view, as it will appear in the GUI.
+  type: The name of the voView subclass to use for this view.
+
 parameters tag
 Container tag for the parameters of your script.  If your script does not use
 parameters, then you do not need to include this tag.

@@ -307,6 +307,16 @@ void voAnalysis::addOutputType(const QString& outputName, const QString& outputT
 }
 
 // --------------------------------------------------------------------------
+void voAnalysis::addOutputView(const QString& outputName,
+                               const QString& viewType,
+                               const QString& viewPrettyName)
+{
+  Q_D(voAnalysis);
+  d->OutputViewInformation.insertMulti(outputName, viewType);
+  d->OutputViewPrettyName.insert(outputName + viewType, viewPrettyName);
+}
+
+// --------------------------------------------------------------------------
 QString voAnalysis::outputType(const QString& outputName) const
 {
   Q_D(const voAnalysis);
@@ -485,7 +495,9 @@ QStringList voAnalysis::viewTypesForOutput(const QString& outputName)const
     return QStringList();
     }
 
-  return d->OutputViewInformation.values(outputName);
+  QStringList viewTypes = d->OutputViewInformation.values(outputName);
+  viewTypes.sort();
+  return viewTypes;
 }
 
 //// --------------------------------------------------------------------------

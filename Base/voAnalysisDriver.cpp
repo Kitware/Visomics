@@ -810,16 +810,32 @@ void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
       new voCustomAnalysisData(analysisInformation);
     QStringRef outputName = stream.attributes().value("name");
     QStringRef outputType = stream.attributes().value("type");
-    QStringRef outputViewType = stream.attributes().value("viewType");
-    QStringRef outputViewPrettyName = stream.attributes().value("viewPrettyName");
-    QStringRef outputRawViewType = stream.attributes().value("rawViewType");
-    QStringRef outputRawViewPrettyName = stream.attributes().value("rawViewPrettyName");
     outputData->setName(outputName.toString());
     outputData->setType(outputType.toString());
-    outputData->setViewType(outputViewType.toString());
-    outputData->setViewPrettyName(outputViewPrettyName.toString());
-    outputData->setRawViewType(outputRawViewType.toString());
-    outputData->setRawViewPrettyName(outputRawViewPrettyName.toString());
+
+    stream.readNextStartElement(); //view
+    tagName = stream.name().toString();
+    while (tagName != "output" && !stream.atEnd())
+      {
+      if (tagName != "view")
+        {
+        qCritical() << "expected view, found " << tagName;
+        return;
+        }
+
+      QStringRef viewName = stream.attributes().value("name");
+      QStringRef viewType = stream.attributes().value("type");
+      // add info to outputData
+      outputData->addView(viewName.toString(), viewType.toString());
+
+      stream.readNext();
+      stream.readNextStartElement();
+      tagName = stream.name().toString();
+      if (tagName == "output" || tagName == "outputs")
+        {
+        break;
+        }
+      }
     analysisInformation->addOutput(outputData);
     stream.readNext();
     stream.readNextStartElement();
@@ -908,6 +924,7 @@ void voAnalysisDriver::loadAnalysisFromScript(const QString& xmlFileName,
   emit this->addedCustomAnalysis(analysisInformation->name());
 }
 
+// --------------------------------------------------------------------------
 void voAnalysisDriver::provideRemoteAnalysisUrl(QUrl *url)
 {
   Q_D(voAnalysisDriver);
@@ -926,12 +943,14 @@ void voAnalysisDriver::provideRemoteAnalysisUrl(QUrl *url)
     }
 }
 
+// --------------------------------------------------------------------------
 void voAnalysisDriver::updateRemoteAnalysisUrl(QUrl * url)
 {
   Q_D(voAnalysisDriver);
   d->remoteAnalysisUrl = *url;
 }
 
+// --------------------------------------------------------------------------
 void voAnalysisDriver::onInvalidCredentials()
 {
   Q_D(voAnalysisDriver);
@@ -943,6 +962,7 @@ void voAnalysisDriver::onInvalidCredentials()
       "Authentication error", "Invalid username or password",  QMessageBox::Ok);
 }
 
+// --------------------------------------------------------------------------
 void voAnalysisDriver::onAnalysisSubmitted()
 {
   QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));

@@ -4,7 +4,8 @@
     <input name="tree2" type="Tree"/>
   </inputs>
   <outputs>
-    <output name="comparisonTree" type="Tree" rawViewType="voTreeHeatmapView"
-            rawViewPrettyName="comparison tree"/>
+    <output name="comparisonTree" type="Tree">
+      <view type="voTreeHeatmapView" name="comparison tree"/>
+    </output>
   </outputs>
 </analysis>
