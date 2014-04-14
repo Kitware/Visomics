@@ -162,6 +162,7 @@ voMainWindow::voMainWindow(QWidget * newParent)
 
 
   // Populate Analysis menu
+  this->loadAnalysisScripts();
   voAnalysisFactory* analysisFactory = voApplication::application()->analysisFactory();
   QList<QAction*> analysisActions;
   QStringList registeredAnalysisPrettyNames = analysisFactory->registeredAnalysisPrettyNames();
@@ -250,8 +251,6 @@ voMainWindow::voMainWindow(QWidget * newParent)
           SIGNAL(remoteAnalysisUrlUpdated(QUrl *)),
           voApplication::application()->analysisDriver(),
           SLOT(updateRemoteAnalysisUrl(QUrl *)));
-
-  this->loadAnalysisScripts();
 
   // Initialize status bar
   this->statusBar()->showMessage(tr(""), 2000);
