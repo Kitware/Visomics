@@ -1,0 +1,26 @@
+<analysis name="Principal Component Analysis">
+  <inputs>
+    <input name="input_table" type="Table" />
+  </inputs>
+  <outputs>
+    <output name="projection" type="Table">
+      <view type="voTableView"  name="Projection (Table)"/>
+      <view type="voPCAProjectionView" name="Projection (Plot)"/>
+      <view type="voPCAProjectionDynView" name="Projection (Interactive Plot)"/>
+    </output>
+    <output name="pcaRot" type="Table">
+      <view type="voTableView"  name="Rotation (Table)"/>
+    </output>
+    <output name="stddev" type="Table">
+      <view type="voTableView" name="Std. Deviation (Table)"/>
+    </output>
+    <output name="perload" type="Table">
+      <view type="voTableView" name="Percent Loading (Table)"/>
+      <view type="voPCABarView" name="Percent Loading (Plot)"/>
+    </output>
+    <output name="sumperload" type="Table">
+      <view type="voTableView" name="Cumulative Percent Loading (Table)"/>
+      <view type="voPCABarView" name="Cumulative Percent Loading (Plot)"/>
+    </output>
+  </outputs>
+</analysis>

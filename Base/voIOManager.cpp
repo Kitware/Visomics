@@ -125,7 +125,7 @@ bool voIOManager::readCSVFileIntoExtendedTable(const QString& fileName,
   bool transpose = settings.value(voDelimitedTextImportSettings::Transpose).toBool();
   if (transpose)
     {
-    voUtils::transposeTable(dataTable.GetPointer(), voUtils::FirstColumnIntoColumnNames);
+    voUtils::transposeTable(dataTable.GetPointer(), voUtils::Headers);
     }
 
   outputTable->SetInputDataTable(dataTable.GetPointer());

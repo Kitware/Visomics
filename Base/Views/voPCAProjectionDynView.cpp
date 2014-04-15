@@ -28,6 +28,7 @@
 #include "voUtils.h"
 
 // VTK includes
+#include <vtkNew.h>
 #include <vtkTable.h>
 
 // --------------------------------------------------------------------------
@@ -68,5 +69,8 @@ QString voPCAProjectionDynView::stringify(const voDataObject& dataObject)
     qCritical() << "voPCAProjectionDynView - Failed to setDataObject - vtkTable data is expected !";
     return QString();
     }
-  return voUtils::stringify(this->viewName(), table, QList<vtkIdType>() << 0);
+
+  vtkNew<vtkTable> transpose;
+  voUtils::transposeTable(table, transpose.GetPointer(), voUtils::Headers);
+  return voUtils::stringify(this->viewName(), transpose.GetPointer(), QList<vtkIdType>() << 0);
 }

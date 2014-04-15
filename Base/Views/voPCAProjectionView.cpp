@@ -33,7 +33,6 @@
 #include <vtkChartXY.h>
 #include <vtkContextScene.h>
 #include <vtkContextView.h>
-#include <vtkNew.h>
 #include <vtkPlot.h>
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
@@ -106,13 +105,7 @@ void voPCAProjectionView::setDataObjectInternal(const voDataObject& dataObject)
     return;
     }
 
-  // Transpose table - this is pretty much unavoidable: vtkPlot expects each dimension
-  // to be a column, but the information should be presented to the user with each
-  // data point (principle component) in its own column
-  vtkNew<vtkTable> transpose;
-  voUtils::transposeTable(table, transpose.GetPointer(), voUtils::Headers);
-
-  vtkStringArray* labels = vtkStringArray::SafeDownCast(transpose->GetColumn(0));
+  vtkStringArray* labels = vtkStringArray::SafeDownCast(table->GetColumn(0));
   if (!labels)
     {
     qCritical() << "voPCAProjectionView - Failed to setDataObject - first column of vtkTable data could not be converted to string !";
@@ -122,14 +115,13 @@ void voPCAProjectionView::setDataObjectInternal(const voDataObject& dataObject)
   // See http://www.colorjack.com/?swatch=A6CEE3
   unsigned char color[3] = {166, 206, 227};
 
-  // TODO Extract only the first two rows of the data table instead of transposing the entire table
-  d->Plot->SetInputData(transpose.GetPointer(), 1, 2);
+  d->Plot->SetInputData(table, 1, 2);
   d->Plot->SetColor(color[0], color[1], color[2], 255);
   d->Plot->SetWidth(10);
   d->Plot->SetIndexedLabels(labels);
 
-  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(transpose->GetColumnName(1)); // x
-  d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(transpose->GetColumnName(2)); // y
+  d->Chart->GetAxis(vtkAxis::BOTTOM)->SetTitle(table->GetColumnName(1)); // x
+  d->Chart->GetAxis(vtkAxis::LEFT)->SetTitle(table->GetColumnName(2)); // y
 
   d->ChartView->GetRenderWindow()->SetMultiSamples(4);
   d->ChartView->Render();
