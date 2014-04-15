@@ -43,13 +43,7 @@ OPTION(Visomics_SUPERBUILD "Build Visomics and the projects it depends on via Su
 MARK_AS_ADVANCED(Visomics_SUPERBUILD)
 
 #-----------------------------------------------------------------------------
-# Build options
-#
-SET(Visomics_KEGG_SERVER_HOSTNAME "visomics.kitware.com" CACHE STRING "KEGG Server hostname")
-SET(Visomics_KEGG_SERVER_PORT "8090" CACHE STRING "KEGG Server port")
-
-#-----------------------------------------------------------------------------
-# Visomics version number.  An even minor number corresponds to releases.
+# Visomics version number.
 #
 SET(Visomics_MAJOR_VERSION 0)
 SET(Visomics_MINOR_VERSION 6)

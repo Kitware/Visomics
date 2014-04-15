@@ -2,10 +2,6 @@
 PROJECT(VisomicsBase)
 
 SET(KIT_SRCS
-  Analysis/voKEGGCompounds.h
-  Analysis/voKEGGCompounds.cpp
-  Analysis/voKEGGPathway.h
-  Analysis/voKEGGPathway.cpp
   Analysis/voOneZoom.cpp
   Analysis/voOneZoom.h
   Analysis/voCustomAnalysis.cpp
@@ -39,12 +35,6 @@ SET(KIT_SRCS
   Views/voHorizontalBarView.cpp
   Views/voInteractorStyleRubberBand2D.h
   Views/voInteractorStyleRubberBand2D.cpp
-  Views/voKEGGImageView.cpp
-  Views/voKEGGImageView.h
-  Views/voKEGGPathwayView.cpp
-  Views/voKEGGPathwayView.h
-  Views/voKEGGTableView.cpp
-  Views/voKEGGTableView.h
   Views/voKMeansClusteringDynView.cpp
   Views/voKMeansClusteringDynView.h
   Views/voOneZoomDynView.cpp
@@ -89,8 +79,6 @@ SET(KIT_SRCS
   voInputFileDataObject.h
   voIOManager.cpp
   voIOManager.h
-  voKEGGUtils.cpp
-  voKEGGUtils.h
   voQObjectFactory.h
   voOutputDataObject.cpp
   voOutputDataObject.h
@@ -112,8 +100,6 @@ SET(KIT_SRCS
   )
 
 SET(KIT_MOC_SRCS
-  Analysis/voKEGGCompounds.h
-  Analysis/voKEGGPathway.h
   Analysis/voOneZoom.h
   Analysis/voCustomAnalysis.h
   Analysis/voCustomAnalysisData.h
@@ -130,9 +116,6 @@ SET(KIT_MOC_SRCS
   Views/voHeatMapView.h
   Views/voHierarchicalClusteringDynView.h
   Views/voHorizontalBarView.h
-  Views/voKEGGImageView.h
-  Views/voKEGGPathwayView.h
-  Views/voKEGGTableView.h
   Views/voKMeansClusteringDynView.h
   Views/voOneZoomDynView.h
   Views/voPCABarView.h

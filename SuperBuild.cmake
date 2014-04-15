@@ -110,12 +110,9 @@ ExternalProject_Add(${proj}
     -DCMAKE_CXX_FLAGS:STRING=${CMAKE_CXX_FLAGS}
     -DCMAKE_C_FLAGS:STRING=${CMAKE_C_FLAGS}
     -DCMAKE_BUILD_TYPE:STRING=${CMAKE_BUILD_TYPE}
-    #-DGIT_EXECUTABLE:FILEPATH=${GIT_EXECUTABLE} # Not used
     -DVisomics_SUPERBUILD:BOOL=OFF
     -DVisomics_C_FLAGS:STRING=${Visomics_C_FLAGS}
     -DVisomics_CXX_FLAGS:STRING=${Visomics_CXX_FLAGS}
-    -DVisomics_KEGG_SERVER_HOSTNAME=${Visomics_KEGG_SERVER_HOSTNAME}
-    -DVisomics_KEGG_SERVER_PORT=${Visomics_KEGG_SERVER_PORT}
     # QtPropertyBrowser
     -DQtPropertyBrowser_DIR:PATH=${QtPropertyBrowser_DIR}
     # QtTesting
@@ -124,11 +121,8 @@ ExternalProject_Add(${proj}
     -DVisomicsData_DIR:PATH=${VisomicsData_DIR}
     # VTK
     -DVTK_DIR:PATH=${VTK_DIR}
-    #-DVTK_DEBUG_LEAKS:BOOL=${Slicer_USE_VTK_DEBUG_LEAKS}
     # Qt
     -DQT_QMAKE_EXECUTABLE:PATH=${QT_QMAKE_EXECUTABLE}
-    # CTK
-    #-DCTK_DIR:PATH=${CTK_DIR}
   DOWNLOAD_COMMAND ""
   INSTALL_COMMAND ""
   DEPENDS

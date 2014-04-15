@@ -31,9 +31,6 @@
 #include "voHierarchicalClusteringDynView.h"
 #include "voExtendedTableView.h"
 #include "voHorizontalBarView.h"
-#include "voKEGGImageView.h"
-#include "voKEGGPathwayView.h"
-#include "voKEGGTableView.h"
 #include "voKMeansClusteringDynView.h"
 #include "voPCAProjectionDynView.h"
 #include "voPCAProjectionView.h"
@@ -66,9 +63,6 @@ voViewFactory::voViewFactory():d_ptr(new voViewFactoryPrivate)
   this->registerView<voHeatMapView>();
   this->registerView<voHierarchicalClusteringDynView>();
   this->registerView<voHorizontalBarView>();
-  this->registerView<voKEGGImageView>();
-  this->registerView<voKEGGPathwayView>();
-  this->registerView<voKEGGTableView>();
   this->registerView<voKMeansClusteringDynView>();
   this->registerView<voOneZoomDynView>();
   this->registerView<voPCABarView>();

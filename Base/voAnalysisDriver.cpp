@@ -75,29 +75,7 @@ voAnalysisDriver::voAnalysisDriver(QObject* newParent):
     Superclass(newParent), d_ptr(new voAnalysisDriverPrivate)
 {
   analysisNameToInputTypes.insert(
-    "ANOVA", QStringList() << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
-    "Cross Correlation", QStringList() << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
-    "Fold Change", QStringList() << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
-    "Geiger Tree Model Fitting", QStringList() << "vtkTree" << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
-    "Hierarchical Clustering", QStringList() << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
-    "KEGG Compounds", QStringList() << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
-    "KEGG Pathway", QStringList() << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
-    "KMeans Clustering", QStringList() << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
     "OneZoom Visualization", QStringList() << "vtkTree");
-  analysisNameToInputTypes.insert(
-    "PCA", QStringList() << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
-    "PLS", QStringList() << "vtkExtendedTable");
-  analysisNameToInputTypes.insert(
-    "T-Test", QStringList() << "vtkExtendedTable");
   analysisNameToInputTypes.insert(
     "Tree Drop Tip", QStringList() << "vtkTree");
   analysisNameToInputTypes.insert(

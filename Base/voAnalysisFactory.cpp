@@ -26,8 +26,6 @@
 #include "voAnalysisFactory.h"
 #include "voQObjectFactory.h"
 
-#include "voKEGGCompounds.h"
-#include "voKEGGPathway.h"
 #include "voOneZoom.h"
 #include "voTreeDropTip.h"
 #include "voTreeDropTipWithoutData.h"
@@ -55,13 +53,10 @@ public:
 //----------------------------------------------------------------------------
 voAnalysisFactory::voAnalysisFactory():d_ptr(new voAnalysisFactoryPrivate)
 {
-  this->registerAnalysis<voKEGGCompounds>("KEGG Compounds");
-  this->registerAnalysis<voKEGGPathway>("KEGG Pathway");
   this->registerAnalysis<voOneZoom>("OneZoom Visualization");
   this->registerAnalysis<voTreeDropTip>("Tree Drop Tip With Data");
   this->registerAnalysis<voTreeDropTipWithoutData>("Tree Drop Tip");
 }
-
 
 //-----------------------------------------------------------------------------
 voAnalysisFactory::~voAnalysisFactory()
