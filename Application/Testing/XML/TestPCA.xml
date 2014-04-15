@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<events>
+    <event widget="voMainWindow/DatasetsToolBar/1QToolButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow/voDelimitedTextImportDialog/ImportStepTabWidget/qt_tabwidget_stackedwidget/ImportTab/DelimitedTextImportWidget/RowsColumnsGroupBox/TransposeCheckBox" command="set_boolean" arguments="true"/>
+    <event widget="voMainWindow/voDelimitedTextImportDialog/buttonBox/1QPushButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow/menubar" command="activate" arguments="menuAnalysis"/>
+    <event widget="voMainWindow/menubar/menuAnalysis" command="activate" arguments="Principal Component Analysis"/>
+    <event widget="voMainWindow/voRemoteAnalysisConnectionDialog/buttonBox/1QPushButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow" command="pause" arguments="10000"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.8.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.8.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.7.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.7.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.6.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.6.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.5.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.5.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.4.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.4.0,0"/>
+    <event widget="voMainWindow/1voViewStackedWidget0/Principal Component Analysis 1 | Projection (Interactive Plot)/1QWebView0" command="mousePress" arguments="1,1,0,416,194"/>
+    <event widget="voMainWindow/1voViewStackedWidget0/Principal Component Analysis 1 | Projection (Interactive Plot)/1QWebView0" command="mouseRelease" arguments="1,0,0,416,194"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.3.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.3.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.2.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.2.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.1.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.1.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.0.0,0"/>
+    <event widget="voMainWindow/1voViewStackedWidget0/Principal Component Analysis 1 | Rotation (Table)/1QTableView0" command="mousePress" arguments="1,1,0,50,10,/0:1"/>
+    <event widget="voMainWindow/1voViewStackedWidget0/Principal Component Analysis 1 | Rotation (Table)/1QTableView0" command="mouseRelease" arguments="1,0,0,50,10,/0:1"/>
+</events>

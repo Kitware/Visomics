@@ -13,6 +13,7 @@ add_GUI_test(FOLD "11.0")
 add_GUI_test(GeigerFitContinuous "Success =  true")
 add_GUI_test(KMEANS "Success =  true")
 add_GUI_test(OneZoom "Success =  true")
+add_GUI_test(PCA "0.056")
 add_GUI_test(XCorrel "0.160")
 
 # built-in analyses
