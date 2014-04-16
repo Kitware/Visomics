@@ -32,7 +32,7 @@ for (row in rows) {
 input_table <- df[numeric_rows,]
 input_table <- input_table[sapply(input_table, function(x) all(!is.na(x)))]
 
-km<-kmeans(metabData, kmeans_centers, iter.max = kmeans_iter_max, nstart = kmeans_number_of_random_start, algorithm = "kmeans_algorithm")
+km<-kmeans(input_table, kmeans_centers, iter.max = kmeans_iter_max, nstart = kmeans_number_of_random_start, algorithm = "kmeans_algorithm")
 
 cluster <- data.frame(t(km$cluster))
 colnames(cluster) <- row_names
