@@ -1,0 +1,61 @@
+<analysis name="Partial Least Squares Regression">
+  <inputs>
+    <input name="input_table" type="Table" />
+  </inputs>
+  <outputs>
+    <output name="scores" type="Table">
+      <view type="voTableView"  name="Scores (Table)"/>
+    </output>
+    <output name="scores_transposed" type="Table">
+      <view type="voPCAProjectionView" name="Scores (Plot)"/>
+    </output>
+    <output name="yScores" type="Table">
+      <view type="voTableView"  name="Y-Scores (Table)"/>
+    </output>
+    <output name="yScores_transposed" type="Table">
+      <view type="voPCAProjectionView" name="Y-Scores (Plot)"/>
+    </output>
+    <output name="loadings" type="Table">
+      <view type="voTableView"  name="Loadings (Table)"/>
+      <view type="voPCAProjectionView" name="Loadings (Plot)"/>
+    </output>
+    <output name="loadingWeights" type="Table">
+      <view type="voTableView"  name="Loading Weights (Table)"/>
+      <view type="voPCAProjectionView" name="Loading Weights (Plot)"/>
+    </output>
+    <output name="yLoadings" type="Table">
+      <view type="voTableView"  name="Y-Loadings (Table)"/>
+      <view type="voPCAProjectionView" name="Y-Loadings (Plot)"/>
+    </output>
+  </outputs>
+  <parameters>
+    <parameter name="predictorGroup" type="Range">
+      <title>Predictor Group</title>
+      <description>
+        The independent variables.  Specify by a range and/or list of columns.
+      </description>
+      <default>1-3,6</default>
+      <table>input_table</table>
+    </parameter>
+    <parameter name="responseGroup" type="Range">
+      <title>Response Group</title>
+      <description>
+        The response variables.  Specify by a range and/or list of columns.
+      </description>
+      <default>4,5,7-10</default>
+      <table>input_table</table>
+    </parameter>
+    <parameter name="algorithm" type="Enum">
+      <title>Algorithm</title>
+      <description>
+        The multivariate regression method to use.
+        Choose from kernelpls (Kernel), widekernelpls (Wide Kernel),
+        simpls (SIMPLS) and oscorespls (Orthogonal Scores)
+      </description>
+      <option>kernelpls</option>
+      <option>widekernelpls</option>
+      <option>simpls</option>
+      <option>oscorespls</option>
+    </parameter>
+  </parameters>
+</analysis>

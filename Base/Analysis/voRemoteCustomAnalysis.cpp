@@ -212,14 +212,19 @@ int voRemoteCustomAnalysis::execute()
       QList<int> range;
 
       if (!voUtils::parseRangeString(this->stringParameter(name), range, true))
-        qDebug() << "Range error";
+        {
+        if (!voUtils::parseRangeString(this->stringParameter(name), range, false))
+          {
+          qDebug() << "Range error";
+          }
+        }
 
       QStringList list;
       foreach(int i, range)
         {
         list << QString::number(i+1);
         }
-       QString rangeString = list.join(",");
+      QString rangeString = list.join(",");
 
       parameterValue = QString("c(%1)").arg(rangeString);
       }
