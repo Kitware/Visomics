@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<events>
+    <event widget="voMainWindow/DatasetsToolBar/1QToolButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow/voDelimitedTextImportDialog/buttonBox/1QPushButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0"/>
+    <event widget="voMainWindow/menubar" command="activate" arguments="menuAnalysis"/>
+    <event widget="voMainWindow/menubar/menuAnalysis" command="activate" arguments="Partial Least Squares Regression"/>
+    <event widget="voMainWindow/1voAnalysisParameterDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow/voRemoteAnalysisConnectionDialog/buttonBox/1QPushButton0" command="activate" arguments=""/>
+    <event widget="voMainWindow" command="pause" arguments="10000"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0.0.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,9,40"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,10,104"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,10,104"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.9.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCheckState" arguments="0.0.0.0.9.0,0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.8.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.7.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.6.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.5.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.4.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.3.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.2.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.1.0"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget/qt_scrollarea_vcontainer/1QScrollBar0" command="mousePress" arguments="1,1,0,8,54"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseMove" arguments="1,0,0,10,10"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget/qt_scrollarea_vcontainer/1QScrollBar0" command="mouseRelease" arguments="1,0,0,10,10"/>
+    <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.0.0.0.0"/>
+    <event widget="voMainWindow/1voViewStackedWidget0/Partial Least Squares Regression 1 | Loading Weights (Table)/1QTableView0" command="mousePress" arguments="1,1,0,35,14,/0:1"/>
+    <event widget="voMainWindow/1voViewStackedWidget0/Partial Least Squares Regression 1 | Loading Weights (Table)/1QTableView0" command="mouseRelease" arguments="1,0,0,35,14,/0:1"/>
+</events>
