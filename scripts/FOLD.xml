@@ -22,17 +22,17 @@
     <parameter name="sample1_range" type="Range">
       <title>Initial Samples(s)</title>
       <description>
-        A group of Experiments, specified by a range and/or list of columns.
+        A group of Experiments, specified by a range and/or list of rows.
       </description>
-      <default>A-C,F</default>
+      <default>1-3,6</default>
       <table>input_table</table>
     </parameter>
     <parameter name="sample2_range" type="Range">
      <title>Final Samples(s)</title>
       <description>
-        A group of Experiments, specified by a range and/or list of columns.
+        A group of Experiments, specified by a range and/or list of rows.
       </description>
-      <default>D,E,G-J</default>
+      <default>4,5,7-10</default>
       <table>input_table</table>
     </parameter>
   </parameters>

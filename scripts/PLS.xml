@@ -34,7 +34,7 @@
       <description>
         The independent variables.  Specify by a range and/or list of columns.
       </description>
-      <default>1-3,6</default>
+      <default>A-C,F</default>
       <table>input_table</table>
     </parameter>
     <parameter name="responseGroup" type="Range">
@@ -42,7 +42,7 @@
       <description>
         The response variables.  Specify by a range and/or list of columns.
       </description>
-      <default>4,5,7-10</default>
+      <default>D,E,G-J</default>
       <table>input_table</table>
     </parameter>
     <parameter name="algorithm" type="Enum">

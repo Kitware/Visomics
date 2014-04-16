@@ -585,7 +585,8 @@ void voMainWindow::loadSampleTable()
     file = QString(VISOMICS_DATA_DIR) + "/Data/sample/visomics-sample_liver.csv";
     }
   voDelimitedTextImportSettings defaultSettings;
-  defaultSettings.insert(voDelimitedTextImportSettings::NumberOfColumnMetaDataTypes, 3);
+  defaultSettings.insert(voDelimitedTextImportSettings::NumberOfRowMetaDataTypes, 3);
+  defaultSettings.insert(voDelimitedTextImportSettings::Transpose, true);
   voDelimitedTextImportDialog dialog(this, defaultSettings);
   dialog.setFileName(file);
   int status = dialog.exec();

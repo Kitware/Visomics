@@ -1,86 +1,39 @@
-# Order the data
-ind <- order(input_table[[1]])
+# get size of input data
+rows <- 1:length(input_table[[1]])
+cols <- 1:length(input_table)
 
-for(i in 1:length(input_table)) {
-  input_table[[i]] = input_table[[i]][ind]
-} 
+# get row names too (assumed to be first column)
+row_names <- input_table[[1]]
 
-toMatrix <- function(columnList) {
-  sample <- matrix(nrow=length(columnList[[1]]), ncol=0)
-  for(i in 2:length(columnList)) {
-    
-    # Replace an columns contain characters with zeros
-    if (typeof(columnList[[i]]) == 'character') {
-      sample <- cbind(sample, c(rep(0, length(columnList[[i]]))))
+# convert data to numeric if it isn't already
+for (col in cols) {
+    input_table[[col]] <- suppressWarnings(as.numeric(input_table[[col]]))
+}
+
+# convert to data frame format
+df <- data.frame(input_table)
+
+# detect rows that consist solely of non-numeric data
+numeric_rows <- integer(0)
+for (row in rows) {
+    keep_this_row <- FALSE
+    for (col in cols) {
+        if (!is.na(df[row,col])) {
+            keep_this_row <- TRUE
+            break
+        }
     }
-    else {
-      sample <- cbind(sample,  columnList[[i]])
+    if (keep_this_row) {
+        numeric_rows <- append(numeric_rows, row)
     }
-  }
-
-  return(sample)
 }
 
-metabData <- toMatrix(input_table)
+# strip out any non-numerical elements
+input_table <- df[numeric_rows,]
+input_table <- input_table[sapply(input_table, function(x) all(!is.na(x)))]
 
-metabDatat <- t(metabData)
-km<-kmeans(metabDatat, kmeans_centers, iter.max = kmeans_iter_max, nstart = kmeans_number_of_random_start, algorithm = "kmeans_algorithm")
-kmCenters<-km$centers 
-kmCluster<-km$cluster
-kmWithinss<-km$withinss
-kmSize<-km$size
+km<-kmeans(metabData, kmeans_centers, iter.max = kmeans_iter_max, nstart = kmeans_number_of_random_start, algorithm = "kmeans_algorithm")
 
-collectColumnIds <- function(columnList, clusterId) {
-
-  ids = numeric(0)
-  for(i in 1:length(columnList)) {
-    column = columnList[i]
-    if (column[[1]] == clusterId ) {
-      ids <- c(ids, i)
-    }
-  }
-
-  return(ids)
-}
-
-swapClusterIds <- function(columnList, columnIds1, value1, columnIds2, value2) {
-  for(i in columnIds1) {
-    columnList[i][[1]] = value2
-  }
-
-  for(i in columnIds2) {
-    columnList[i][[1]] = value1
-  }
-  return(columnList)
-}
-
-
-renumber <- function(columnList) {
-  processedClusterIds <- numeric(0)
-  futureClusterId <- 1
-  for(i in 1:length(columnList)) {
-    column = columnList[i]
-    currentClusterId = column[[1]]
-
-    if (currentClusterId %in% processedClusterIds )
-      next
-
-    rightColumnIds <- collectColumnIds(columnList, currentClusterId)
-    leftColumnIds <- collectColumnIds(columnList, futureClusterId)
-    columnList <- swapClusterIds(columnList, rightColumnIds, currentClusterId, leftColumnIds, futureClusterId)
-    processedClusterIds <- c(processedClusterIds, currentClusterId)
-    futureClusterId <- futureClusterId + 1
-  }
-
-  return(columnList)
-}
-
-cluster <- list()
-clusterNames <- names(input_table)
-for (i in 1:length(kmCluster)) {
-  name <- paste(rawToChar(as.raw(64+i)), clusterNames[i+1], sep=":")
-  cluster[name] <- kmCluster[i]
-}
-
-cluster <- renumber(cluster)
-cluster <- c("Cluster number", renumber(cluster))
+cluster <- data.frame(t(km$cluster))
+colnames(cluster) <- row_names
+rownames(cluster) <- "Cluster number"
