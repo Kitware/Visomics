@@ -233,7 +233,19 @@ voDataModelItem* voDataModel::addOutput(voDataObject * newDataObject, QStandardI
     QString uniqueText = this->generateUniqueName(rawViewPrettyName);
     newItem->setText(uniqueText);
     }
-  newItem->setRawViewType(rawViewType);
+
+  // change icon if this is not a typical "raw data" view
+  if (rawViewType != "voExtendedTableView" && rawViewType != "voTableView" &&
+      rawViewType != "voTreeHeatmapView")
+    {
+    newItem->setType(voDataModelItem::ViewType);
+    newItem->setViewType(rawViewType);
+    }
+  else
+    {
+    newItem->setRawViewType(rawViewType);
+    }
+
   return newItem;
 }
 
