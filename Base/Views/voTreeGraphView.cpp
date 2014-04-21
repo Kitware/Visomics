@@ -90,7 +90,7 @@ void voTreeGraphView::setupUi(QLayout *layout)
   d->GraphView->SetLayoutStrategy( treeLayout );
   d->GraphView->VertexLabelVisibilityOn();
   d->GraphView->ColorVerticesOn();
-  d->GraphView->SetVertexLabelArrayName("id");
+  d->GraphView->SetVertexLabelArrayName("node name");
 
   layout->addWidget(d->Widget);
 }

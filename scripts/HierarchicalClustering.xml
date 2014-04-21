@@ -1,0 +1,23 @@
+<analysis name="Hierarchical Clustering">
+  <inputs>
+    <input name="input_table" type="Table"/>
+  </inputs>
+  <outputs>
+    <output name="output_tree" type="Tree">
+      <view type="voTreeGraphView" name="Clusters (Tree)"/>
+    </output>
+  </outputs>
+  <parameters>
+    <parameter name="agglomerationMethod" type="Enum">
+      <title>Method</title>
+      <description>
+        The agglomeration method to be used.
+      </description>
+      <option>complete</option>
+      <option>average</option>
+      <option>mcquitty</option>
+      <option>median</option>
+      <option>centroid</option>
+    </parameter>
+  </parameters>
+</analysis>
