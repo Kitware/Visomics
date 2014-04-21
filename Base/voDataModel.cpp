@@ -351,8 +351,7 @@ bool voDataModel::removeObject(voDataModelItem *objectToRemove,
           // if we just removed the parent's last row, we should get rid of the
           // parent too.
           if (this->rowCount(parent->index()) == 0 &&
-               (parent->parent() == NULL ||
-                parent->parent() == this->invisibleRootItem()))
+              parent->type() == voDataModelItem::ContainerType)
             {
             this->removeObject(parentItem, parent->parent());
             }
