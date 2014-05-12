@@ -7,7 +7,7 @@
     <event widget="voMainWindow/1voAnalysisParameterDialog0/1QtGroupBoxPropertyBrowser0/1QGroupBox0/1QComboBox0" command="set_string" arguments="EB"/>
     <event widget="voMainWindow/1voAnalysisParameterDialog0/1QDialogButtonBox0/1QPushButton0" command="activate" arguments=""/>
     <event widget="voMainWindow/voRemoteAnalysisConnectionDialog/buttonBox/1QPushButton0" command="activate" arguments=""/>
-    <event widget="voMainWindow" command="pause" arguments="30000"/>
+    <event widget="voMainWindow" command="pause" arguments="5000"/>
     <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0"/>
     <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="setCurrent" arguments="0.0.2.0"/>
     <event widget="voMainWindow/DataBrowserDockWidget/DataBrowserDockWidgetContents/DataBrowserWidget" command="expand" arguments="0.0.2.0"/>
